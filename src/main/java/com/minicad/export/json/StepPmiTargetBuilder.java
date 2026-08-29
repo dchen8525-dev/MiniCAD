@@ -3205,13 +3205,18 @@ public final class StepPmiTargetBuilder {
             Map<Integer, StepEntity> resolved,
             Set<Integer> visiting
     ) {
+        return collectTargetsReferencingEntity(referencedId, resolved, visiting, new PmiEntityIndex(resolved));
+    }
+
+    private static Set<StepEntity> collectTargetsReferencingEntity(
+            int referencedId,
+            Map<Integer, StepEntity> resolved,
+            Set<Integer> visiting,
+            PmiEntityIndex index
+    ) {
         Set<StepEntity> targets = new LinkedHashSet<>();
-        for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPropertyDefinition
-                    && ((StepPropertyDefinition) candidate).definition().id() == referencedId) {
-                StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) candidate;
-                targets.addAll(collectSemanticTargets(propertyDefinition, resolved, visiting));
-            }
+        for (StepPropertyDefinition propertyDefinition : index.propertyDefinitionsReferencing(referencedId)) {
+            targets.addAll(collectSemanticTargets(propertyDefinition, resolved, visiting, index));
         }
         return Set.copyOf(targets);
     }
@@ -4223,6 +4228,15 @@ public final class StepPmiTargetBuilder {
             Map<Integer, StepEntity> resolved,
             Set<Integer> visiting
     ) {
+        return collectSemanticTargets(entity, resolved, visiting, new PmiEntityIndex(resolved));
+    }
+
+    private static Set<StepEntity> collectSemanticTargets(
+            StepEntity entity,
+            Map<Integer, StepEntity> resolved,
+            Set<Integer> visiting,
+            PmiEntityIndex index
+    ) {
         if (entity == null || !visiting.add(entity.id())) {
             return Set.of();
         }
@@ -4265,8 +4279,8 @@ public final class StepPmiTargetBuilder {
         }
         if (entity instanceof StepPropertyDefinition) {
             StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) entity;
-            targets.addAll(collectSemanticTargets(propertyDefinition.definition(), resolved, visiting));
-            for (StepEntity candidate : resolved.values()) {
+            targets.addAll(collectSemanticTargets(propertyDefinition.definition(), resolved, visiting, index));
+            for (StepEntity candidate : index.propertyDefinitionLinks()) {
                 if (candidate instanceof StepPropertyDefinitionRepresentation
                     && ((StepPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
                 StepPropertyDefinitionRepresentation representationLink = (StepPropertyDefinitionRepresentation) candidate;
@@ -4314,744 +4328,744 @@ public final class StepPmiTargetBuilder {
             } else if (candidate instanceof StepPropertyDefinitionRelationship) {
                 StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) candidate;
                 if (relationship.relatingPropertyDefinition().id() == propertyDefinition.id()) {
-                    targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting, index));
                 }
                 if (relationship.relatedPropertyDefinition().id() == propertyDefinition.id()) {
-                    targets.addAll(collectSemanticTargets(relationship.relatingPropertyDefinition(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(relationship.relatingPropertyDefinition(), resolved, visiting, index));
                 }
             }
         }
     } else if (entity instanceof StepDescriptiveRepresentationItem) {
             StepDescriptiveRepresentationItem item = (StepDescriptiveRepresentationItem) entity;
-            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting, index));
         } else if (entity instanceof StepValueRepresentationItem) {
             StepValueRepresentationItem item = (StepValueRepresentationItem) entity;
-            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting, index));
         } else if (entity instanceof StepMeasureRepresentationItem) {
             StepMeasureRepresentationItem item = (StepMeasureRepresentationItem) entity;
-            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(item.unit(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(item.unit(), resolved, visiting, index));
         } else if (entity instanceof StepMeasureWithUnit) {
             StepMeasureWithUnit measure = (StepMeasureWithUnit) entity;
-            targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting, index));
         } else if (entity instanceof StepTypedMeasureWithUnit) {
             StepTypedMeasureWithUnit measure = (StepTypedMeasureWithUnit) entity;
-            targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting, index));
         } else if (entity instanceof StepUncertaintyMeasureWithUnit) {
             StepUncertaintyMeasureWithUnit measure = (StepUncertaintyMeasureWithUnit) entity;
-            targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(measure.unitComponent(), resolved, visiting, index));
             targets.addAll(collectTargetsForAssignedUncertainty(measure.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(measure.id(), resolved, visiting, index));
         } else if (entity instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) entity;
-            targets.addAll(collectTargetsReferencingEntity(point.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(point.id(), resolved, visiting, index));
         } else if (entity instanceof StepDirection) {
             StepDirection direction = (StepDirection) entity;
-            targets.addAll(collectTargetsReferencingEntity(direction.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(direction.id(), resolved, visiting, index));
         } else if (entity instanceof StepVector) {
             StepVector vector = (StepVector) entity;
-            targets.addAll(collectSemanticTargets(vector.orientation(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(vector.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(vector.orientation(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(vector.id(), resolved, visiting, index));
         } else if (entity instanceof StepAxis1Placement) {
             StepAxis1Placement placement = (StepAxis1Placement) entity;
-            targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(placement.axis(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(placement.axis(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting, index));
         } else if (entity instanceof StepAxis2Placement2D) {
             StepAxis2Placement2D placement = (StepAxis2Placement2D) entity;
-            targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting, index));
             if (placement.refDirection() != null) {
-                targets.addAll(collectSemanticTargets(placement.refDirection(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(placement.refDirection(), resolved, visiting, index));
             }
-            targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting, index));
         } else if (entity instanceof StepAxis2Placement3D) {
             StepAxis2Placement3D placement = (StepAxis2Placement3D) entity;
-            targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(placement.location(), resolved, visiting, index));
             if (placement.axis() != null) {
-                targets.addAll(collectSemanticTargets(placement.axis(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(placement.axis(), resolved, visiting, index));
             }
             if (placement.refDirection() != null) {
-                targets.addAll(collectSemanticTargets(placement.refDirection(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(placement.refDirection(), resolved, visiting, index));
             }
-            targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(placement.id(), resolved, visiting, index));
         } else if (entity instanceof StepAddress) {
             StepAddress address = (StepAddress) entity;
-            targets.addAll(collectTargetsReferencingEntity(address.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(address.id(), resolved, visiting, index));
         } else if (entity instanceof StepCharacterizedObject) {
             StepCharacterizedObject characterizedObject = (StepCharacterizedObject) entity;
-            targets.addAll(collectTargetsReferencingEntity(characterizedObject.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(characterizedObject.id(), resolved, visiting, index));
         } else if (entity instanceof StepPoint) {
             StepPoint point = (StepPoint) entity;
-            targets.addAll(collectTargetsReferencingEntity(point.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(point.id(), resolved, visiting, index));
         } else if (entity instanceof StepPointSet) {
             StepPointSet pointSet = (StepPointSet) entity;
-            targets.addAll(collectSemanticTargets(pointSet.points(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(pointSet.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(pointSet.points(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(pointSet.id(), resolved, visiting, index));
         } else if (entity instanceof StepPolyline) {
             StepPolyline polyline = (StepPolyline) entity;
-            targets.addAll(collectSemanticTargets(polyline.points(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(polyline.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(polyline.points(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(polyline.id(), resolved, visiting, index));
         } else if (entity instanceof StepProfileDef) {
             StepProfileDef profile = (StepProfileDef) entity;
             if (profile.position() != null) {
-                targets.addAll(collectSemanticTargets(profile.position(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(profile.position(), resolved, visiting, index));
             }
-            targets.addAll(collectSemanticTargets(profile.curves(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(profile.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(profile.curves(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(profile.id(), resolved, visiting, index));
         } else if (entity instanceof StepLine) {
             StepLine line = (StepLine) entity;
-            targets.addAll(collectSemanticTargets(line.point(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(line.vector(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(line.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(line.point(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(line.vector(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(line.id(), resolved, visiting, index));
         } else if (entity instanceof StepCircle) {
             StepCircle circle = (StepCircle) entity;
-            targets.addAll(collectSemanticTargets(circle.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(circle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(circle.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(circle.id(), resolved, visiting, index));
         } else if (entity instanceof StepEllipse) {
             StepEllipse ellipse = (StepEllipse) entity;
-            targets.addAll(collectSemanticTargets(ellipse.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(ellipse.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(ellipse.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(ellipse.id(), resolved, visiting, index));
         } else if (entity instanceof StepCurve) {
             StepCurve curve = (StepCurve) entity;
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepBoundedCurve) {
             StepBoundedCurve curve = (StepBoundedCurve) entity;
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepConicCurve) {
             StepConicCurve curve = (StepConicCurve) entity;
-            targets.addAll(collectSemanticTargets(curve.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepBSplineCurve) {
             StepBSplineCurve curve = (StepBSplineCurve) entity;
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepBezierCurve) {
             StepBezierCurve curve = (StepBezierCurve) entity;
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepBSplineCurveWithKnots) {
             StepBSplineCurveWithKnots curve = (StepBSplineCurveWithKnots) entity;
-            targets.addAll(collectSemanticTargets(curve.controlPoints(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.controlPoints(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepRationalBSplineCurve) {
             StepRationalBSplineCurve curve = (StepRationalBSplineCurve) entity;
-            targets.addAll(collectSemanticTargets(curve.controlPoints(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.controlPoints(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepPiecewiseBezierCurve) {
             StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) entity;
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepUniformCurve) {
             StepUniformCurve curve = (StepUniformCurve) entity;
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepQuasiUniformCurve) {
             StepQuasiUniformCurve curve = (StepQuasiUniformCurve) entity;
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepOffsetCurve2D) {
             StepOffsetCurve2D curve = (StepOffsetCurve2D) entity;
-            targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepOffsetCurve3D) {
             StepOffsetCurve3D curve = (StepOffsetCurve3D) entity;
-            targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curve.refDirection(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(curve.refDirection(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepOrientedCurve) {
             StepOrientedCurve curve = (StepOrientedCurve) entity;
-            targets.addAll(collectSemanticTargets(curve.curveElement(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.curveElement(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepTrimmedCurve) {
             StepTrimmedCurve curve = (StepTrimmedCurve) entity;
-            targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.basisCurve(), resolved, visiting, index));
             for (StepValue trim : curve.trim1()) {
                 if (trim instanceof StepValue.ReferenceValue && resolved.containsKey(((StepValue.ReferenceValue) trim).id())) {
                     StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
-                    targets.addAll(collectSemanticTargets(resolved.get(ref.id()), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(resolved.get(ref.id()), resolved, visiting, index));
                 }
             }
             for (StepValue trim : curve.trim2()) {
                 if (trim instanceof StepValue.ReferenceValue && resolved.containsKey(((StepValue.ReferenceValue) trim).id())) {
                     StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
-                    targets.addAll(collectSemanticTargets(resolved.get(ref.id()), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(resolved.get(ref.id()), resolved, visiting, index));
                 }
             }
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceCurve) {
             StepSurfaceCurve curve = (StepSurfaceCurve) entity;
-            targets.addAll(collectSemanticTargets(curve.curve3d(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curve.associatedGeometry(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.curve3d(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(curve.associatedGeometry(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepSeamCurve) {
             StepSeamCurve curve = (StepSeamCurve) entity;
-            targets.addAll(collectSemanticTargets(curve.curve3d(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curve.associatedGeometry(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.curve3d(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(curve.associatedGeometry(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepPcurve) {
             StepPcurve curve = (StepPcurve) entity;
-            targets.addAll(collectSemanticTargets(curve.basisSurface(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curve.referenceToCurve(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.basisSurface(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(curve.referenceToCurve(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepCompositeCurve) {
             StepCompositeCurve curve = (StepCompositeCurve) entity;
-            targets.addAll(collectSemanticTargets(curve.segments(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.segments(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepCompositeCurveOnSurface) {
             StepCompositeCurveOnSurface curve = (StepCompositeCurveOnSurface) entity;
-            targets.addAll(collectSemanticTargets(curve.segments(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.segments(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepCompositeCurveSegment) {
             StepCompositeCurveSegment segment = (StepCompositeCurveSegment) entity;
-            targets.addAll(collectSemanticTargets(segment.parentCurve(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(segment.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(segment.parentCurve(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(segment.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurface) {
             StepSurface surface = (StepSurface) entity;
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepBoundedSurface) {
             StepBoundedSurface surface = (StepBoundedSurface) entity;
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepBSplineSurface) {
             StepBSplineSurface surface = (StepBSplineSurface) entity;
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepBezierSurface) {
             StepBezierSurface surface = (StepBezierSurface) entity;
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepBSplineSurfaceWithKnots) {
             StepBSplineSurfaceWithKnots surface = (StepBSplineSurfaceWithKnots) entity;
             targets.addAll(collectSemanticTargets(surface.controlPoints().stream().flatMap(List::stream).collect(Collectors.toList()),
-                    resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+                    resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepRationalBSplineSurface) {
             StepRationalBSplineSurface surface = (StepRationalBSplineSurface) entity;
             targets.addAll(collectSemanticTargets(surface.controlPoints().stream().flatMap(List::stream).collect(Collectors.toList()),
-                    resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+                    resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepPiecewiseBezierSurface) {
             StepPiecewiseBezierSurface surface = (StepPiecewiseBezierSurface) entity;
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepUniformSurface) {
             StepUniformSurface surface = (StepUniformSurface) entity;
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepQuasiUniformSurface) {
             StepQuasiUniformSurface surface = (StepQuasiUniformSurface) entity;
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepPlane) {
             StepPlane plane = (StepPlane) entity;
-            targets.addAll(collectSemanticTargets(plane.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(plane.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(plane.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(plane.id(), resolved, visiting, index));
         } else if (entity instanceof StepCylindricalSurface) {
             StepCylindricalSurface surface = (StepCylindricalSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepConicalSurface) {
             StepConicalSurface surface = (StepConicalSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepToroidalSurface) {
             StepToroidalSurface surface = (StepToroidalSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceOfLinearExtrusion) {
             StepSurfaceOfLinearExtrusion surface = (StepSurfaceOfLinearExtrusion) entity;
-            targets.addAll(collectSemanticTargets(surface.sweptCurve(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(surface.extrusionAxis(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.sweptCurve(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(surface.extrusionAxis(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceOfRevolution) {
             StepSurfaceOfRevolution surface = (StepSurfaceOfRevolution) entity;
-            targets.addAll(collectSemanticTargets(surface.sweptCurve(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(surface.axisPosition(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.sweptCurve(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(surface.axisPosition(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepRectangularTrimmedSurface) {
             StepRectangularTrimmedSurface surface = (StepRectangularTrimmedSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepCurveBoundedSurface) {
             StepCurveBoundedSurface surface = (StepCurveBoundedSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(surface.boundaries(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(surface.boundaries(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepOrientedSurface) {
             StepOrientedSurface surface = (StepOrientedSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.surfaceElement(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.surfaceElement(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepOffsetSurface) {
             StepOffsetSurface surface = (StepOffsetSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.basisSurface(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepSphericalSurface) {
             StepSphericalSurface surface = (StepSphericalSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepDegenerateToroidalSurface) {
             StepDegenerateToroidalSurface surface = (StepDegenerateToroidalSurface) entity;
-            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(surface.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(surface.id(), resolved, visiting, index));
         } else if (entity instanceof StepShellBasedSurfaceModel) {
             StepShellBasedSurfaceModel model = (StepShellBasedSurfaceModel) entity;
-            targets.addAll(collectSemanticTargets(model.shells(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(model.shells(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting, index));
         } else if (entity instanceof StepFaceBasedSurfaceModel) {
             StepFaceBasedSurfaceModel model = (StepFaceBasedSurfaceModel) entity;
-            targets.addAll(collectSemanticTargets(model.faceSets(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(model.faceSets(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceModel) {
             StepSurfaceModel model = (StepSurfaceModel) entity;
-            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting, index));
         } else if (entity instanceof StepSolidModel) {
             StepSolidModel model = (StepSolidModel) entity;
-            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting, index));
         } else if (entity instanceof StepGeometricCurveSet) {
             StepGeometricCurveSet set = (StepGeometricCurveSet) entity;
-            targets.addAll(collectSemanticTargets(set.elements(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(set.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(set.elements(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(set.id(), resolved, visiting, index));
         } else if (entity instanceof StepGeometricSet) {
             StepGeometricSet set = (StepGeometricSet) entity;
-            targets.addAll(collectSemanticTargets(set.elements(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(set.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(set.elements(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(set.id(), resolved, visiting, index));
         } else if (entity instanceof StepBoxDomain) {
             StepBoxDomain boxDomain = (StepBoxDomain) entity;
-            targets.addAll(collectSemanticTargets(boxDomain.corner(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(boxDomain.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(boxDomain.corner(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(boxDomain.id(), resolved, visiting, index));
         } else if (entity instanceof StepDimensionalExponents) {
             StepDimensionalExponents exponents = (StepDimensionalExponents) entity;
-            targets.addAll(collectTargetsReferencingEntity(exponents.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(exponents.id(), resolved, visiting, index));
         } else if (entity instanceof StepDegeneratePcurve) {
             StepDegeneratePcurve curve = (StepDegeneratePcurve) entity;
-            targets.addAll(collectSemanticTargets(curve.basisSurface(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curve.referenceToCurve(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curve.basisSurface(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(curve.referenceToCurve(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curve.id(), resolved, visiting, index));
         } else if (entity instanceof StepHalfSpaceSolid) {
             StepHalfSpaceSolid halfSpaceSolid = (StepHalfSpaceSolid) entity;
-            targets.addAll(collectSemanticTargets(halfSpaceSolid.baseSurface(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(halfSpaceSolid.baseSurface(), resolved, visiting, index));
             if (halfSpaceSolid.enclosure() != null) {
-                targets.addAll(collectSemanticTargets(halfSpaceSolid.enclosure(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(halfSpaceSolid.enclosure(), resolved, visiting, index));
             }
-            targets.addAll(collectTargetsReferencingEntity(halfSpaceSolid.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(halfSpaceSolid.id(), resolved, visiting, index));
         } else if (entity instanceof StepVertex) {
             StepVertex vertex = (StepVertex) entity;
-            targets.addAll(collectTargetsReferencingEntity(vertex.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(vertex.id(), resolved, visiting, index));
         } else if (entity instanceof StepVertexPoint) {
             StepVertexPoint vertexPoint = (StepVertexPoint) entity;
-            targets.addAll(collectSemanticTargets(vertexPoint.point(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(vertexPoint.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(vertexPoint.point(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(vertexPoint.id(), resolved, visiting, index));
         } else if (entity instanceof StepEdge) {
             StepEdge edge = (StepEdge) entity;
-            targets.addAll(collectTargetsReferencingEntity(edge.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(edge.id(), resolved, visiting, index));
         } else if (entity instanceof StepConnectedEdgeSet) {
             StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) entity;
-            targets.addAll(collectSemanticTargets(edgeSet.edges(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(edgeSet.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(edgeSet.edges(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(edgeSet.id(), resolved, visiting, index));
         } else if (entity instanceof StepEdgeBasedWireframeModel) {
             StepEdgeBasedWireframeModel model = (StepEdgeBasedWireframeModel) entity;
-            targets.addAll(collectSemanticTargets(model.boundaries(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(model.boundaries(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting, index));
         } else if (entity instanceof StepPolyLoop) {
             StepPolyLoop loop = (StepPolyLoop) entity;
-            targets.addAll(collectSemanticTargets(loop.polygon(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(loop.polygon(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting, index));
         } else if (entity instanceof StepLoop) {
             StepLoop loop = (StepLoop) entity;
-            targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting, index));
         } else if (entity instanceof StepEdgeLoop) {
             StepEdgeLoop loop = (StepEdgeLoop) entity;
-            targets.addAll(collectSemanticTargets(loop.edges(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(loop.edges(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting, index));
         } else if (entity instanceof StepVertexLoop) {
             StepVertexLoop loop = (StepVertexLoop) entity;
-            targets.addAll(collectSemanticTargets(loop.loopVertex(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(loop.loopVertex(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(loop.id(), resolved, visiting, index));
         } else if (entity instanceof com.minicad.step.model.StepFaceBound) {
             com.minicad.step.model.StepFaceBound faceBound = (com.minicad.step.model.StepFaceBound) entity;
-            targets.addAll(collectSemanticTargets(faceBound.loop(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(faceBound.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(faceBound.loop(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(faceBound.id(), resolved, visiting, index));
         } else if (entity instanceof StepFace) {
             StepFace face = (StepFace) entity;
-            targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting, index));
         } else if (entity instanceof StepAdvancedFace) {
             StepAdvancedFace face = (StepAdvancedFace) entity;
-            targets.addAll(collectSemanticTargets(face.bounds(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(face.faceGeometry(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(face.bounds(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(face.faceGeometry(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting, index));
         } else if (entity instanceof StepFaceSurface) {
             StepFaceSurface face = (StepFaceSurface) entity;
-            targets.addAll(collectSemanticTargets(face.bounds(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(face.faceGeometry(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(face.bounds(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(face.faceGeometry(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting, index));
         } else if (entity instanceof StepOpenShell) {
             StepOpenShell shell = (StepOpenShell) entity;
-            targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfacedOpenShell) {
             StepSurfacedOpenShell shell = (StepSurfacedOpenShell) entity;
-            targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting, index));
         } else if (entity instanceof StepOrientedOpenShell) {
             StepOrientedOpenShell shell = (StepOrientedOpenShell) entity;
-            targets.addAll(collectSemanticTargets(shell.openShellElement(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(shell.openShellElement(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting, index));
         } else if (entity instanceof StepClosedShell) {
             StepClosedShell shell = (StepClosedShell) entity;
-            targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(shell.faces(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting, index));
         } else if (entity instanceof StepOrientedClosedShell) {
             StepOrientedClosedShell shell = (StepOrientedClosedShell) entity;
-            targets.addAll(collectSemanticTargets(shell.closedShellElement(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(shell.closedShellElement(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(shell.id(), resolved, visiting, index));
         } else if (entity instanceof StepConnectedFaceSet) {
             StepConnectedFaceSet faceSet = (StepConnectedFaceSet) entity;
-            targets.addAll(collectSemanticTargets(faceSet.faces(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(faceSet.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(faceSet.faces(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(faceSet.id(), resolved, visiting, index));
         } else if (entity instanceof StepConnectedFaceSubSet) {
             StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) entity;
-            targets.addAll(collectSemanticTargets(faceSet.faces(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(faceSet.parentFaceSet(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(faceSet.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(faceSet.faces(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(faceSet.parentFaceSet(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(faceSet.id(), resolved, visiting, index));
         } else if (entity instanceof StepOrientedEdge) {
             StepOrientedEdge edge = (StepOrientedEdge) entity;
-            targets.addAll(collectSemanticTargets(edge.edgeElement(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(edge.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(edge.edgeElement(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(edge.id(), resolved, visiting, index));
         } else if (entity instanceof StepOrientedFace) {
             StepOrientedFace face = (StepOrientedFace) entity;
-            targets.addAll(collectSemanticTargets(face.faceElement(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(face.faceElement(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(face.id(), resolved, visiting, index));
         } else if (entity instanceof StepPath) {
             StepPath path = (StepPath) entity;
-            targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting, index));
         } else if (entity instanceof StepOpenPath) {
             StepOpenPath path = (StepOpenPath) entity;
-            targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting, index));
         } else if (entity instanceof StepSubpath) {
             StepSubpath subpath = (StepSubpath) entity;
-            targets.addAll(collectSemanticTargets(subpath.edges(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(subpath.parentPath(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(subpath.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(subpath.edges(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(subpath.parentPath(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(subpath.id(), resolved, visiting, index));
         } else if (entity instanceof StepOrientedPath) {
             StepOrientedPath path = (StepOrientedPath) entity;
-            targets.addAll(collectSemanticTargets(path.pathElement(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(path.pathElement(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(path.edges(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(path.id(), resolved, visiting, index));
         } else if (entity instanceof StepWireShell) {
             StepWireShell wireShell = (StepWireShell) entity;
-            targets.addAll(collectSemanticTargets(wireShell.loops(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(wireShell.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(wireShell.loops(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(wireShell.id(), resolved, visiting, index));
         } else if (entity instanceof StepVertexShell) {
             StepVertexShell vertexShell = (StepVertexShell) entity;
-            targets.addAll(collectSemanticTargets(vertexShell.extent(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(vertexShell.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(vertexShell.extent(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(vertexShell.id(), resolved, visiting, index));
         } else if (entity instanceof StepShellBasedWireframeModel) {
             StepShellBasedWireframeModel model = (StepShellBasedWireframeModel) entity;
-            targets.addAll(collectSemanticTargets(model.boundaries(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(model.boundaries(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(model.id(), resolved, visiting, index));
         } else if (entity instanceof StepSubedge) {
             StepSubedge subedge = (StepSubedge) entity;
-            targets.addAll(collectSemanticTargets(subedge.start(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(subedge.end(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(subedge.parentEdge(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(subedge.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(subedge.start(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(subedge.end(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(subedge.parentEdge(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(subedge.id(), resolved, visiting, index));
         } else if (entity instanceof StepCartesianTransformationOperator) {
             StepCartesianTransformationOperator transformation = (StepCartesianTransformationOperator) entity;
             if (transformation.axis1() != null) {
-                targets.addAll(collectSemanticTargets(transformation.axis1(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(transformation.axis1(), resolved, visiting, index));
             }
             if (transformation.axis2() != null) {
-                targets.addAll(collectSemanticTargets(transformation.axis2(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(transformation.axis2(), resolved, visiting, index));
             }
             if (transformation.axis3() != null) {
-                targets.addAll(collectSemanticTargets(transformation.axis3(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(transformation.axis3(), resolved, visiting, index));
             }
-            targets.addAll(collectSemanticTargets(transformation.localOrigin(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(transformation.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(transformation.localOrigin(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(transformation.id(), resolved, visiting, index));
         } else if (entity instanceof StepGeometricReplica) {
             StepGeometricReplica replica = (StepGeometricReplica) entity;
-            targets.addAll(collectSemanticTargets(replica.parent(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(replica.transformation(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(replica.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(replica.parent(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(replica.transformation(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(replica.id(), resolved, visiting, index));
         } else if (entity instanceof StepSweptAreaSolid) {
             StepSweptAreaSolid solid = (StepSweptAreaSolid) entity;
-            targets.addAll(collectSemanticTargets(solid.sweptArea(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(solid.position(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(solid.sweepReference(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(solid.sweptArea(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(solid.position(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(solid.sweepReference(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting, index));
         } else if (entity instanceof StepSweptDiskSolid) {
             StepSweptDiskSolid solid = (StepSweptDiskSolid) entity;
-            targets.addAll(collectSemanticTargets(solid.sweptCurve(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(solid.sweptCurve(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting, index));
         } else if (entity instanceof StepComplexClippingResult) {
             StepComplexClippingResult solid = (StepComplexClippingResult) entity;
-            targets.addAll(collectSemanticTargets(solid.firstOperand(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(solid.secondOperand(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(solid.firstOperand(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(solid.secondOperand(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting, index));
         } else if (entity instanceof StepSolidReplica) {
             StepSolidReplica solid = (StepSolidReplica) entity;
-            targets.addAll(collectSemanticTargets(solid.parentSolid(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(solid.transformation(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(solid.parentSolid(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(solid.transformation(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting, index));
         } else if (entity instanceof StepManifoldSolidBrep) {
             StepManifoldSolidBrep solid = (StepManifoldSolidBrep) entity;
-            targets.addAll(collectSemanticTargets(solid.outer(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(solid.outer(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting, index));
         } else if (entity instanceof StepBrepWithVoids) {
             StepBrepWithVoids solid = (StepBrepWithVoids) entity;
-            targets.addAll(collectSemanticTargets(solid.outer(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(solid.voids(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(solid.outer(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(solid.voids(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting, index));
         } else if (entity instanceof StepBooleanClippingResult) {
             StepBooleanClippingResult result = (StepBooleanClippingResult) entity;
-            targets.addAll(collectSemanticTargets(result.firstOperand(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(result.secondOperand(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(result.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(result.firstOperand(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(result.secondOperand(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(result.id(), resolved, visiting, index));
         } else if (entity instanceof StepBooleanResult) {
             StepBooleanResult result = (StepBooleanResult) entity;
-            targets.addAll(collectSemanticTargets(result.firstOperand(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(result.secondOperand(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(result.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(result.firstOperand(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(result.secondOperand(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(result.id(), resolved, visiting, index));
         } else if (entity instanceof StepCsgSolid) {
             StepCsgSolid solid = (StepCsgSolid) entity;
-            targets.addAll(collectSemanticTargets(solid.treeRootExpression(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(solid.treeRootExpression(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(solid.id(), resolved, visiting, index));
         } else if (entity instanceof StepCsgPrimitive) {
             StepCsgPrimitive primitive = (StepCsgPrimitive) entity;
-            targets.addAll(collectSemanticTargets(primitive.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(primitive.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(primitive.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(primitive.id(), resolved, visiting, index));
         } else if (entity instanceof StepRepresentationContext) {
             StepRepresentationContext context = (StepRepresentationContext) entity;
             targets.addAll(collectTargetsForRepresentationContext(context.id(), resolved, visiting));
         } else if (entity instanceof StepGeometricRepresentationContext) {
             StepGeometricRepresentationContext context = (StepGeometricRepresentationContext) entity;
             if (context.globalUnitAssignedContext() != null) {
-                targets.addAll(collectSemanticTargets(context.globalUnitAssignedContext(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(context.globalUnitAssignedContext(), resolved, visiting, index));
             }
             if (context.globalUncertaintyAssignedContext() != null) {
-                targets.addAll(collectSemanticTargets(context.globalUncertaintyAssignedContext(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(context.globalUncertaintyAssignedContext(), resolved, visiting, index));
             }
             targets.addAll(collectTargetsForRepresentationContext(context.id(), resolved, visiting));
         } else if (entity instanceof StepAbstractVariable) {
             StepAbstractVariable variable = (StepAbstractVariable) entity;
             targets.add(variable.usedRepresentation());
-            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting, index));
         } else if (entity instanceof StepScalarVariable) {
             StepScalarVariable variable = (StepScalarVariable) entity;
             targets.add(variable.usedRepresentation());
-            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting, index));
         } else if (entity instanceof StepRowVariable) {
             StepRowVariable variable = (StepRowVariable) entity;
             targets.add(variable.usedRepresentation());
-            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting, index));
         } else if (entity instanceof StepForwardChainingRulePremise) {
             StepForwardChainingRulePremise variable = (StepForwardChainingRulePremise) entity;
             targets.add(variable.usedRepresentation());
-            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting, index));
         } else if (entity instanceof StepBackChainingRuleBody) {
             StepBackChainingRuleBody variable = (StepBackChainingRuleBody) entity;
             targets.add(variable.usedRepresentation());
-            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(variable.definition(), resolved, visiting, index));
         } else if (entity instanceof StepApplicationContext) {
             StepApplicationContext applicationContext = (StepApplicationContext) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepApplicationProtocolDefinition
                         && ((StepApplicationProtocolDefinition) candidate).application().id() == applicationContext.id()) {
                     StepApplicationProtocolDefinition protocolDefinition = (StepApplicationProtocolDefinition) candidate;
-                    targets.addAll(collectSemanticTargets(protocolDefinition, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(protocolDefinition, resolved, visiting, index));
                 } else if (candidate instanceof StepProductContext
                         && ((StepProductContext) candidate).frameOfReference().id() == applicationContext.id()) {
                     StepProductContext productContext = (StepProductContext) candidate;
-                    targets.addAll(collectSemanticTargets(productContext, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(productContext, resolved, visiting, index));
                 } else if (candidate instanceof StepProductDefinitionContext
                         && ((StepProductDefinitionContext) candidate).frameOfReference().id() == applicationContext.id()) {
                     StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) candidate;
-                    targets.addAll(collectSemanticTargets(productDefinitionContext, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(productDefinitionContext, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepApplicationProtocolDefinition) {
             StepApplicationProtocolDefinition protocolDefinition = (StepApplicationProtocolDefinition) entity;
-            targets.addAll(collectSemanticTargets(protocolDefinition.application(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(protocolDefinition.application(), resolved, visiting, index));
         } else if (entity instanceof StepProductContext) {
             StepProductContext productContext = (StepProductContext) entity;
-            targets.addAll(collectSemanticTargets(productContext.frameOfReference(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(productContext.frameOfReference(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProduct
                         && ((StepProduct) candidate).frameOfReference().stream().anyMatch(context -> context.id() == productContext.id())) {
                     StepProduct product = (StepProduct) candidate;
-                    targets.addAll(collectSemanticTargets(product, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(product, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepProductDefinitionContext) {
             StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) entity;
-            targets.addAll(collectSemanticTargets(productDefinitionContext.frameOfReference(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(productDefinitionContext.frameOfReference(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProductDefinition
                         && ((StepProductDefinition) candidate).frameOfReference().id() == productDefinitionContext.id()) {
                     StepProductDefinition productDefinition = (StepProductDefinition) candidate;
-                    targets.addAll(collectSemanticTargets(productDefinition, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(productDefinition, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepGeneralProperty) {
             StepGeneralProperty generalProperty = (StepGeneralProperty) entity;
-            targets.addAll(collectTargetsReferencingEntity(generalProperty.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(generalProperty.id(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepGeneralPropertyRelationship) {
                     StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) candidate;
                     if (relationship.relatingGeneralProperty().id() == generalProperty.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedGeneralProperty(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatedGeneralProperty(), resolved, visiting, index));
                     }
                     if (relationship.relatedGeneralProperty().id() == generalProperty.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingGeneralProperty(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatingGeneralProperty(), resolved, visiting, index));
                     }
                 }
             }
         } else if (entity instanceof StepDocument) {
             StepDocument document = (StepDocument) entity;
-            targets.addAll(collectTargetsReferencingEntity(document.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(document.id(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepDocumentReference
                         && ((StepDocumentReference) candidate).assignedDocument().id() == document.id()) {
                     StepDocumentReference reference = (StepDocumentReference) candidate;
-                    targets.addAll(collectSemanticTargets(reference, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(reference, resolved, visiting, index));
                 } else if (candidate instanceof StepAppliedDocumentReference
                         && ((StepAppliedDocumentReference) candidate).assignedDocument().id() == document.id()) {
                     StepAppliedDocumentReference reference = (StepAppliedDocumentReference) candidate;
-                    targets.addAll(collectSemanticTargets(reference, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(reference, resolved, visiting, index));
                 } else if (candidate instanceof StepDocumentRelationship) {
                     StepDocumentRelationship relationship = (StepDocumentRelationship) candidate;
                     if (relationship.relatingDocument().id() == document.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedDocument(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatedDocument(), resolved, visiting, index));
                     }
                     if (relationship.relatedDocument().id() == document.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingDocument(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatingDocument(), resolved, visiting, index));
                     }
                 }
             }
         } else if (entity instanceof StepDocumentUsageConstraint) {
             StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) entity;
-            targets.addAll(collectSemanticTargets(documentUsageConstraint.source(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(documentUsageConstraint.source(), resolved, visiting, index));
         } else if (entity instanceof StepGroup) {
             StepGroup group = (StepGroup) entity;
-            targets.addAll(collectTargetsReferencingEntity(group.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(group.id(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepGroupAssignment
                     && ((StepGroupAssignment) candidate).assignedGroup().id() == group.id()) {
                 StepGroupAssignment assignment = (StepGroupAssignment) candidate;
-                targets.addAll(collectSemanticTargets(assignment.assignedGroup(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(assignment.assignedGroup(), resolved, visiting, index));
             } else if (candidate instanceof StepAppliedGroupAssignment
                     && ((StepAppliedGroupAssignment) candidate).assignedGroup().id() == group.id()) {
                 StepAppliedGroupAssignment assignment = (StepAppliedGroupAssignment) candidate;
-                targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
             } else if (candidate instanceof StepClassificationAssignment
                     && ((StepClassificationAssignment) candidate).assignedClass().id() == group.id()) {
                 StepClassificationAssignment assignment = (StepClassificationAssignment) candidate;
-                targets.addAll(collectSemanticTargets(assignment.assignedClass(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(assignment.assignedClass(), resolved, visiting, index));
             } else if (candidate instanceof StepAppliedClassificationAssignment
                     && ((StepAppliedClassificationAssignment) candidate).assignedClass().id() == group.id()) {
                 StepAppliedClassificationAssignment assignment = (StepAppliedClassificationAssignment) candidate;
-                targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepGroupRelationship) {
             StepGroupRelationship relationship = (StepGroupRelationship) candidate;
                     if (relationship.relatingGroup().id() == group.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedGroup(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatedGroup(), resolved, visiting, index));
                     }
                     if (relationship.relatedGroup().id() == group.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingGroup(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatingGroup(), resolved, visiting, index));
                     }
                 }
             }
         } else if (entity instanceof StepOrganization) {
             StepOrganization organization = (StepOrganization) entity;
-            targets.addAll(collectTargetsReferencingEntity(organization.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(organization.id(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepAppliedOrganizationAssignment
                         && ((StepAppliedOrganizationAssignment) candidate).assignedOrganization().id() == organization.id()) {
                     StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepOrganizationAssignment
                         && ((StepOrganizationAssignment) candidate).assignedOrganization().id() == organization.id()) {
                     StepOrganizationAssignment assignment = (StepOrganizationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.assignedOrganization(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.assignedOrganization(), resolved, visiting, index));
                 } else if (candidate instanceof StepOrganizationRelationship) {
                     StepOrganizationRelationship relationship = (StepOrganizationRelationship) candidate;
                     if (relationship.relatingOrganization().id() == organization.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedOrganization(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatedOrganization(), resolved, visiting, index));
                     }
                     if (relationship.relatedOrganization().id() == organization.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingOrganization(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatingOrganization(), resolved, visiting, index));
                     }
                 }
             }
         } else if (entity instanceof StepProductCategory) {
             StepProductCategory productCategory = (StepProductCategory) entity;
-            targets.addAll(collectTargetsReferencingEntity(productCategory.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(productCategory.id(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProductCategoryRelationship) {
                     StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) candidate;
                     if (relationship.category().id() == productCategory.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.subCategory(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.subCategory(), resolved, visiting, index));
                     }
                     if (relationship.subCategory().id() == productCategory.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.category(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.category(), resolved, visiting, index));
                     }
                 } else if (candidate instanceof StepProductRelatedProductCategory
                         && ((StepProductRelatedProductCategory) candidate).id() == productCategory.id()) {
                     StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) candidate;
-                    targets.addAll(collectSemanticTargets(relatedCategory.products(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(relatedCategory.products(), resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepProductRelatedProductCategory) {
             StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) entity;
-            targets.addAll(collectSemanticTargets(relatedCategory.products(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relatedCategory.products(), resolved, visiting, index));
         } else if (entity instanceof StepProduct) {
             StepProduct product = (StepProduct) entity;
-            targets.addAll(collectTargetsReferencingEntity(product.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(product.id(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProductDefinitionFormation
                         && ((StepProductDefinitionFormation) candidate).ofProduct().id() == product.id()) {
                     StepProductDefinitionFormation formation = (StepProductDefinitionFormation) candidate;
-                    targets.addAll(collectSemanticTargets(formation, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(formation, resolved, visiting, index));
                 } else if (candidate instanceof StepProductRelatedProductCategory
                         && ((StepProductRelatedProductCategory) candidate).products().stream().anyMatch(related -> related.id() == product.id())) {
                     StepProductRelatedProductCategory relatedCategory = (StepProductRelatedProductCategory) candidate;
-                    targets.addAll(collectSemanticTargets(relatedCategory, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(relatedCategory, resolved, visiting, index));
                 } else if (candidate instanceof StepProductRelationship) {
                     StepProductRelationship relationship = (StepProductRelationship) candidate;
                     if (relationship.relatingProduct().id() == product.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedProduct(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatedProduct(), resolved, visiting, index));
                     }
                     if (relationship.relatedProduct().id() == product.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingProduct(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatingProduct(), resolved, visiting, index));
                     }
                 }
             }
         } else if (entity instanceof StepProductDefinitionFormation) {
             StepProductDefinitionFormation formation = (StepProductDefinitionFormation) entity;
-            targets.addAll(collectTargetsReferencingEntity(formation.id(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(formation.ofProduct(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(formation.id(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(formation.ofProduct(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepProductDefinition
                         && ((StepProductDefinition) candidate).formation().id() == formation.id()) {
                     StepProductDefinition productDefinition = (StepProductDefinition) candidate;
-                    targets.addAll(collectSemanticTargets(productDefinition, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(productDefinition, resolved, visiting, index));
                 } else if (candidate instanceof StepProductDefinitionFormationRelationship) {
                     StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) candidate;
                     if (relationship.relatingFormation().id() == formation.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedFormation(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatedFormation(), resolved, visiting, index));
                     }
                     if (relationship.relatedFormation().id() == formation.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingFormation(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatingFormation(), resolved, visiting, index));
                     }
                 }
             }
         } else if (entity instanceof StepProductDefinitionEffectivity) {
             StepProductDefinitionEffectivity effectivity = (StepProductDefinitionEffectivity) entity;
-            targets.addAll(collectSemanticTargets(effectivity.productDefinition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(effectivity.productDefinition(), resolved, visiting, index));
         } else if (entity instanceof StepEffectivity) {
             StepEffectivity effectivity = (StepEffectivity) entity;
-            targets.addAll(collectTargetsReferencingEntity(effectivity.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(effectivity.id(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepEffectivityRelationship) {
             StepEffectivityRelationship relationship = (StepEffectivityRelationship) candidate;
                     if (relationship.relatingEffectivity().id() == effectivity.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedEffectivity(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatedEffectivity(), resolved, visiting, index));
                     }
                     if (relationship.relatedEffectivity().id() == effectivity.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingEffectivity(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatingEffectivity(), resolved, visiting, index));
                     }
                 }
             }
@@ -5061,44 +5075,44 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepDateAssignment
                         && ((StepDateAssignment) candidate).assignedDate().id() == calendarDate.id()) {
                     StepDateAssignment assignment = (StepDateAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment, resolved, visiting, index));
                 } else if (candidate instanceof StepAppliedDateAssignment
                         && ((StepAppliedDateAssignment) candidate).assignedDate().id() == calendarDate.id()) {
                     StepAppliedDateAssignment assignment = (StepAppliedDateAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepDateAndTime
                         && ((StepDateAndTime) candidate).dateComponent().id() == calendarDate.id()) {
                     StepDateAndTime dateAndTime = (StepDateAndTime) candidate;
-                    targets.addAll(collectSemanticTargets(dateAndTime, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(dateAndTime, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepDateAndTime) {
             StepDateAndTime dateAndTime = (StepDateAndTime) entity;
-            targets.addAll(collectSemanticTargets(dateAndTime.dateComponent(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(dateAndTime.timeComponent(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(dateAndTime.dateComponent(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(dateAndTime.timeComponent(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepDateTimeAssignment
                         && ((StepDateTimeAssignment) candidate).assignedDateAndTime().id() == dateAndTime.id()) {
                     StepDateTimeAssignment assignment = (StepDateTimeAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment, resolved, visiting, index));
                 } else if (candidate instanceof StepAppliedDateTimeAssignment
                         && ((StepAppliedDateTimeAssignment) candidate).assignedDateAndTime().id() == dateAndTime.id()) {
                     StepAppliedDateTimeAssignment assignment = (StepAppliedDateTimeAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepApprovalDateTime
                         && ((StepApprovalDateTime) candidate).dateTime().id() == dateAndTime.id()) {
                     StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) candidate;
-                    targets.addAll(collectSemanticTargets(approvalDateTime, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(approvalDateTime, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepLocalTime) {
             StepLocalTime localTime = (StepLocalTime) entity;
-            targets.addAll(collectSemanticTargets(localTime.zone(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(localTime.zone(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepDateAndTime
                         && ((StepDateAndTime) candidate).timeComponent().id() == localTime.id()) {
                     StepDateAndTime dateAndTime = (StepDateAndTime) candidate;
-                    targets.addAll(collectSemanticTargets(dateAndTime, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(dateAndTime, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepCoordinatedUniversalTimeOffset) {
@@ -5107,7 +5121,7 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepLocalTime
                         && ((StepLocalTime) candidate).zone().id() == zone.id()) {
                     StepLocalTime localTime = (StepLocalTime) candidate;
-                    targets.addAll(collectSemanticTargets(localTime, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(localTime, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepDateAssignment) {
@@ -5122,7 +5136,7 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepPersonAndOrganization
                         && ((StepPersonAndOrganization) candidate).person().id() == person.id()) {
                     StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) candidate;
-                    targets.addAll(collectSemanticTargets(personAndOrganization, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(personAndOrganization, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepApprovalStatus) {
@@ -5167,19 +5181,19 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepAppliedApprovalAssignment
                         && ((StepAppliedApprovalAssignment) candidate).assignedApproval().id() == approval.id()) {
                     StepAppliedApprovalAssignment assignment = (StepAppliedApprovalAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepApprovalAssignment
                         && ((StepApprovalAssignment) candidate).assignedApproval().id() == approval.id()) {
                     StepApprovalAssignment assignment = (StepApprovalAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.assignedApproval(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.assignedApproval(), resolved, visiting, index));
                 } else if (candidate instanceof StepApprovalPersonOrganization
                         && ((StepApprovalPersonOrganization) candidate).authorizedApproval().id() == approval.id()) {
                     StepApprovalPersonOrganization personOrganization = (StepApprovalPersonOrganization) candidate;
-                    targets.addAll(collectSemanticTargets(personOrganization.personOrganization(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(personOrganization.personOrganization(), resolved, visiting, index));
                 } else if (candidate instanceof StepApprovalDateTime
                         && ((StepApprovalDateTime) candidate).datedApproval().id() == approval.id()) {
                     StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) candidate;
-                    targets.addAll(collectSemanticTargets(approvalDateTime.dateTime(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(approvalDateTime.dateTime(), resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepSecurityClassification) {
@@ -5188,11 +5202,11 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepAppliedSecurityClassificationAssignment
                         && ((StepAppliedSecurityClassificationAssignment) candidate).assignedSecurityClassification().id() == classification.id()) {
                     StepAppliedSecurityClassificationAssignment assignment = (StepAppliedSecurityClassificationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepSecurityClassificationAssignment
                         && ((StepSecurityClassificationAssignment) candidate).assignedSecurityClassification().id() == classification.id()) {
                     StepSecurityClassificationAssignment assignment = (StepSecurityClassificationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.assignedSecurityClassification(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.assignedSecurityClassification(), resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepContract) {
@@ -5201,11 +5215,11 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepAppliedContractAssignment
                         && ((StepAppliedContractAssignment) candidate).assignedContract().id() == contract.id()) {
                     StepAppliedContractAssignment assignment = (StepAppliedContractAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepContractAssignment
                         && ((StepContractAssignment) candidate).assignedContract().id() == contract.id()) {
                     StepContractAssignment assignment = (StepContractAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.assignedContract(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.assignedContract(), resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepCertification) {
@@ -5214,11 +5228,11 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepAppliedCertificationAssignment
                         && ((StepAppliedCertificationAssignment) candidate).assignedCertification().id() == certification.id()) {
                     StepAppliedCertificationAssignment assignment = (StepAppliedCertificationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepCertificationAssignment
                         && ((StepCertificationAssignment) candidate).assignedCertification().id() == certification.id()) {
                     StepCertificationAssignment assignment = (StepCertificationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.assignedCertification(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.assignedCertification(), resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepPersonAndOrganization) {
@@ -5227,11 +5241,11 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepAppliedPersonAndOrganizationAssignment
                         && ((StepAppliedPersonAndOrganizationAssignment) candidate).assignedPersonAndOrganization().id() == personAndOrganization.id()) {
                     StepAppliedPersonAndOrganizationAssignment assignment = (StepAppliedPersonAndOrganizationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepPersonAndOrganizationAssignment
                         && ((StepPersonAndOrganizationAssignment) candidate).assignedPersonAndOrganization().id() == personAndOrganization.id()) {
                     StepPersonAndOrganizationAssignment assignment = (StepPersonAndOrganizationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.assignedPersonAndOrganization(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.assignedPersonAndOrganization(), resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepLanguage) {
@@ -5240,119 +5254,119 @@ public final class StepPmiTargetBuilder {
                 if (candidate instanceof StepAppliedLanguageAssignment
                         && ((StepAppliedLanguageAssignment) candidate).assignedLanguage().id() == language.id()) {
                     StepAppliedLanguageAssignment assignment = (StepAppliedLanguageAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepLanguageAssignment
                         && ((StepLanguageAssignment) candidate).assignedLanguage().id() == language.id()) {
                     StepLanguageAssignment assignment = (StepLanguageAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.assignedLanguage(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.assignedLanguage(), resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepExternalIdentificationAssignment) {
             StepExternalIdentificationAssignment assignment = (StepExternalIdentificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.source(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.source(), resolved, visiting, index));
         } else if (entity instanceof StepExternalSource) {
             StepExternalSource source = (StepExternalSource) entity;
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepExternallyDefinedItem
                         && ((StepExternallyDefinedItem) candidate).source().id() == source.id()) {
                     StepExternallyDefinedItem item = (StepExternallyDefinedItem) candidate;
-                    targets.addAll(collectSemanticTargets(item, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(item, resolved, visiting, index));
                 } else if (candidate instanceof StepAppliedExternalIdentificationAssignment
                         && ((StepAppliedExternalIdentificationAssignment) candidate).source().id() == source.id()) {
                     StepAppliedExternalIdentificationAssignment assignment = (StepAppliedExternalIdentificationAssignment) candidate;
-                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+                    targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
                 } else if (candidate instanceof StepExternalSourceRelationship) {
                     StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) candidate;
                     if (relationship.relatingSource().id() == source.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatedSource(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatedSource(), resolved, visiting, index));
                     }
                     if (relationship.relatedSource().id() == source.id()) {
-                        targets.addAll(collectSemanticTargets(relationship.relatingSource(), resolved, visiting));
+                        targets.addAll(collectSemanticTargets(relationship.relatingSource(), resolved, visiting, index));
                     }
                 }
             }
         } else if (entity instanceof StepExternallyDefinedItem) {
             StepExternallyDefinedItem item = (StepExternallyDefinedItem) entity;
-            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(item.source(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(item.source(), resolved, visiting, index));
         } else if (entity instanceof StepGeneralPropertyRelationship) {
             StepGeneralPropertyRelationship relationship = (StepGeneralPropertyRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingGeneralProperty(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedGeneralProperty(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingGeneralProperty(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedGeneralProperty(), resolved, visiting, index));
         } else if (entity instanceof StepApprovalAssignment) {
             StepApprovalAssignment assignment = (StepApprovalAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedApproval(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedApproval(), resolved, visiting, index));
         } else if (entity instanceof StepClassificationAssignment) {
             StepClassificationAssignment assignment = (StepClassificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedClass(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedClass(), resolved, visiting, index));
         } else if (entity instanceof StepGroupAssignment) {
             StepGroupAssignment assignment = (StepGroupAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedGroup(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedGroup(), resolved, visiting, index));
         } else if (entity instanceof StepSecurityClassificationAssignment) {
             StepSecurityClassificationAssignment assignment = (StepSecurityClassificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedSecurityClassification(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedSecurityClassification(), resolved, visiting, index));
         } else if (entity instanceof StepContractAssignment) {
             StepContractAssignment assignment = (StepContractAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedContract(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedContract(), resolved, visiting, index));
         } else if (entity instanceof StepCertificationAssignment) {
             StepCertificationAssignment assignment = (StepCertificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedCertification(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedCertification(), resolved, visiting, index));
         } else if (entity instanceof StepPersonAndOrganizationAssignment) {
             StepPersonAndOrganizationAssignment assignment = (StepPersonAndOrganizationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedPersonAndOrganization(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedPersonAndOrganization(), resolved, visiting, index));
         } else if (entity instanceof StepOrganizationAssignment) {
             StepOrganizationAssignment assignment = (StepOrganizationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedOrganization(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedOrganization(), resolved, visiting, index));
         } else if (entity instanceof StepLanguageAssignment) {
             StepLanguageAssignment assignment = (StepLanguageAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedLanguage(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedLanguage(), resolved, visiting, index));
         } else if (entity instanceof StepDocumentReference) {
             StepDocumentReference reference = (StepDocumentReference) entity;
-            targets.addAll(collectSemanticTargets(reference.assignedDocument(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(reference.assignedDocument(), resolved, visiting, index));
         } else if (entity instanceof StepPresentationLayerAssignment) {
             StepPresentationLayerAssignment assignment = (StepPresentationLayerAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.assignedItems(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.assignedItems(), resolved, visiting, index));
         } else if (entity instanceof StepApprovalPersonOrganization) {
             StepApprovalPersonOrganization approvalPersonOrganization = (StepApprovalPersonOrganization) entity;
-            targets.addAll(collectSemanticTargets(approvalPersonOrganization.authorizedApproval(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(approvalPersonOrganization.authorizedApproval(), resolved, visiting, index));
         } else if (entity instanceof StepApprovalDateTime) {
             StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) entity;
-            targets.addAll(collectSemanticTargets(approvalDateTime.datedApproval(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(approvalDateTime.datedApproval(), resolved, visiting, index));
         } else if (entity instanceof StepItemDefinedTransformation) {
             StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) entity;
             targets.addAll(collectTargetsForItemDefinedTransformation(transformation.id(), resolved));
         } else if (entity instanceof StepExternalSourceRelationship) {
             StepExternalSourceRelationship relationship = (StepExternalSourceRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingSource(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedSource(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingSource(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedSource(), resolved, visiting, index));
         } else if (entity instanceof StepDocumentRelationship) {
             StepDocumentRelationship relationship = (StepDocumentRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingDocument(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedDocument(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingDocument(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedDocument(), resolved, visiting, index));
         } else if (entity instanceof StepGroupRelationship) {
             StepGroupRelationship relationship = (StepGroupRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingGroup(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedGroup(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingGroup(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedGroup(), resolved, visiting, index));
         } else if (entity instanceof StepOrganizationRelationship) {
             StepOrganizationRelationship relationship = (StepOrganizationRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingOrganization(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedOrganization(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingOrganization(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedOrganization(), resolved, visiting, index));
         } else if (entity instanceof StepProductCategoryRelationship) {
             StepProductCategoryRelationship relationship = (StepProductCategoryRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.category(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.subCategory(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.category(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.subCategory(), resolved, visiting, index));
         } else if (entity instanceof StepProductRelationship) {
             StepProductRelationship relationship = (StepProductRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingProduct(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedProduct(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingProduct(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedProduct(), resolved, visiting, index));
         } else if (entity instanceof StepProductDefinitionFormationRelationship) {
             StepProductDefinitionFormationRelationship relationship = (StepProductDefinitionFormationRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingFormation(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedFormation(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingFormation(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedFormation(), resolved, visiting, index));
         } else if (entity instanceof StepEffectivityRelationship) {
             StepEffectivityRelationship relationship = (StepEffectivityRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingEffectivity(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedEffectivity(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingEffectivity(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedEffectivity(), resolved, visiting, index));
         } else if (entity instanceof StepRepresentationRelationship) {
             StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
             targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
@@ -5364,216 +5378,216 @@ public final class StepPmiTargetBuilder {
             targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
         } else if (entity instanceof StepGeometricItemSpecificUsage) {
             StepGeometricItemSpecificUsage usage = (StepGeometricItemSpecificUsage) entity;
-            targets.addAll(collectSemanticTargets(usage.usage(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.usage(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
         } else if (entity instanceof StepChainBasedGeometricItemSpecificUsage) {
             StepChainBasedGeometricItemSpecificUsage usage = (StepChainBasedGeometricItemSpecificUsage) entity;
-            targets.addAll(collectSemanticTargets(usage.usage(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.nodes(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.usage(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.nodes(), resolved, visiting, index));
             for (StepRepresentationRelationship relationship : usage.undirectedLinks()) {
                 targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
             }
         } else if (entity instanceof StepItemIdentifiedRepresentationUsage) {
             StepItemIdentifiedRepresentationUsage usage = (StepItemIdentifiedRepresentationUsage) entity;
             targets.add(usage.usedRepresentation());
-            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
         } else if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage) {
             StepChainBasedItemIdentifiedRepresentationUsage usage = (StepChainBasedItemIdentifiedRepresentationUsage) entity;
-            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.nodes(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.nodes(), resolved, visiting, index));
             for (StepRepresentationRelationship relationship : usage.undirectedLinks()) {
                 targets.addAll(collectRepresentationTargetsFromRelationship(relationship));
             }
         } else if (entity instanceof StepPlacedTarget) {
             StepPlacedTarget usage = (StepPlacedTarget) entity;
             targets.add(usage.usedRepresentation());
-            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
         } else if (entity instanceof StepDraughtingModelItemAssociation) {
             StepDraughtingModelItemAssociation usage = (StepDraughtingModelItemAssociation) entity;
             targets.add(usage.usedRepresentation());
-            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
         } else if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder) {
             StepDraughtingModelItemAssociationWithPlaceholder usage = (StepDraughtingModelItemAssociationWithPlaceholder) entity;
             targets.add(usage.usedRepresentation());
-            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.annotationPlaceholder(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.annotationPlaceholder(), resolved, visiting, index));
         } else if (entity instanceof StepPmiRequirementItemAssociation) {
             StepPmiRequirementItemAssociation usage = (StepPmiRequirementItemAssociation) entity;
             targets.add(usage.usedRepresentation());
-            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.requirement(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.requirement(), resolved, visiting, index));
         } else if (entity instanceof StepMechanicalDesignRequirementItemAssociation) {
             StepMechanicalDesignRequirementItemAssociation usage = (StepMechanicalDesignRequirementItemAssociation) entity;
             targets.add(usage.usedRepresentation());
-            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(usage.requirement(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.definition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.identifiedItem(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(usage.requirement(), resolved, visiting, index));
         } else if (entity instanceof StepStyledItem) {
             StepStyledItem styledItem = (StepStyledItem) entity;
-            targets.addAll(collectSemanticTargets(styledItem.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(styledItem.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(styledItem.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(styledItem.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(styledItem.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(styledItem.id(), resolved, visiting, index));
         } else if (entity instanceof StepOverRidingStyledItem) {
             StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) entity;
-            targets.addAll(collectSemanticTargets(styledItem.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(styledItem.item(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(styledItem.overRiddenStyle(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(styledItem.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(styledItem.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(styledItem.item(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(styledItem.overRiddenStyle(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(styledItem.id(), resolved, visiting, index));
         } else if (entity instanceof StepMappedItem) {
             StepMappedItem mappedItem = (StepMappedItem) entity;
-            targets.addAll(collectSemanticTargets(mappedItem.mappingSource(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(mappedItem.mappingTarget(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(mappedItem.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(mappedItem.mappingSource(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(mappedItem.mappingTarget(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(mappedItem.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationCurveOccurrence) {
             StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationFillArea) {
             StepAnnotationFillArea fillArea = (StepAnnotationFillArea) entity;
-            targets.addAll(collectSemanticTargets(fillArea.boundaries(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(fillArea.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(fillArea.boundaries(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(fillArea.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationFillAreaOccurrence) {
             StepAnnotationFillAreaOccurrence occurrence = (StepAnnotationFillAreaOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.fillStyleTarget(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.fillStyleTarget(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationPlaceholderOccurrence) {
             StepAnnotationPlaceholderOccurrence occurrence = (StepAnnotationPlaceholderOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationPlane) {
             StepAnnotationPlane plane = (StepAnnotationPlane) entity;
-            targets.addAll(collectSemanticTargets(plane.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(plane.item(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(plane.elements(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(plane.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(plane.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(plane.item(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(plane.elements(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(plane.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationPointOccurrence) {
             StepAnnotationPointOccurrence occurrence = (StepAnnotationPointOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationSymbolOccurrence) {
             StepAnnotationSymbolOccurrence occurrence = (StepAnnotationSymbolOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationSubfigureOccurrence) {
             StepAnnotationSubfigureOccurrence occurrence = (StepAnnotationSubfigureOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationTextOccurrence) {
             StepAnnotationTextOccurrence occurrence = (StepAnnotationTextOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.position(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.position(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepDraughtingAnnotationOccurrence) {
             StepDraughtingAnnotationOccurrence occurrence = (StepDraughtingAnnotationOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepDimensionCurve) {
             StepDimensionCurve occurrence = (StepDimensionCurve) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepLeaderCurve) {
             StepLeaderCurve occurrence = (StepLeaderCurve) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepProjectionCurve) {
             StepProjectionCurve occurrence = (StepProjectionCurve) entity;
-            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(occurrence.item(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepTerminatorSymbol) {
             StepTerminatorSymbol symbol = (StepTerminatorSymbol) entity;
-            targets.addAll(collectSemanticTargets(symbol.styles(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(symbol.item(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(symbol.annotatedCurve(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(symbol.styles(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(symbol.item(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(symbol.annotatedCurve(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting, index));
         } else if (entity instanceof StepDraughtingCallout) {
             StepDraughtingCallout callout = (StepDraughtingCallout) entity;
-            targets.addAll(collectSemanticTargets(callout.contents(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(callout.contents(), resolved, visiting, index));
         } else if (entity instanceof StepDraughtingCalloutRelationship) {
             StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingCallout(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedCallout(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingCallout(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedCallout(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationOccurrenceRelationship) {
             StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingAnnotationOccurrence(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedAnnotationOccurrence(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingAnnotationOccurrence(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedAnnotationOccurrence(), resolved, visiting, index));
         } else if (entity instanceof StepRepresentationMap) {
             StepRepresentationMap mapping = (StepRepresentationMap) entity;
             targets.add(mapping.mappedRepresentation());
-            targets.addAll(collectSemanticTargets(mapping.mappedOrigin(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(mapping.mappedOrigin(), resolved, visiting, index));
         } else if (entity instanceof StepSymbolRepresentationMap) {
             StepSymbolRepresentationMap mapping = (StepSymbolRepresentationMap) entity;
             targets.add(mapping.mappedRepresentation());
-            targets.addAll(collectSemanticTargets(mapping.mappedOrigin(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(mapping.mappedOrigin(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationSymbol) {
             StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) entity;
-            targets.addAll(collectSemanticTargets(annotationSymbol.mappingSource(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(annotationSymbol.mappingTarget(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(annotationSymbol.mappingSource(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(annotationSymbol.mappingTarget(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationText) {
             StepAnnotationText annotationText = (StepAnnotationText) entity;
-            targets.addAll(collectSemanticTargets(annotationText.mappingSource(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(annotationText.mappingTarget(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(annotationText.mappingSource(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(annotationText.mappingTarget(), resolved, visiting, index));
         } else if (entity instanceof StepAnnotationTextCharacter) {
             StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) entity;
-            targets.addAll(collectSemanticTargets(annotationTextCharacter.mappingSource(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(annotationTextCharacter.mappingTarget(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(annotationTextCharacter.mappingSource(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(annotationTextCharacter.mappingTarget(), resolved, visiting, index));
         } else if (entity instanceof StepUserDefinedCurveFont) {
             StepUserDefinedCurveFont curveFont = (StepUserDefinedCurveFont) entity;
-            targets.addAll(collectSemanticTargets(curveFont.mappingSource(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curveFont.mappingTarget(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curveFont.mappingSource(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(curveFont.mappingTarget(), resolved, visiting, index));
         } else if (entity instanceof StepUserDefinedMarker) {
             StepUserDefinedMarker marker = (StepUserDefinedMarker) entity;
-            targets.addAll(collectSemanticTargets(marker.mappingSource(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(marker.mappingTarget(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(marker.mappingSource(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(marker.mappingTarget(), resolved, visiting, index));
         } else if (entity instanceof StepUserDefinedTerminatorSymbol) {
             StepUserDefinedTerminatorSymbol symbol = (StepUserDefinedTerminatorSymbol) entity;
-            targets.addAll(collectSemanticTargets(symbol.mappingSource(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(symbol.mappingTarget(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(symbol.mappingSource(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(symbol.mappingTarget(), resolved, visiting, index));
         } else if (entity instanceof StepPresentationStyleAssignment) {
             StepPresentationStyleAssignment assignment = (StepPresentationStyleAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.styles(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(assignment.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.styles(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(assignment.id(), resolved, visiting, index));
         } else if (entity instanceof StepFillAreaStyle) {
             StepFillAreaStyle fillAreaStyle = (StepFillAreaStyle) entity;
-            targets.addAll(collectSemanticTargets(fillAreaStyle.styles(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(fillAreaStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(fillAreaStyle.styles(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(fillAreaStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepFillAreaStyleColour) {
             StepFillAreaStyleColour fillAreaStyleColour = (StepFillAreaStyleColour) entity;
-            targets.addAll(collectSemanticTargets(fillAreaStyleColour.colour(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(fillAreaStyleColour.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(fillAreaStyleColour.colour(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(fillAreaStyleColour.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleFillArea) {
             StepSurfaceStyleFillArea style = (StepSurfaceStyleFillArea) entity;
-            targets.addAll(collectSemanticTargets(style.fillStyle(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.fillStyle(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepCharacterGlyphStyleStroke) {
             StepCharacterGlyphStyleStroke style = (StepCharacterGlyphStyleStroke) entity;
-            targets.addAll(collectSemanticTargets(style.strokeStyle(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.strokeStyle(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepCharacterGlyphStyleOutline) {
             StepCharacterGlyphStyleOutline style = (StepCharacterGlyphStyleOutline) entity;
-            targets.addAll(collectSemanticTargets(style.outlineStyle(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.outlineStyle(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepCharacterGlyphStyleOutlineWithCharacteristics) {
             StepCharacterGlyphStyleOutlineWithCharacteristics style = (StepCharacterGlyphStyleOutlineWithCharacteristics) entity;
-            targets.addAll(collectSemanticTargets(style.outlineStyle(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(style.characteristics(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.outlineStyle(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(style.characteristics(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedCurveFont) {
             StepPreDefinedCurveFont curveFont = (StepPreDefinedCurveFont) entity;
             targets.addAll(collectTargetsForCurveFont(curveFont.id(), resolved, visiting));
@@ -5589,65 +5603,65 @@ public final class StepPmiTargetBuilder {
         } else if (entity instanceof StepColour) {
             StepColour colour = (StepColour) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting, index));
         } else if (entity instanceof StepColourSpecification) {
             StepColourSpecification colour = (StepColourSpecification) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting, index));
         } else if (entity instanceof StepColourRgb) {
             StepColourRgb colour = (StepColourRgb) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(colour.id(), resolved, visiting, index));
         } else if (entity instanceof StepConversionBasedUnit) {
             StepConversionBasedUnit unit = (StepConversionBasedUnit) entity;
-            targets.addAll(collectSemanticTargets(unit.conversionFactor(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(unit.conversionFactor(), resolved, visiting, index));
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting, index));
         } else if (entity instanceof StepConversionBasedUnitWithOffset) {
             StepConversionBasedUnitWithOffset unit = (StepConversionBasedUnitWithOffset) entity;
-            targets.addAll(collectSemanticTargets(unit.conversionFactor(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(unit.conversionFactor(), resolved, visiting, index));
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting, index));
         } else if (entity instanceof StepDerivedUnit) {
             StepDerivedUnit unit = (StepDerivedUnit) entity;
-            targets.addAll(collectSemanticTargets(unit.elements(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(unit.elements(), resolved, visiting, index));
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting, index));
         } else if (entity instanceof StepDerivedUnitElement) {
             StepDerivedUnitElement element = (StepDerivedUnitElement) entity;
-            targets.addAll(collectSemanticTargets(element.unit(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(element.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(element.unit(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(element.id(), resolved, visiting, index));
         } else if (entity instanceof StepNamedUnit) {
             StepNamedUnit unit = (StepNamedUnit) entity;
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting, index));
         } else if (entity instanceof StepSiUnit) {
             StepSiUnit unit = (StepSiUnit) entity;
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting, index));
         } else if (entity instanceof StepContextDependentUnit) {
             StepContextDependentUnit unit = (StepContextDependentUnit) entity;
             targets.addAll(collectTargetsForAssignedUnit(unit.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(unit.id(), resolved, visiting, index));
         } else if (entity instanceof StepGlobalUncertaintyAssignedContext) {
             StepGlobalUncertaintyAssignedContext context = (StepGlobalUncertaintyAssignedContext) entity;
-            targets.addAll(collectSemanticTargets(context.uncertainties(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(context.uncertainties(), resolved, visiting, index));
             targets.addAll(collectTargetsForGlobalUncertaintyContext(context.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(context.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(context.id(), resolved, visiting, index));
         } else if (entity instanceof StepGlobalUnitAssignedContext) {
             StepGlobalUnitAssignedContext context = (StepGlobalUnitAssignedContext) entity;
-            targets.addAll(collectSemanticTargets(context.units(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(context.units(), resolved, visiting, index));
             targets.addAll(collectTargetsForGlobalUnitContext(context.id(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(context.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(context.id(), resolved, visiting, index));
         } else if (entity instanceof StepRepresentationItem) {
             StepRepresentationItem item = (StepRepresentationItem) entity;
-            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting, index));
         } else if (entity instanceof StepGeometricRepresentationItem) {
             StepGeometricRepresentationItem item = (StepGeometricRepresentationItem) entity;
-            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting, index));
         } else if (entity instanceof StepTopologicalRepresentationItem) {
             StepTopologicalRepresentationItem item = (StepTopologicalRepresentationItem) entity;
-            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedColour) {
             StepPreDefinedColour colour = (StepPreDefinedColour) entity;
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
@@ -5656,184 +5670,184 @@ public final class StepPmiTargetBuilder {
             targets.addAll(collectTargetsForStyleColour(colour.id(), resolved, visiting));
         } else if (entity instanceof StepCurveStyle) {
             StepCurveStyle curveStyle = (StepCurveStyle) entity;
-            targets.addAll(collectSemanticTargets(curveStyle.curveFont(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(curveStyle.colour(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(curveStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(curveStyle.curveFont(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(curveStyle.colour(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(curveStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepPointStyle) {
             StepPointStyle pointStyle = (StepPointStyle) entity;
-            targets.addAll(collectSemanticTargets(pointStyle.marker(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(pointStyle.colour(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(pointStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(pointStyle.marker(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(pointStyle.colour(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(pointStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepSymbolColour) {
             StepSymbolColour symbolColour = (StepSymbolColour) entity;
-            targets.addAll(collectSemanticTargets(symbolColour.colour(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(symbolColour.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(symbolColour.colour(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(symbolColour.id(), resolved, visiting, index));
         } else if (entity instanceof StepSymbolStyle) {
             StepSymbolStyle symbolStyle = (StepSymbolStyle) entity;
-            targets.addAll(collectSemanticTargets(symbolStyle.styleOfSymbol(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(symbolStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(symbolStyle.styleOfSymbol(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(symbolStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepTextStyleForDefinedFont) {
             StepTextStyleForDefinedFont textStyle = (StepTextStyleForDefinedFont) entity;
-            targets.addAll(collectSemanticTargets(textStyle.textColour(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(textStyle.textColour(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepTextStyle) {
             StepTextStyle textStyle = (StepTextStyle) entity;
-            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepTextStyleWithSpacing) {
             StepTextStyleWithSpacing textStyle = (StepTextStyleWithSpacing) entity;
-            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepTextStyleWithJustification) {
             StepTextStyleWithJustification textStyle = (StepTextStyleWithJustification) entity;
-            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepTextStyleWithBoxCharacteristics) {
             StepTextStyleWithBoxCharacteristics textStyle = (StepTextStyleWithBoxCharacteristics) entity;
-            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepTextStyleWithMirror) {
             StepTextStyleWithMirror textStyle = (StepTextStyleWithMirror) entity;
-            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(textStyle.mirrorPlacement(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(textStyle.characterAppearance(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(textStyle.mirrorPlacement(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(textStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleBoundary) {
             StepSurfaceStyleBoundary style = (StepSurfaceStyleBoundary) entity;
-            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleParameterLine) {
             StepSurfaceStyleParameterLine style = (StepSurfaceStyleParameterLine) entity;
-            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleSegmentationCurve) {
             StepSurfaceStyleSegmentationCurve style = (StepSurfaceStyleSegmentationCurve) entity;
-            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleSilhouette) {
             StepSurfaceStyleSilhouette style = (StepSurfaceStyleSilhouette) entity;
-            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleControlGrid) {
             StepSurfaceStyleControlGrid style = (StepSurfaceStyleControlGrid) entity;
-            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.style(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceSideStyle) {
             StepSurfaceSideStyle sideStyle = (StepSurfaceSideStyle) entity;
-            targets.addAll(collectSemanticTargets(sideStyle.styles(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(sideStyle.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(sideStyle.styles(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(sideStyle.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleUsage) {
             StepSurfaceStyleUsage usage = (StepSurfaceStyleUsage) entity;
-            targets.addAll(collectSemanticTargets(usage.style(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(usage.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(usage.style(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(usage.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleTransparent) {
             StepSurfaceStyleTransparent style = (StepSurfaceStyleTransparent) entity;
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleReflectanceAmbient) {
             StepSurfaceStyleReflectanceAmbient style = (StepSurfaceStyleReflectanceAmbient) entity;
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuse) {
             StepSurfaceStyleReflectanceAmbientDiffuse style = (StepSurfaceStyleReflectanceAmbientDiffuse) entity;
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular) {
             StepSurfaceStyleReflectanceAmbientDiffuseSpecular style = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) entity;
-            targets.addAll(collectSemanticTargets(style.specularColour(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(style.specularColour(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedSurfaceSideStyle) {
             StepPreDefinedSurfaceSideStyle style = (StepPreDefinedSurfaceSideStyle) entity;
-            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(style.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedTextFont) {
             StepPreDefinedTextFont textFont = (StepPreDefinedTextFont) entity;
-            targets.addAll(collectTargetsReferencingEntity(textFont.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(textFont.id(), resolved, visiting, index));
         } else if (entity instanceof StepDraughtingPreDefinedTextFont) {
             StepDraughtingPreDefinedTextFont textFont = (StepDraughtingPreDefinedTextFont) entity;
-            targets.addAll(collectTargetsReferencingEntity(textFont.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(textFont.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedTerminatorSymbol) {
             StepPreDefinedTerminatorSymbol symbol = (StepPreDefinedTerminatorSymbol) entity;
-            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedSymbol) {
             StepPreDefinedSymbol symbol = (StepPreDefinedSymbol) entity;
-            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedDimensionSymbol) {
             StepPreDefinedDimensionSymbol symbol = (StepPreDefinedDimensionSymbol) entity;
-            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedGeometricalToleranceSymbol) {
             StepPreDefinedGeometricalToleranceSymbol symbol = (StepPreDefinedGeometricalToleranceSymbol) entity;
-            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(symbol.id(), resolved, visiting, index));
         } else if (entity instanceof StepPreDefinedItem) {
             StepPreDefinedItem item = (StepPreDefinedItem) entity;
-            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(item.id(), resolved, visiting, index));
         } else if (entity instanceof StepDescriptionAttribute) {
             StepDescriptionAttribute descriptionAttribute = (StepDescriptionAttribute) entity;
-            targets.addAll(collectSemanticTargets(descriptionAttribute.describedItem(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(descriptionAttribute.describedItem(), resolved, visiting, index));
         } else if (entity instanceof StepNameAttribute) {
             StepNameAttribute nameAttribute = (StepNameAttribute) entity;
-            targets.addAll(collectSemanticTargets(nameAttribute.namedItem(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(nameAttribute.namedItem(), resolved, visiting, index));
         } else if (entity instanceof StepIdAttribute) {
             StepIdAttribute idAttribute = (StepIdAttribute) entity;
-            targets.addAll(collectSemanticTargets(idAttribute.identifiedItem(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(idAttribute.identifiedItem(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedNameAssignment) {
             StepAppliedNameAssignment assignment = (StepAppliedNameAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedIdentificationAssignment) {
             StepAppliedIdentificationAssignment assignment = (StepAppliedIdentificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedExternalIdentificationAssignment) {
             StepAppliedExternalIdentificationAssignment assignment = (StepAppliedExternalIdentificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedGroupAssignment) {
             StepAppliedGroupAssignment assignment = (StepAppliedGroupAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedClassificationAssignment) {
             StepAppliedClassificationAssignment assignment = (StepAppliedClassificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedDateAssignment) {
             StepAppliedDateAssignment assignment = (StepAppliedDateAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedDateTimeAssignment) {
             StepAppliedDateTimeAssignment assignment = (StepAppliedDateTimeAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedApprovalAssignment) {
             StepAppliedApprovalAssignment assignment = (StepAppliedApprovalAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedSecurityClassificationAssignment) {
             StepAppliedSecurityClassificationAssignment assignment = (StepAppliedSecurityClassificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedDocumentReference) {
             StepAppliedDocumentReference assignment = (StepAppliedDocumentReference) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedContractAssignment) {
             StepAppliedContractAssignment assignment = (StepAppliedContractAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedCertificationAssignment) {
             StepAppliedCertificationAssignment assignment = (StepAppliedCertificationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedPersonAndOrganizationAssignment) {
             StepAppliedPersonAndOrganizationAssignment assignment = (StepAppliedPersonAndOrganizationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedOrganizationAssignment) {
             StepAppliedOrganizationAssignment assignment = (StepAppliedOrganizationAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAppliedLanguageAssignment) {
             StepAppliedLanguageAssignment assignment = (StepAppliedLanguageAssignment) entity;
-            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(assignment.items(), resolved, visiting, index));
         } else if (entity instanceof StepAttributeAssertion) {
             StepAttributeAssertion attributeAssertion = (StepAttributeAssertion) entity;
             targets.add(attributeAssertion.usedRepresentation());
-            targets.addAll(collectSemanticTargets(attributeAssertion.definition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(attributeAssertion.definition(), resolved, visiting, index));
         } else if (entity instanceof StepIdentificationAssignment
                 || entity instanceof StepNameAssignment) {
             // Pure assignment metadata without item references contributes no target by itself.
         } else if (entity instanceof StepShapeDefinitionRepresentation) {
             StepShapeDefinitionRepresentation shapeDefinitionRepresentation = (StepShapeDefinitionRepresentation) entity;
             targets.add(shapeDefinitionRepresentation.usedRepresentation());
-            targets.addAll(collectSemanticTargets(shapeDefinitionRepresentation.definition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(shapeDefinitionRepresentation.definition(), resolved, visiting, index));
         } else if (entity instanceof StepContextDependentShapeRepresentation) {
             StepContextDependentShapeRepresentation contextDependent = (StepContextDependentShapeRepresentation) entity;
             targets.addAll(collectRepresentationTargetsFromRelationship(contextDependent.representationRelationship()));
-            targets.addAll(collectSemanticTargets(contextDependent.representedProductRelation(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(contextDependent.representedProductRelation(), resolved, visiting, index));
         } else if (entity instanceof StepProductDefinitionShape) {
             StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) entity;
-            targets.addAll(collectSemanticTargets(productDefinitionShape.definition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(productDefinitionShape.definition(), resolved, visiting, index));
             for (StepEntity candidate : resolved.values()) {
                 if (candidate instanceof StepShapeDefinitionRepresentation
                         && ((StepShapeDefinitionRepresentation) candidate).definition().id() == productDefinitionShape.id()) {
@@ -5842,15 +5856,15 @@ public final class StepPmiTargetBuilder {
                 } else if (candidate instanceof StepContextDependentShapeRepresentation
                         && ((StepContextDependentShapeRepresentation) candidate).representedProductRelation().id() == productDefinitionShape.id()) {
                     StepContextDependentShapeRepresentation contextDependent = (StepContextDependentShapeRepresentation) candidate;
-                    targets.addAll(collectSemanticTargets(contextDependent, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(contextDependent, resolved, visiting, index));
                 } else if (candidate instanceof StepShapeAspect
                         && ((StepShapeAspect) candidate).ofShape().id() == productDefinitionShape.id()) {
                     StepShapeAspect shapeAspect = (StepShapeAspect) candidate;
-                    targets.addAll(collectSemanticTargets(shapeAspect, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(shapeAspect, resolved, visiting, index));
                 } else if (candidate instanceof StepShapeAspectOccurrence
                         && ((StepShapeAspectOccurrence) candidate).ofShape().id() == productDefinitionShape.id()) {
                     StepShapeAspectOccurrence occurrence = (StepShapeAspectOccurrence) candidate;
-                    targets.addAll(collectSemanticTargets(occurrence, resolved, visiting));
+                    targets.addAll(collectSemanticTargets(occurrence, resolved, visiting, index));
                 }
             }
         } else if (entity instanceof StepProductDefinition) {
@@ -5858,31 +5872,31 @@ public final class StepPmiTargetBuilder {
             targets.addAll(collectTargetsForProductDefinition(productDefinition.id(), resolved, visiting));
         } else if (entity instanceof StepNextAssemblyUsageOccurrence) {
             StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.relatedProductDefinition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.relatedProductDefinition(), resolved, visiting, index));
             targets.addAll(collectTargetsForOccurrence(occurrence.id(), resolved, visiting));
         } else if (entity instanceof StepProductDefinitionRelationship) {
             StepProductDefinitionRelationship relationship = (StepProductDefinitionRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingProductDefinition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedProductDefinition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingProductDefinition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedProductDefinition(), resolved, visiting, index));
         } else if (entity instanceof StepProductDefinitionRelationshipRelationship) {
             StepProductDefinitionRelationshipRelationship relationship = (StepProductDefinitionRelationshipRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relating(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.related(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relating(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.related(), resolved, visiting, index));
         } else if (entity instanceof StepPropertyDefinitionRelationship) {
             StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingPropertyDefinition(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingPropertyDefinition(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting, index));
         } else if (entity instanceof StepShapeAspectOccurrence) {
             StepShapeAspectOccurrence occurrence = (StepShapeAspectOccurrence) entity;
-            targets.addAll(collectSemanticTargets(occurrence.definition(), resolved, visiting));
-            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(occurrence.definition(), resolved, visiting, index));
+            targets.addAll(collectTargetsReferencingEntity(occurrence.id(), resolved, visiting, index));
         } else if (entity instanceof StepShapeAspect) {
             StepShapeAspect shapeAspect = (StepShapeAspect) entity;
-            targets.addAll(collectTargetsReferencingEntity(shapeAspect.id(), resolved, visiting));
+            targets.addAll(collectTargetsReferencingEntity(shapeAspect.id(), resolved, visiting, index));
         } else if (entity instanceof StepShapeAspectRelationship) {
             StepShapeAspectRelationship relationship = (StepShapeAspectRelationship) entity;
-            targets.addAll(collectSemanticTargets(relationship.relatingShapeAspect(), resolved, visiting));
-            targets.addAll(collectSemanticTargets(relationship.relatedShapeAspect(), resolved, visiting));
+            targets.addAll(collectSemanticTargets(relationship.relatingShapeAspect(), resolved, visiting, index));
+            targets.addAll(collectSemanticTargets(relationship.relatedShapeAspect(), resolved, visiting, index));
         }
         visiting.remove(entity.id());
         return Set.copyOf(targets);
@@ -6221,6 +6235,19 @@ public final class StepPmiTargetBuilder {
         Set<StepEntity> targets = new LinkedHashSet<>();
         for (StepEntity entity : entities) {
             targets.addAll(collectSemanticTargets(entity, resolved, visiting));
+        }
+        return Set.copyOf(targets);
+    }
+
+    private static Set<StepEntity> collectSemanticTargets(
+            List<? extends StepEntity> entities,
+            Map<Integer, StepEntity> resolved,
+            Set<Integer> visiting,
+            PmiEntityIndex index
+    ) {
+        Set<StepEntity> targets = new LinkedHashSet<>();
+        for (StepEntity entity : entities) {
+            targets.addAll(collectSemanticTargets(entity, resolved, visiting, index));
         }
         return Set.copyOf(targets);
     }
