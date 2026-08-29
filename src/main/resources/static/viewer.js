@@ -33,6 +33,10 @@ const sceneHost = document.querySelector('#scene');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xdfe7e8);
 
+// Render scheduling state. Declared before any module-init call (resize(),
+// applyUnsupportedViewMode(), …) can request a frame.
+let renderPending = false;
+
 const camera = new THREE.PerspectiveCamera(55, 1, 0.01, 5000);
 camera.position.set(3.5, 2.8, 3.5);
 
@@ -351,24 +355,38 @@ function resize() {
     updateRenderResolution(true);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+    requestRender();
 }
 
 window.addEventListener('resize', resize);
 new ResizeObserver(() => resize()).observe(sceneHost);
 resize();
 
-function animate() {
-    controls.update();
+function renderFrame() {
+    renderPending = false;
+    // With damping enabled update() keeps returning true while inertia
+    // settles, which keeps the on-demand loop alive until the camera rests.
+    const cameraMoved = controls.update();
     updateRenderResolution();
     updatePmiOverlay();
     renderer.setRenderTarget(renderTarget);
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
     renderer.render(postScene, postCamera);
-    requestAnimationFrame(animate);
+    if (cameraMoved) {
+        requestRender();
+    }
 }
 
-animate();
+function requestRender() {
+    if (!renderPending) {
+        renderPending = true;
+        requestAnimationFrame(renderFrame);
+    }
+}
+
+controls.addEventListener('change', requestRender);
+requestRender();
 
 function setStatus(text) {
     statusText.textContent = text;
@@ -589,6 +607,7 @@ function applyUnsupportedViewMode() {
     }
     updateUnsupportedFaces(currentUnsupportedFaces);
     updateUnsupportedBooleans(currentUnsupportedBooleans);
+    requestRender();
 }
 
 function setSelection(entries) {
@@ -685,6 +704,7 @@ function clearModel() {
     if (togglePmiButton) {
         togglePmiButton.textContent = '隐藏 PMI';
     }
+    requestRender();
 }
 
 function disposeMaterial(material, disposedTextures = new Set()) {
@@ -2091,6 +2111,7 @@ function applyPmiVisibility() {
     if (togglePmiButton) {
         togglePmiButton.textContent = pmiVisible ? '隐藏 PMI' : '显示 PMI';
     }
+    requestRender();
 }
 
 function updateEdgeToggleButton() {
@@ -2113,6 +2134,7 @@ function applyEdgeVisibility() {
         }
     });
     updateEdgeToggleButton();
+    requestRender();
 }
 
 function refreshRenderableStyle(object) {
@@ -2128,6 +2150,7 @@ function refreshRenderableStyle(object) {
         object.material.depthWrite = true;
         object.material.needsUpdate = true;
     }
+    requestRender();
 }
 
 function registerStepObject(stepId, object) {
@@ -2178,6 +2201,7 @@ function selectRenderable(object) {
 
 function setGroupVisibility(group, visible) {
     group.visible = visible;
+    requestRender();
 }
 
 function showOnlyInstance(instanceId) {

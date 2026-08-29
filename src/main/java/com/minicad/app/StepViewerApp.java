@@ -31,8 +31,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -226,6 +229,12 @@ public final class StepViewerApp {
     }
 
     private static final class StaticServlet extends HttpServlet {
+
+        // Classpath resources cannot change while the process runs, so serve
+        // them from memory and answer If-None-Match with 304 instead of
+        // re-streaming ~3MB of vendored three.js on every refresh.
+        private final ConcurrentMap<String, StaticResource> resources = new ConcurrentHashMap<>();
+
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
             String resourcePath = resolveStaticResource(request.getRequestURI());
@@ -233,26 +242,59 @@ public final class StepViewerApp {
                 sendTextError(response, HttpServletResponse.SC_NOT_FOUND, "Not Found");
                 return;
             }
+            StaticResource resource = resources.computeIfAbsent(resourcePath, this::loadResource);
+            if (resource == null) {
+                sendTextError(response, HttpServletResponse.SC_NOT_FOUND, "Not Found");
+                return;
+            }
 
+            setSecurityHeaders(response);
+            response.setHeader("Cache-Control", "no-cache");
+            String ifNoneMatch = request.getHeader("If-None-Match");
+            if (ifNoneMatch != null && ifNoneMatch.contains(resource.etag())) {
+                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                response.setHeader("ETag", resource.etag());
+                return;
+            }
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType(contentTypeFor(resourcePath));
+            response.setHeader("ETag", resource.etag());
+            response.setContentLength(resource.body().length);
+            response.getOutputStream().write(resource.body());
+        }
+
+        private StaticResource loadResource(String resourcePath) {
             try (InputStream input = StepViewerApp.class.getResourceAsStream(resourcePath)) {
                 if (input == null) {
-                    sendTextError(response, HttpServletResponse.SC_NOT_FOUND, "Not Found");
-                    return;
+                    return null;
                 }
-                String contentType = contentTypeFor(resourcePath);
-                response.setHeader("Cache-Control", "no-store");
-                response.setHeader("Pragma", "no-cache");
-                response.setDateHeader("Expires", 0);
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.setContentType(contentType);
-                setSecurityHeaders(response);
-                input.transferTo(response.getOutputStream());
+                return new StaticResource(input.readAllBytes());
+            } catch (IOException e) {
+                return null;
             }
         }
 
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
             sendTextError(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Method Not Allowed");
+        }
+    }
+
+    private static final class StaticResource {
+        private final byte[] body;
+        private final String etag;
+
+        StaticResource(byte[] body) {
+            this.body = body;
+            this.etag = '"' + Integer.toHexString(body.length) + '-' + Integer.toHexString(Arrays.hashCode(body)) + '"';
+        }
+
+        byte[] body() {
+            return body;
+        }
+
+        String etag() {
+            return etag;
         }
     }
 
