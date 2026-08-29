@@ -197,8 +197,10 @@ public final class StepFacePayloadBuilder {
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
                 String reason = ex.getMessage();
                 if (reason != null && !reason.isBlank() && reason.contains("POLY_LOOP")) {
+                    log.warn("Planar face build failed; returning unsupported face payload: {}", reason);
                     return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, reason));
                 }
+                log.warn("Planar face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "planar face build failed"));
             }
         }
@@ -213,7 +215,7 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - log and return unsupported face payload
+                log.warn("Cylindrical face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "cylindrical face build failed: " + ex.getMessage()));
             }
         }
@@ -228,7 +230,7 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - log and return unsupported face payload
+                log.warn("Conical face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "conical face build failed: " + ex.getMessage()));
             }
         }
@@ -256,8 +258,8 @@ public final class StepFacePayloadBuilder {
                 }
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "rational b-spline surface patch preview failed"));
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                log.debug("stage={} faceId={}, surfaceId={}, reason={}", "rational_bspline_surface_preview_exception",
-                        stepFace.id(), splineSurface.id(), ex.getMessage());
+                log.warn("stage={} faceId={}, surfaceId={}, reason={}", "rational_bspline_surface_preview_exception",
+                        stepFace.id(), splineSurface.id(), ex.getMessage(), ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "rational b-spline surface preview failed"));
             }
         }
@@ -282,8 +284,8 @@ public final class StepFacePayloadBuilder {
                 }
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "b-spline surface patch preview failed"));
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                log.debug("stage={} faceId={}, surfaceId={}, reason={}", "bspline_surface_preview_exception",
-                        stepFace.id(), previewGeometry.id(), ex.getMessage());
+                log.warn("stage={} faceId={}, surfaceId={}, reason={}", "bspline_surface_preview_exception",
+                        stepFace.id(), previewGeometry.id(), ex.getMessage(), ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "b-spline surface preview failed"));
             }
         }
@@ -312,7 +314,7 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - log and return unsupported face payload
+                log.warn("Toroidal surface with specified bends face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "toroidal surface with specified bends face build failed: " + ex.getMessage()));
             }
         }
@@ -327,7 +329,7 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
-                // C03: No silent geometry loss - log and return unsupported face payload
+                log.warn("Toroidal face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "toroidal face build failed: " + ex.getMessage()));
             }
         }
@@ -455,6 +457,7 @@ public final class StepFacePayloadBuilder {
                     return trimmed;
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Blended surface preview failed; returning unsupported face payload", ex);
                 // C03: No silent geometry loss - continue to fallback
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "blended surface preview failed"));
@@ -469,6 +472,7 @@ public final class StepFacePayloadBuilder {
                     return trimmed;
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Parametric surface preview failed; falling back to sampled-grid tessellation", ex);
                 // C03: No silent geometry loss - continue to fallback tessellation
             }
             // Fallback: tessellate via sampled grid if parametric mapping fails
@@ -483,8 +487,10 @@ public final class StepFacePayloadBuilder {
                     }
                 }
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException | GeometryException ex) {
+                log.warn("Free-form surface preview failed; returning unsupported face payload", ex);
                 // C03: No silent geometry loss - continue to unsupported face payload
             } catch (Exception ex) {
+                log.warn("Free-form surface preview failed unexpectedly", ex);
                 // C03: Catch unexpected errors - log and return unsupported face payload
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "free-form surface preview failed: unexpected error - " + ex.getMessage()));
             }
@@ -1335,6 +1341,7 @@ public final class StepFacePayloadBuilder {
         } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
             String unsupportedSurface = describeUnsupportedPreviewSurface(geometry, builder);
             if (unsupportedSurface != null && unsupportedSurface.contains("unsupported")) {
+                log.warn("Face bounds derivation failed; returning unsupported face payload: {}", unsupportedSurface);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, unsupportedSurface));
             }
             log.debug("stage={} faceId={}, surfaceType={}, reason={}", "parametric_bounds_fallback",
@@ -1355,6 +1362,7 @@ public final class StepFacePayloadBuilder {
             try {
                 loops = buildParametricLoops(normalizedBounds, mapper);
             } catch (TopologyException | StepResolutionException | UnsupportedGeometryException ex) {
+                log.warn("Face bounds derivation failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "failed to derive face bounds"));
             }
         }

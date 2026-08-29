@@ -15,12 +15,12 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Exports STEP files to OBJ and STL mesh formats.
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  */
 public final class StepMeshExporter {
 
-    private static final Logger LOG = Logger.getLogger(StepMeshExporter.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(StepMeshExporter.class);
 
     // STL binary layout constants
     private static final int STL_HEADER_SIZE = 80;
@@ -516,15 +516,26 @@ public final class StepMeshExporter {
                 .map(e -> (com.minicad.step.model.StepFaceEntity) e)
                 .collect(Collectors.toList());
         Triangulator t = new Triangulator();
+        int faceFailures = 0;
+        String firstFaceFailure = null;
         for (com.minicad.step.model.StepFaceEntity faceEntity : faceEntities) {
             try {
                 t.triangulateSemanticFace(faceEntity, builder);
             } catch (Exception e) {
-                LOG.log(Level.FINE, "Skipping semantic face #{0}: {1}",
-                        new Object[]{faceEntity.id(), e.getMessage()});
+                faceFailures++;
+                if (firstFaceFailure == null) {
+                    firstFaceFailure = "#" + faceEntity.id() + ": " + e.getMessage();
+                }
             }
         }
+        if (faceFailures > 0) {
+            LOG.warn("Skipped {} face(s) during mesh export; first failure: {}", faceFailures, firstFaceFailure);
+        }
         // Sequential triangulation of solids/shells (complex dependencies)
+        int solidFailures = 0;
+        String firstSolidFailure = null;
+        int shellFailures = 0;
+        String firstShellFailure = null;
         for (Map.Entry<Integer, StepEntity> entry : resolved.entrySet()) {
             int id = entry.getKey();
             StepEntity entity = entry.getValue();
@@ -536,16 +547,28 @@ public final class StepMeshExporter {
                     Solid solid = builder.buildSolid(id);
                     t.triangulateSolid(solid);
                 } catch (Exception e) {
-                    LOG.log(Level.FINE, "Skipping solid #{0}: {1}", new Object[]{id, e.getMessage()});
+                    solidFailures++;
+                    if (firstSolidFailure == null) {
+                        firstSolidFailure = "#" + id + ": " + e.getMessage();
+                    }
                 }
             } else if (isShellCandidate(entity)) {
                 try {
                     Shell shell = builder.buildShell(id);
                     t.triangulateShell(shell);
                 } catch (Exception e) {
-                    LOG.log(Level.FINE, "Skipping shell #{0}: {1}", new Object[]{id, e.getMessage()});
+                    shellFailures++;
+                    if (firstShellFailure == null) {
+                        firstShellFailure = "#" + id + ": " + e.getMessage();
+                    }
                 }
             }
+        }
+        if (solidFailures > 0) {
+            LOG.warn("Skipped {} solid(s) during mesh export; first failure: {}", solidFailures, firstSolidFailure);
+        }
+        if (shellFailures > 0) {
+            LOG.warn("Skipped {} shell(s) during mesh export; first failure: {}", shellFailures, firstShellFailure);
         }
         return t.toMeshData();
     }
