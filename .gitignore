@@ -1,5 +1,6 @@
 target/
 .worktrees/
+.minicad-cache/
 .idea/
 .claude/
 .workbuddy/
