@@ -213,15 +213,10 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <!-- 手写代码口径下限：2026-08-29 补完 preview.sampling /
-                                                 builder / mapper 纯函数单测后实测 55.34%，故门槛由 0.50
-                                                 上调至 0.55。下一步爬坡目标 0.60，需打通 preview 管线级
-                                                 测试（PreviewCurveEvaluator / PreviewFaceBuilder /
-                                                 PreviewGeometryCollector 目前约 0-4%）。
-                                                 注：PreviewUvMapper / PreviewEdgeSampler /
-                                                 PreviewPcurveSampler / PcurveMatcher 四个零调用死类
-                                                 已于 2026-08-29 删除（约 1142 行），可从 git 历史恢复。 -->
-                                            <minimum>0.55</minimum>
+                                            <!-- 手写代码口径下限：2026-08-30 实测 60.1%（coverage 口径
+                                                 剔除 tool/ANTLR 生成物 + preview 管线测试落地后），门槛由
+                                                 0.55 上调至 0.60。下一步爬坡靶点：step.semantic（50%）。 -->
+                                            <minimum>0.60</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
