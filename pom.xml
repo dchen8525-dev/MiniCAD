@@ -36,6 +36,27 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-bom</artifactId>
+                <version>${jetty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.ee10</groupId>
+                <artifactId>jetty-ee10-bom</artifactId>
+                <version>${jetty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
@@ -44,21 +65,6 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${junit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-server</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty.ee10</groupId>
-                <artifactId>jetty-ee10-servlet</artifactId>
-                <version>${jetty.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
@@ -170,6 +176,13 @@
                          使覆盖率指标失真且不可达。按“手写代码覆盖率”口径度量，排除之。 -->
                     <excludes>
                         <exclude>com/minicad/step/model/**</exclude>
+                        <!-- 开发期 codegen CLI（与 step.model 同理，不进运行时口径） -->
+                        <exclude>com/minicad/tool/**</exclude>
+                        <!-- ANTLR 生成解析器（与手写的 StepAntlrBridge 同包，逐类排除以免误伤） -->
+                        <exclude>com/minicad/step/syntax/StepAntlrLexer</exclude>
+                        <exclude>com/minicad/step/syntax/StepAntlrParser*</exclude>
+                        <exclude>com/minicad/step/syntax/StepAntlr*Listener</exclude>
+                        <exclude>com/minicad/step/syntax/StepAntlr*Visitor</exclude>
                     </excludes>
                 </configuration>
                 <executions>

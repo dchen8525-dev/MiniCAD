@@ -1,64 +1,50 @@
 # 测试覆盖体检（结构化映射）
 
-> 生成：2026-08-27（结构估算）。2026-08-29 校准：Maven 已可用，下表改为 jacoco 实测行覆盖。
-> 门禁：`pom.xml` jacoco `check`——手写代码口径（排除 `step.model` 1265 个 codegen 类）
-> BUNDLE 行覆盖 ≥ 0.55，绑定在 `test` 阶段，`mvn test` 即强制；报告在 `target/site/jacoco/`。
-> 基线：2026-08-29 `mvn test`，2047 个测试全绿，手写代码整体行覆盖 **56.5%**。
+> 生成：2026-08-27（结构估算）。2026-08-29 首次校准为 jacoco 实测；2026-08-30 再校准。
+> 门禁：`pom.xml` jacoco `check`——手写代码口径（排除 `step.model` 1265 个 codegen 类、
+> `tool` 包 5 个开发期 codegen CLI、ANTLR 生成的 6 个语法类）BUNDLE 行覆盖 ≥ 0.55，
+> 绑定在 `test` 阶段，`mvn test` 即强制；报告在 `target/site/jacoco/`。
+> 工具链：JDK 17+（本地 26 验证），字节码目标 17。
 
-## 包级行覆盖（jacoco 实测，2026-08-29）
+## 包级行覆盖（jacoco 实测，2026-08-30 口径校准前）
 
 | 包 | 行覆盖 | 评估 |
 |---|---:|---|
-| common | 87.9% | OK |
-| geometry2d | 81.6% | OK |
-| topology | 80.6% | OK |
-| geometry | 80.5% | OK |
+| common | 86.2% | OK |
+| geometry2d | 81.9% | OK（真 De Boor 落地后） |
+| geometry | 80.8% | OK（Cox-de Boor 表格式已锁独立参考测试） |
+| app | 78.2% | OK |
 | preview.statistics | 78.7% | OK |
-| app | 78.1% | OK |
 | builder | 77.6% | OK |
-| helper | 73.5% | OK（靠间接覆盖） |
-| export.json | 71.2% | 已有 samples 全量 JSON 导出契约测试兜底 |
-| export.mesh | 63.3% | 间接覆盖为主（app 层 OBJ/STL 断言） |
+| topology | 78.2% | OK |
+| export.json | 71.7% | samples 全量 JSON 契约测试兜底 |
+| helper | 72.7% | 靠间接覆盖 |
+| export.mesh | 63.9% | 间接覆盖为主 |
 | preview.mapper | 63.1% | 已补 `PreviewUvCoordsTest` |
-| preview.payload | 55.0% | 45 个 DTO 仅 `UvBounds` 有专属测试 |
-| step.syntax | 55.2% | 含 ANTLR 生成解析器（约 3.5% 分母），口径待排除 |
-| export.glb | 52.2% | **零专属测试文件**，靠 app 层 GLB 字节断言间接 |
-| step.semantic | 47.6% | **绝对缺口最大**（11,222 missed 行） |
-| preview.sampling | 29.8% | 已补 6 个纯函数测试，管线级仍缺 |
-| preview.builder | 15.9% | 仅 `mergeGeometry`/`reverseFacePayload` 两个纯函数被测 |
-| tool | 0.0% | codegen CLI 工具，零引用零测试 |
+| preview.payload | 55.2% | 45 个 DTO 仅 UvBounds 有专属测试 |
+| step.syntax | 58.1% | 含 ANTLR 生成物（已入排除口径） |
+| export.glb | 52.2% | 零专属测试文件，靠 app 层间接 |
+| step.semantic | 50.0% | **绝对缺口最大**（~10,200 missed 行） |
+| preview.sampling | 33.9% | 纯函数多，**最好爬的池** |
+| preview.builder | 24.8% | `PreviewPipelineTest` 已锁主入口（0→13%） |
+| preview.sampling(Evaluator) | 5% | `PreviewCurveEvaluator` 主入口已测，深处待补 |
+| tool | 0% | codegen CLI，已从口径剔除 |
 
-## 补测优先级（2026-08-29 更新）
+## 补测优先级（2026-08-30 更新）
 
-1. **P0 — preview 管线三个核心类**：`PreviewCurveEvaluator`（1,693 行，**0%**）、
-   `PreviewFaceBuilder`（1,866 行，约 4%）、`PreviewGeometryCollector`（约 1%）。
-   注意 `PreviewCurveEvaluator` 与 `StepPreviewJsonExporter` 存在 verbatim 复制耦合
-   （`sampleLooseCurvePoints`），先解耦再补测试才划算。
-2. **P1 — export.glb**：4 个类零专属测试。复用 samples 循环，断言 GLB 头/长度/非空即可。
-3. **P1 — step.semantic 大类**：`StepCadBuilder`（4,397 行）、`StepEntityResolver`
-   （6,455 行）、`StepCadSurfaceBuilder`、`GeometryResolver`、`AnalysisResolver`
-   （308 行仅 3 行被覆盖）。用手写 STEP 文本 fixture 定向打分支；真实世界分支依赖
-   `src/test/resources/step/realworld/local-only/`（设计上不入库，放入语料后自动生效，
-   但 CI 上恒为空——注意假绿风险，语料为空时应 `assumeTrue` 跳过）。
-4. **P2 — export.json payload builders 与 preview.payload 其余 44 个 DTO**：
-   只测不变量（span、defensive copy、equals 契约），勿照抄逐 getter 的低价值断言。
-5. **P3 — tool 包（0%）**：补冒烟测试，或从 jacoco 口径剔除（与 `step.model` 同理）。
+1. **preview.sampling**（纯函数，参数化测试性价比最高）。
+2. **step.semantic 大类分支**：样例驱动（照 `PreviewPipelineTest` 模式）。
+3. **export.glb**：samples 循环 + GLB 头/长度断言。
+4. preview.payload 其余 44 个 DTO：只测不变量。
 
-## 已完成的补测（本轮，2026-08-29）
+## 已完成的里程碑
 
-- preview.sampling / builder / mapper / payload / statistics 纯函数单测（9 个文件）
-- `export.json/StepPreviewJsonExporterTest`：全部 samples 走 JSON 导出契约断言
-- `geometry/BSplineCurveFullConsistencyTest`
-- `step/SamplesParseSmokeTest`：45 个 STEP 全量 parse→resolve→build 回归
-- `step/model/StepModelEntityAccessorTest`：1265 个生成类反射冒烟
-- 同轮删除 4 个零调用死类（约 1142 行）与 `StepCurveMetadataHelper` 死类
+- 2026-08-29：preview 四包纯函数测试 + SamplesParseSmokeTest + jacoco 0.50→0.55
+- 2026-08-30：PreviewPipelineTest（三兄弟 0-4% → 5-15%）、2D B-spline 真 De Boor、
+  批 C 死子图删除（StepCadSurfaceBuilder 1847→153）、StepEntityResolver 助手提取（6484→5909+760）
+- 工具链：maven wrapper（3.9.16）、JDK 17+ 字节码、Jetty 12.0.15、CodeQL 恢复
 
-## 工具链（2026-08-29 更新）
+## 工具链备忘
 
-- Maven 已可用（wrapper 分发包 + JDK 11），并已提交 **maven wrapper**（`./mvnw` /
-  `mvnw.cmd`，钉 3.9.16）——依赖解析与 classpath 以 Maven 为唯一真相源。
-- `tools/build_test_classpath.py` 与 `target/cp.txt` 已退役（原为无 Maven 环境的手拼
-  classpath 方案，ghost 路径防御不再需要）。
-- `lib/` 的 junit-platform-console-standalone jar 已删除，测试统一走 surefire。
-- ANTLR 生成物位于 `target/generated-sources/antlr4/com/minicad/step/syntax/`，
-  与手写代码同包计数——建议后续把 `StepAntlr*` 纳入 jacoco 排除口径（约 +3.5%）。
+- ANTLR 生成物与手写 `StepAntlrBridge` 同包——jacoco 按类名逐个排除（见 pom 注释）。
+- `tools/analyze_surface_builder_closure.sh`：方法闭包分析器（批 C 已执行完毕，留档防复发）。
