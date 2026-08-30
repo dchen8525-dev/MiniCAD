@@ -137,4 +137,23 @@ class BSplineCurveFullConsistencyTest {
         // Matches the VerifyCurves harness bound (1.1e-16 for double precision).
         assertEquals(0.0, maxRadiusError, 1.1e-15, "NURBS quarter-circle radius drift");
     }
+
+    @Test
+    void parameterAtRoundTripsToTheExactParameter() {
+        List<CartesianPoint> controlPoints = List.of(
+                new CartesianPoint(0, 0, 0),
+                new CartesianPoint(1, 1, 0),
+                new CartesianPoint(2, 1, 0),
+                new CartesianPoint(3, 0, 0));
+        BSplineCurve3 nonRational = new BSplineCurve3(3, controlPoints, List.of(4, 4), List.of(0.0, 1.0));
+        RationalBSplineCurve3 rational = new RationalBSplineCurve3(
+                3, controlPoints, List.of(1.0, 1.0, 1.0, 1.0), List.of(4, 4), List.of(0.0, 1.0));
+
+        // A 1024-sample scan alone quantizes the answer to ~5e-4; the local
+        // refinement must land back on the original parameter to ~1e-9.
+        for (double t : new double[] {0.05, 0.37, 0.62, 0.95}) {
+            assertEquals(t, nonRational.parameterAt(nonRational.pointAt(t)), 1e-9, "non-rational t=" + t);
+            assertEquals(t, rational.parameterAt(rational.pointAt(t)), 1e-9, "rational t=" + t);
+        }
+    }
 }

@@ -202,6 +202,13 @@ final class StepTrimResolver {
     }
 
     double parameterOnCurve2(Curve2 curve, Point2 point) {
+        // Known limitation: for closed conic bases (full Circle2/Ellipse2) the
+        // returned angle is the raw atan2 in [-pi, pi]. A Cartesian-point trim
+        // on a full revolution is ambiguous in STEP (which arc is intended),
+        // so resolving the wrap here would require the sibling trim value and
+        // sense agreement; all corpus files use numeric trims or seam handling
+        // for that case. If a wrap bug ever shows up, fix it in
+        // StepCadCurveBuilder.buildTrimmedCurve2 where both bounds are known.
         if (curve instanceof Line2) {
             Line2 line = (Line2) curve;
             return line.parameterOf(point);

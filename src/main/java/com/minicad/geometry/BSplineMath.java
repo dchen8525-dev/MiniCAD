@@ -207,4 +207,30 @@ public final class BSplineMath {
         }
         return Math.max(min, Math.min(value, max));
     }
+
+    /**
+     * Refines a local minimum of a smooth 1-D function with a ternary search.
+     * Used to polish the coarse nearest-sample result of parameter-space
+     * inversions, whose resolution is otherwise bounded by the sample step.
+     *
+     * @param distanceAt distance function (assumed unimodal on [lo, hi])
+     * @param lo lower bracket
+     * @param hi upper bracket
+     * @param iterations number of interval-shrinking rounds
+     * @return the refined minimizer
+     */
+    public static double refineLocalMinimum(java.util.function.DoubleUnaryOperator distanceAt,
+                                            double lo, double hi, int iterations) {
+        for (int i = 0; i < iterations; i++) {
+            double third = (hi - lo) / 3.0;
+            double m1 = lo + third;
+            double m2 = hi - third;
+            if (distanceAt.applyAsDouble(m1) <= distanceAt.applyAsDouble(m2)) {
+                hi = m2;
+            } else {
+                lo = m1;
+            }
+        }
+        return (lo + hi) / 2.0;
+    }
 }

@@ -249,7 +249,17 @@ public final class BSplineCurve3 implements Curve3 {
                 bestParameter = parameter;
             }
         }
-        return bestParameter;
+        // The coarse scan quantizes to domain/1024; polish the winner locally
+        // so Edge sampling lands its endpoint parameters on the true vertices.
+        // Keep the coarse winner when refinement does not improve on it - the
+        // minimum may sit exactly on a bracket boundary (e.g. an endpoint hit).
+        double step = (end - start) / samples;
+        double refined = BSplineMath.refineLocalMinimum(
+                p -> point.distanceTo(pointAt(p)),
+                Math.max(start, bestParameter - step),
+                Math.min(end, bestParameter + step),
+                40);
+        return point.distanceTo(pointAt(refined)) <= bestDistance ? refined : bestParameter;
     }
 
     @Override
