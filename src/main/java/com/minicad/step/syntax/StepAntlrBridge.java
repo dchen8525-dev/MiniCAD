@@ -40,6 +40,19 @@ public final class StepAntlrBridge {
         // Pre-parse validation for unterminated constructs (Phase 5)
         validateUnterminatedConstructs(stepText);
 
+        // Chunked fast path: parse the DATA section one entity statement at a
+        // time so only a small token buffer and parse tree are alive at once.
+        // Any surprise falls back to the whole-file parse, which owns the
+        // precise error diagnostics.
+        StepFile chunked = StepChunkedFileParser.tryParseInChunks(stepText);
+        if (chunked != null) {
+            return chunked;
+        }
+
+        return parseWholeFile(stepText);
+    }
+
+    private static StepFile parseWholeFile(String stepText) {
         // Fast path: SLL prediction with a bail-out error strategy. Any file the
         // fast path cannot prove valid (prediction bail or lexer error) is re-parsed
         // with the full LL configuration, so error reporting for malformed files
@@ -194,7 +207,7 @@ public final class StepAntlrBridge {
         return new StepFile(headerEntries, entities);
     }
 
-    private static StepHeaderEntry convertHeaderEntry(StepAntlrParser.HeaderEntryContext ctx) {
+    static StepHeaderEntry convertHeaderEntry(StepAntlrParser.HeaderEntryContext ctx) {
         // HEADER entries are TYPE_NAME(parameters) format
         String name = ctx.typeName().getText();
         List<StepValue> parameters = new ArrayList<>();
@@ -206,7 +219,7 @@ public final class StepAntlrBridge {
         return new StepHeaderEntry(name, parameters);
     }
 
-    private static StepEntityInstance convertEntityInstance(StepAntlrParser.EntityInstanceContext ctx) {
+    static StepEntityInstance convertEntityInstance(StepAntlrParser.EntityInstanceContext ctx) {
         int id = extractEntityId(ctx.entityId());
 
         if (ctx.simpleEntity() != null) {

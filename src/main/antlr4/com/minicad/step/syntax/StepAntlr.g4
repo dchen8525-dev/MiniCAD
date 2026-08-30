@@ -25,6 +25,17 @@ stepFile
     : ISO_HEADER? headerSection? anchorSection? referenceSection? dataSection? ISO_FOOTER? EOF
     ;
 
+/* Chunked-parsing entry points: the bridge slices the DATA section into
+   per-entity statements and parses each with these rules so that only one
+   small parse tree is alive at a time. */
+filePrologue
+    : ISO_HEADER? headerSection? anchorSection? referenceSection? EOF
+    ;
+
+entityInstanceStatement
+    : entityInstance EOF
+    ;
+
 /* HEADER section: entries are TYPE_NAME(parameters), not #id=parameter */
 headerSection
     : HEADER_SEMI headerEntry* ENDSEC_SEMI
