@@ -56,13 +56,19 @@ import com.minicad.step.model.StepCartesianTransformationOperator;
 import com.minicad.step.model.StepDirection;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 final class StepCadGeometryOps {
 
     private final StepCadBuilder builder;
+    // transformBasis3 re-resolves axis directions through the (memoized)
+    // builder and re-validates orthogonality; transformPoint3 calls it once
+    // per control point on B-spline transforms, so cache per transformation id.
+    private final Map<Integer, TransformBasis3> transformBasisCache = new HashMap<>();
 
     StepCadGeometryOps(StepCadBuilder builder) {
         this.builder = builder;
@@ -847,11 +853,17 @@ final class StepCadGeometryOps {
     }
 
     private TransformBasis3 transformBasis3(StepCartesianTransformationOperator transformation) {
+        TransformBasis3 cached = transformBasisCache.get(transformation.id());
+        if (cached != null) {
+            return cached;
+        }
         Vector3 axis1 = transformAxis1_3(transformation);
         Vector3 axis2 = transformAxis2OrDefault3(transformation, axis1);
         Vector3 axis3 = transformAxis3OrDefault3(transformation, axis1, axis2);
         validateOrthogonalBasis3(transformation, axis1, axis2, axis3);
-        return new TransformBasis3(axis1, axis2, axis3);
+        TransformBasis3 basis = new TransformBasis3(axis1, axis2, axis3);
+        transformBasisCache.put(transformation.id(), basis);
+        return basis;
     }
 
     private static void validateOrthogonalBasis3(
