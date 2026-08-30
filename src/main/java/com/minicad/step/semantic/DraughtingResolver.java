@@ -76,7 +76,7 @@ final class DraughtingResolver {
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity relating = resolver.resolve(resolver.referenceId(instance, definition, 2));
     StepEntity related = resolver.resolve(resolver.referenceId(instance, definition, 3));
-    if (!resolver.isAnnotationOccurrence(relating) || !resolver.isAnnotationOccurrence(related)) {
+    if (!StepResolverValueHelpers.isAnnotationOccurrence(relating) || !StepResolverValueHelpers.isAnnotationOccurrence(related)) {
       throw new UnsupportedStepEntityException(
           entityName + " occurrences must reference supported annotation occurrence entities");
     }

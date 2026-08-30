@@ -34,7 +34,7 @@ final class GeometryResolver {
     return new StepCartesianPoint(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.coordinateList(instance, definition, 1, 2, 3));
+        StepResolverValueHelpers.coordinateList(instance, definition, 1, 2, 3));
   }
 
   StepDirection resolveDirection(StepEntityInstance instance) {
@@ -43,7 +43,7 @@ final class GeometryResolver {
     return new StepDirection(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.coordinateList(instance, definition, 1, 2, 3));
+        StepResolverValueHelpers.coordinateList(instance, definition, 1, 2, 3));
   }
 
   StepVector resolveVector(StepEntityInstance instance) {
@@ -73,13 +73,13 @@ final class GeometryResolver {
         resolver.referenceId(instance, definition, 1),
         StepCartesianPoint.class,
         "AXIS2_PLACEMENT_3D location must reference CARTESIAN_POINT");
-    StepDirection axis = resolver.isUnset(definition.parameters().get(2))
+    StepDirection axis = StepResolverValueHelpers.isUnset(definition.parameters().get(2))
         ? defaultAxis()
         : resolver.requireEntity(
             resolver.referenceId(instance, definition, 2),
             StepDirection.class,
             "AXIS2_PLACEMENT_3D axis must reference DIRECTION");
-    StepDirection refDirection = resolver.isUnset(definition.parameters().get(3))
+    StepDirection refDirection = StepResolverValueHelpers.isUnset(definition.parameters().get(3))
         ? defaultRefDirection(axis)
         : resolver.requireEntity(
             resolver.referenceId(instance, definition, 3),
@@ -117,7 +117,7 @@ final class GeometryResolver {
         resolver.referenceId(instance, definition, 1),
         StepCartesianPoint.class,
         "AXIS2_PLACEMENT_2D location must reference CARTESIAN_POINT");
-    StepDirection refDirection = resolver.isUnset(definition.parameters().get(2))
+    StepDirection refDirection = StepResolverValueHelpers.isUnset(definition.parameters().get(2))
         ? new StepDirection(0, "", List.of(1.0, 0.0))
         : resolver.requireEntity(
             resolver.referenceId(instance, definition, 2),
@@ -234,7 +234,7 @@ final class GeometryResolver {
     StepEntityDefinition definition = resolver.definition(instance, "OFFSET_CURVE_3D");
     StepEntityResolver.requireParameterCount(instance, definition, 5);
     StepEntity basisCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(basisCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(basisCurve)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_CURVE_3D basis_curve must reference a supported curve");
     }
@@ -254,7 +254,7 @@ final class GeometryResolver {
     StepEntityDefinition definition = resolver.definition(instance, "OFFSET_CURVE_2D");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity basisCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(basisCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(basisCurve)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_CURVE_2D basis_curve must reference a supported curve");
     }
@@ -277,7 +277,7 @@ final class GeometryResolver {
           "ORIENTED_CURVE curve_element must not self-reference");
     }
     StepEntity curveElement = resolver.resolve(curveElementId);
-    if (!resolver.isSupportedCurveReference(curveElement)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(curveElement)) {
       throw new UnsupportedStepEntityException(
           "ORIENTED_CURVE curve_element must reference a supported curve");
     }
@@ -292,7 +292,7 @@ final class GeometryResolver {
     StepEntityDefinition definition = resolver.definition(instance, "ORIENTED_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity surfaceElement = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(surfaceElement)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(surfaceElement)) {
       throw new UnsupportedStepEntityException(
           "ORIENTED_SURFACE surface_element must reference a supported surface");
     }
@@ -307,7 +307,7 @@ final class GeometryResolver {
     StepEntityDefinition definition = resolver.definition(instance, "OFFSET_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_SURFACE basis_surface must reference a supported surface");
     }
@@ -325,7 +325,7 @@ final class GeometryResolver {
     StepEntityDefinition definition = resolver.definition(instance, "COMPOSITE_CURVE_SEGMENT");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity parentCurve = resolver.resolve(resolver.referenceId(instance, definition, 2));
-    if (!resolver.isSupportedCurveReference(parentCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(parentCurve)) {
       throw new UnsupportedStepEntityException(
           "COMPOSITE_CURVE_SEGMENT parent_curve must reference a supported curve");
     }
@@ -615,7 +615,7 @@ final class GeometryResolver {
         resolver.booleanValue(instance, base, 4),
         resolver.booleanValue(instance, base, 5),
         resolver.booleanValue(instance, base, 6),
-        resolver.numberGrid(instance, rational, 0),
+        StepResolverValueHelpers.numberGrid(instance, rational, 0),
         uMultiplicities,
         vMultiplicities,
         uKnots,

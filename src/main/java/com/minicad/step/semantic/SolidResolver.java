@@ -283,7 +283,7 @@ final class SolidResolver {
     StepEntityDefinition definition = resolver.definition(instance, "SWEPT_DISK_SOLID");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity sweptCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(sweptCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(sweptCurve)) {
       throw new UnsupportedStepEntityException(
           "SWEPT_DISK_SOLID swept_curve must reference a supported curve");
     }

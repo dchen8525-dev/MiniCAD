@@ -106,9 +106,9 @@ final class AssignmentResolver {
         resolver.optionalStringValue(instance, definition, 0),
         resolver.optionalStringValue(instance, definition, 1),
         resolver.optionalStringValue(instance, definition, 2),
-        resolver.optionalStringListValue(instance, definition, 3),
-        resolver.optionalStringListValue(instance, definition, 4),
-        resolver.optionalStringListValue(instance, definition, 5));
+        StepResolverValueHelpers.optionalStringListValue(instance, definition, 3),
+        StepResolverValueHelpers.optionalStringListValue(instance, definition, 4),
+        StepResolverValueHelpers.optionalStringListValue(instance, definition, 5));
   }
 
   StepPersonAddress resolvePersonAddress(StepEntityInstance instance) {

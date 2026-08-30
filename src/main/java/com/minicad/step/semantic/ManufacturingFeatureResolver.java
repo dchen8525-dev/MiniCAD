@@ -184,7 +184,7 @@ class ManufacturingFeatureResolver {
             resolver.resolve(resolver.referenceId(instance, definition, 1)),
             resolver.resolve(resolver.referenceId(instance, definition, 2)),
             resolver.optionalNumberValue(instance, definition, 3),
-            resolver.optionalIntegerValue(instance, definition, 4));
+            StepResolverValueHelpers.optionalIntegerValue(instance, definition, 4));
     }
 
     StepLinearPattern resolveLinearPattern(StepEntityInstance instance) {
@@ -196,6 +196,6 @@ class ManufacturingFeatureResolver {
             resolver.resolve(resolver.referenceId(instance, definition, 1)),
             resolver.resolve(resolver.referenceId(instance, definition, 2)),
             resolver.optionalNumberValue(instance, definition, 3),
-            resolver.optionalIntegerValue(instance, definition, 4));
+            StepResolverValueHelpers.optionalIntegerValue(instance, definition, 4));
     }
 }

@@ -222,7 +222,7 @@ final class BSplineResolver {
         resolver.booleanValue(instance, base, 4),
         resolver.booleanValue(instance, base, 5),
         resolver.booleanValue(instance, base, 6),
-        resolver.numberGrid(instance, rational, 0),
+        StepResolverValueHelpers.numberGrid(instance, rational, 0),
         uMultiplicities,
         vMultiplicities,
         uKnots,

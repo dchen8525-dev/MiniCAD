@@ -1106,9 +1106,9 @@ public final class StepEntityResolver {
     if ("POINT_REPLICA".equals(entityName)) {
       validParent = parent instanceof StepCartesianPoint || parent instanceof StepVertexPoint;
     } else if ("CURVE_REPLICA".equals(entityName)) {
-      validParent = isSupportedCurveReference(parent);
+      validParent = StepResolverValueHelpers.isSupportedCurveReference(parent);
     } else if ("SURFACE_REPLICA".equals(entityName)) {
-      validParent = isSupportedSurfaceReference(parent);
+      validParent = StepResolverValueHelpers.isSupportedSurfaceReference(parent);
     } else {
       validParent = false;
     }
@@ -1531,7 +1531,7 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 1),
         numberValue(instance, definition, 2),
         resolve(referenceId(instance, definition, 3)),
-        literalList(instance, definition, 4));
+        StepResolverValueHelpers.literalList(instance, definition, 4));
   }
 
   // Phase 3: GD&T extended tolerance resolve methods
@@ -2604,7 +2604,7 @@ public final class StepEntityResolver {
         instance.id(),
         stringValue(instance, definition, 0),
         points,
-        intList(instance, definition, 2),
+        StepResolverValueHelpers.intList(instance, definition, 2),
         booleanValue(instance, definition, 4));
   }
 
@@ -2815,7 +2815,7 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         stringValue(instance, definition, 1),
         resolve(referenceId(instance, definition, 2)),
-        stringList(instance, definition, 3),
+        StepResolverValueHelpers.stringList(instance, definition, 3),
         stringValue(instance, definition, 4));
   }
 
@@ -2841,7 +2841,7 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 0),
         stringValue(instance, definition, 1),
         stringValue(instance, definition, 2),
-        stringList(instance, definition, 3),
+        StepResolverValueHelpers.stringList(instance, definition, 3),
         stringValue(instance, definition, 4),
         stringValue(instance, definition, 5));
   }
@@ -3445,7 +3445,7 @@ public final class StepEntityResolver {
     return new StepCoordinatedUniversalTimeOffset(
         instance.id(),
         integerValue(instance, definition, 0),
-        optionalIntegerValue(instance, definition, 1),
+        StepResolverValueHelpers.optionalIntegerValue(instance, definition, 1),
         enumValue(instance, definition, 2));
   }
 
@@ -4040,7 +4040,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "NAMED_UNIT");
     requireParameterCount(instance, definition, 1);
     StepValue dimensions = unwrapTyped(definition.parameters().get(0));
-    if (isUnset(dimensions)) {
+    if (StepResolverValueHelpers.isUnset(dimensions)) {
       return;
     }
     if (!(dimensions instanceof StepValue.ReferenceValue)) {
@@ -4283,19 +4283,19 @@ public final class StepEntityResolver {
   StepVertex resolveVertex(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "VERTEX");
     requireParameterCount(instance, definition, 0);
-    return new StepVertex(instance.id(), inheritedTopologicalRepresentationItemName(instance));
+    return new StepVertex(instance.id(), StepResolverValueHelpers.inheritedTopologicalRepresentationItemName(instance));
   }
 
   StepEdge resolveEdge(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "EDGE");
     requireParameterCount(instance, definition, 0);
-    return new StepEdge(instance.id(), inheritedTopologicalRepresentationItemName(instance));
+    return new StepEdge(instance.id(), StepResolverValueHelpers.inheritedTopologicalRepresentationItemName(instance));
   }
 
   StepFace resolveFace(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "FACE");
     requireParameterCount(instance, definition, 0);
-    return new StepFace(instance.id(), inheritedTopologicalRepresentationItemName(instance));
+    return new StepFace(instance.id(), StepResolverValueHelpers.inheritedTopologicalRepresentationItemName(instance));
   }
 
   StepColourRgb resolveColourRgb(StepEntityInstance instance) {
@@ -4442,7 +4442,7 @@ public final class StepEntityResolver {
       throw new UnsupportedStepEntityException(
           "TEXT_STYLE_WITH_BOX_CHARACTERISTICS character_appearance must reference TEXT_STYLE_FOR_DEFINED_FONT");
     }
-    List<String> boxCharacteristics = literalList(instance, definition, 2);
+    List<String> boxCharacteristics = StepResolverValueHelpers.literalList(instance, definition, 2);
     if (boxCharacteristics.isEmpty()) {
       throw new StepResolutionException(
           "TEXT_STYLE_WITH_BOX_CHARACTERISTICS box_characteristics must not be empty");
@@ -4893,7 +4893,7 @@ public final class StepEntityResolver {
     StepEntityDefinition definition = definition(instance, "SUBFACE");
     requireParameterCount(instance, definition, 3);
     StepEntity faceElement = resolve(referenceId(instance, definition, 1));
-    if (!isSupportedSurfaceReference(faceElement)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(faceElement)) {
       throw new UnsupportedStepEntityException(
           "SUBFACE face_element must reference a supported surface");
     }
@@ -5080,7 +5080,7 @@ public final class StepEntityResolver {
   }
 
   boolean isSupportedAnnotationCurveCarrier(StepEntity item) {
-    return isSupportedCurveReference(item)
+    return StepResolverValueHelpers.isSupportedCurveReference(item)
         || item instanceof StepEdgeCurve
         || item instanceof StepSubedge
         || item instanceof StepOrientedEdge
@@ -5134,7 +5134,7 @@ public final class StepEntityResolver {
         || item instanceof StepAnnotationText
         || item instanceof StepAnnotationTextCharacter
         || item instanceof StepAnnotationFillArea
-        || isAnnotationOccurrence(item);
+        || StepResolverValueHelpers.isAnnotationOccurrence(item);
   }
 
   StepGeometricSet resolveGeometricSet(StepEntityInstance instance) {
@@ -5153,7 +5153,7 @@ public final class StepEntityResolver {
   }
 
   boolean isSupportedGeometricCurveSetElement(StepEntity element) {
-    return isSupportedCurveReference(element)
+    return StepResolverValueHelpers.isSupportedCurveReference(element)
         || isPointLikeSetElement(element)
         || element instanceof StepEdgeCurve
         || element instanceof StepSubedge
@@ -5177,7 +5177,7 @@ public final class StepEntityResolver {
 
   boolean isSupportedGeometricSetElement(StepEntity element) {
     return isSupportedGeometricCurveSetElement(element)
-        || isSupportedSurfaceReference(element)
+        || StepResolverValueHelpers.isSupportedSurfaceReference(element)
         || element instanceof StepVertexLoop
         || element instanceof StepWireShell
         || element instanceof StepOpenShell
@@ -5347,154 +5347,88 @@ public final class StepEntityResolver {
     return representationResolver.resolveShapeAspectOccurrence(instance);
   }
 
+  // Package-private shims retained for the stateless value helpers that have
+  // more than 30 call sites across the resolver package. The bodies live
+  // verbatim in StepResolverValueHelpers; these wrappers only forward.
+
   StepEntityDefinition definition(StepEntityInstance instance, String name) {
-    return instance.requireDefinition(name);
+    return StepResolverValueHelpers.definition(instance, name);
   }
 
   static void requireParameterCount(
       StepEntityInstance instance, StepEntityDefinition definition, int expected) {
-    StepParameterReader.requireParameterCount(instance, definition, expected);
+    StepResolverValueHelpers.requireParameterCount(instance, definition, expected);
   }
 
   static void requireParameterCountIn(
       StepEntityInstance instance, StepEntityDefinition definition, int... expectedCounts) {
-    StepParameterReader.requireParameterCountIn(instance, definition, expectedCounts);
+    StepResolverValueHelpers.requireParameterCountIn(instance, definition, expectedCounts);
   }
 
   String stringValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.StringValue) {
-      StepValue.StringValue stringValue = (StepValue.StringValue) value;
-      return stringValue.value();
-    }
-    throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "string");
+    return StepResolverValueHelpers.stringValue(instance, definition, index);
   }
 
   String optionalStringValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = definition.parameters().get(index);
-    if (isUnset(value)) {
-      return "";
-    }
-    return stringValue(instance, definition, index);
-  }
-
-  List<String> optionalStringListValue(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = definition.parameters().get(index);
-    if (isUnset(value)) {
-      return List.of();
-    }
-    StepValue unwrapped = unwrapTyped(value);
-    if (!(unwrapped instanceof StepValue.ListValue)) {
-      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "string list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) unwrapped;
-    List<String> result = new ArrayList<>(listValue.elements().size());
-    for (StepValue element : listValue.elements()) {
-      StepValue unwrappedElement = unwrapTyped(element);
-      if (!(unwrappedElement instanceof StepValue.StringValue)) {
-        throw new StepResolutionException(
-            definition.name() + " string list must contain only strings");
-      }
-      StepValue.StringValue stringValue = (StepValue.StringValue) unwrappedElement;
-      result.add(stringValue.value());
-    }
-    return List.copyOf(result);
+    return StepResolverValueHelpers.optionalStringValue(instance, definition, index);
   }
 
   double numberValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.NumberValue) {
-      StepValue.NumberValue numberValue = (StepValue.NumberValue) value;
-      return numberValue.value();
-    }
-    throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "number");
-  }
-
-  int integerValue(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    double value = numberValue(instance, definition, index);
-    if (value != Math.rint(value)) {
-      throw new StepResolutionException(
-          "entity #"
-              + instance.id()
-              + " "
-              + definition.name()
-              + " parameter "
-              + index
-              + " type mismatch: expected integer, actual number");
-    }
-    return (int) value;
-  }
-
-  Integer optionalIntegerValue(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = definition.parameters().get(index);
-    if (isUnset(value)) {
-      return null;
-    }
-    return integerValue(instance, definition, index);
+    return StepResolverValueHelpers.numberValue(instance, definition, index);
   }
 
   Double optionalNumberValue(
       StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = definition.parameters().get(index);
-    if (isUnset(value)) {
-      return null;
-    }
-    return numberValue(instance, definition, index);
+    return StepResolverValueHelpers.optionalNumberValue(instance, definition, index);
+  }
+
+  int integerValue(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return StepResolverValueHelpers.integerValue(instance, definition, index);
+  }
+
+  String enumValue(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return StepResolverValueHelpers.enumValue(instance, definition, index);
+  }
+
+  boolean booleanValue(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return StepResolverValueHelpers.booleanValue(instance, definition, index);
+  }
+
+  int referenceId(StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return StepResolverValueHelpers.referenceId(instance, definition, index);
+  }
+
+  List<Double> numberList(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return StepResolverValueHelpers.numberList(instance, definition, index);
+  }
+
+  List<Integer> integerList(
+      StepEntityInstance instance, StepEntityDefinition definition, int index) {
+    return StepResolverValueHelpers.integerList(instance, definition, index);
+  }
+
+  StepValue unwrapTyped(StepValue value) {
+    return StepResolverValueHelpers.unwrapTyped(value);
+  }
+
+  String inheritedRepresentationItemName(StepEntityInstance instance) {
+    return StepResolverValueHelpers.inheritedRepresentationItemName(instance);
   }
 
   StepDirection optionalDirectionReference(
       StepEntityInstance instance, StepEntityDefinition definition, int index, String message) {
     StepValue value = definition.parameters().get(index);
-    if (isUnset(value)) {
+    if (StepResolverValueHelpers.isUnset(value)) {
       return null;
     }
     return requireEntity(referenceId(instance, definition, index), StepDirection.class, message);
-  }
-
-  String enumValue(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.EnumValue) {
-      StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
-      return enumValue.value();
-    }
-    throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "enum");
-  }
-
-  boolean booleanValue(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    String enumVal = enumValue(instance, definition, index);
-    if ("T".equals(enumVal)) {
-      return true;
-    }
-    if ("F".equals(enumVal)) {
-      return false;
-    }
-    throw new StepResolutionException(
-        "entity #"
-            + instance.id()
-            + " "
-            + definition.name()
-            + " parameter "
-            + index
-            + " type mismatch: expected boolean .T. or .F., actual enum ."
-            + enumVal
-            + ".");
-  }
-
-  int referenceId(StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.ReferenceValue) {
-      StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
-      return referenceValue.id();
-    }
-    throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "reference");
   }
 
   StepEntity tryResolveReference(StepValue value) {
@@ -5507,195 +5441,6 @@ public final class StepEntityResolver {
       return resolve(referenceValue.id());
     }
     throw new StepResolutionException("parameter must be a reference or omit/not-provided");
-  }
-
-  List<Double> coordinateTriple(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    return coordinateList(instance, definition, index, 3, 3);
-  }
-
-  List<Double> doubleList(StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) value;
-    return listValue.elements().stream()
-        .map(v -> numberValueFrom(instance, v, definition, index))
-        .collect(Collectors.toList());
-  }
-
-  double numberValueFrom(
-      StepEntityInstance instance, StepValue value, StepEntityDefinition definition, int index) {
-    value = unwrapTyped(value);
-    if (!(value instanceof StepValue.NumberValue)) {
-      throw parameterElementTypeMismatch(instance, definition, index, "number", value);
-    }
-    StepValue.NumberValue numberValue = (StepValue.NumberValue) value;
-    return numberValue.value();
-  }
-
-  List<Double> coordinateList(
-      StepEntityInstance instance,
-      StepEntityDefinition definition,
-      int index,
-      int minSize,
-      int maxSize) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) value;
-    if (listValue.elements().size() < minSize || listValue.elements().size() > maxSize) {
-      throw new UnsupportedStepEntityException(
-          definition.name() + " only supports " + minSize + "D to " + maxSize + "D coordinates");
-    }
-    List<Double> result = new ArrayList<>(listValue.elements().size());
-    for (StepValue element : listValue.elements()) {
-      StepValue unwrapped = unwrapTyped(element);
-      if (unwrapped instanceof StepValue.NumberValue) {
-        StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
-        result.add(numberValue.value());
-      } else {
-        throw parameterElementTypeMismatch(instance, definition, index, "number", element);
-      }
-    }
-    return List.copyOf(result);
-  }
-
-  List<Double> numberList(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) value;
-    List<Double> result = new ArrayList<>(listValue.elements().size());
-    for (StepValue element : listValue.elements()) {
-      StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.NumberValue)) {
-        throw parameterElementTypeMismatch(instance, definition, index, "number", element);
-      }
-      StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
-      result.add(numberValue.value());
-    }
-    return List.copyOf(result);
-  }
-
-  List<Integer> intList(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) value;
-    List<Integer> result = new ArrayList<>(listValue.elements().size());
-    for (StepValue element : listValue.elements()) {
-      StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.NumberValue)) {
-        throw parameterElementTypeMismatch(instance, definition, index, "number", element);
-      }
-      StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
-      result.add((int) numberValue.value());
-    }
-    return List.copyOf(result);
-  }
-
-  List<String> stringList(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) value;
-    List<String> result = new ArrayList<>(listValue.elements().size());
-    for (StepValue element : listValue.elements()) {
-      StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.StringValue)) {
-        throw parameterElementTypeMismatch(instance, definition, index, "string", element);
-      }
-      StepValue.StringValue strValue = (StepValue.StringValue) unwrapped;
-      result.add(strValue.value());
-    }
-    return List.copyOf(result);
-  }
-
-  String logicalValue(StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (value instanceof StepValue.EnumValue) {
-      StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
-      return enumValue.value();
-    }
-    if (value instanceof StepValue.StringValue) {
-      StepValue.StringValue strValue = (StepValue.StringValue) value;
-      return strValue.value();
-    }
-    throw StepParameterReader.parameterTypeMismatch(
-        instance, definition, index, "LOGICAL value (.T., .F., or .U.)");
-  }
-
-  /**
-   * Extracts a list of numbers from a pre-unwrapped StepValue.
-   * Useful when the caller has already handled nested list unwrapping.
-   */
-  List<Double> extractNumberList(StepEntityDefinition definition, StepValue value, String paramName) {
-    if (!(value instanceof StepValue.ListValue)) {
-      throw new StepResolutionException(paramName + " parameter must be a list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) value;
-    List<Double> result = new ArrayList<>(listValue.elements().size());
-    for (StepValue element : listValue.elements()) {
-      StepValue unwrapped = unwrapTyped(element);
-      if (!(unwrapped instanceof StepValue.NumberValue)) {
-        throw new StepResolutionException(paramName + " numeric list must contain only numbers");
-      }
-      StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
-      result.add(numberValue.value());
-    }
-    return List.copyOf(result);
-  }
-
-  List<String> literalList(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) value;
-    List<String> result = new ArrayList<>(listValue.elements().size());
-    for (StepValue element : listValue.elements()) {
-      result.add(literalText(element));
-    }
-    return List.copyOf(result);
-  }
-
-  List<List<Double>> numberGrid(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw StepParameterReader.parameterTypeMismatch(instance, definition, index, "nested list");
-    }
-    StepValue.ListValue outerList = (StepValue.ListValue) value;
-    List<List<Double>> grid = new ArrayList<>(outerList.elements().size());
-    for (StepValue rowValue : outerList.elements()) {
-      StepValue row = unwrapTyped(rowValue);
-      if (!(row instanceof StepValue.ListValue)) {
-        throw parameterElementTypeMismatch(instance, definition, index, "nested numeric list", rowValue);
-      }
-      StepValue.ListValue rowList = (StepValue.ListValue) row;
-      List<Double> entries = new ArrayList<>(rowList.elements().size());
-      for (StepValue element : rowList.elements()) {
-        StepValue unwrapped = unwrapTyped(element);
-        if (!(unwrapped instanceof StepValue.NumberValue)) {
-          throw parameterElementTypeMismatch(instance, definition, index, "number", element);
-        }
-        StepValue.NumberValue numberValue = (StepValue.NumberValue) unwrapped;
-        entries.add(numberValue.value());
-      }
-      grid.add(List.copyOf(entries));
-    }
-    return List.copyOf(grid);
   }
 
   <T extends StepEntity> List<List<T>> referenceGrid(
@@ -5713,14 +5458,14 @@ public final class StepEntityResolver {
     for (StepValue rowValue : outerList.elements()) {
       StepValue row = unwrapTyped(rowValue);
       if (!(row instanceof StepValue.ListValue)) {
-        throw parameterElementTypeMismatch(instance, definition, index, "nested reference list", rowValue);
+        throw StepResolverValueHelpers.parameterElementTypeMismatch(instance, definition, index, "nested reference list", rowValue);
       }
       StepValue.ListValue rowList = (StepValue.ListValue) row;
       List<T> entries = new ArrayList<>(rowList.elements().size());
       for (StepValue element : rowList.elements()) {
         StepValue unwrapped = unwrapTyped(element);
         if (!(unwrapped instanceof StepValue.ReferenceValue)) {
-          throw parameterElementTypeMismatch(instance, definition, index, "reference", element);
+          throw StepResolverValueHelpers.parameterElementTypeMismatch(instance, definition, index, "reference", element);
         }
         StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) unwrapped;
         entries.add(requireEntity(referenceValue.id(), type, message));
@@ -5730,126 +5475,9 @@ public final class StepEntityResolver {
     return List.copyOf(grid);
   }
 
-  List<Integer> integerList(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    List<Double> values = numberList(instance, definition, index);
-    List<Integer> result = new ArrayList<>(values.size());
-    for (double value : values) {
-      if (value != Math.rint(value)) {
-        throw new StepResolutionException(
-            "entity #"
-                + instance.id()
-                + " "
-                + definition.name()
-                + " parameter "
-                + index
-                + " element type mismatch: expected integer, actual number");
-      }
-      result.add((int) value);
-    }
-    return List.copyOf(result);
-  }
-
-  StepResolutionException parameterElementTypeMismatch(
-      StepEntityInstance instance,
-      StepEntityDefinition definition,
-      int index,
-      String expected,
-      StepValue actualValue) {
-    return new StepResolutionException(
-        "entity #"
-            + instance.id()
-            + " "
-            + definition.name()
-            + " parameter "
-            + index
-            + " element type mismatch: expected "
-            + expected
-            + ", actual "
-            + StepParameterReader.valueType(actualValue));
-  }
-
-  boolean isUnset(StepValue value) {
-    return StepParameterReader.isUnset(value);
-  }
-
-  // ---------------------------------------------------------------------------
-  // SELECT type handling helpers (C10)
-  // ---------------------------------------------------------------------------
-
-  /** Wrapper for StepParameterReader.typedSelection with entity ID context. */
-  StepParameterReader.TypedSelection typedSelection(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    return StepParameterReader.typedSelection(instance, definition, index);
-  }
-
-  /** Wrapper for StepParameterReader.optionalTypedSelection with entity ID context. */
-  StepParameterReader.TypedSelection optionalTypedSelection(
-      StepEntityInstance instance, StepEntityDefinition definition, int index) {
-    return StepParameterReader.optionalTypedSelection(instance, definition, index);
-  }
-
-  /** Wrapper for StepParameterReader.validateSelectTypeName. */
-  void validateSelectTypeName(
-      StepEntityInstance instance,
-      StepEntityDefinition definition,
-      int index,
-      StepParameterReader.TypedSelection selection,
-      java.util.Set<String> allowedTypes) {
-    StepParameterReader.validateSelectTypeName(instance, definition, index, selection, allowedTypes);
-  }
-
-  /** Wrapper for StepParameterReader.validateSelectTypeKnown. */
-  void validateSelectTypeKnown(
-      StepEntityInstance instance,
-      StepEntityDefinition definition,
-      int index,
-      StepParameterReader.TypedSelection selection) {
-    StepParameterReader.validateSelectTypeKnown(instance, definition, index, selection);
-  }
-
   // ---------------------------------------------------------------------------
   // Core value helpers
   // ---------------------------------------------------------------------------
-
-  StepValue unwrapTyped(StepValue value) {
-    StepValue current = value;
-    while (current instanceof StepValue.TypedValue) {
-      StepValue.TypedValue typedValue = (StepValue.TypedValue) current;
-      current = typedValue.value();
-    }
-    return current;
-  }
-
-  String literalText(StepValue value) {
-    if (value instanceof StepValue.StringValue) {
-      StepValue.StringValue stringValue = (StepValue.StringValue) value;
-      return stringValue.value();
-    }
-    if (value instanceof StepValue.NumberValue) {
-      StepValue.NumberValue numberValue = (StepValue.NumberValue) value;
-      return numberValue.raw();
-    }
-    if (value instanceof StepValue.EnumValue) {
-      StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
-      return "." + enumValue.value() + ".";
-    }
-    if (value instanceof StepValue.ReferenceValue) {
-      StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
-      return "#" + referenceValue.id();
-    }
-    if (value instanceof StepValue.OmittedValue) {
-      return "$";
-    }
-    if (value instanceof StepValue.NotProvidedValue) {
-      return "*";
-    }
-    if (value instanceof StepValue.TypedValue) {
-      StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
-      return typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
-    }
-    throw new IllegalArgumentException();
-  }
 
   <T extends StepEntity> T requireEntity(int id, Class<T> type, String message) {
     StepEntity entity = resolve(id);
@@ -5857,22 +5485,6 @@ public final class StepEntityResolver {
       throw new StepResolutionException(message + " but got " + entity.getClass().getSimpleName());
     }
     return type.cast(entity);
-  }
-
-  boolean isAnnotationOccurrence(StepEntity entity) {
-    return entity instanceof StepAnnotationTextOccurrence
-        || entity instanceof StepAnnotationPointOccurrence
-        || entity instanceof StepAnnotationCurveOccurrence
-        || entity instanceof StepLeaderCurve
-        || entity instanceof StepProjectionCurve
-        || entity instanceof StepDimensionCurve
-        || entity instanceof StepAnnotationFillAreaOccurrence
-        || entity instanceof StepAnnotationPlaceholderOccurrence
-        || entity instanceof StepAnnotationPlane
-        || entity instanceof StepAnnotationSymbolOccurrence
-        || entity instanceof StepAnnotationSubfigureOccurrence
-        || entity instanceof StepDraughtingAnnotationOccurrence
-        || entity instanceof StepTerminatorSymbol;
   }
 
   boolean isSupportedAnnotationUsageItem(StepEntity entity) {
@@ -5939,82 +5551,6 @@ public final class StepEntityResolver {
         || entity instanceof StepPlacedDatumTargetFeature;
   }
 
-  boolean isSupportedCurveReference(StepEntity entity) {
-    return entity instanceof StepLine
-        || entity instanceof StepLineSegment
-        || entity instanceof StepCircle
-        || entity instanceof StepEllipse
-        || entity instanceof StepConicCurve
-        || entity instanceof StepPolyline
-        || entity instanceof StepOffsetCurve2D
-        || entity instanceof StepOffsetCurve3D
-        || entity instanceof StepOrientedCurve
-        || entity instanceof StepCompositeCurve
-        || entity instanceof StepCompositeCurveOnSurface
-        || entity instanceof StepCompositeCurveOnSurface3D
-        || entity instanceof StepCurve
-        || entity instanceof StepBoundedCurve
-        || entity instanceof StepBSplineCurve
-        || entity instanceof StepBSplineCurveWithKnots
-        || entity instanceof StepRationalBSplineCurve
-        || entity instanceof StepBezierCurve
-        || entity instanceof StepPiecewiseBezierCurve
-        || entity instanceof StepUniformCurve
-        || entity instanceof StepQuasiUniformCurve
-        || entity instanceof StepTrimmedCurve
-        || entity instanceof StepPcurve
-        || entity instanceof StepDegeneratePcurve
-        || entity instanceof StepSurfaceCurve
-        || entity instanceof StepSeamCurve
-        || entity instanceof StepAnnotationCurveOccurrence
-        || entity instanceof StepLeaderCurve
-        || entity instanceof StepProjectionCurve
-        || entity instanceof StepDimensionCurve
-        || entity instanceof StepDraughtingAnnotationOccurrence
-        || entity instanceof StepTerminatorSymbol
-        || entity instanceof StepClothoid
-        || entity instanceof StepIndexedPolyCurve
-        || entity instanceof StepDegenerateCurve
-        || entity instanceof StepEdgeWire
-        || entity instanceof StepSweptDiskSolid
-        || entity instanceof StepCurve2D
-        || entity instanceof StepMappedItem
-        || (entity instanceof StepGeometricReplica
-            && "CURVE_REPLICA".equals(((StepGeometricReplica) entity).entityName()));
-  }
-
-  boolean isSupportedSurfaceReference(StepEntity entity) {
-    return entity instanceof StepPlane
-        || entity instanceof StepSurface
-        || entity instanceof StepBoundedSurface
-        || entity instanceof StepOffsetSurface
-        || entity instanceof StepOffsetSurface2
-        || entity instanceof StepBSplineSurface
-        || entity instanceof StepBSplineSurfaceWithKnots
-        || entity instanceof StepRationalBSplineSurface
-        || entity instanceof StepBezierSurface
-        || entity instanceof StepPiecewiseBezierSurface
-        || entity instanceof StepUniformSurface
-        || entity instanceof StepQuasiUniformSurface
-        || entity instanceof StepCylindricalSurface
-        || entity instanceof StepConicalSurface
-        || entity instanceof StepToroidalSurface
-        || entity instanceof StepDegenerateToroidalSurface
-        || entity instanceof StepSphericalSurface
-        || entity instanceof StepSurfaceOfLinearExtrusion
-        || entity instanceof StepSurfaceOfRevolution
-        || entity instanceof StepSurfaceOfConstantRadius
-        || entity instanceof StepRectangularTrimmedSurface
-        || entity instanceof StepRectangularCompositeSurface
-        || entity instanceof StepSurfacePatch
-        || entity instanceof StepCurveBoundedSurface
-        || entity instanceof StepOrientedSurface
-        || entity instanceof StepSubface
-        || entity instanceof StepMappedItem
-        || (entity instanceof StepGeometricReplica
-            && "SURFACE_REPLICA".equals(((StepGeometricReplica) entity).entityName()));
-  }
-
   <T extends StepEntity> List<T> referenceList(
       StepEntityInstance instance,
       StepEntityDefinition definition,
@@ -6057,117 +5593,6 @@ public final class StepEntityResolver {
       result.add(resolve(referenceValue.id()));
     }
     return List.copyOf(result);
-  }
-
-  String deriveUnitKind(StepEntityInstance instance) {
-    for (String candidate : List.of(
-        "LENGTH_UNIT",
-        "PLANE_ANGLE_UNIT",
-        "SOLID_ANGLE_UNIT",
-        "RATIO_UNIT",
-        "AREA_UNIT",
-        "VOLUME_UNIT",
-        "TIME_UNIT",
-        "THERMODYNAMIC_TEMPERATURE_UNIT",
-        "ELECTRIC_CURRENT_UNIT",
-        "AMOUNT_OF_SUBSTANCE_UNIT",
-        "LUMINOUS_FLUX_UNIT",
-        "LUMINOUS_INTENSITY_UNIT",
-        "ACCELERATION_UNIT",
-        "VELOCITY_UNIT",
-        "THERMAL_RESISTANCE_UNIT",
-        "MASS_DENSITY_UNIT",
-        "DYNAMIC_VISCOSITY_UNIT",
-        "KINEMATIC_VISCOSITY_UNIT",
-        "MOMENT_OF_INERTIA_UNIT",
-        "THERMAL_CONDUCTIVITY_UNIT",
-        "HEAT_FLUX_DENSITY_UNIT",
-        "SPECIFIC_HEAT_CAPACITY_UNIT",
-        "AREA_DENSITY_UNIT",
-        "VOLUMETRIC_FLOW_RATE_UNIT",
-        "MASS_FLOW_RATE_UNIT",
-        "ROTATIONAL_FREQUENCY_UNIT",
-        "ANGULAR_VELOCITY_UNIT",
-        "ANGULAR_ACCELERATION_UNIT",
-        "TORQUE_UNIT",
-        "LINEAR_FORCE_UNIT",
-        "LINEAR_STIFFNESS_UNIT",
-        "ROTATIONAL_STIFFNESS_UNIT",
-        "LINEAR_MOMENT_UNIT",
-        "FREQUENCY_UNIT",
-        "FORCE_UNIT",
-        "PRESSURE_UNIT",
-        "ENERGY_UNIT",
-        "POWER_UNIT",
-        "ELECTRIC_CHARGE_UNIT",
-        "ELECTRIC_POTENTIAL_UNIT",
-        "CAPACITANCE_UNIT",
-        "RESISTANCE_UNIT",
-        "CONDUCTANCE_UNIT",
-        "MAGNETIC_FLUX_UNIT",
-        "MAGNETIC_FLUX_DENSITY_UNIT",
-        "INDUCTANCE_UNIT",
-        "ILLUMINANCE_UNIT",
-        "RADIOACTIVITY_UNIT",
-        "ABSORBED_DOSE_UNIT",
-        "DOSE_EQUIVALENT_UNIT")) {
-      if (instance.hasDefinition(candidate)) {
-        return candidate;
-      }
-    }
-    if (instance.hasDefinition("MASS_UNIT")) {
-      return "MASS_UNIT";
-    }
-    return "NAMED_UNIT";
-  }
-
-  boolean matchesUnitKind(StepEntity entity, String expectedUnitKind) {
-    if (entity instanceof StepNamedUnit) {
-            StepNamedUnit namedUnit = (StepNamedUnit) entity;
-      return expectedUnitKind.equals(namedUnit.unitKind());
-    }
-    if (entity instanceof StepSiUnit) {
-            StepSiUnit siUnit = (StepSiUnit) entity;
-      return expectedUnitKind.equals(siUnit.unitKind());
-    }
-    if (entity instanceof StepConversionBasedUnit) {
-            StepConversionBasedUnit conversionBasedUnit = (StepConversionBasedUnit) entity;
-      return expectedUnitKind.equals(conversionBasedUnit.unitKind());
-    }
-    if (entity instanceof StepConversionBasedUnitWithOffset) {
-            StepConversionBasedUnitWithOffset conversionBasedUnitWithOffset = (StepConversionBasedUnitWithOffset) entity;
-      return expectedUnitKind.equals(conversionBasedUnitWithOffset.unitKind());
-    }
-    if (entity instanceof StepContextDependentUnit) {
-            StepContextDependentUnit contextDependentUnit = (StepContextDependentUnit) entity;
-      return expectedUnitKind.equals(contextDependentUnit.unitKind());
-    }
-    if (entity instanceof StepDerivedUnit) {
-            StepDerivedUnit derivedUnit = (StepDerivedUnit) entity;
-      return expectedUnitKind.equals(derivedUnit.unitKind());
-    }
-    return false;
-  }
-
-  String inheritedRepresentationItemName(StepEntityInstance instance) {
-    return instance.hasDefinition("REPRESENTATION_ITEM")
-        ? stringValue(instance, definition(instance, "REPRESENTATION_ITEM"), 0)
-        : "";
-  }
-
-  String inheritedTopologicalRepresentationItemName(StepEntityInstance instance) {
-    return instance.hasDefinition("TOPOLOGICAL_REPRESENTATION_ITEM")
-        ? stringValue(instance, definition(instance, "TOPOLOGICAL_REPRESENTATION_ITEM"), 0)
-        : inheritedRepresentationItemName(instance);
-  }
-
-  int inheritedStyledItemTargetId(StepEntityInstance instance) {
-    if (!instance.hasDefinition("STYLED_ITEM")) {
-      throw new StepResolutionException("complex entity is missing STYLED_ITEM definition");
-    }
-    StepEntityDefinition definition = definition(instance, "STYLED_ITEM");
-    requireParameterCount(instance, definition, 3);
-    return referenceId(instance, definition, 2);
   }
 
   static void registerProductDefinitionRelationshipAliases(
@@ -6275,11 +5700,11 @@ public final class StepEntityResolver {
         instance.id(),
         stringValue(instance, definition, 0),
         resolve(referenceId(instance, definition, 1)),
-        literalList(instance, definition, 2),
-        literalList(instance, definition, 3),
+        StepResolverValueHelpers.literalList(instance, definition, 2),
+        StepResolverValueHelpers.literalList(instance, definition, 3),
         resolve(referenceId(instance, definition, 4)),
-        literalList(instance, definition, 5),
-        literalList(instance, definition, 6));
+        StepResolverValueHelpers.literalList(instance, definition, 5),
+        StepResolverValueHelpers.literalList(instance, definition, 6));
   }
 
   // Phase 2 Batch 2: Helper resolver methods for A3M validation entities

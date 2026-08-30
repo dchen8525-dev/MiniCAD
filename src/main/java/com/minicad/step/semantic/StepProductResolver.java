@@ -681,7 +681,7 @@ final class StepProductResolver {
         resolver.stringValue(instance, definition, 0),
         resolver.entityReferenceList(instance, definition, 1,
             "ASSEMBLY_SEQUENCE operations must contain entity references"),
-        resolver.intList(instance, definition, 2),
+        StepResolverValueHelpers.intList(instance, definition, 2),
         resolver.resolve(resolver.referenceId(instance, definition, 3)),
         resolver.entityReferenceList(instance, definition, 4,
             "ASSEMBLY_SEQUENCE tools must contain entity references"),

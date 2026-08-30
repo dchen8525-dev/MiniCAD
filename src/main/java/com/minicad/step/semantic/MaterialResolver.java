@@ -34,7 +34,7 @@ final class MaterialResolver {
         resolver.stringValue(instance, definition, 1),
         resolver.entityReferenceList(instance, definition, 2,
             "BILL_OF_MATERIALS items must contain entity references"),
-        resolver.intList(instance, definition, 3),
+        StepResolverValueHelpers.intList(instance, definition, 3),
         resolver.stringValue(instance, definition, 4),
         (int) resolver.numberValue(instance, definition, 5),
         resolver.stringValue(instance, definition, 6));

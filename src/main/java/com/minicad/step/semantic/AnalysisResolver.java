@@ -42,7 +42,7 @@ final class AnalysisResolver {
   StepAnalysisInstance resolveAnalysisInstance(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "ANALYSIS_INSTANCE");
     StepEntityResolver.requireParameterCount(instance, definition, 7);
-    List<String> analysisResults = resolver.literalList(instance, definition, 4);
+    List<String> analysisResults = StepResolverValueHelpers.literalList(instance, definition, 4);
     return new StepAnalysisInstance(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
@@ -58,7 +58,7 @@ final class AnalysisResolver {
   StepConfigurationInstance resolveConfigurationInstance(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "CONFIGURATION_INSTANCE");
     StepEntityResolver.requireParameterCount(instance, definition, 7);
-    List<String> configurationValues = resolver.literalList(instance, definition, 4);
+    List<String> configurationValues = StepResolverValueHelpers.literalList(instance, definition, 4);
     return new StepConfigurationInstance(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
@@ -95,8 +95,8 @@ final class AnalysisResolver {
   StepModelDefinition resolveModelDefinition(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "MODEL_DEFINITION");
     StepEntityResolver.requireParameterCount(instance, definition, 7);
-    List<String> modelParameters = resolver.literalList(instance, definition, 4);
-    List<String> modelConstraints = resolver.literalList(instance, definition, 5);
+    List<String> modelParameters = StepResolverValueHelpers.literalList(instance, definition, 4);
+    List<String> modelConstraints = StepResolverValueHelpers.literalList(instance, definition, 5);
     return new StepModelDefinition(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
@@ -110,7 +110,7 @@ final class AnalysisResolver {
   StepModelInstance resolveModelInstance(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "MODEL_INSTANCE");
     StepEntityResolver.requireParameterCount(instance, definition, 7);
-    List<String> modelProperties = resolver.literalList(instance, definition, 5);
+    List<String> modelProperties = StepResolverValueHelpers.literalList(instance, definition, 5);
     return new StepModelInstance(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
@@ -126,7 +126,7 @@ final class AnalysisResolver {
   StepSimulationDefinition resolveSimulationDefinition(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "SIMULATION_DEFINITION");
     StepEntityResolver.requireParameterCount(instance, definition, 7);
-    List<String> simulationParameters = resolver.literalList(instance, definition, 4);
+    List<String> simulationParameters = StepResolverValueHelpers.literalList(instance, definition, 4);
     return new StepSimulationDefinition(
         instance.id(),
         resolver.stringValue(instance, definition, 0),

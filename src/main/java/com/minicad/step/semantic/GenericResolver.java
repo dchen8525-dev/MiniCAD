@@ -28,7 +28,7 @@ final class GenericResolver {
     return new StepBinaryGenericExpression(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.literalList(instance, definition, 1),
+        StepResolverValueHelpers.literalList(instance, definition, 1),
         entityName);
   }
 
@@ -38,7 +38,7 @@ final class GenericResolver {
     return new StepMultipleArityGenericExpression(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.literalList(instance, definition, 1),
+        StepResolverValueHelpers.literalList(instance, definition, 1),
         entityName);
   }
 

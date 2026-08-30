@@ -26,7 +26,7 @@ final class BezierResolver {
     StepEntityDefinition definition = resolver.definition(instance, "OFFSET_CURVE_3D");
     StepEntityResolver.requireParameterCount(instance, definition, 5);
     StepEntity basisCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(basisCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(basisCurve)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_CURVE_3D basis_curve must reference a supported curve");
     }
@@ -46,7 +46,7 @@ final class BezierResolver {
     StepEntityDefinition definition = resolver.definition(instance, "OFFSET_CURVE_2D");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity basisCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(basisCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(basisCurve)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_CURVE_2D basis_curve must reference a supported curve");
     }
@@ -69,7 +69,7 @@ final class BezierResolver {
           "ORIENTED_CURVE curve_element must not self-reference");
     }
     StepEntity curveElement = resolver.resolve(curveElementId);
-    if (!resolver.isSupportedCurveReference(curveElement)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(curveElement)) {
       throw new UnsupportedStepEntityException(
           "ORIENTED_CURVE curve_element must reference a supported curve");
     }
@@ -84,7 +84,7 @@ final class BezierResolver {
     StepEntityDefinition definition = resolver.definition(instance, "ORIENTED_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity surfaceElement = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(surfaceElement)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(surfaceElement)) {
       throw new UnsupportedStepEntityException(
           "ORIENTED_SURFACE surface_element must reference a supported surface");
     }
@@ -99,7 +99,7 @@ final class BezierResolver {
     StepEntityDefinition definition = resolver.definition(instance, "OFFSET_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_SURFACE basis_surface must reference a supported surface");
     }
@@ -117,7 +117,7 @@ final class BezierResolver {
     StepEntityDefinition definition = resolver.definition(instance, "COMPOSITE_CURVE_SEGMENT");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity parentCurve = resolver.resolve(resolver.referenceId(instance, definition, 2));
-    if (!resolver.isSupportedCurveReference(parentCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(parentCurve)) {
       throw new UnsupportedStepEntityException(
           "COMPOSITE_CURVE_SEGMENT parent_curve must reference a supported curve");
     }

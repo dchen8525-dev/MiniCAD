@@ -226,7 +226,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "OFFSET_SURFACE_2");
     StepEntityResolver.requireParameterCount(instance, definition, 5);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "OFFSET_SURFACE_2 basis_surface must reference a supported surface");
     }
@@ -256,7 +256,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_CONSTANT_RADIUS");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity sweptSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(sweptSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(sweptSurface)) {
       throw new UnsupportedStepEntityException(
           "SURFACE_OF_CONSTANT_RADIUS swept_surface must reference a supported surface");
     }
@@ -271,7 +271,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_LINEAR_EXTRUSION");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity sweptCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(sweptCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(sweptCurve)) {
       throw new UnsupportedStepEntityException(
           "SURFACE_OF_LINEAR_EXTRUSION swept_curve must reference a supported curve");
     }
@@ -289,7 +289,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_PROJECTION");
     StepEntityResolver.requireParameterCount(instance, definition, 5);
     StepEntity profile = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(profile)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(profile)) {
       throw new UnsupportedStepEntityException(
           "SURFACE_OF_PROJECTION profile must reference a supported curve");
     }
@@ -305,7 +305,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_REVOLUTION");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity sweptCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(sweptCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(sweptCurve)) {
       throw new UnsupportedStepEntityException(
           "SURFACE_OF_REVOLUTION swept_curve must reference a supported curve");
     }
@@ -323,7 +323,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "SURFACE_OF_TRANSLATION");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity profile = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(profile)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(profile)) {
       throw new UnsupportedStepEntityException(
           "SURFACE_OF_TRANSLATION profile must reference a supported curve");
     }
@@ -340,7 +340,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "CURVE_BOUNDED_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "CURVE_BOUNDED_SURFACE basis_surface must reference a supported surface");
     }
@@ -359,7 +359,7 @@ final class SurfaceResolver {
           && !(boundary instanceof StepSeamCurve)
           && !(boundary instanceof StepCompositeCurveOnSurface)
           && !(boundary instanceof StepCompositeCurve)
-          && !resolver.isSupportedCurveReference(boundary)) {
+          && !StepResolverValueHelpers.isSupportedCurveReference(boundary)) {
         throw new UnsupportedStepEntityException(
             "CURVE_BOUNDED_SURFACE boundaries must reference supported curve entities");
       }
@@ -376,7 +376,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "RECTANGULAR_COMPOSITE_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 7);
     StepEntity parentSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(parentSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(parentSurface)) {
       throw new UnsupportedStepEntityException(
           "RECTANGULAR_COMPOSITE_SURFACE parent_surface must reference a supported surface");
     }
@@ -394,7 +394,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "RECTANGULAR_TRIMMED_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 8);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "RECTANGULAR_TRIMMED_SURFACE basis_surface must reference a supported surface");
     }
@@ -414,7 +414,7 @@ final class SurfaceResolver {
     StepEntityDefinition definition = resolver.definition(instance, "SURFACE_PATCH");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "SURFACE_PATCH basis_surface must reference a supported surface");
     }
@@ -434,7 +434,7 @@ final class SurfaceResolver {
         resolver.entityReferenceList(
             instance, definition, 1, "GEOMETRIC_SURFACE_SET elements must contain entity references");
     for (StepEntity element : elements) {
-      if (!resolver.isSupportedSurfaceReference(element)) {
+      if (!StepResolverValueHelpers.isSupportedSurfaceReference(element)) {
         throw new UnsupportedStepEntityException(
             "GEOMETRIC_SURFACE_SET elements must be supported surfaces");
       }

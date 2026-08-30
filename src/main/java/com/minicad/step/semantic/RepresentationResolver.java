@@ -164,7 +164,7 @@ final class RepresentationResolver {
         instance.id(),
         resolver.stringValue(instance, definition, 0),
         resolver.stringValue(instance, definition, 1),
-        resolver.doubleList(instance, definition, 2));
+        StepResolverValueHelpers.doubleList(instance, definition, 2));
   }
 
   StepRepresentationItem resolveRepresentationItem(StepEntityInstance instance) {
@@ -231,14 +231,14 @@ final class RepresentationResolver {
     StepEntityResolver.requireParameterCount(instance, definition, 2);
 
     // Use enhanced typedSelection with validation
-    StepParameterReader.TypedSelection selection = resolver.typedSelection(instance, definition, 1);
-    resolver.validateSelectTypeKnown(instance, definition, 1, selection);
+    StepParameterReader.TypedSelection selection = StepResolverValueHelpers.typedSelection(instance, definition, 1);
+    StepResolverValueHelpers.validateSelectTypeKnown(instance, definition, 1, selection);
 
     return new StepValueRepresentationItem(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
         selection.typeName(),
-        resolver.literalText(selection.value()));
+        StepResolverValueHelpers.literalText(selection.value()));
   }
 
   StepWithDescriptiveRepresentationItem resolveWithDescriptiveRepresentationItem(StepEntityInstance instance) {
@@ -587,7 +587,7 @@ final class RepresentationResolver {
         resolver.stringValue(instance, definition, 1),
         resolver.requireEntity(resolver.referenceId(instance, definition, 2), com.minicad.step.model.StepProductDefinitionShape.class,
             "SHAPE_ASPECT_OCCURRENCE ofShape must reference PRODUCT_DEFINITION_SHAPE"),
-        resolver.logicalValue(instance, definition, 3),
+        StepResolverValueHelpers.logicalValue(instance, definition, 3),
         resolver.resolve(resolver.referenceId(instance, definition, 4)),
         entityName);
   }

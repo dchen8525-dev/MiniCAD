@@ -55,7 +55,7 @@ final class CurveResolver {
             StepCompositeCurveSegment.class,
             "COMPOSITE_CURVE_ON_SURFACE_3D segments must reference COMPOSITE_CURVE_SEGMENT");
     StepEntity surface = resolver.resolve(resolver.referenceId(instance, definition, 2));
-    if (!resolver.isSupportedSurfaceReference(surface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(surface)) {
       throw new UnsupportedStepEntityException(
           "COMPOSITE_CURVE_ON_SURFACE_3D surface must reference a supported surface");
     }
@@ -71,7 +71,7 @@ final class CurveResolver {
     StepEntityDefinition definition = resolver.definition(instance, "SEAM_CURVE");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity curve3d = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(curve3d)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(curve3d)) {
       throw new UnsupportedStepEntityException(
           "SEAM_CURVE curve_3d must reference a supported curve");
     }
@@ -107,7 +107,7 @@ final class CurveResolver {
     StepEntityDefinition definition = resolver.definition(instance, entityName);
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity curve3d = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(curve3d)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(curve3d)) {
       throw new UnsupportedStepEntityException(
           entityName + " curve_3d must reference a supported curve");
     }
@@ -138,7 +138,7 @@ final class CurveResolver {
     StepEntityDefinition definition = resolver.definition(instance, "DEGENERATE_PCURVE");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "DEGENERATE_PCURVE basis surface must reference a supported surface");
     }
@@ -152,7 +152,7 @@ final class CurveResolver {
           "DEGENERATE_PCURVE reference_to_curve must contain exactly one 2D curve item");
     }
     StepEntity item = representation.items().get(0);
-    if (!resolver.isSupportedCurveReference(item)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(item)) {
       throw new UnsupportedStepEntityException(
           "DEGENERATE_PCURVE reference_to_curve must contain a supported curve item");
     }
@@ -164,7 +164,7 @@ final class CurveResolver {
     StepEntityDefinition definition = resolver.definition(instance, "PCURVE");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "PCURVE basis surface must reference a supported surface");
     }
@@ -178,7 +178,7 @@ final class CurveResolver {
           "PCURVE reference_to_curve must contain exactly one 2D curve item");
     }
     StepEntity item = representation.items().get(0);
-    if (!resolver.isSupportedCurveReference(item)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(item)) {
       throw new UnsupportedStepEntityException(
           "PCURVE reference_to_curve must contain a supported curve item");
     }
@@ -239,7 +239,7 @@ final class CurveResolver {
     StepEntityDefinition definition = resolver.definition(instance, "TRIMMED_CURVE");
     StepEntityResolver.requireParameterCount(instance, definition, 6);
     StepEntity basisCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(basisCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(basisCurve)) {
       throw new UnsupportedStepEntityException(
           "TRIMMED_CURVE basis curve must reference a supported curve");
     }
@@ -271,7 +271,7 @@ final class CurveResolver {
         eqParam = innerList;
       }
     }
-    List<Double> eqList = resolver.extractNumberList(definition, eqParam, "CURVE_2D");
+    List<Double> eqList = StepResolverValueHelpers.extractNumberList(definition, eqParam, "CURVE_2D");
     double[] equation = new double[eqList.size()];
     for (int i = 0; i < eqList.size(); i++) {
       equation[i] = eqList.get(i);
@@ -290,7 +290,7 @@ final class CurveResolver {
     StepEntityDefinition definition = resolver.definition(instance, "DEGENERATE_CURVE");
     StepEntityResolver.requireParameterCount(instance, definition, 3);
     StepEntity basisCurve = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedCurveReference(basisCurve)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(basisCurve)) {
       throw new UnsupportedStepEntityException(
           "DEGENERATE_CURVE basis_curve must reference a supported curve");
     }

@@ -59,7 +59,7 @@ final class AnnotationResolver {
     StepEntityDefinition definition = resolver.definition(instance, "ANNOTATION_PLANE");
     StepEntityResolver.requireParameterCount(instance, definition, 1);
     List<StepEntity> elements = List.of();
-    if (!resolver.isUnset(definition.parameters().get(0))) {
+    if (!StepResolverValueHelpers.isUnset(definition.parameters().get(0))) {
       elements =
           resolver.entityReferenceList(
               instance,
@@ -83,7 +83,7 @@ final class AnnotationResolver {
             StepPresentationStyleAssignment.class,
             "ANNOTATION_PLANE styles must contain PRESENTATION_STYLE_ASSIGNMENT references"),
         resolver.requireEntity(
-            resolver.inheritedStyledItemTargetId(instance),
+            StepResolverValueHelpers.inheritedStyledItemTargetId(instance),
             StepPlane.class,
             "ANNOTATION_PLANE item must reference PLANE"),
         elements);
@@ -175,7 +175,7 @@ final class AnnotationResolver {
       if (!(content instanceof StepAnnotationTextOccurrence)
           && !(content instanceof StepCartesianPoint)
           && !(content instanceof StepVertexPoint)
-          && !resolver.isSupportedCurveReference(content)
+          && !StepResolverValueHelpers.isSupportedCurveReference(content)
           && !(content instanceof StepGeometricReplica
               && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName()))
           && !(content instanceof StepEdgeCurve)

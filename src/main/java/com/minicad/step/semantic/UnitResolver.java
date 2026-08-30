@@ -41,7 +41,7 @@ final class UnitResolver {
     return new StepContextDependentUnit(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.deriveUnitKind(instance));
+        StepResolverValueHelpers.deriveUnitKind(instance));
   }
 
   StepConversionBasedUnit resolveConversionBasedUnit(StepEntityInstance instance, String entityName) {
@@ -57,7 +57,7 @@ final class UnitResolver {
     return new StepConversionBasedUnit(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.deriveUnitKind(instance),
+        StepResolverValueHelpers.deriveUnitKind(instance),
         measureWithUnit,
         entityName);
   }
@@ -118,7 +118,7 @@ final class UnitResolver {
     return new StepExternallyDefinedConversionBasedUnit(
         instance.id(),
         resolver.stringValue(instance, definition, 0),
-        resolver.deriveUnitKind(instance),
+        StepResolverValueHelpers.deriveUnitKind(instance),
         item);
   }
 
@@ -146,7 +146,7 @@ final class UnitResolver {
     StepEntityDefinition definition = resolver.definition(instance, "NAMED_UNIT");
     StepEntityResolver.requireParameterCount(instance, definition, 1);
     resolver.validateNamedUnitDimensions(instance);
-    return new StepNamedUnit(instance.id(), resolver.deriveUnitKind(instance));
+    return new StepNamedUnit(instance.id(), StepResolverValueHelpers.deriveUnitKind(instance));
   }
 
   StepNonAgreedUnitUsage resolveNonAgreedUnitUsage(StepEntityInstance instance) {
@@ -175,11 +175,11 @@ final class UnitResolver {
     StepEntityResolver.requireParameterCount(instance, definition, 2);
     resolver.validateNamedUnitDimensions(instance);
     String prefix = null;
-    if (!resolver.isUnset(definition.parameters().get(0))) {
+    if (!StepResolverValueHelpers.isUnset(definition.parameters().get(0))) {
       prefix = resolver.enumValue(instance, definition, 0);
     }
     return new StepSiUnit(
-        instance.id(), resolver.deriveUnitKind(instance), prefix, resolver.enumValue(instance, definition, 1));
+        instance.id(), StepResolverValueHelpers.deriveUnitKind(instance), prefix, resolver.enumValue(instance, definition, 1));
   }
 
   StepDerivedUnit resolveStandaloneDerivedUnitKind(StepEntityInstance instance, String entityName) {
@@ -239,8 +239,8 @@ final class UnitResolver {
     StepEntityResolver.requireParameterCount(instance, definition, 3);
 
     // Use enhanced typedSelection with validation
-    StepParameterReader.TypedSelection selection = resolver.typedSelection(instance, definition, 1);
-    resolver.validateSelectTypeName(instance, definition, 1, selection,
+    StepParameterReader.TypedSelection selection = StepResolverValueHelpers.typedSelection(instance, definition, 1);
+    StepResolverValueHelpers.validateSelectTypeName(instance, definition, 1, selection,
         SelectTypeRegistry.MEASURE_SELECT_TYPES);
 
     StepValue unwrapped = selection.value();
@@ -292,7 +292,7 @@ final class UnitResolver {
     StepEntityDefinition definition = resolver.definition(instance, entityName);
     StepEntityResolver.requireParameterCount(instance, definition, 2);
     StepEntity unitComponent = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.matchesUnitKind(unitComponent, expectedUnitKind)) {
+    if (!StepResolverValueHelpers.matchesUnitKind(unitComponent, expectedUnitKind)) {
       throw new StepResolutionException(
           entityName + " unit_component must reference " + expectedUnitKind);
     }
@@ -361,7 +361,7 @@ final class UnitResolver {
   StepSurfaceMeasurement resolveSurfaceMeasurement(StepEntityInstance instance) {
     StepEntityDefinition definition = resolver.definition(instance, "SURFACE_MEASUREMENT");
     StepEntityResolver.requireParameterCount(instance, definition, 8);
-    List<String> roughnessParameters = resolver.literalList(instance, definition, 3);
+    List<String> roughnessParameters = StepResolverValueHelpers.literalList(instance, definition, 3);
     List<Double> measuredValues = resolver.numberList(instance, definition, 4);
     return new StepSurfaceMeasurement(
         instance.id(),

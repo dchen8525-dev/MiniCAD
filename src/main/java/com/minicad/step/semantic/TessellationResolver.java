@@ -77,7 +77,7 @@ final class TessellationResolver {
     StepEntityDefinition definition = resolver.definition(instance, "POLYGONAL_BOUNDED_HALF_SPACE");
     StepEntityResolver.requireParameterCount(instance, definition, 5);
     StepEntity basisSurface = resolver.resolve(resolver.referenceId(instance, definition, 1));
-    if (!resolver.isSupportedSurfaceReference(basisSurface)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(basisSurface)) {
       throw new UnsupportedStepEntityException(
           "POLYGONAL_BOUNDED_HALF_SPACE basis_surface must reference a supported surface");
     }

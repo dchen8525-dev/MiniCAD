@@ -80,7 +80,7 @@ final class StepTopologyResolver {
     StepEntityDefinition definition = resolver.definition(instance, "EDGE_CURVE");
     StepEntityResolver.requireParameterCount(instance, definition, 5);
     StepEntity edgeGeometry = resolver.resolve(resolver.referenceId(instance, definition, 3));
-    if (!resolver.isSupportedCurveReference(edgeGeometry)) {
+    if (!StepResolverValueHelpers.isSupportedCurveReference(edgeGeometry)) {
       throw new UnsupportedStepEntityException(
           "EDGE_CURVE geometry must reference a supported curve");
     }
@@ -108,7 +108,7 @@ final class StepTopologyResolver {
             StepEdgeCurve.class,
             "ORIENTED_EDGE edge_element must reference EDGE_CURVE");
     boolean orientation = resolver.booleanValue(instance, definition, 4);
-    if (!resolver.isUnset(definition.parameters().get(1)) || !resolver.isUnset(definition.parameters().get(2))) {
+    if (!StepResolverValueHelpers.isUnset(definition.parameters().get(1)) || !StepResolverValueHelpers.isUnset(definition.parameters().get(2))) {
       StepVertexPoint explicitStart =
           resolver.requireEntity(
               resolver.referenceId(instance, definition, 1),
@@ -337,7 +337,7 @@ final class StepTopologyResolver {
     StepEntityDefinition definition = resolver.definition(instance, "ADVANCED_FACE");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity faceGeometry = resolver.resolve(resolver.referenceId(instance, definition, 2));
-    if (!resolver.isSupportedSurfaceReference(faceGeometry)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(faceGeometry)) {
       throw new UnsupportedStepEntityException(
           "ADVANCED_FACE geometry must reference a supported surface but got "
               + faceGeometry.getClass().getSimpleName());
@@ -359,7 +359,7 @@ final class StepTopologyResolver {
     StepEntityDefinition definition = resolver.definition(instance, "FACE_SURFACE");
     StepEntityResolver.requireParameterCount(instance, definition, 4);
     StepEntity faceGeometry = resolver.resolve(resolver.referenceId(instance, definition, 2));
-    if (!resolver.isSupportedSurfaceReference(faceGeometry)) {
+    if (!StepResolverValueHelpers.isSupportedSurfaceReference(faceGeometry)) {
       throw new UnsupportedStepEntityException(
           "FACE_SURFACE geometry must reference a supported surface but got "
               + faceGeometry.getClass().getSimpleName());
