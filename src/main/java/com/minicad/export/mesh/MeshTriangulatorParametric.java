@@ -139,30 +139,7 @@ final class MeshTriangulatorParametric {
         int sampleCount = normalizedLoops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
         int uSegments = Math.max(16, Math.min(64, sampleCount * 2));
         int vSegments = Math.max(12, Math.min(48, sampleCount * 2));
-        int trianglesBefore = triangleCountSupplier.get();
-        for (int ui = 0; ui < uSegments; ui++) {
-            double u0 = bounds.minU() + bounds.uSpan() * ui / uSegments;
-            double u1 = bounds.minU() + bounds.uSpan() * (ui + 1) / uSegments;
-            for (int vi = 0; vi < vSegments; vi++) {
-                double v0 = bounds.minV() + bounds.vSpan() * vi / vSegments;
-                double v1 = bounds.minV() + bounds.vSpan() * (vi + 1) / vSegments;
-                UvPoint center = new UvPoint((u0 + u1) * 0.5, (v0 + v1) * 0.5);
-                if (!containsParametricLoops(normalizedLoops, center)) {
-                    continue;
-                }
-                CartesianPoint p00 = mapper.pointAt(u0, v0);
-                CartesianPoint p10 = mapper.pointAt(u1, v0);
-                CartesianPoint p01 = mapper.pointAt(u0, v1);
-                CartesianPoint p11 = mapper.pointAt(u1, v1);
-                Vector3 normal = mapper.normalAt(center.u(), center.v());
-                if (flipped) {
-                    normal = normal.negate();
-                }
-                appendOrientedTriangle(p00, p10, p11, normal, flipped, addVertex, addTriangle);
-                appendOrientedTriangle(p00, p11, p01, normal, flipped, addVertex, addTriangle);
-            }
-        }
-        return triangleCountSupplier.get() > trianglesBefore;
+        return triangulateGrid(mapper, normalizedLoops, bounds, uSegments, vSegments, flipped, triangleCountSupplier, addVertex, addTriangle);
     }
 
     /**
@@ -204,6 +181,40 @@ final class MeshTriangulatorParametric {
         int sampleCount = normalizedLoops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
         int uSegments = Math.max(16, Math.min(64, sampleCount * 2));
         int vSegments = Math.max(12, Math.min(48, sampleCount * 2));
+        return triangulateGrid(mapper, normalizedLoops, bounds, uSegments, vSegments, flipped, triangleCountSupplier, addVertex, addTriangle);
+    }
+
+    // --- ParametricMapper factory ---
+
+    /**
+     * Triangulates the parametric bounds with a shared corner grid: every
+     * (u,v) lattice point is evaluated exactly once instead of once per
+     * adjacent cell (up to 4x), and loop bounds are precomputed instead of
+     * being rebuilt for every cell's containment test.
+     */
+    private static boolean triangulateGrid(
+            ParametricMapper mapper,
+            List<ParametricLoop> normalizedLoops,
+            UvBounds bounds,
+            int uSegments,
+            int vSegments,
+            boolean flipped,
+            Supplier<Integer> triangleCountSupplier,
+            BiFunction<CartesianPoint, Vector3, Integer> addVertex,
+            Consumer<int[]> addTriangle
+    ) {
+        CartesianPoint[][] grid = new CartesianPoint[uSegments + 1][vSegments + 1];
+        for (int ui = 0; ui <= uSegments; ui++) {
+            double u = bounds.minU() + bounds.uSpan() * ui / uSegments;
+            for (int vi = 0; vi <= vSegments; vi++) {
+                double v = bounds.minV() + bounds.vSpan() * vi / vSegments;
+                grid[ui][vi] = mapper.pointAt(u, v);
+            }
+        }
+        PrecomputedLoops loops = PrecomputedLoops.of(normalizedLoops);
+        if (loops == null) {
+            return false;
+        }
         int trianglesBefore = triangleCountSupplier.get();
         for (int ui = 0; ui < uSegments; ui++) {
             double u0 = bounds.minU() + bounds.uSpan() * ui / uSegments;
@@ -212,13 +223,13 @@ final class MeshTriangulatorParametric {
                 double v0 = bounds.minV() + bounds.vSpan() * vi / vSegments;
                 double v1 = bounds.minV() + bounds.vSpan() * (vi + 1) / vSegments;
                 UvPoint center = new UvPoint((u0 + u1) * 0.5, (v0 + v1) * 0.5);
-                if (!containsParametricLoops(normalizedLoops, center)) {
+                if (!loops.contains(center)) {
                     continue;
                 }
-                CartesianPoint p00 = mapper.pointAt(u0, v0);
-                CartesianPoint p10 = mapper.pointAt(u1, v0);
-                CartesianPoint p01 = mapper.pointAt(u0, v1);
-                CartesianPoint p11 = mapper.pointAt(u1, v1);
+                CartesianPoint p00 = grid[ui][vi];
+                CartesianPoint p10 = grid[ui + 1][vi];
+                CartesianPoint p01 = grid[ui][vi + 1];
+                CartesianPoint p11 = grid[ui + 1][vi + 1];
                 Vector3 normal = mapper.normalAt(center.u(), center.v());
                 if (flipped) {
                     normal = normal.negate();
@@ -230,7 +241,64 @@ final class MeshTriangulatorParametric {
         return triangleCountSupplier.get() > trianglesBefore;
     }
 
-    // --- ParametricMapper factory ---
+    /** Outer loop plus holes with their bounding boxes resolved once per face. */
+    private static final class PrecomputedLoops {
+        private final ParametricLoop outer;
+        private final UvBounds outerBox;
+        private final List<ParametricLoop> holes;
+        private final List<UvBounds> holeBoxes;
+
+        private PrecomputedLoops(ParametricLoop outer, UvBounds outerBox,
+                                 List<ParametricLoop> holes, List<UvBounds> holeBoxes) {
+            this.outer = outer;
+            this.outerBox = outerBox;
+            this.holes = holes;
+            this.holeBoxes = holeBoxes;
+        }
+
+        static PrecomputedLoops of(List<ParametricLoop> loops) {
+            ParametricLoop outer = null;
+            for (ParametricLoop loop : loops) {
+                if (loop.outer()) {
+                    outer = loop;
+                    break;
+                }
+            }
+            if (outer == null) {
+                return null;
+            }
+            List<ParametricLoop> holes = new ArrayList<>();
+            List<UvBounds> holeBoxes = new ArrayList<>();
+            for (ParametricLoop loop : loops) {
+                if (!loop.outer()) {
+                    holes.add(loop);
+                    holeBoxes.add(loopBoundingBox(loop));
+                }
+            }
+            return new PrecomputedLoops(outer, loopBoundingBox(outer), holes, holeBoxes);
+        }
+
+        boolean contains(UvPoint point) {
+            if (point.u() < outerBox.minU() || point.u() > outerBox.maxU()
+                    || point.v() < outerBox.minV() || point.v() > outerBox.maxV()) {
+                return false;
+            }
+            if (!containsUvPolygon(outer.points(), point)) {
+                return false;
+            }
+            for (int i = 0; i < holes.size(); i++) {
+                UvBounds holeBox = holeBoxes.get(i);
+                if (point.u() < holeBox.minU() || point.u() > holeBox.maxU()
+                        || point.v() < holeBox.minV() || point.v() > holeBox.maxV()) {
+                    continue;
+                }
+                if (containsUvPolygon(holes.get(i).points(), point)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
 
     static ParametricMapper mapperFor(SurfaceGeometry surface) {
         if (surface instanceof CylindricalSurface) {
@@ -1416,34 +1484,6 @@ final class MeshTriangulatorParametric {
             }
         }
         return found ? new UvBounds(minU, maxU, minV, maxV) : null;
-    }
-
-    static boolean containsParametricLoops(List<ParametricLoop> loops, UvPoint point) {
-        ParametricLoop outer = loops.stream().filter(ParametricLoop::outer).findFirst().orElse(null);
-        if (outer == null) {
-            return false;
-        }
-        UvBounds outerBox = loopBoundingBox(outer);
-        if (point.u() < outerBox.minU() || point.u() > outerBox.maxU()
-                || point.v() < outerBox.minV() || point.v() > outerBox.maxV()) {
-            return false;
-        }
-        if (!containsUvPolygon(outer.points(), point)) {
-            return false;
-        }
-        for (ParametricLoop hole : loops) {
-            if (!hole.outer()) {
-                UvBounds holeBox = loopBoundingBox(hole);
-                if (point.u() < holeBox.minU() || point.u() > holeBox.maxU()
-                        || point.v() < holeBox.minV() || point.v() > holeBox.maxV()) {
-                    continue;
-                }
-                if (containsUvPolygon(hole.points(), point)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private static UvBounds loopBoundingBox(ParametricLoop loop) {
