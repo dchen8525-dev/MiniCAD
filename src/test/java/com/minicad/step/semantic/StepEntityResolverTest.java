@@ -558,6 +558,23 @@ class StepEntityResolverTest {
     }
 
     @Test
+    void shouldRejectExcessivelyDeepReferenceChainWithResolutionException() {
+        StringBuilder step = new StringBuilder("DATA;\n");
+        for (int id = 1; id <= 600; id++) {
+            step.append("#").append(id).append("=EDGE_LOOP('',(#").append(id + 1).append("));\n");
+        }
+        step.append("ENDSEC;");
+
+        StepResolutionException exception = assertThrows(
+                StepResolutionException.class,
+                () -> StepEntityResolver.resolveAll(StepParser.parse(step.toString()))
+        );
+
+        assertTrue(exception.getMessage().startsWith("entity reference chain deeper than"),
+                () -> "unexpected message: " + exception.getMessage());
+    }
+
+    @Test
     void shouldRejectWrongParameterCountWithEntityContext() {
         String step =
         "DATA;\n"

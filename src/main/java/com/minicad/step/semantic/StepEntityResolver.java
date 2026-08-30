@@ -780,6 +780,9 @@ public final class StepEntityResolver {
 
   private static final Map<String, EntityFactory> REGISTRY = createRegistry();
   private static final Map<String, Integer> REGISTRY_ORDER = createRegistryOrder(REGISTRY);
+  // Comfortably above any real model's dependency depth, yet low enough that
+  // the recursion unwinds before the default thread stack is exhausted.
+  private static final int MAX_RESOLUTION_DEPTH = 512;
 
   final Map<Integer, StepEntityInstance> instancesById;
   private final Map<Integer, StepEntity> resolved = new LinkedHashMap<>();
@@ -885,6 +888,13 @@ public final class StepEntityResolver {
     if (factory != null) {
       if (!onResolutionStack.add(id)) {
         throw new StepResolutionException(circularReferenceMessage(id));
+      }
+      // Cycle detection above cannot catch long-but-acyclic reference chains;
+      // without a depth cap they die with an uncatchable StackOverflowError.
+      if (resolutionStack.size() >= MAX_RESOLUTION_DEPTH) {
+        throw new StepResolutionException(
+            "entity reference chain deeper than " + MAX_RESOLUTION_DEPTH
+                + " while resolving entity #" + id);
       }
       resolutionStack.push(id);
       try {
