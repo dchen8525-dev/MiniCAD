@@ -987,7 +987,7 @@ final class StepCadCurveBuilder {
         return new TrimmedCurve2(basisCurve, trim1, trim2, trimmedCurve2D.isSenseAgreement());
     }
 
-    private BSplineCurve2 buildBSplineCurve2D(StepBSplineCurve2D spline2D) {
+    BSplineCurve2 buildBSplineCurve2D(StepBSplineCurve2D spline2D) {
         BSplineCurve2 existing = splineCurves2d.get(spline2D.id());
         if (existing != null) {
             return existing;
@@ -1005,7 +1005,7 @@ final class StepCadCurveBuilder {
         return built;
     }
 
-    private RationalBSplineCurve2 buildRationalBSplineCurve2D(StepRationalBSplineCurve2D rationalSpline2D) {
+    RationalBSplineCurve2 buildRationalBSplineCurve2D(StepRationalBSplineCurve2D rationalSpline2D) {
         RationalBSplineCurve2 existing = rationalSplineCurves2d.get(rationalSpline2D.id());
         if (existing != null) {
             return existing;
@@ -1023,19 +1023,19 @@ final class StepCadCurveBuilder {
         return built;
     }
 
-    private BSplineCurve2 buildBezierCurve2D(StepBezierCurve2D bezier2D) {
+    BSplineCurve2 buildBezierCurve2D(StepBezierCurve2D bezier2D) {
         return buildImplicitBSplineCurve2D(bezier2D.id(), bezier2D.getDegree(), bezier2D.getControlPoints(), "BEZIER");
     }
 
-    private BSplineCurve2 buildQuasiUniformCurve2D(StepQuasiUniformCurve2D quasiUniform2D) {
+    BSplineCurve2 buildQuasiUniformCurve2D(StepQuasiUniformCurve2D quasiUniform2D) {
         return buildImplicitBSplineCurve2D(quasiUniform2D.id(), quasiUniform2D.getDegree(), quasiUniform2D.getControlPoints(), "QUASI_UNIFORM");
     }
 
-    private BSplineCurve2 buildUniformCurve2D(StepUniformCurve2D uniform2D) {
+    BSplineCurve2 buildUniformCurve2D(StepUniformCurve2D uniform2D) {
         return buildImplicitBSplineCurve2D(uniform2D.id(), uniform2D.getDegree(), uniform2D.getControlPoints(), "UNIFORM");
     }
 
-    private BSplineCurve2 buildPiecewiseBezierCurve2D(StepPiecewiseBezierCurve2D piecewiseBezier2D) {
+    BSplineCurve2 buildPiecewiseBezierCurve2D(StepPiecewiseBezierCurve2D piecewiseBezier2D) {
         return buildImplicitBSplineCurve2D(piecewiseBezier2D.id(), piecewiseBezier2D.getDegree(), piecewiseBezier2D.getControlPoints(), "PIECEWISE_BEZIER");
     }
 

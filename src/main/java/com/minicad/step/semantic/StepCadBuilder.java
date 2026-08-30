@@ -847,90 +847,6 @@ public final class StepCadBuilder {
         return new TrimmedCurve2(basisCurve, trim1, trim2, trimmedCurve2D.isSenseAgreement());
     }
 
-    private BSplineCurve2 buildBSplineCurve2D(StepBSplineCurve2D spline2D) {
-        BSplineCurve2 existing = splineCurves2d.get(spline2D.id());
-        if (existing != null) {
-            return existing;
-        }
-        List<Point2> controlPoints = spline2D.getControlPoints().stream()
-                .map(p -> buildPoint2(p.id()))
-                .collect(Collectors.toList());
-        // A bare b_spline_curve carries no knot data; STEP's implied form is uniform.
-        BSplineCurve2 built = new BSplineCurve2(
-                spline2D.getDegree(),
-                controlPoints,
-                StepBSplineKnotGenerator.uniformMultiplicities(controlPoints.size(), spline2D.getDegree()),
-                StepBSplineKnotGenerator.uniformKnots(controlPoints.size(), spline2D.getDegree()));
-        splineCurves2d.put(spline2D.id(), built);
-        return built;
-    }
-
-    private RationalBSplineCurve2 buildRationalBSplineCurve2D(StepRationalBSplineCurve2D rationalSpline2D) {
-        RationalBSplineCurve2 existing = rationalSplineCurves2d.get(rationalSpline2D.id());
-        if (existing != null) {
-            return existing;
-        }
-        List<Point2> controlPoints = rationalSpline2D.getControlPoints().stream()
-                .map(p -> buildPoint2(p.id()))
-                .collect(Collectors.toList());
-        RationalBSplineCurve2 built = new RationalBSplineCurve2(
-                rationalSpline2D.getDegree(),
-                controlPoints,
-                rationalSpline2D.getWeights(),
-                StepBSplineKnotGenerator.uniformMultiplicities(controlPoints.size(), rationalSpline2D.getDegree()),
-                StepBSplineKnotGenerator.uniformKnots(controlPoints.size(), rationalSpline2D.getDegree()));
-        rationalSplineCurves2d.put(rationalSpline2D.id(), built);
-        return built;
-    }
-
-    private BSplineCurve2 buildBezierCurve2D(StepBezierCurve2D bezier2D) {
-        return buildImplicitBSplineCurve2D(bezier2D.id(), bezier2D.getDegree(), bezier2D.getControlPoints(), "BEZIER");
-    }
-
-    private BSplineCurve2 buildQuasiUniformCurve2D(StepQuasiUniformCurve2D quasiUniform2D) {
-        return buildImplicitBSplineCurve2D(quasiUniform2D.id(), quasiUniform2D.getDegree(), quasiUniform2D.getControlPoints(), "QUASI_UNIFORM");
-    }
-
-    private BSplineCurve2 buildUniformCurve2D(StepUniformCurve2D uniform2D) {
-        return buildImplicitBSplineCurve2D(uniform2D.id(), uniform2D.getDegree(), uniform2D.getControlPoints(), "UNIFORM");
-    }
-
-    private BSplineCurve2 buildPiecewiseBezierCurve2D(StepPiecewiseBezierCurve2D piecewiseBezier2D) {
-        return buildImplicitBSplineCurve2D(piecewiseBezier2D.id(), piecewiseBezier2D.getDegree(), piecewiseBezier2D.getControlPoints(), "PIECEWISE_BEZIER");
-    }
-
-    private BSplineCurve2 buildImplicitBSplineCurve2D(int id, int degree, List<StepCartesianPoint> controlPoints, String impliedForm) {
-        BSplineCurve2 existing = splineCurves2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        List<Point2> points = controlPoints.stream()
-                .map(p -> buildPoint2(p.id()))
-                .collect(Collectors.toList());
-        int count = points.size();
-        List<Integer> multiplicities;
-        List<Double> knots;
-        if ("BEZIER".equals(impliedForm)) {
-            if (count != degree + 1) {
-                throw new UnsupportedGeometryException("BEZIER_CURVE_2D requires controlPointCount = degree + 1");
-            }
-            multiplicities = List.of(degree + 1, degree + 1);
-            knots = List.of(0.0, 1.0);
-        } else if ("UNIFORM".equals(impliedForm)) {
-            multiplicities = StepBSplineKnotGenerator.uniformMultiplicities(count, degree);
-            knots = StepBSplineKnotGenerator.uniformKnots(count, degree);
-        } else if ("QUASI_UNIFORM".equals(impliedForm)) {
-            multiplicities = StepBSplineKnotGenerator.quasiUniformMultiplicities(count, degree);
-            knots = StepBSplineKnotGenerator.quasiUniformKnots(count, degree);
-        } else {
-            multiplicities = StepBSplineKnotGenerator.piecewiseBezierMultiplicities(count, degree, impliedForm);
-            knots = StepBSplineKnotGenerator.piecewiseBezierKnots(count, degree, impliedForm);
-        }
-        BSplineCurve2 built = new BSplineCurve2(degree, points, multiplicities, knots);
-        splineCurves2d.put(id, built);
-        return built;
-    }
-
     private Polyline2 buildIndexedPolyCurve2D(StepIndexedPolyCurve2D polyCurve2D) {
         List<StepCartesianPoint> stepPoints = polyCurve2D.getPoints();
         List<Integer> indices = polyCurve2D.indices();
@@ -2699,27 +2615,27 @@ public final class StepCadBuilder {
         }
         if (curve instanceof StepBSplineCurve2D) {
             StepBSplineCurve2D spline2D = (StepBSplineCurve2D) curve;
-            return liftCurve2(buildBSplineCurve2D(spline2D));
+            return liftCurve2(curveBuilder.buildBSplineCurve2D(spline2D));
         }
         if (curve instanceof StepRationalBSplineCurve2D) {
             StepRationalBSplineCurve2D rational2D = (StepRationalBSplineCurve2D) curve;
-            return liftCurve2(buildRationalBSplineCurve2D(rational2D));
+            return liftCurve2(curveBuilder.buildRationalBSplineCurve2D(rational2D));
         }
         if (curve instanceof StepBezierCurve2D) {
             StepBezierCurve2D bezier2D = (StepBezierCurve2D) curve;
-            return liftCurve2(buildBezierCurve2D(bezier2D));
+            return liftCurve2(curveBuilder.buildBezierCurve2D(bezier2D));
         }
         if (curve instanceof StepQuasiUniformCurve2D) {
             StepQuasiUniformCurve2D quasiUniform2D = (StepQuasiUniformCurve2D) curve;
-            return liftCurve2(buildQuasiUniformCurve2D(quasiUniform2D));
+            return liftCurve2(curveBuilder.buildQuasiUniformCurve2D(quasiUniform2D));
         }
         if (curve instanceof StepUniformCurve2D) {
             StepUniformCurve2D uniform2D = (StepUniformCurve2D) curve;
-            return liftCurve2(buildUniformCurve2D(uniform2D));
+            return liftCurve2(curveBuilder.buildUniformCurve2D(uniform2D));
         }
         if (curve instanceof StepPiecewiseBezierCurve2D) {
             StepPiecewiseBezierCurve2D piecewiseBezier2D = (StepPiecewiseBezierCurve2D) curve;
-            return liftCurve2(buildPiecewiseBezierCurve2D(piecewiseBezier2D));
+            return liftCurve2(curveBuilder.buildPiecewiseBezierCurve2D(piecewiseBezier2D));
         }
         if (curve instanceof StepIndexedPolyCurve2D) {
             StepIndexedPolyCurve2D polyCurve2D = (StepIndexedPolyCurve2D) curve;
