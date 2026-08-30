@@ -30,6 +30,8 @@ public final class BSplineCurve2 implements Curve2 {
     private final List<Integer> knotMultiplicities;
     private final List<Double> knots;
 
+    private volatile List<Double> expandedKnotsCache;
+
     public BSplineCurve2(int degree, List<Point2> controlPoints, List<Integer> knotMultiplicities, List<Double> knots) {
         validateDefinition(degree, controlPoints, knotMultiplicities, knots);
         this.degree = degree;
@@ -130,24 +132,14 @@ public final class BSplineCurve2 implements Curve2 {
      */
     public Point2 pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        // Simple approximation using control points for now
-        // Full De Boor implementation would be more accurate
         if (controlPoints == null || controlPoints.isEmpty()) {
             return new Point2(0, 0);
         }
-        // Linear interpolation between control points as fallback
-        double t = (parameter - startParameter()) / (endParameter() - startParameter());
-        t = Math.max(0.0, Math.min(1.0, t));
-        int n = controlPoints.size();
-        if (n == 1) {
-            return controlPoints.get(0);
+        List<Double> expanded = expandedKnots();
+        if (expanded.size() <= degree + 1) {
+            return new Point2(0, 0);
         }
-        int i = (int) (t * (n - 1));
-        i = Math.max(0, Math.min(i, n - 2));
-        double localT = t * (n - 1) - i;
-        Point2 p0 = controlPoints.get(i);
-        Point2 p1 = controlPoints.get(i + 1);
-        return new Point2(p0.getX() + localT * (p1.getX() - p0.getX()), p0.getY() + localT * (p1.getY() - p0.getY()));
+        return BSplineMath2.evaluate(controlPoints, degree, parameter, expanded);
     }
 
     @Override
@@ -183,10 +175,20 @@ public final class BSplineCurve2 implements Curve2 {
 
     /**
      * Returns the expanded knot vector (with multiplicities expanded).
+     * Cached after first use to avoid repeated allocation on evaluation hot paths.
      *
      * @return expanded knot vector
      */
     public List<Double> expandedKnots() {
+        List<Double> local = expandedKnotsCache;
+        if (local == null) {
+            local = computeExpandedKnots();
+            expandedKnotsCache = local;
+        }
+        return local;
+    }
+
+    private List<Double> computeExpandedKnots() {
         if (knots == null || knotMultiplicities == null) {
             return List.of();
         }
