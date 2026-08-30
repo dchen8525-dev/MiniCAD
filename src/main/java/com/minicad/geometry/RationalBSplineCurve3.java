@@ -192,6 +192,32 @@ public final class RationalBSplineCurve3 implements Curve3 {
         return closest;
     }
 
+    /**
+     * Returns the curve parameter whose point is closest to the given point,
+     * over the curve's natural knot domain. Mirrors BSplineCurve3.parameterAt:
+     * without this override the inherited default would hand back a normalized
+     * [0,1] value while pointAt evaluates on the knot domain, collapsing
+     * Edge sampling onto the start of the curve.
+     */
+    @Override
+    public double parameterAt(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        int samples = 1024;
+        double start = startParameter();
+        double end = endParameter();
+        double bestParameter = start;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i <= samples; i++) {
+            double parameter = start + (end - start) * i / samples;
+            double distance = point.distanceTo(pointAt(parameter));
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestParameter = parameter;
+            }
+        }
+        return bestParameter;
+    }
+
     @Override
     public java.util.List<CartesianPoint> sample(int segments) {
         java.util.List<CartesianPoint> points = new java.util.ArrayList<>();

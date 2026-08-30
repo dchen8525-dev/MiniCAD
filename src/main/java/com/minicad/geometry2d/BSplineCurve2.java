@@ -31,6 +31,18 @@ public final class BSplineCurve2 implements Curve2 {
     private final List<Double> knots;
 
     public BSplineCurve2(int degree, List<Point2> controlPoints, List<Integer> knotMultiplicities, List<Double> knots) {
+        validateDefinition(degree, controlPoints, knotMultiplicities, knots);
+        this.degree = degree;
+        this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
+        this.knotMultiplicities = knotMultiplicities == null ? null : java.util.List.copyOf(knotMultiplicities);
+        this.knots = knots == null ? null : java.util.List.copyOf(knots);
+    }
+
+    /**
+     * Shared definition validation for the 2D B-spline classes (called by the
+     * rational variant too). Throws {@link GeometryException} on invalid data.
+     */
+    static void validateDefinition(int degree, List<Point2> controlPoints, List<Integer> knotMultiplicities, List<Double> knots) {
         // Validate degree (must be >= 1)
         if (degree < 1) {
             throw new GeometryException("B-spline degree must be at least 1, got " + degree);
@@ -61,10 +73,6 @@ public final class BSplineCurve2 implements Curve2 {
         if (expandedCount != controlPoints.size() + degree + 1) {
             throw new GeometryException("expanded knot count does not match control points and degree");
         }
-        this.degree = degree;
-        this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-        this.knotMultiplicities = knotMultiplicities == null ? null : java.util.List.copyOf(knotMultiplicities);
-        this.knots = knots == null ? null : java.util.List.copyOf(knots);
     }
 
     public int getDegree() {
