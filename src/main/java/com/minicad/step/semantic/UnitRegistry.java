@@ -18,7 +18,7 @@ public final class UnitRegistry {
               resolver.resolveShapeAspect(instance, "COMPOSITE_UNIT_SHAPE_ASPECT"));
 
 // Entity: UNCERTAINTY_MEASURE_WITH_UNIT
-      registry.put("UNCERTAINTY_MEASURE_WITH_UNIT", StepEntityResolver::resolveUncertaintyMeasureWithUnit);
+      registry.put("UNCERTAINTY_MEASURE_WITH_UNIT", (resolver, instance) -> resolver.unitResolver.resolveUncertaintyMeasureWithUnit(instance));
 
 // Entity: LENGTH_MEASURE_WITH_UNIT
       registry.put(
@@ -236,16 +236,16 @@ public final class UnitRegistry {
                   "THERMAL_RESISTANCE_UNIT"));
 
 // Entity: MEASURE_WITH_UNIT
-      registry.put("MEASURE_WITH_UNIT", StepEntityResolver::resolveMeasureWithUnit);
+      registry.put("MEASURE_WITH_UNIT", (resolver, instance) -> resolver.unitResolver.resolveMeasureWithUnit(instance));
 
 // Entity: DERIVED_UNIT_ELEMENT
-      registry.put("DERIVED_UNIT_ELEMENT", StepEntityResolver::resolveDerivedUnitElement);
+      registry.put("DERIVED_UNIT_ELEMENT", (resolver, instance) -> resolver.unitResolver.resolveDerivedUnitElement(instance));
 
 // Entity: DERIVED_UNIT
-      registry.put("DERIVED_UNIT", StepEntityResolver::resolveDerivedUnit);
+      registry.put("DERIVED_UNIT", (resolver, instance) -> resolver.unitResolver.resolveDerivedUnit(instance));
 
 // Entity: SI_UNIT
-      registry.put("SI_UNIT", StepEntityResolver::resolveSiUnit);
+      registry.put("SI_UNIT", (resolver, instance) -> resolver.unitResolver.resolveSiUnit(instance));
 
 // Entity: SOLID_ANGLE_UNIT (moved from ProductRegistry, must be AFTER SI_UNIT for proper complex entity resolution)
       registry.put(
@@ -258,13 +258,13 @@ public final class UnitRegistry {
           (resolver, instance) -> resolver.resolveStandaloneUnitKind(instance, "VOLUME_UNIT"));
 
 // Entity: CONVERSION_BASED_UNIT_WITH_OFFSET
-      registry.put("CONVERSION_BASED_UNIT_WITH_OFFSET", StepEntityResolver::resolveConversionBasedUnitWithOffset);
+      registry.put("CONVERSION_BASED_UNIT_WITH_OFFSET", (resolver, instance) -> resolver.unitResolver.resolveConversionBasedUnitWithOffset(instance));
 
 // Entity: CONVERSION_BASED_UNIT (must be before NAMED_UNIT for complex entity priority)
       registry.put("CONVERSION_BASED_UNIT", (resolver, instance) -> resolver.resolveConversionBasedUnit(instance, "CONVERSION_BASED_UNIT"));
 
 // Entity: NAMED_UNIT
-      registry.put("NAMED_UNIT", StepEntityResolver::resolveNamedUnit);
+      registry.put("NAMED_UNIT", (resolver, instance) -> resolver.unitResolver.resolveNamedUnit(instance));
 
 // Entity: PLANE_ANGLE_UNIT (moved from GeometryRegistry1 to ensure consistent ordering)
       registry.put(
@@ -279,7 +279,7 @@ public final class UnitRegistry {
                   instance, "PLANE_ANGLE_MEASURE_WITH_UNIT", "PLANE_ANGLE_UNIT"));
 
 // Entity: PLANE_ANGLE_UNIT_WITH_UNIT (moved from GeometryRegistry2 to ensure consistent ordering)
-      registry.put("PLANE_ANGLE_UNIT_WITH_UNIT", StepEntityResolver::resolvePlaneAngleUnitWithUnit);
+      registry.put("PLANE_ANGLE_UNIT_WITH_UNIT", (resolver, instance) -> resolver.unitResolver.resolvePlaneAngleUnitWithUnit(instance));
 
 // Entity: LENGTH_UNIT
       registry.put(
@@ -522,16 +522,16 @@ public final class UnitRegistry {
           resolver.resolveTypedMeasureWithUnit(instance, "TYPED_MEASURE_WITH_UNIT"));
 
 // Entity: LENGTH_UNIT_WITH_UNIT
-      registry.put("LENGTH_UNIT_WITH_UNIT", StepEntityResolver::resolveLengthUnitWithUnit);
+      registry.put("LENGTH_UNIT_WITH_UNIT", (resolver, instance) -> resolver.unitResolver.resolveLengthUnitWithUnit(instance));
 
 // Entity: AREA_UNIT_WITH_UNIT
-      registry.put("AREA_UNIT_WITH_UNIT", StepEntityResolver::resolveAreaUnitWithUnit);
+      registry.put("AREA_UNIT_WITH_UNIT", (resolver, instance) -> resolver.unitResolver.resolveAreaUnitWithUnit(instance));
 
 // Entity: MASS_UNIT_WITH_UNIT
-      registry.put("MASS_UNIT_WITH_UNIT", StepEntityResolver::resolveMassUnitWithUnit);
+      registry.put("MASS_UNIT_WITH_UNIT", (resolver, instance) -> resolver.unitResolver.resolveMassUnitWithUnit(instance));
 
 // Entity: CONVERSION_BASED_UNIT_AND_UNIT
-      registry.put("CONVERSION_BASED_UNIT_AND_UNIT", StepEntityResolver::resolveConversionBasedUnitAndUnit);
+      registry.put("CONVERSION_BASED_UNIT_AND_UNIT", (resolver, instance) -> resolver.unitResolver.resolveConversionBasedUnitAndUnit(instance));
 
 // Entity: MASS_DENSITY_MEASURE_WITH_UNIT
       registry.put(

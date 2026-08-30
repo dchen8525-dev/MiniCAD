@@ -54,28 +54,28 @@ public final class ProductRegistry {
       registry.put("BOOLEAN_CLIPPING_RESULT", StepEntityResolver::resolveBooleanClippingResult);
 
 // Entity: BOOLEAN_RESULT
-      registry.put("BOOLEAN_RESULT", StepEntityResolver::resolveBooleanResult);
+      registry.put("BOOLEAN_RESULT", (resolver, instance) -> resolver.solidResolver.resolveBooleanResult(instance));
 
 // Entity: CSG_SOLID
-      registry.put("CSG_SOLID", StepEntityResolver::resolveCsgSolid);
+      registry.put("CSG_SOLID", (resolver, instance) -> resolver.solidResolver.resolveCsgSolid(instance));
 
 // Entity: CSG_VOLUME
-      registry.put("CSG_VOLUME", StepEntityResolver::resolveCsgVolume);
+      registry.put("CSG_VOLUME", (resolver, instance) -> resolver.solidResolver.resolveCsgVolume(instance));
 
 // Entity: BLOCK_VOLUME
-      registry.put("BLOCK_VOLUME", StepEntityResolver::resolveBlockVolume);
+      registry.put("BLOCK_VOLUME", (resolver, instance) -> resolver.solidResolver.resolveBlockVolume(instance));
 
 // Entity: SPHERE_VOLUME
-      registry.put("SPHERE_VOLUME", StepEntityResolver::resolveSphereVolume);
+      registry.put("SPHERE_VOLUME", (resolver, instance) -> resolver.solidResolver.resolveSphereVolume(instance));
 
 // Entity: PRISM_VOLUME
-      registry.put("PRISM_VOLUME", StepEntityResolver::resolvePrismVolume);
+      registry.put("PRISM_VOLUME", (resolver, instance) -> resolver.solidResolver.resolvePrismVolume(instance));
 
 // Entity: RIGHT_CIRCULAR_CONE_VOLUME
-      registry.put("RIGHT_CIRCULAR_CONE_VOLUME", StepEntityResolver::resolveRightCircularConeVolume);
+      registry.put("RIGHT_CIRCULAR_CONE_VOLUME", (resolver, instance) -> resolver.solidResolver.resolveRightCircularConeVolume(instance));
 
 // Entity: SOLID_REPLICA
-      registry.put("SOLID_REPLICA", StepEntityResolver::resolveSolidReplica);
+      registry.put("SOLID_REPLICA", (resolver, instance) -> resolver.solidResolver.resolveSolidReplica(instance));
 
 // Entity: BLOCK
       registry.put(
@@ -85,25 +85,25 @@ public final class ProductRegistry {
                   instance, "BLOCK", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 3));
 
 // Entity: EXTRUDED_AREA_SOLID
-      registry.put("EXTRUDED_AREA_SOLID", StepEntityResolver::resolveExtrudedAreaSolid);
+      registry.put("EXTRUDED_AREA_SOLID", (resolver, instance) -> resolver.solidResolver.resolveExtrudedAreaSolid(instance));
 
 // Entity: REVOLVED_AREA_SOLID
-      registry.put("REVOLVED_AREA_SOLID", StepEntityResolver::resolveRevolvedAreaSolid);
+      registry.put("REVOLVED_AREA_SOLID", (resolver, instance) -> resolver.solidResolver.resolveRevolvedAreaSolid(instance));
 
 // Entity: HALF_SPACE_SOLID
-      registry.put("HALF_SPACE_SOLID", StepEntityResolver::resolveHalfSpaceSolid);
+      registry.put("HALF_SPACE_SOLID", (resolver, instance) -> resolver.solidResolver.resolveHalfSpaceSolid(instance));
 
 // Entity: BOXED_HALF_SPACE
-      registry.put("BOXED_HALF_SPACE", StepEntityResolver::resolveBoxedHalfSpace);
+      registry.put("BOXED_HALF_SPACE", (resolver, instance) -> resolver.solidResolver.resolveBoxedHalfSpace(instance));
 
 // Entity: SWEPT_DISK_SOLID
-      registry.put("SWEPT_DISK_SOLID", StepEntityResolver::resolveSweptDiskSolid);
+      registry.put("SWEPT_DISK_SOLID", (resolver, instance) -> resolver.solidResolver.resolveSweptDiskSolid(instance));
 
 // Entity: REVOLVED_AREA_SOLID_TAPERED
-      registry.put("REVOLVED_AREA_SOLID_TAPERED", StepEntityResolver::resolveRevolvedAreaSolidTapered);
+      registry.put("REVOLVED_AREA_SOLID_TAPERED", (resolver, instance) -> resolver.solidResolver.resolveRevolvedAreaSolidTapered(instance));
 
 // Entity: EXTRUDED_AREA_SOLID_TAPERED
-      registry.put("EXTRUDED_AREA_SOLID_TAPERED", StepEntityResolver::resolveExtrudedAreaSolidTapered);
+      registry.put("EXTRUDED_AREA_SOLID_TAPERED", (resolver, instance) -> resolver.solidResolver.resolveExtrudedAreaSolidTapered(instance));
 
 // Entity: BREP_WITH_VOIDS
       registry.put("BREP_WITH_VOIDS", StepEntityResolver::resolveBrepWithVoids);
@@ -133,7 +133,7 @@ public final class ProductRegistry {
 // Entity: PRODUCT_DEFINITION_FORMATION_RELATIONSHIP
       registry.put(
           "PRODUCT_DEFINITION_FORMATION_RELATIONSHIP",
-          StepEntityResolver::resolveProductDefinitionFormationRelationship);
+          (resolver, instance) -> resolver.productResolver.resolveProductDefinitionFormationRelationship(instance));
 
 // Entity: PRODUCT_DEFINITION_CONTEXT
       registry.put("PRODUCT_DEFINITION_CONTEXT", StepEntityResolver::resolveProductDefinitionContext);
@@ -179,7 +179,7 @@ public final class ProductRegistry {
                   instance, "PRODUCT_DEFINITION_USAGE_RELATIONSHIP"));
 
 // Entity: PRODUCT_DEFINITION_SHAPE
-      registry.put("PRODUCT_DEFINITION_SHAPE", StepEntityResolver::resolveProductDefinitionShape);
+      registry.put("PRODUCT_DEFINITION_SHAPE", (resolver, instance) -> resolver.productResolver.resolveProductDefinitionShape(instance));
 
 // Entity: PRODUCT_DEFINITION_EFFECTIVITY
       registry.put(
@@ -716,7 +716,7 @@ public final class ProductRegistry {
       registry.put("MANIFOLD_SOLID_BREP", StepEntityResolver::resolveManifoldSolidBrep);
 
 // Entity: NON_MANIFOLD_SOLID_BREP
-      registry.put("NON_MANIFOLD_SOLID_BREP", StepEntityResolver::resolveNonManifoldSolidBrep);
+      registry.put("NON_MANIFOLD_SOLID_BREP", (resolver, instance) -> resolver.topologyResolver.resolveNonManifoldSolidBrep(instance));
 
 // Entity: QUANTIFIED_ASSEMBLY_COMPONENT_USAGE
       registry.put(
@@ -729,38 +729,38 @@ public final class ProductRegistry {
           (resolver, instance) -> resolver.resolveProductDefinition(instance));
 
 // Entity: MAKE_FROM_BUILD_ASSEMBLY
-      registry.put("MAKE_FROM_BUILD_ASSEMBLY", StepEntityResolver::resolveMakeFromBuildAssembly);
+      registry.put("MAKE_FROM_BUILD_ASSEMBLY", (resolver, instance) -> resolver.productResolver.resolveMakeFromBuildAssembly(instance));
 
 // Entity: ASSEMBLY_COMPONENT_RELATIONSHIP
       registry.put("ASSEMBLY_COMPONENT_RELATIONSHIP", StepEntityResolver::resolveAssemblyComponentRelationship);
 
 // Entity: VIEW_VOLUME
-      registry.put("VIEW_VOLUME", StepEntityResolver::resolveViewVolume);
+      registry.put("VIEW_VOLUME", (resolver, instance) -> resolver.visualizationResolver.resolveViewVolume(instance));
 
 // Entity: SOLID_MODEL
-      registry.put("SOLID_MODEL", StepEntityResolver::resolveSolidModel);
+      registry.put("SOLID_MODEL", (resolver, instance) -> resolver.solidResolver.resolveSolidModel(instance));
 
 // Entity: VOLUME_3D_ELEMENT_REPRESENTATION
       registry.put("VOLUME_3D_ELEMENT_REPRESENTATION",
-          StepEntityResolver::resolveVolume3dElementRepresentation);
+          (resolver, instance) -> resolver.representationResolver.resolveVolume3dElementRepresentation(instance));
 
 // Entity: VOLUME_3D_ELEMENT_PROPERTY
-      registry.put("VOLUME_3D_ELEMENT_PROPERTY", StepEntityResolver::resolveVolume3dElementProperty);
+      registry.put("VOLUME_3D_ELEMENT_PROPERTY", (resolver, instance) -> resolver.analysisResolver.resolveVolume3dElementProperty(instance));
 
 // Entity: ELEMENT_VOLUME_2D
-      registry.put("ELEMENT_VOLUME_2D", StepEntityResolver::resolveElementVolume2d);
+      registry.put("ELEMENT_VOLUME_2D", (resolver, instance) -> resolver.feaElementResolver.resolveElementVolume2d(instance));
 
 // Entity: ELEMENT_VOLUME_3D
-      registry.put("ELEMENT_VOLUME_3D", StepEntityResolver::resolveElementVolume3d);
+      registry.put("ELEMENT_VOLUME_3D", (resolver, instance) -> resolver.feaElementResolver.resolveElementVolume3d(instance));
 
 // Entity: ELEMENT_VOLUME
-      registry.put("ELEMENT_VOLUME", StepEntityResolver::resolveElementVolume);
+      registry.put("ELEMENT_VOLUME", (resolver, instance) -> resolver.feaElementResolver.resolveElementVolume(instance));
 
 // Entity: VOLUME_ELEMENT
-      registry.put("VOLUME_ELEMENT", StepEntityResolver::resolveVolumeElement);
+      registry.put("VOLUME_ELEMENT", (resolver, instance) -> resolver.feaElementResolver.resolveVolumeElement(instance));
 
 // Entity: UNIFORM_VOLUME_ELEMENT
-      registry.put("UNIFORM_VOLUME_ELEMENT", StepEntityResolver::resolveUniformVolumeElement);
+      registry.put("UNIFORM_VOLUME_ELEMENT", (resolver, instance) -> resolver.feaElementResolver.resolveUniformVolumeElement(instance));
 
 // Entity: SWEPT_AREA_SOLID
       registry.put(
@@ -858,7 +858,7 @@ public final class ProductRegistry {
           (resolver, instance) -> resolver.resolveRepresentation(instance, "ASSEMBLY_SEQUENCE_DEFINITION", false));
 
 // Entity: ASSEMBLY_SEQUENCE
-      registry.put("ASSEMBLY_SEQUENCE", StepEntityResolver::resolveAssemblySequence);
+      registry.put("ASSEMBLY_SEQUENCE", (resolver, instance) -> resolver.productResolver.resolveAssemblySequence(instance));
 
 // Entity: ASSEMBLY_STEP
       registry.put(
@@ -879,19 +879,19 @@ public final class ProductRegistry {
           resolver.resolveCsgPrimitive(instance, "CSG_PRIMITIVE", StepAxis2Placement3D.class, "AXIS2_PLACEMENT_3D", 3));
 
 // Entity: FEA_VOLUME_ELEMENT_PROPERTY
-      registry.put("FEA_VOLUME_ELEMENT_PROPERTY", StepEntityResolver::resolveFeaVolumeElementProperty);
+      registry.put("FEA_VOLUME_ELEMENT_PROPERTY", (resolver, instance) -> resolver.analysisResolver.resolveFeaVolumeElementProperty(instance));
 
 // Entity: VOLUME_UNIT_WITH_UNIT
-      registry.put("VOLUME_UNIT_WITH_UNIT", StepEntityResolver::resolveVolumeUnitWithUnit);
+      registry.put("VOLUME_UNIT_WITH_UNIT", (resolver, instance) -> resolver.unitResolver.resolveVolumeUnitWithUnit(instance));
 
 // Entity: CSG_PRIMITIVE_3D
-      registry.put("CSG_PRIMITIVE_3D", StepEntityResolver::resolveCsgPrimitive3D);
+      registry.put("CSG_PRIMITIVE_3D", (resolver, instance) -> resolver.solidResolver.resolveCsgPrimitive3D(instance));
 
 // Entity: ASSEMBLY_OPERATION
-      registry.put("ASSEMBLY_OPERATION", StepEntityResolver::resolveAssemblyOperation);
+      registry.put("ASSEMBLY_OPERATION", (resolver, instance) -> resolver.productResolver.resolveAssemblyOperation(instance));
 
 // Entity: ASSEMBLY_STRUCTURE
-      registry.put("ASSEMBLY_STRUCTURE", StepEntityResolver::resolveAssemblyStructure);
+      registry.put("ASSEMBLY_STRUCTURE", (resolver, instance) -> resolver.productResolver.resolveAssemblyStructure(instance));
 
   }
 }

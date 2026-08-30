@@ -137,7 +137,7 @@ public final class MiscellaneousRegistry4 {
               resolver.resolveGenericAssignment(instance, "DATA_QUALITY_INSPECTION_RESULT"));
 
 // Entity: MATERIAL_DESIGNATION
-      registry.put("MATERIAL_DESIGNATION", StepEntityResolver::resolveMaterialDesignation);
+      registry.put("MATERIAL_DESIGNATION", (resolver, instance) -> resolver.materialResolver.resolveMaterialDesignation(instance));
 
 // Entity: MATERIAL_PROPERTY
       registry.put(
@@ -145,19 +145,19 @@ public final class MiscellaneousRegistry4 {
           (resolver, instance) -> resolver.resolvePropertyDefinition(instance));
 
 // Entity: LAYERED_ITEM
-      registry.put("LAYERED_ITEM", StepEntityResolver::resolveLayeredItem);
+      registry.put("LAYERED_ITEM", (resolver, instance) -> resolver.materialResolver.resolveLayeredItem(instance));
 
 // Entity: COLOR_SPECIFICATION
-      registry.put("COLOR_SPECIFICATION", StepEntityResolver::resolveColorSpecification);
+      registry.put("COLOR_SPECIFICATION", (resolver, instance) -> resolver.materialResolver.resolveColorSpecification(instance));
 
 // Entity: MACHINING_OPERATION_SEQUENCE
-      registry.put("MACHINING_OPERATION_SEQUENCE", StepEntityResolver::resolveMachiningOperationSequence);
+      registry.put("MACHINING_OPERATION_SEQUENCE", (resolver, instance) -> resolver.machiningResolver.resolveMachiningOperationSequence(instance));
 
 // Entity: GEOMETRIC_MEASUREMENT
-      registry.put("GEOMETRIC_MEASUREMENT", StepEntityResolver::resolveGeometricMeasurement);
+      registry.put("GEOMETRIC_MEASUREMENT", (resolver, instance) -> resolver.unitResolver.resolveGeometricMeasurement(instance));
 
 // Entity: MAKE_FROM_USAGE_OPTION
-      registry.put("MAKE_FROM_USAGE_OPTION", StepEntityResolver::resolveMakeFromUsageOption);
+      registry.put("MAKE_FROM_USAGE_OPTION", (resolver, instance) -> resolver.productResolver.resolveMakeFromUsageOption(instance));
 
 // Entity: SPECIFIED_HIGHER_USAGE_OCCURRENCE
       registry.put("SPECIFIED_HIGHER_USAGE_OCCURRENCE", StepEntityResolver::resolveSpecifiedHigherUsageOccurrence);
@@ -166,43 +166,43 @@ public final class MiscellaneousRegistry4 {
       registry.put("ALTERNATE_PRODUCT_RELATIONSHIP", StepEntityResolver::resolveAlternateProductRelationship);
 
 // Entity: DESIGN_MAKE_FROM
-      registry.put("DESIGN_MAKE_FROM", StepEntityResolver::resolveDesignMakeFrom);
+      registry.put("DESIGN_MAKE_FROM", (resolver, instance) -> resolver.productResolver.resolveDesignMakeFrom(instance));
 
 // Entity: RENDERING_PROPERTIES
-      registry.put("RENDERING_PROPERTIES", StepEntityResolver::resolveRenderingProperties);
+      registry.put("RENDERING_PROPERTIES", (resolver, instance) -> resolver.materialResolver.resolveRenderingProperties(instance));
 
 // Entity: LIGHT_SOURCE
-      registry.put("LIGHT_SOURCE", StepEntityResolver::resolveLightSource);
+      registry.put("LIGHT_SOURCE", (resolver, instance) -> resolver.visualizationResolver.resolveLightSource(instance));
 
 // Entity: LIGHT_SOURCE_AMBIENT
-      registry.put("LIGHT_SOURCE_AMBIENT", StepEntityResolver::resolveLightSourceAmbient);
+      registry.put("LIGHT_SOURCE_AMBIENT", (resolver, instance) -> resolver.visualizationResolver.resolveLightSourceAmbient(instance));
 
 // Entity: LIGHT_SOURCE_POSITIONAL
-      registry.put("LIGHT_SOURCE_POSITIONAL", StepEntityResolver::resolveLightSourcePositional);
+      registry.put("LIGHT_SOURCE_POSITIONAL", (resolver, instance) -> resolver.visualizationResolver.resolveLightSourcePositional(instance));
 
 // Entity: LIGHT_SOURCE_SPOT
-      registry.put("LIGHT_SOURCE_SPOT", StepEntityResolver::resolveLightSourceSpot);
+      registry.put("LIGHT_SOURCE_SPOT", (resolver, instance) -> resolver.visualizationResolver.resolveLightSourceSpot(instance));
 
 // Entity: CAMERA_MODEL_D2
-      registry.put("CAMERA_MODEL_D2", StepEntityResolver::resolveCameraModelD2);
+      registry.put("CAMERA_MODEL_D2", (resolver, instance) -> resolver.visualizationResolver.resolveCameraModelD2(instance));
 
 // Entity: CAMERA_MODEL_D3
-      registry.put("CAMERA_MODEL_D3", StepEntityResolver::resolveCameraModelD3);
+      registry.put("CAMERA_MODEL_D3", (resolver, instance) -> resolver.visualizationResolver.resolveCameraModelD3(instance));
 
 // Entity: CAMERA_USAGE
-      registry.put("CAMERA_USAGE", StepEntityResolver::resolveCameraUsage);
+      registry.put("CAMERA_USAGE", (resolver, instance) -> resolver.visualizationResolver.resolveCameraUsage(instance));
 
 // Entity: CAMERA_IMAGE
-      registry.put("CAMERA_IMAGE", StepEntityResolver::resolveCameraImage);
+      registry.put("CAMERA_IMAGE", (resolver, instance) -> resolver.visualizationResolver.resolveCameraImage(instance));
 
 // Entity: PLANAR_BOX
-      registry.put("PLANAR_BOX", StepEntityResolver::resolvePlanarBox);
+      registry.put("PLANAR_BOX", (resolver, instance) -> resolver.visualizationResolver.resolvePlanarBox(instance));
 
 // Entity: PLANAR_EXTENT
-      registry.put("PLANAR_EXTENT", StepEntityResolver::resolvePlanarExtent);
+      registry.put("PLANAR_EXTENT", (resolver, instance) -> resolver.visualizationResolver.resolvePlanarExtent(instance));
 
 // Entity: MOTION_CONSTRAINT
-      registry.put("MOTION_CONSTRAINT", StepEntityResolver::resolveMotionConstraint);
+      registry.put("MOTION_CONSTRAINT", (resolver, instance) -> resolver.kinematicResolver.resolveMotionConstraint(instance));
 
 // Entity: START_REQUEST
       registry.put("START_REQUEST", StepEntityResolver::resolveStartRequest);
@@ -220,22 +220,24 @@ public final class MiscellaneousRegistry4 {
       registry.put("USAGE_OCCURRENCE", StepEntityResolver::resolveUsageOccurrence);
 
 // Entity: APPLIED_ATTRIBUTE_CLASSIFICATION
-      registry.put("APPLIED_ATTRIBUTE_CLASSIFICATION", StepEntityResolver::resolveAppliedAttributeClassification);
+      registry.put(
+          "APPLIED_ATTRIBUTE_CLASSIFICATION",
+          (resolver, instance) -> resolver.propertyResolver.resolveAppliedAttributeClassification(instance));
 
 // Entity: ATTRIBUTE_CLASSIFICATION
       registry.put("ATTRIBUTE_CLASSIFICATION", StepEntityResolver::resolveAttributeClassification);
 
 // Entity: MODEL_DEFINITION
-      registry.put("MODEL_DEFINITION", StepEntityResolver::resolveModelDefinition);
+      registry.put("MODEL_DEFINITION", (resolver, instance) -> resolver.analysisResolver.resolveModelDefinition(instance));
 
 // Entity: MODEL_INSTANCE
-      registry.put("MODEL_INSTANCE", StepEntityResolver::resolveModelInstance);
+      registry.put("MODEL_INSTANCE", (resolver, instance) -> resolver.analysisResolver.resolveModelInstance(instance));
 
 // Entity: SIMULATION_DEFINITION
-      registry.put("SIMULATION_DEFINITION", StepEntityResolver::resolveSimulationDefinition);
+      registry.put("SIMULATION_DEFINITION", (resolver, instance) -> resolver.analysisResolver.resolveSimulationDefinition(instance));
 
 // Entity: SIMULATION_INSTANCE
-      registry.put("SIMULATION_INSTANCE", StepEntityResolver::resolveSimulationInstance);
+      registry.put("SIMULATION_INSTANCE", (resolver, instance) -> resolver.analysisResolver.resolveSimulationInstance(instance));
 
 // Entity: ANGULAR_SIZE
       registry.put("ANGULAR_SIZE", StepEntityResolver::resolveAngularSize);
@@ -259,7 +261,7 @@ public final class MiscellaneousRegistry4 {
       registry.put("PRE_DEFINED_ITEM", StepEntityResolver::resolvePreDefinedItem);
 
 // Entity: PRE_DEFINED_MARKER
-      registry.put("PRE_DEFINED_MARKER", StepEntityResolver::resolvePreDefinedMarker);
+      registry.put("PRE_DEFINED_MARKER", (resolver, instance) -> resolver.materialResolver.resolvePreDefinedMarker(instance));
 
 // Entity: GEOMETRIC_SET
       registry.put("GEOMETRIC_SET", StepEntityResolver::resolveGeometricSet);
@@ -280,24 +282,24 @@ public final class MiscellaneousRegistry4 {
 // Entity: CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE
       registry.put(
           "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE",
-          StepEntityResolver::resolveChainBasedGeometricItemSpecificUsage);
+          (resolver, instance) -> resolver.associationResolver.resolveChainBasedGeometricItemSpecificUsage(instance));
 
 // Entity: MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION
       registry.put(
           "MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION",
-          StepEntityResolver::resolveMechanicalDesignRequirementItemAssociation);
+          (resolver, instance) -> resolver.associationResolver.resolveMechanicalDesignRequirementItemAssociation(instance));
 
 // Entity: PMI_REQUIREMENT_ITEM_ASSOCIATION
       registry.put(
           "PMI_REQUIREMENT_ITEM_ASSOCIATION",
-          StepEntityResolver::resolvePmiRequirementItemAssociation);
+          (resolver, instance) -> resolver.associationResolver.resolvePmiRequirementItemAssociation(instance));
 
 // Entity: PLACED_TARGET
       registry.put("PLACED_TARGET", StepEntityResolver::resolvePlacedTarget);
 
 // Entity: GEOMETRIC_ITEM_SPECIFIC_USAGE
       registry.put(
-          "GEOMETRIC_ITEM_SPECIFIC_USAGE", StepEntityResolver::resolveGeometricItemSpecificUsage);
+          "GEOMETRIC_ITEM_SPECIFIC_USAGE", (resolver, instance) -> resolver.associationResolver.resolveGeometricItemSpecificUsage(instance));
 
 // Entity: DEGENERATE_CONIC
       registry.put(
@@ -305,7 +307,7 @@ public final class MiscellaneousRegistry4 {
           (resolver, instance) -> resolver.resolveConicCurve(instance, "DEGENERATE_CONIC", 0));
 
 // Entity: MATERIAL
-      registry.put("MATERIAL", StepEntityResolver::resolveMaterial);
+      registry.put("MATERIAL", (resolver, instance) -> resolver.materialResolver.resolveMaterial(instance));
 
 // Entity: MAKE_FROM_OPTION
       registry.put(
@@ -608,13 +610,19 @@ public final class MiscellaneousRegistry4 {
           (resolver, instance) -> resolver.resolveMappedItem(instance));
 
 // Entity: CARTESIAN_TRANSFORMATION_OPERATOR
-      registry.put("CARTESIAN_TRANSFORMATION_OPERATOR", StepEntityResolver::resolveCartesianTransformationOperator);
+      registry.put(
+          "CARTESIAN_TRANSFORMATION_OPERATOR",
+          (resolver, instance) -> resolver.transformationResolver.resolveCartesianTransformationOperator(instance));
 
 // Entity: CARTESIAN_TRANSFORMATION_OPERATOR_2D
-      registry.put("CARTESIAN_TRANSFORMATION_OPERATOR_2D", StepEntityResolver::resolveCartesianTransformationOperator2D);
+      registry.put(
+          "CARTESIAN_TRANSFORMATION_OPERATOR_2D",
+          (resolver, instance) -> resolver.transformationResolver.resolveCartesianTransformationOperator2D(instance));
 
 // Entity: CARTESIAN_TRANSFORMATION_OPERATOR_3D
-      registry.put("CARTESIAN_TRANSFORMATION_OPERATOR_3D", StepEntityResolver::resolveCartesianTransformationOperator3D);
+      registry.put(
+          "CARTESIAN_TRANSFORMATION_OPERATOR_3D",
+          (resolver, instance) -> resolver.transformationResolver.resolveCartesianTransformationOperator3D(instance));
 
 // Entity: ITEM_DEFINED_TRANSFORMATION
       registry.put("ITEM_DEFINED_TRANSFORMATION", StepEntityResolver::resolveItemDefinedTransformation);
@@ -629,13 +637,13 @@ public final class MiscellaneousRegistry4 {
       registry.put("GENERALIZED_AREA_PROFILE", StepEntityResolver::resolveGeneralizedAreaProfile);
 
 // Entity: USAGE_ASSOCIATION
-      registry.put("USAGE_ASSOCIATION", StepEntityResolver::resolveUsageAssociation);
+      registry.put("USAGE_ASSOCIATION", (resolver, instance) -> resolver.associationResolver.resolveUsageAssociation(instance));
 
 // Entity: BUY_FROM_USAGE_OPTION
       registry.put("BUY_FROM_USAGE_OPTION", StepEntityResolver::resolveBuyFromUsageOption);
 
 // Entity: EXCLUSION_ASSIGNMENT
-      registry.put("EXCLUSION_ASSIGNMENT", StepEntityResolver::resolveExclusionAssignment);
+      registry.put("EXCLUSION_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveExclusionAssignment(instance));
 
 // Entity: DRAWING_REFERENCE
       registry.put("DRAWING_REFERENCE", StepEntityResolver::resolveDrawingReference);
@@ -644,16 +652,16 @@ public final class MiscellaneousRegistry4 {
       registry.put("TECHNICAL_NOTE", StepEntityResolver::resolveTechnicalNote);
 
 // Entity: CHARACTER_GLYPH
-      registry.put("CHARACTER_GLYPH", StepEntityResolver::resolveCharacterGlyph);
+      registry.put("CHARACTER_GLYPH", (resolver, instance) -> resolver.draughtingResolver.resolveCharacterGlyph(instance));
 
 // Entity: CHARACTER_GLYPH_STROKE
-      registry.put("CHARACTER_GLYPH_STROKE", StepEntityResolver::resolveCharacterGlyphStroke);
+      registry.put("CHARACTER_GLYPH_STROKE", (resolver, instance) -> resolver.draughtingResolver.resolveCharacterGlyphStroke(instance));
 
 // Entity: PMI_REQUIREMENT
       registry.put("PMI_REQUIREMENT", StepEntityResolver::resolvePmiRequirement);
 
 // Entity: PMI_GROUP
-      registry.put("PMI_GROUP", StepEntityResolver::resolvePmiGroup);
+      registry.put("PMI_GROUP", (resolver, instance) -> resolver.propertyResolver.resolvePmiGroup(instance));
 
 // Entity: WEBS
       registry.put("WEBS", StepEntityResolver::resolveWebs);
@@ -665,13 +673,13 @@ public final class MiscellaneousRegistry4 {
       registry.put("ATTRIBUTE_INSTANCE", StepEntityResolver::resolveAttributeInstance);
 
 // Entity: COMPOSITE_SHAPE_ASPECT
-      registry.put("COMPOSITE_SHAPE_ASPECT", StepEntityResolver::resolveCompositeShapeAspect);
+      registry.put("COMPOSITE_SHAPE_ASPECT", (resolver, instance) -> resolver.representationResolver.resolveCompositeShapeAspect(instance));
 
 // Entity: BILL_OF_MATERIALS
-      registry.put("BILL_OF_MATERIALS", StepEntityResolver::resolveBillOfMaterials);
+      registry.put("BILL_OF_MATERIALS", (resolver, instance) -> resolver.materialResolver.resolveBillOfMaterials(instance));
 
 // Entity: MAKE_FROM_RELATIONSHIP
-      registry.put("MAKE_FROM_RELATIONSHIP", StepEntityResolver::resolveMakeFromRelationship);
+      registry.put("MAKE_FROM_RELATIONSHIP", (resolver, instance) -> resolver.productResolver.resolveMakeFromRelationship(instance));
 
 // Entity: CAD_MODEL_REFERENCE
       registry.put("CAD_MODEL_REFERENCE", StepEntityResolver::resolveCadModelReference);

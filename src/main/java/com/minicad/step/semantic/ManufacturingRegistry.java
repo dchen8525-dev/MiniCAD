@@ -114,10 +114,10 @@ public final class ManufacturingRegistry {
               resolver.resolveGenericAssignment(instance, "ATTACHMENT_SLOT_PLANNED_TO_REALIZED"));
 
 // Entity: FILLET_DEFINITION
-      registry.put("FILLET_DEFINITION", StepEntityResolver::resolveFilletDefinition);
+      registry.put("FILLET_DEFINITION", (resolver, instance) -> resolver.geometricFeatureResolver.resolveFilletDefinition(instance));
 
 // Entity: CHAMFER_DEFINITION
-      registry.put("CHAMFER_DEFINITION", StepEntityResolver::resolveChamferDefinition);
+      registry.put("CHAMFER_DEFINITION", (resolver, instance) -> resolver.geometricFeatureResolver.resolveChamferDefinition(instance));
 
 // Entity: PATTERN
       registry.put("PATTERN", StepEntityResolver::resolvePattern);
@@ -126,7 +126,7 @@ public final class ManufacturingRegistry {
       registry.put("FLAT_PATTERN", StepEntityResolver::resolveFlatPattern);
 
 // Entity: THREAD
-      registry.put("THREAD", StepEntityResolver::resolveThread);
+      registry.put("THREAD", (resolver, instance) -> resolver.machiningResolver.resolveThread(instance));
 
 // Entity: SPOTFACE_HOLE_OCCURRENCE
       registry.put(

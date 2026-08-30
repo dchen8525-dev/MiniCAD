@@ -11,7 +11,9 @@ public final class RepresentationRegistry1 {
 
   public static void register(Map<String, EntityFactory> registry) {
 // Entity: GEOMETRIC_REPRESENTATION_CONTEXT
-      registry.put("GEOMETRIC_REPRESENTATION_CONTEXT", StepEntityResolver::resolveGeometricRepresentationContext);
+      registry.put(
+          "GEOMETRIC_REPRESENTATION_CONTEXT",
+          (resolver, instance) -> resolver.representationResolver.resolveGeometricRepresentationContext(instance));
 
 // Entity: SHAPE_REPRESENTATION
       registry.put(
@@ -472,37 +474,37 @@ public final class RepresentationRegistry1 {
 // Entity: ACTION_PROPERTY_REPRESENTATION
       registry.put(
           "ACTION_PROPERTY_REPRESENTATION",
-          StepEntityResolver::resolveActionPropertyRepresentation);
+          (resolver, instance) -> resolver.representationResolver.resolveActionPropertyRepresentation(instance));
 
 // Entity: CONTACT_RATIO_REPRESENTATION
       registry.put(
           "CONTACT_RATIO_REPRESENTATION",
-          StepEntityResolver::resolveContactRatioRepresentation);
+          (resolver, instance) -> resolver.representationResolver.resolveContactRatioRepresentation(instance));
 
 // Entity: KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION
       registry.put(
           "KINEMATIC_PROPERTY_DEFINITION_REPRESENTATION",
-          StepEntityResolver::resolveKinematicPropertyDefinitionRepresentation);
+          (resolver, instance) -> resolver.kinematicResolver.resolveKinematicPropertyDefinitionRepresentation(instance));
 
 // Entity: KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION
       registry.put(
           "KINEMATIC_PROPERTY_MECHANISM_REPRESENTATION",
-          StepEntityResolver::resolveKinematicPropertyMechanismRepresentation);
+          (resolver, instance) -> resolver.kinematicResolver.resolveKinematicPropertyMechanismRepresentation(instance));
 
 // Entity: KINEMATIC_PROPERTY_REPRESENTATION_RELATION
       registry.put(
           "KINEMATIC_PROPERTY_REPRESENTATION_RELATION",
-          StepEntityResolver::resolveKinematicPropertyRepresentationRelation);
+          (resolver, instance) -> resolver.kinematicResolver.resolveKinematicPropertyRepresentationRelation(instance));
 
 // Entity: KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION
       registry.put(
           "KINEMATIC_PROPERTY_TOPOLOGY_REPRESENTATION",
-          StepEntityResolver::resolveKinematicPropertyTopologyRepresentation);
+          (resolver, instance) -> resolver.kinematicResolver.resolveKinematicPropertyTopologyRepresentation(instance));
 
 // Entity: RESOURCE_PROPERTY_REPRESENTATION
       registry.put(
           "RESOURCE_PROPERTY_REPRESENTATION",
-          StepEntityResolver::resolveResourcePropertyRepresentation);
+          (resolver, instance) -> resolver.representationResolver.resolveResourcePropertyRepresentation(instance));
 
 // Entity: PROPERTY_DEFINITION_REPRESENTATION
       registry.put(
@@ -520,7 +522,7 @@ public final class RepresentationRegistry1 {
 // Entity: REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION
       registry.put(
           "REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION",
-          StepEntityResolver::resolveRepresentationRelationshipWithTransformation);
+          (resolver, instance) -> resolver.transformationResolver.resolveRepresentationRelationshipWithTransformation(instance));
 
 // Entity: REPRESENTATION_RELATIONSHIP
       registry.put("REPRESENTATION_RELATIONSHIP", StepEntityResolver::resolveRepresentationRelationship);

@@ -790,34 +790,34 @@ public final class StepEntityResolver {
   // O(1) mirror of resolutionStack for cycle detection; ArrayDeque.contains
   // would be O(depth) on every resolve call.
   private final Set<Integer> onResolutionStack = new HashSet<>();
-  private final StepTopologyResolver topologyResolver;
-  private final StepProductResolver productResolver;
-  private final GeometryResolver geometryResolver;
-  private final SurfaceResolver surfaceResolver;
-  private final GeometricFeatureResolver geometricFeatureResolver;
-  private final AnalysisResolver analysisResolver;
-  private final AnnotationResolver annotationResolver;
-  private final MaterialResolver materialResolver;
-  private final UnitResolver unitResolver;
-  private final KinematicResolver kinematicResolver;
-  private final TessellationResolver tessellationResolver;
-  private final AssignmentResolver assignmentResolver;
-  private final RepresentationResolver representationResolver;
-  private final BSplineResolver bSplineResolver;
-  private final BezierResolver bezierResolver;
-  private final SolidResolver solidResolver;
-  private final ProfileResolver profileResolver;
-  private final MachiningResolver machiningResolver;
-  private final TransformationResolver transformationResolver;
+  final StepTopologyResolver topologyResolver;
+  final StepProductResolver productResolver;
+  final GeometryResolver geometryResolver;
+  final SurfaceResolver surfaceResolver;
+  final GeometricFeatureResolver geometricFeatureResolver;
+  final AnalysisResolver analysisResolver;
+  final AnnotationResolver annotationResolver;
+  final MaterialResolver materialResolver;
+  final UnitResolver unitResolver;
+  final KinematicResolver kinematicResolver;
+  final TessellationResolver tessellationResolver;
+  final AssignmentResolver assignmentResolver;
+  final RepresentationResolver representationResolver;
+  final BSplineResolver bSplineResolver;
+  final BezierResolver bezierResolver;
+  final SolidResolver solidResolver;
+  final ProfileResolver profileResolver;
+  final MachiningResolver machiningResolver;
+  final TransformationResolver transformationResolver;
   private final GenericResolver genericResolver;
-  private final AssociationResolver associationResolver;
-  private final PropertyResolver propertyResolver;
-  private final CurveResolver curveResolver;
-  private final DraughtingResolver draughtingResolver;
+  final AssociationResolver associationResolver;
+  final PropertyResolver propertyResolver;
+  final CurveResolver curveResolver;
+  final DraughtingResolver draughtingResolver;
   private final ManufacturingFeatureResolver manufacturingFeatureResolver;
-  private final VisualizationResolver visualizationResolver;
-  private final BoundaryConditionResolver boundaryConditionResolver;
-  private final FeaElementResolver feaElementResolver;
+  final VisualizationResolver visualizationResolver;
+  final BoundaryConditionResolver boundaryConditionResolver;
+  final FeaElementResolver feaElementResolver;
 
   private StepEntityResolver(StepFile file) {
     this.instancesById = file.entitiesById();
@@ -954,13 +954,7 @@ public final class StepEntityResolver {
     return geometryResolver.resolveCartesianPoint(instance);
   }
 
-  StepDirection resolveDirection(StepEntityInstance instance) {
-    return geometryResolver.resolveDirection(instance);
-  }
 
-  StepVector resolveVector(StepEntityInstance instance) {
-    return geometryResolver.resolveVector(instance);
-  }
 
   StepAxis2Placement3D resolveAxis2Placement3D(StepEntityInstance instance) {
     return geometryResolver.resolveAxis2Placement3D(instance);
@@ -974,50 +968,23 @@ public final class StepEntityResolver {
     return geometryResolver.resolveAxis2Placement2D(instance);
   }
 
-  StepLine resolveLine(StepEntityInstance instance) {
-    return geometryResolver.resolveLine(instance);
-  }
 
-  StepPolyline resolvePolyline(StepEntityInstance instance) {
-    return geometryResolver.resolvePolyline(instance);
-  }
 
-  StepPlane resolvePlane(StepEntityInstance instance) {
-    return surfaceResolver.resolvePlane(instance);
-  }
 
-  StepCircle resolveCircle(StepEntityInstance instance) {
-    return geometryResolver.resolveCircle(instance);
-  }
 
-  StepEllipse resolveEllipse(StepEntityInstance instance) {
-    return geometryResolver.resolveEllipse(instance);
-  }
 
   StepConicCurve resolveConicCurve(StepEntityInstance instance, String entityName, int parameterCount) {
     return curveResolver.resolveConicCurve(instance, entityName, parameterCount);
   }
 
-  StepCylindricalSurface resolveCylindricalSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveCylindricalSurface(instance);
-  }
 
-  StepConicalSurface resolveConicalSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveConicalSurface(instance);
-  }
 
-  StepToroidalSurface resolveToroidalSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveToroidalSurface(instance);
-  }
 
   StepDegenerateToroidalSurface resolveDegenerateToroidalSurface(
       StepEntityInstance instance) {
     return surfaceResolver.resolveDegenerateToroidalSurface(instance);
   }
 
-  StepSphericalSurface resolveSphericalSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveSphericalSurface(instance);
-  }
 
   StepCylindricalSurfaceWithEllipticalAxis resolveCylindricalSurfaceWithEllipticalAxis(
       StepEntityInstance instance) {
@@ -1049,53 +1016,20 @@ public final class StepEntityResolver {
     return surfaceResolver.resolveToroidalSurfaceWithSpecifiedBends(instance);
   }
 
-  StepParaboloidSurface resolveParaboloidSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveParaboloidSurface(instance);
-  }
 
-  StepHyperboloidSurface resolveHyperboloidSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveHyperboloidSurface(instance);
-  }
 
-  StepChamferEdge resolveChamferEdge(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveChamferEdge(instance);
-  }
 
-  StepFilletEdge resolveFilletEdge(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveFilletEdge(instance);
-  }
 
-  StepBlendedSurface resolveBlendedSurface(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveBlendedSurface(instance);
-  }
 
-  StepFreeFormSurface resolveFreeFormSurface(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveFreeFormSurface(instance);
-  }
 
   List<List<StepEntity>> resolveFreeFormControlPoints(StepEntityInstance instance, StepEntityDefinition definition, int index) {
     return curveResolver.resolveFreeFormControlPoints(instance, definition, index);
   }
 
-  StepCurvedToleranceZone resolveCurvedToleranceZone(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveCurvedToleranceZone(instance);
-  }
 
-  StepSurfaceQuality resolveSurfaceQuality(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveSurfaceQuality(instance);
-  }
 
-  StepMeasurementPoint resolveMeasurementPoint(StepEntityInstance instance) {
-    return unitResolver.resolveMeasurementPoint(instance);
-  }
 
-  StepSurfaceMeasurement resolveSurfaceMeasurement(StepEntityInstance instance) {
-    return unitResolver.resolveSurfaceMeasurement(instance);
-  }
 
-  StepSurfaceTextureRepresentationItem resolveSurfaceTextureRepresentationItem(StepEntityInstance instance) {
-    return representationResolver.resolveSurfaceTextureRepresentationItem(instance);
-  }
 
   StepGeometricReplica resolveGeometricReplica(
       StepEntityInstance instance, String entityName) {
@@ -1128,85 +1062,28 @@ public final class StepEntityResolver {
         entityName);
   }
 
-  StepRectangularTrimmedSurface resolveRectangularTrimmedSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveRectangularTrimmedSurface(instance);
-  }
 
-  StepCurveBoundedSurface resolveCurveBoundedSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveCurveBoundedSurface(instance);
-  }
 
-  StepAnalysisResult resolveAnalysisResult(StepEntityInstance instance) {
-    return analysisResolver.resolveAnalysisResult(instance);
-  }
 
-  StepAnalysisInstance resolveAnalysisInstance(StepEntityInstance instance) {
-    return analysisResolver.resolveAnalysisInstance(instance);
-  }
 
-  StepConfigurationInstance resolveConfigurationInstance(StepEntityInstance instance) {
-    return analysisResolver.resolveConfigurationInstance(instance);
-  }
 
-  StepModelDefinition resolveModelDefinition(StepEntityInstance instance) {
-    return analysisResolver.resolveModelDefinition(instance);
-  }
 
-  StepModelInstance resolveModelInstance(StepEntityInstance instance) {
-    return analysisResolver.resolveModelInstance(instance);
-  }
 
-  StepSimulationDefinition resolveSimulationDefinition(StepEntityInstance instance) {
-    return analysisResolver.resolveSimulationDefinition(instance);
-  }
 
-  StepSimulationInstance resolveSimulationInstance(StepEntityInstance instance) {
-    return analysisResolver.resolveSimulationInstance(instance);
-  }
 
-  StepOrientedSurface resolveOrientedSurface(StepEntityInstance instance) {
-    return bezierResolver.resolveOrientedSurface(instance);
-  }
 
-  StepSurfaceOfLinearExtrusion resolveSurfaceOfLinearExtrusion(StepEntityInstance instance) {
-    return surfaceResolver.resolveSurfaceOfLinearExtrusion(instance);
-  }
 
-  StepSurfaceOfRevolution resolveSurfaceOfRevolution(StepEntityInstance instance) {
-    return surfaceResolver.resolveSurfaceOfRevolution(instance);
-  }
 
-  StepSurfaceOfTranslation resolveSurfaceOfTranslation(StepEntityInstance instance) {
-    return surfaceResolver.resolveSurfaceOfTranslation(instance);
-  }
 
-  StepSurfaceOfProjection resolveSurfaceOfProjection(StepEntityInstance instance) {
-    return surfaceResolver.resolveSurfaceOfProjection(instance);
-  }
 
-  StepOffsetCurve3D resolveOffsetCurve3D(StepEntityInstance instance) {
-    return bezierResolver.resolveOffsetCurve3D(instance);
-  }
 
-  StepOffsetCurve2D resolveOffsetCurve2D(StepEntityInstance instance) {
-    return bezierResolver.resolveOffsetCurve2D(instance);
-  }
 
-  StepOrientedCurve resolveOrientedCurve(StepEntityInstance instance) {
-    return bezierResolver.resolveOrientedCurve(instance);
-  }
 
-  StepOffsetSurface resolveOffsetSurface(StepEntityInstance instance) {
-    return bezierResolver.resolveOffsetSurface(instance);
-  }
 
   StepCompositeCurveSegment resolveCompositeCurveSegment(StepEntityInstance instance) {
     return bezierResolver.resolveCompositeCurveSegment(instance);
   }
 
-  StepCompositeCurve resolveCompositeCurve(StepEntityInstance instance) {
-    return bezierResolver.resolveCompositeCurve(instance);
-  }
 
   StepCompositeCurveOnSurface resolveCompositeCurveOnSurface(StepEntityInstance instance) {
     return curveResolver.resolveCompositeCurveOnSurface(instance);
@@ -1216,9 +1093,6 @@ public final class StepEntityResolver {
     return curveResolver.resolveCompositeCurveOnSurface(instance, entityName);
   }
 
-  StepTrimmedCurve resolveTrimmedCurve(StepEntityInstance instance) {
-    return curveResolver.resolveTrimmedCurve(instance);
-  }
 
   List<StepValue> trimValues(
       StepEntityInstance instance, StepEntityDefinition definition, int index, String message) {
@@ -1238,37 +1112,19 @@ public final class StepEntityResolver {
     return curveResolver.resolveSurfaceCurve(instance, entityName);
   }
 
-  StepSeamCurve resolveSeamCurve(StepEntityInstance instance) {
-    return curveResolver.resolveSeamCurve(instance);
-  }
 
-  StepPcurve resolvePcurve(StepEntityInstance instance) {
-    return curveResolver.resolvePcurve(instance);
-  }
 
-  StepDegeneratePcurve resolveDegeneratePcurve(StepEntityInstance instance) {
-    return curveResolver.resolveDegeneratePcurve(instance);
-  }
 
   StepBSplineCurveWithKnots resolveBSplineCurveWithKnots(StepEntityInstance instance) {
     return bSplineResolver.resolveBSplineCurveWithKnots(instance);
   }
 
-  StepBSplineCurve resolveBSplineCurve(StepEntityInstance instance) {
-    return bSplineResolver.resolveBSplineCurve(instance);
-  }
 
-  StepRationalBSplineCurve resolveRationalBSplineCurve(StepEntityInstance instance) {
-    return bSplineResolver.resolveRationalBSplineCurve(instance);
-  }
 
   StepBSplineSurfaceWithKnots resolveBSplineSurfaceWithKnots(StepEntityInstance instance) {
     return bSplineResolver.resolveBSplineSurfaceWithKnots(instance);
   }
 
-  StepBSplineSurface resolveBSplineSurface(StepEntityInstance instance) {
-    return bSplineResolver.resolveBSplineSurface(instance);
-  }
 
   StepBSplineCurveWithKnotsAndBreakpoints resolveBSplineCurveWithKnotsAndBreakpoints(
       StepEntityInstance instance) {
@@ -1280,117 +1136,39 @@ public final class StepEntityResolver {
     return bSplineResolver.resolveBSplineSurfaceWithKnotsAndBreakpoints(instance);
   }
 
-  StepRationalBSplineSurface resolveRationalBSplineSurface(StepEntityInstance instance) {
-    return bSplineResolver.resolveRationalBSplineSurface(instance);
-  }
 
-  StepVertexPoint resolveVertexPoint(StepEntityInstance instance) {
-    return topologyResolver.resolveVertexPoint(instance);
-  }
 
-  StepEdgeCurve resolveEdgeCurve(StepEntityInstance instance) {
-    return topologyResolver.resolveEdgeCurve(instance);
-  }
 
-  StepOrientedEdge resolveOrientedEdge(StepEntityInstance instance) {
-    return topologyResolver.resolveOrientedEdge(instance);
-  }
 
-  StepSubedge resolveSubedge(StepEntityInstance instance) {
-    return topologyResolver.resolveSubedge(instance);
-  }
 
-  StepConnectedEdgeSet resolveConnectedEdgeSet(StepEntityInstance instance) {
-    return topologyResolver.resolveConnectedEdgeSet(instance);
-  }
 
-  StepEdgeBasedWireframeModel resolveEdgeBasedWireframeModel(StepEntityInstance instance) {
-    return topologyResolver.resolveEdgeBasedWireframeModel(instance);
-  }
 
-  StepEdgeLoop resolveEdgeLoop(StepEntityInstance instance) {
-    return topologyResolver.resolveEdgeLoop(instance);
-  }
 
-  StepPath resolvePath(StepEntityInstance instance) {
-    return topologyResolver.resolvePath(instance);
-  }
 
-  StepOpenPath resolveOpenPath(StepEntityInstance instance) {
-    return topologyResolver.resolveOpenPath(instance);
-  }
 
-  StepSubpath resolveSubpath(StepEntityInstance instance) {
-    return topologyResolver.resolveSubpath(instance);
-  }
 
-  StepOrientedPath resolveOrientedPath(StepEntityInstance instance) {
-    return topologyResolver.resolveOrientedPath(instance);
-  }
 
   static boolean isPathEntity(StepEntity entity) {
     return StepTopologyResolver.isPathEntity(entity);
   }
 
-  StepVertexLoop resolveVertexLoop(StepEntityInstance instance) {
-    return topologyResolver.resolveVertexLoop(instance);
-  }
 
-  StepPolyLoop resolvePolyLoop(StepEntityInstance instance) {
-    return topologyResolver.resolvePolyLoop(instance);
-  }
 
   StepFaceBound resolveFaceBound(StepEntityInstance instance, boolean outer) {
     return topologyResolver.resolveFaceBound(instance, outer);
   }
 
-  StepAdvancedFace resolveAdvancedFace(StepEntityInstance instance) {
-    return topologyResolver.resolveAdvancedFace(instance);
-  }
 
-  StepFaceSurface resolveFaceSurface(StepEntityInstance instance) {
-    return topologyResolver.resolveFaceSurface(instance);
-  }
 
-  StepOrientedFace resolveOrientedFace(StepEntityInstance instance) {
-    return topologyResolver.resolveOrientedFace(instance);
-  }
 
-  StepOpenShell resolveOpenShell(StepEntityInstance instance) {
-    return topologyResolver.resolveOpenShell(instance);
-  }
 
-  StepClosedShell resolveClosedShell(StepEntityInstance instance) {
-    return topologyResolver.resolveClosedShell(instance);
-  }
 
-  StepSurfacedOpenShell resolveSurfacedOpenShell(StepEntityInstance instance) {
-    return topologyResolver.resolveSurfacedOpenShell(instance);
-  }
 
-  StepOrientedOpenShell resolveOrientedOpenShell(StepEntityInstance instance) {
-    return topologyResolver.resolveOrientedOpenShell(instance);
-  }
 
-  StepOrientedClosedShell resolveOrientedClosedShell(StepEntityInstance instance) {
-    return topologyResolver.resolveOrientedClosedShell(instance);
-  }
 
-  StepConnectedFaceSet resolveConnectedFaceSet(StepEntityInstance instance) {
-    return topologyResolver.resolveConnectedFaceSet(instance);
-  }
 
-  StepConnectedFaceSubSet resolveConnectedFaceSubSet(StepEntityInstance instance) {
-    return topologyResolver.resolveConnectedFaceSubSet(instance);
-  }
 
-  StepVertexShell resolveVertexShell(StepEntityInstance instance) {
-    return topologyResolver.resolveVertexShell(instance);
-  }
 
-  StepWireShell resolveWireShell(StepEntityInstance instance) {
-    return topologyResolver.resolveWireShell(instance);
-  }
 
   StepManifoldSolidBrep resolveManifoldSolidBrep(StepEntityInstance instance) {
     return topologyResolver.resolveManifoldSolidBrep(instance);
@@ -1400,29 +1178,11 @@ public final class StepEntityResolver {
     return topologyResolver.resolveManifoldSolidBrep(instance, entityName);
   }
 
-  StepNonManifoldSolidBrep resolveNonManifoldSolidBrep(StepEntityInstance instance) {
-    return topologyResolver.resolveNonManifoldSolidBrep(instance);
-  }
 
-  StepFacettedBrep resolveFacettedBrep(StepEntityInstance instance) {
-    return topologyResolver.resolveFacettedBrep(instance);
-  }
 
-  StepShellBasedSurfaceModel resolveShellBasedSurfaceModel(StepEntityInstance instance) {
-    return topologyResolver.resolveShellBasedSurfaceModel(instance);
-  }
 
-  StepFaceBasedSurfaceModel resolveFaceBasedSurfaceModel(StepEntityInstance instance) {
-    return topologyResolver.resolveFaceBasedSurfaceModel(instance);
-  }
 
-  StepManifoldSurfaceModel resolveManifoldSurfaceModel(StepEntityInstance instance) {
-    return topologyResolver.resolveManifoldSurfaceModel(instance);
-  }
 
-  StepSurfacedEdgeCurve resolveSurfacedEdgeCurve(StepEntityInstance instance) {
-    return topologyResolver.resolveSurfacedEdgeCurve(instance);
-  }
 
   boolean isConnectedFaceSetEntity(StepEntity entity) {
     return topologyResolver.isConnectedFaceSetEntity(entity);
@@ -1432,21 +1192,9 @@ public final class StepEntityResolver {
     return annotationResolver.resolveGeometricTolerance(instance);
   }
 
-  StepToleranceZoneForm resolveToleranceZoneForm(StepEntityInstance instance) {
-    return annotationResolver.resolveToleranceZoneForm(instance);
-  }
 
-  StepToleranceZone resolveToleranceZone(StepEntityInstance instance) {
-    return annotationResolver.resolveToleranceZone(instance);
-  }
 
-  StepConfigurationItem resolveConfigurationItem(StepEntityInstance instance) {
-    return analysisResolver.resolveConfigurationItem(instance);
-  }
 
-  StepDirectedDimensionalSize resolveDirectedDimensionalSize(StepEntityInstance instance) {
-    return annotationResolver.resolveDirectedDimensionalSize(instance);
-  }
 
   StepGeometricTolerance resolveGeometricTolerance(StepEntityInstance instance, String entityName) {
     return annotationResolver.resolveGeometricTolerance(instance, entityName);
@@ -1461,21 +1209,9 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 1));
   }
 
-  StepCompositeGroupTolerance resolveCompositeGroupTolerance(StepEntityInstance instance) {
-    return annotationResolver.resolveCompositeGroupTolerance(instance);
-  }
 
-  StepGeometricToleranceTarget resolveGeometricToleranceTarget(StepEntityInstance instance) {
-    return annotationResolver.resolveGeometricToleranceTarget(instance);
-  }
 
-  StepQualifiedRepresentationItem resolveQualifiedRepresentationItem(StepEntityInstance instance) {
-    return representationResolver.resolveQualifiedRepresentationItem(instance);
-  }
 
-  StepDatumReferenceModifierWithSign resolveDatumReferenceModifierWithSign(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumReferenceModifierWithSign(instance);
-  }
 
   StepRunoutZoneDefinition resolveRunoutZoneDefinition(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "RUNOUT_ZONE_DEFINITION");
@@ -1490,25 +1226,13 @@ public final class StepEntityResolver {
     return analysisResolver.resolveConfigurationEffectivity(instance);
   }
 
-  StepFeatureControlFrame resolveFeatureControlFrame(StepEntityInstance instance) {
-    return annotationResolver.resolveFeatureControlFrame(instance);
-  }
 
-  StepRunoutToleranceZone resolveRunoutToleranceZone(StepEntityInstance instance) {
-    return annotationResolver.resolveRunoutToleranceZone(instance);
-  }
 
   StepGeometricToleranceWithDatumReference resolveGeometricToleranceWithDatumReference(StepEntityInstance instance) {
     return annotationResolver.resolveGeometricToleranceWithDatumReference(instance);
   }
 
-  StepLinearToleranceZone resolveLinearToleranceZone(StepEntityInstance instance) {
-    return annotationResolver.resolveLinearToleranceZone(instance);
-  }
 
-  StepRadialToleranceZone resolveRadialToleranceZone(StepEntityInstance instance) {
-    return annotationResolver.resolveRadialToleranceZone(instance);
-  }
 
   StepProjectedZoneDefinition resolveProjectedZoneDefinition(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PROJECTED_ZONE_DEFINITION");
@@ -1575,9 +1299,6 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 3));
   }
 
-  StepDatumReferenceModifierWithValue resolveDatumReferenceModifierWithValue(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumReferenceModifierWithValue(instance);
-  }
 
   StepRunoutZoneDefinitionOrientation resolveRunoutZoneDefinitionOrientation(
       StepEntityInstance instance) {
@@ -1591,9 +1312,6 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 3));
   }
 
-  StepDatumReferenceModifier resolveDatumReferenceModifier(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumReferenceModifier(instance);
-  }
 
   // Phase 4: Tessellated triangulated resolve methods
 
@@ -1601,9 +1319,6 @@ public final class StepEntityResolver {
     return tessellationResolver.resolveTriangulatedFace(instance);
   }
 
-  StepComplexTriangulatedFace resolveComplexTriangulatedFace(StepEntityInstance instance) {
-    return tessellationResolver.resolveComplexTriangulatedFace(instance);
-  }
 
   StepCubicBezierTriangulatedFace resolveCubicBezierTriangulatedFace(
       StepEntityInstance instance) {
@@ -1617,75 +1332,27 @@ public final class StepEntityResolver {
         integerList(instance, definition, 2));
   }
 
-  StepMaterialDesignation resolveMaterialDesignation(StepEntityInstance instance) {
-    return materialResolver.resolveMaterialDesignation(instance);
-  }
 
-  StepLayeredItem resolveLayeredItem(StepEntityInstance instance) {
-    return materialResolver.resolveLayeredItem(instance);
-  }
 
-  StepDatum resolveDatum(StepEntityInstance instance) {
-    return annotationResolver.resolveDatum(instance);
-  }
 
-  StepDatumFeature resolveDatumFeature(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumFeature(instance);
-  }
 
-  StepDatumReference resolveDatumReference(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumReference(instance);
-  }
 
-  StepDatumReferenceCompartment resolveDatumReferenceCompartment(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumReferenceCompartment(instance);
-  }
 
-  StepDatumTarget resolveDatumTarget(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumTarget(instance);
-  }
 
-  StepDatumSystem resolveDatumSystem(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumSystem(instance);
-  }
 
-  StepDatumSystemReference resolveDatumSystemReference(StepEntityInstance instance) {
-    return annotationResolver.resolveDatumSystemReference(instance);
-  }
 
-  StepTolerancePair resolveTolerancePair(StepEntityInstance instance) {
-    return annotationResolver.resolveTolerancePair(instance);
-  }
 
-  StepToleranceSet resolveToleranceSet(StepEntityInstance instance) {
-    return annotationResolver.resolveToleranceSet(instance);
-  }
 
-  StepGeometricMeasurement resolveGeometricMeasurement(StepEntityInstance instance) {
-    return unitResolver.resolveGeometricMeasurement(instance);
-  }
 
-  StepDimensionalMeasurement resolveDimensionalMeasurement(StepEntityInstance instance) {
-    return annotationResolver.resolveDimensionalMeasurement(instance);
-  }
 
   // Manufacturing operation resolvers
   StepMachiningOperation resolveMachiningOperation(StepEntityInstance instance) {
     return machiningResolver.resolveMachiningOperation(instance);
   }
 
-  StepMachiningOperationSequence resolveMachiningOperationSequence(StepEntityInstance instance) {
-    return machiningResolver.resolveMachiningOperationSequence(instance);
-  }
 
   // Feature definition resolvers
-  StepFilletDefinition resolveFilletDefinition(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveFilletDefinition(instance);
-  }
 
-  StepChamferDefinition resolveChamferDefinition(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveChamferDefinition(instance);
-  }
 
   StepChamfer resolveChamfer(StepEntityInstance instance) {
     return geometricFeatureResolver.resolveChamfer(instance);
@@ -1752,17 +1419,8 @@ public final class StepEntityResolver {
     return manufacturingFeatureResolver.resolveLinearPattern(instance);
   }
 
-  StepCompositeDatumReference resolveCompositeDatumReference(StepEntityInstance instance) {
-    return annotationResolver.resolveCompositeDatumReference(instance);
-  }
 
-  StepCsgVolume resolveCsgVolume(StepEntityInstance instance) {
-    return solidResolver.resolveCsgVolume(instance);
-  }
 
-  StepBlockVolume resolveBlockVolume(StepEntityInstance instance) {
-    return solidResolver.resolveBlockVolume(instance);
-  }
 
   StepAssemblyProcessPlan resolveAssemblyProcessPlan(StepEntityInstance instance) {
     return productResolver.resolveAssemblyProcessPlan(instance);
@@ -1776,21 +1434,12 @@ public final class StepEntityResolver {
     return machiningResolver.resolveMachiningWorkPlan(instance);
   }
 
-  StepRectangularToleranceZone resolveRectangularToleranceZone(StepEntityInstance instance) {
-    return annotationResolver.resolveRectangularToleranceZone(instance);
-  }
 
-  StepToleranceModifier resolveToleranceModifier(StepEntityInstance instance) {
-    return annotationResolver.resolveToleranceModifier(instance);
-  }
 
   StepTypedMeasureWithUnit resolveTypedMeasureWithUnit(StepEntityInstance instance, String entityName) {
     return unitResolver.resolveTypedMeasureWithUnit(instance, entityName);
   }
 
-  StepCartesianTransformationOperator resolveCartesianTransformationOperator(StepEntityInstance instance) {
-    return transformationResolver.resolveCartesianTransformationOperator(instance);
-  }
 
   StepCartesianTransformationOperator resolveCartesianTransformationOperator(StepEntityInstance instance, String entityName) {
     return transformationResolver.resolveCartesianTransformationOperator(instance, entityName);
@@ -1814,41 +1463,17 @@ public final class StepEntityResolver {
     return null;
   }
 
-  StepDimensionalSize resolveDimensionalSize(StepEntityInstance instance) {
-    return annotationResolver.resolveDimensionalSize(instance);
-  }
 
-  StepDimensionalLocation resolveDimensionalLocation(StepEntityInstance instance) {
-    return annotationResolver.resolveDimensionalLocation(instance);
-  }
 
   StepShapeDimensionRepresentation resolveShapeDimensionRepresentation(StepEntityInstance instance) {
     return annotationResolver.resolveShapeDimensionRepresentation(instance);
   }
 
-  StepPlusMinusTolerance resolvePlusMinusTolerance(StepEntityInstance instance) {
-    return annotationResolver.resolvePlusMinusTolerance(instance);
-  }
 
-  StepToleranceValue resolveToleranceValue(StepEntityInstance instance) {
-    return annotationResolver.resolveToleranceValue(instance);
-  }
 
-  StepMeasureRepresentationItemWithUnit resolveMeasureRepresentationItemWithUnit(StepEntityInstance instance) {
-    return unitResolver.resolveMeasureRepresentationItemWithUnit(instance);
-  }
 
-  StepMeasureQualification resolveMeasureQualification(StepEntityInstance instance) {
-    return unitResolver.resolveMeasureQualification(instance);
-  }
 
-  StepMakeFromFeature resolveMakeFromFeature(StepEntityInstance instance) {
-    return productResolver.resolveMakeFromFeature(instance);
-  }
 
-  StepMakeFromUsageOption resolveMakeFromUsageOption(StepEntityInstance instance) {
-    return productResolver.resolveMakeFromUsageOption(instance);
-  }
 
   StepQuantifiedAssemblyComponentUsage resolveQuantifiedAssemblyComponentUsage(
       StepEntityInstance instance) {
@@ -1870,103 +1495,37 @@ public final class StepEntityResolver {
     return productResolver.resolveProductDefinitionWithAssociatedDocuments(instance);
   }
 
-  StepShapeAspectShapeRepresentation resolveShapeAspectShapeRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveShapeAspectShapeRepresentation(instance);
-  }
 
-  StepMakeFromBuildAssembly resolveMakeFromBuildAssembly(StepEntityInstance instance) {
-    return productResolver.resolveMakeFromBuildAssembly(instance);
-  }
 
   StepAssemblyComponentRelationship resolveAssemblyComponentRelationship(
       StepEntityInstance instance) {
     return productResolver.resolveAssemblyComponentRelationship(instance);
   }
 
-  StepDesignMakeFrom resolveDesignMakeFrom(StepEntityInstance instance) {
-    return productResolver.resolveDesignMakeFrom(instance);
-  }
 
   StepInterpolatedConfigurationSegment resolveInterpolatedConfigurationSegment(
       StepEntityInstance instance) {
     return productResolver.resolveInterpolatedConfigurationSegment(instance);
   }
 
-  StepRangeDimensionalSize resolveRangeDimensionalSize(StepEntityInstance instance) {
-    return annotationResolver.resolveRangeDimensionalSize(instance);
-  }
 
-  StepDesignedPartDesignVersion resolveDesignedPartDesignVersion(StepEntityInstance instance) {
-    return productResolver.resolveDesignedPartDesignVersion(instance);
-  }
 
-  StepSurfaceStyleRendering resolveSurfaceStyleRendering(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleRendering(instance);
-  }
 
-  StepSurfaceStyleRenderingWithProperties resolveSurfaceStyleRenderingWithProperties(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleRenderingWithProperties(instance);
-  }
 
-  StepRenderingProperties resolveRenderingProperties(StepEntityInstance instance) {
-    return materialResolver.resolveRenderingProperties(instance);
-  }
 
-  StepLightSource resolveLightSource(StepEntityInstance instance) {
-    return visualizationResolver.resolveLightSource(instance);
-  }
 
-  StepLightSourceAmbient resolveLightSourceAmbient(StepEntityInstance instance) {
-    return visualizationResolver.resolveLightSourceAmbient(instance);
-  }
 
-  StepLightSourceDirectional resolveLightSourceDirectional(StepEntityInstance instance) {
-    return visualizationResolver.resolveLightSourceDirectional(instance);
-  }
 
-  StepLightSourcePositional resolveLightSourcePositional(StepEntityInstance instance) {
-    return visualizationResolver.resolveLightSourcePositional(instance);
-  }
 
-  StepLightSourceSpot resolveLightSourceSpot(StepEntityInstance instance) {
-    return visualizationResolver.resolveLightSourceSpot(instance);
-  }
 
-  StepPresentationLayerUsage resolvePresentationLayerUsage(StepEntityInstance instance) {
-    return materialResolver.resolvePresentationLayerUsage(instance);
-  }
 
-  StepCameraModelD2 resolveCameraModelD2(StepEntityInstance instance) {
-    return visualizationResolver.resolveCameraModelD2(instance);
-  }
 
-  StepCameraModelD3 resolveCameraModelD3(StepEntityInstance instance) {
-    return visualizationResolver.resolveCameraModelD3(instance);
-  }
 
-  StepCameraUsage resolveCameraUsage(StepEntityInstance instance) {
-    return visualizationResolver.resolveCameraUsage(instance);
-  }
 
-  StepCameraImage resolveCameraImage(StepEntityInstance instance) {
-    return visualizationResolver.resolveCameraImage(instance);
-  }
 
-  StepPlanarBox resolvePlanarBox(StepEntityInstance instance) {
-    return visualizationResolver.resolvePlanarBox(instance);
-  }
 
-  StepPlanarExtent resolvePlanarExtent(StepEntityInstance instance) {
-    return visualizationResolver.resolvePlanarExtent(instance);
-  }
 
-  StepViewVolume resolveViewVolume(StepEntityInstance instance) {
-    return visualizationResolver.resolveViewVolume(instance);
-  }
 
-  StepMechanicalDesignShapeRepresentation resolveMechanicalDesignShapeRepresentation(StepEntityInstance instance) {
-    return productResolver.resolveMechanicalDesignShapeRepresentation(instance);
-  }
 
   StepKinematicPair resolveKinematicPair(StepEntityInstance instance) {
     return kinematicResolver.resolveKinematicPair(instance);
@@ -1976,65 +1535,23 @@ public final class StepEntityResolver {
     return kinematicResolver.resolveKinematicJoint(instance);
   }
 
-  StepKinematicLink resolveKinematicLink(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicLink(instance);
-  }
 
-  StepKinematicStructure resolveKinematicStructure(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicStructure(instance);
-  }
 
   StepKinematicPair resolveKinematicPair(StepEntityInstance instance, String entityName) {
     return kinematicResolver.resolveKinematicPair(instance, entityName);
   }
 
-  StepPrismaticPair resolvePrismaticPair(StepEntityInstance instance) {
-    return kinematicResolver.resolvePrismaticPair(instance);
-  }
 
-  StepRevolutePair resolveRevolutePair(StepEntityInstance instance) {
-    return kinematicResolver.resolveRevolutePair(instance);
-  }
 
-  StepCylindricalPair resolveCylindricalPair(StepEntityInstance instance) {
-    return kinematicResolver.resolveCylindricalPair(instance);
-  }
 
-  StepSphericalPair resolveSphericalPair(StepEntityInstance instance) {
-    return kinematicResolver.resolveSphericalPair(instance);
-  }
 
-  StepPlanarPair resolvePlanarPair(StepEntityInstance instance) {
-    return kinematicResolver.resolvePlanarPair(instance);
-  }
 
-  StepUniversalPair resolveUniversalPair(StepEntityInstance instance) {
-    return kinematicResolver.resolveUniversalPair(instance);
-  }
 
-  StepScrewPair resolveScrewPair(StepEntityInstance instance) {
-    return kinematicResolver.resolveScrewPair(instance);
-  }
 
-  StepGearPair resolveGearPair(StepEntityInstance instance) {
-    return kinematicResolver.resolveGearPair(instance);
-  }
 
-  StepGearPairWithRange resolveGearPairWithRange(StepEntityInstance instance) {
-    return kinematicResolver.resolveGearPairWithRange(instance);
-  }
 
-  StepRackAndPinionPair resolveRackAndPinionPair(StepEntityInstance instance) {
-    return kinematicResolver.resolveRackAndPinionPair(instance);
-  }
 
-  StepLowOrderKinematicPairWithRange resolveLowOrderKinematicPairWithRange(StepEntityInstance instance) {
-    return kinematicResolver.resolveLowOrderKinematicPairWithRange(instance);
-  }
 
-  StepActuatedKinematicPair resolveActuatedKinematicPair(StepEntityInstance instance) {
-    return kinematicResolver.resolveActuatedKinematicPair(instance);
-  }
 
   StepMechanismStateRepresentation resolveMechanismStateRepresentation(StepEntityInstance instance) {
     return kinematicResolver.resolveMechanismStateRepresentation(instance);
@@ -2044,135 +1561,42 @@ public final class StepEntityResolver {
     return kinematicResolver.resolveKinematicPath(instance);
   }
 
-  StepKinematicFrameBasedTransformation resolveKinematicFrameBasedTransformation(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicFrameBasedTransformation(instance);
-  }
 
-  StepValidationPropertyRepresentation resolveValidationPropertyRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveValidationPropertyRepresentation(instance);
-  }
 
-  StepCalculatedGeometricRepresentationItem resolveCalculatedGeometricRepresentationItem(StepEntityInstance instance) {
-    return representationResolver.resolveCalculatedGeometricRepresentationItem(instance);
-  }
 
   // Phase 5: FEA resolve methods
 
-  StepVolume3dElementRepresentation resolveVolume3dElementRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveVolume3dElementRepresentation(instance);
-  }
 
-  StepFeaNode resolveFeaNode(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaNode(instance);
-  }
 
-  StepFeaElement resolveFeaElement(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaElement(instance);
-  }
 
-  StepFeaLoad resolveFeaLoad(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaLoad(instance);
-  }
 
   StepFeaModel resolveFeaModel(StepEntityInstance instance) {
     return analysisResolver.resolveFeaModel(instance);
   }
 
-  StepMaterial resolveMaterial(StepEntityInstance instance) {
-    return materialResolver.resolveMaterial(instance);
-  }
 
-  StepFeaLinearMaterial resolveFeaLinearMaterial(StepEntityInstance instance) {
-    return materialResolver.resolveFeaLinearMaterial(instance);
-  }
 
-  StepFeaNonLinearMaterial resolveFeaNonLinearMaterial(StepEntityInstance instance) {
-    return materialResolver.resolveFeaNonLinearMaterial(instance);
-  }
 
-  StepFeaMassDensity resolveFeaMassDensity(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaMassDensity(instance);
-  }
 
-  StepFeaYieldStress resolveFeaYieldStress(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaYieldStress(instance);
-  }
 
-  StepFeaUltimateStress resolveFeaUltimateStress(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaUltimateStress(instance);
-  }
 
-  StepDisplacementBoundaryCondition resolveDisplacementBoundaryCondition(StepEntityInstance instance) {
-    return boundaryConditionResolver.resolveDisplacementBoundaryCondition(instance);
-  }
 
-  StepVelocityBoundaryCondition resolveVelocityBoundaryCondition(StepEntityInstance instance) {
-    return boundaryConditionResolver.resolveVelocityBoundaryCondition(instance);
-  }
 
-  StepAccelerationBoundaryCondition resolveAccelerationBoundaryCondition(StepEntityInstance instance) {
-    return boundaryConditionResolver.resolveAccelerationBoundaryCondition(instance);
-  }
 
-  StepForceBoundaryCondition resolveForceBoundaryCondition(StepEntityInstance instance) {
-    return boundaryConditionResolver.resolveForceBoundaryCondition(instance);
-  }
 
-  StepPressureBoundaryCondition resolvePressureBoundaryCondition(StepEntityInstance instance) {
-    return boundaryConditionResolver.resolvePressureBoundaryCondition(instance);
-  }
 
-  StepThermalBoundaryCondition resolveThermalBoundaryCondition(StepEntityInstance instance) {
-    return boundaryConditionResolver.resolveThermalBoundaryCondition(instance);
-  }
 
-  StepStressAnalysis resolveStressAnalysis(StepEntityInstance instance) {
-    return analysisResolver.resolveStressAnalysis(instance);
-  }
 
-  StepBucklingAnalysis resolveBucklingAnalysis(StepEntityInstance instance) {
-    return analysisResolver.resolveBucklingAnalysis(instance);
-  }
 
-  StepModalAnalysis resolveModalAnalysis(StepEntityInstance instance) {
-    return analysisResolver.resolveModalAnalysis(instance);
-  }
 
-  StepThermalAnalysis resolveThermalAnalysis(StepEntityInstance instance) {
-    return analysisResolver.resolveThermalAnalysis(instance);
-  }
 
-  StepStructuralAnalysisModel resolveStructuralAnalysisModel(StepEntityInstance instance) {
-    return analysisResolver.resolveStructuralAnalysisModel(instance);
-  }
 
-  StepRevoluteJoint resolveRevoluteJoint(StepEntityInstance instance) {
-    return kinematicResolver.resolveRevoluteJoint(instance);
-  }
 
-  StepPrismaticJoint resolvePrismaticJoint(StepEntityInstance instance) {
-    return kinematicResolver.resolvePrismaticJoint(instance);
-  }
 
-  StepSphericalJoint resolveSphericalJoint(StepEntityInstance instance) {
-    return kinematicResolver.resolveSphericalJoint(instance);
-  }
 
-  StepCylindricalJoint resolveCylindricalJoint(StepEntityInstance instance) {
-    return kinematicResolver.resolveCylindricalJoint(instance);
-  }
 
-  StepPlanarJoint resolvePlanarJoint(StepEntityInstance instance) {
-    return kinematicResolver.resolvePlanarJoint(instance);
-  }
 
-  StepScrewJoint resolveScrewJoint(StepEntityInstance instance) {
-    return kinematicResolver.resolveScrewJoint(instance);
-  }
 
-  StepGeneralJoint resolveGeneralJoint(StepEntityInstance instance) {
-    return kinematicResolver.resolveGeneralJoint(instance);
-  }
 
   StepDirectionSense resolveDirectionSense(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "DIRECTION_SENSE");
@@ -2183,25 +1607,10 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 1));
   }
 
-  StepJointValue resolveJointValue(StepEntityInstance instance) {
-    return kinematicResolver.resolveJointValue(instance);
-  }
 
-  StepKinematicChain resolveKinematicChain(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicChain(instance);
-  }
 
-  StepKinematicModel resolveKinematicModel(StepEntityInstance instance) {
-    return analysisResolver.resolveKinematicModel(instance);
-  }
 
-  StepKinematicProperty resolveKinematicProperty(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicProperty(instance);
-  }
 
-  StepMotionConstraint resolveMotionConstraint(StepEntityInstance instance) {
-    return kinematicResolver.resolveMotionConstraint(instance);
-  }
 
   StepChange resolveChange(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CHANGE");
@@ -2259,17 +1668,8 @@ public final class StepEntityResolver {
         resolve(referenceId(instance, definition, 2)));
   }
 
-  StepShapeRepresentationTransformation resolveShapeRepresentationTransformation(StepEntityInstance instance) {
-    return representationResolver.resolveShapeRepresentationTransformation(instance);
-  }
 
-  StepRepresentationContext3d resolveRepresentationContext3d(StepEntityInstance instance) {
-    return representationResolver.resolveRepresentationContext3d(instance);
-  }
 
-  StepAppliedAttributeClassification resolveAppliedAttributeClassification(StepEntityInstance instance) {
-    return propertyResolver.resolveAppliedAttributeClassification(instance);
-  }
 
   StepAttributeClassification resolveAttributeClassification(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "ATTRIBUTE_CLASSIFICATION");
@@ -2281,13 +1681,7 @@ public final class StepEntityResolver {
         resolve(referenceId(instance, definition, 2)));
   }
 
-  StepStructuralAnalysisRepresentation resolveStructuralAnalysisRepresentation(StepEntityInstance instance) {
-    return analysisResolver.resolveStructuralAnalysisRepresentation(instance);
-  }
 
-  StepStructuralAnalysisRepresentationParameters resolveStructuralAnalysisRepresentationParameters(StepEntityInstance instance) {
-    return analysisResolver.resolveStructuralAnalysisRepresentationParameters(instance);
-  }
 
   StepValueReasonPair resolveValueReasonPair(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "VALUE_REASON_PAIR");
@@ -2336,155 +1730,44 @@ public final class StepEntityResolver {
     return analysisResolver.resolveStructAnalysisModel(instance);
   }
 
-  StepElementVolume resolveElementVolume(StepEntityInstance instance) {
-    return feaElementResolver.resolveElementVolume(instance);
-  }
 
-  StepVolumeElement resolveVolumeElement(StepEntityInstance instance) {
-    return feaElementResolver.resolveVolumeElement(instance);
-  }
 
-  StepSurfaceElement resolveSurfaceElement(StepEntityInstance instance) {
-    return feaElementResolver.resolveSurfaceElement(instance);
-  }
 
-  StepLineElement resolveLineElement(StepEntityInstance instance) {
-    return feaElementResolver.resolveLineElement(instance);
-  }
 
-  StepMassElement resolveMassElement(StepEntityInstance instance) {
-    return feaElementResolver.resolveMassElement(instance);
-  }
 
-  StepConnectivityElement resolveConnectivityElement(StepEntityInstance instance) {
-    return feaElementResolver.resolveConnectivityElement(instance);
-  }
 
-  StepElementGeometricDescription resolveElementGeometricDescription(StepEntityInstance instance) {
-    return feaElementResolver.resolveElementGeometricDescription(instance);
-  }
 
-  StepUniformSurfaceElement resolveUniformSurfaceElement(StepEntityInstance instance) {
-    return feaElementResolver.resolveUniformSurfaceElement(instance);
-  }
 
-  StepUniformVolumeElement resolveUniformVolumeElement(StepEntityInstance instance) {
-    return feaElementResolver.resolveUniformVolumeElement(instance);
-  }
 
-  StepNodeRepresentation resolveNodeRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveNodeRepresentation(instance);
-  }
 
-  StepVolume3dElementProperty resolveVolume3dElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveVolume3dElementProperty(instance);
-  }
 
-  StepCurve3dElementProperty resolveCurve3dElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveCurve3dElementProperty(instance);
-  }
 
-  StepSurface3dElementProperty resolveSurface3dElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveSurface3dElementProperty(instance);
-  }
 
-  StepFeaMaterialPropertyRepresentation resolveFeaMaterialPropertyRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveFeaMaterialPropertyRepresentation(instance);
-  }
 
-  StepElementVolume2d resolveElementVolume2d(StepEntityInstance instance) {
-    return feaElementResolver.resolveElementVolume2d(instance);
-  }
 
-  StepElementVolume3d resolveElementVolume3d(StepEntityInstance instance) {
-    return feaElementResolver.resolveElementVolume3d(instance);
-  }
 
-  StepNodeSet resolveNodeSet(StepEntityInstance instance) {
-    return feaElementResolver.resolveNodeSet(instance);
-  }
 
-  StepElementSet resolveElementSet(StepEntityInstance instance) {
-    return feaElementResolver.resolveElementSet(instance);
-  }
 
-  StepFeaSecuredVariable resolveFeaSecuredVariable(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaSecuredVariable(instance);
-  }
 
-  StepFeaConstantFunction3d resolveFeaConstantFunction3d(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaConstantFunction3d(instance);
-  }
 
-  StepFeaLinearAlgebraicMatrix resolveFeaLinearAlgebraicMatrix(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaLinearAlgebraicMatrix(instance);
-  }
 
-  StepFeaLinearAlgebraicVector resolveFeaLinearAlgebraicVector(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaLinearAlgebraicVector(instance);
-  }
 
-  StepFeaAxis2Placement3d resolveFeaAxis2Placement3d(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaAxis2Placement3d(instance);
-  }
 
-  StepFeaGroupRepresentation resolveFeaGroupRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveFeaGroupRepresentation(instance);
-  }
 
   // New FEA element property resolvers
-  StepFeaShellElementProperty resolveFeaShellElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaShellElementProperty(instance);
-  }
 
-  StepFeaBeamElementProperty resolveFeaBeamElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaBeamElementProperty(instance);
-  }
 
-  StepFea2DElementProperty resolveFea2DElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveFea2DElementProperty(instance);
-  }
 
-  StepFea3DElementProperty resolveFea3DElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveFea3DElementProperty(instance);
-  }
 
-  StepFeaTrussElementProperty resolveFeaTrussElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaTrussElementProperty(instance);
-  }
 
-  StepFeaSpringElementProperty resolveFeaSpringElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaSpringElementProperty(instance);
-  }
 
-  StepFeaVolumeElementProperty resolveFeaVolumeElementProperty(StepEntityInstance instance) {
-    return analysisResolver.resolveFeaVolumeElementProperty(instance);
-  }
 
   // Unit with unit resolvers
-  StepLengthUnitWithUnit resolveLengthUnitWithUnit(StepEntityInstance instance) {
-    return unitResolver.resolveLengthUnitWithUnit(instance);
-  }
 
-  StepPlaneAngleUnitWithUnit resolvePlaneAngleUnitWithUnit(StepEntityInstance instance) {
-    return unitResolver.resolvePlaneAngleUnitWithUnit(instance);
-  }
 
-  StepVolumeUnitWithUnit resolveVolumeUnitWithUnit(StepEntityInstance instance) {
-    return unitResolver.resolveVolumeUnitWithUnit(instance);
-  }
 
-  StepAreaUnitWithUnit resolveAreaUnitWithUnit(StepEntityInstance instance) {
-    return unitResolver.resolveAreaUnitWithUnit(instance);
-  }
 
-  StepMassUnitWithUnit resolveMassUnitWithUnit(StepEntityInstance instance) {
-    return unitResolver.resolveMassUnitWithUnit(instance);
-  }
 
-  StepConversionBasedUnitAndUnit resolveConversionBasedUnitAndUnit(StepEntityInstance instance) {
-    return unitResolver.resolveConversionBasedUnitAndUnit(instance);
-  }
 
   // Profile resolvers
   StepAreaProfile resolveAreaProfile(StepEntityInstance instance) {
@@ -2505,63 +1788,24 @@ public final class StepEntityResolver {
         resolve(referenceId(instance, definition, 1)));
   }
 
-  StepSweptProfileAreaOutline resolveSweptProfileAreaOutline(StepEntityInstance instance) {
-    return profileResolver.resolveSweptProfileAreaOutline(instance);
-  }
 
   // Kinematic reference resolvers
-  StepKinematicLinkReference resolveKinematicLinkReference(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicLinkReference(instance);
-  }
 
-  StepKinematicJointReference resolveKinematicJointReference(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicJointReference(instance);
-  }
 
   // Product representation resolvers
-  StepHybridShapeRepresentation resolveHybridShapeRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveHybridShapeRepresentation(instance);
-  }
 
-  StepDrawingRepresentation resolveDrawingRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveDrawingRepresentation(instance);
-  }
 
-  StepSchematicRepresentation resolveSchematicRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveSchematicRepresentation(instance);
-  }
 
-  StepSketchRepresentation resolveSketchRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveSketchRepresentation(instance);
-  }
 
-  StepSectionRepresentation resolveSectionRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveSectionRepresentation(instance);
-  }
 
-  StepTabulationRepresentation resolveTabulationRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveTabulationRepresentation(instance);
-  }
 
-  StepZoneRepresentation resolveZoneRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveZoneRepresentation(instance);
-  }
 
-  StepCsgPrimitive3D resolveCsgPrimitive3D(StepEntityInstance instance) {
-    return solidResolver.resolveCsgPrimitive3D(instance);
-  }
 
   StepCompoundRepresentationItem resolveCompoundRepresentationItem(StepEntityInstance instance, String entityName) {
     return representationResolver.resolveCompoundRepresentationItem(instance, entityName);
   }
 
-  StepContextDependentGeometricShapeRepresentation resolveContextDependentGeometricShapeRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveContextDependentGeometricShapeRepresentation(instance);
-  }
 
-  StepUsageAssociation resolveUsageAssociation(StepEntityInstance instance) {
-    return associationResolver.resolveUsageAssociation(instance);
-  }
 
   StepBuyFromUsageOption resolveBuyFromUsageOption(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "BUY_FROM_USAGE_OPTION");
@@ -2573,25 +1817,10 @@ public final class StepEntityResolver {
   }
 
   // Config management resolvers
-  StepExclusionAssignment resolveExclusionAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveExclusionAssignment(instance);
-  }
 
-  StepDateTimeEffectivity resolveDateTimeEffectivity(StepEntityInstance instance) {
-    return assignmentResolver.resolveDateTimeEffectivity(instance);
-  }
 
-  StepDateEffectivity resolveDateEffectivity(StepEntityInstance instance) {
-    return assignmentResolver.resolveDateEffectivity(instance);
-  }
 
-  StepLotEffectivity resolveLotEffectivity(StepEntityInstance instance) {
-    return assignmentResolver.resolveLotEffectivity(instance);
-  }
 
-  StepSerialNumberEffectivity resolveSerialNumberEffectivity(StepEntityInstance instance) {
-    return assignmentResolver.resolveSerialNumberEffectivity(instance);
-  }
 
   // Geometry resolvers
   StepIndexedPolyCurve resolveIndexedPolycurve(StepEntityInstance instance) {
@@ -2619,22 +1848,10 @@ public final class StepEntityResolver {
   }
 
   // Annotation resolvers
-  StepAnnotationFillAreaRegion resolveAnnotationFillAreaRegion(StepEntityInstance instance) {
-    return annotationResolver.resolveAnnotationFillAreaRegion(instance);
-  }
 
   // Product resolvers
-  StepAssemblyOperation resolveAssemblyOperation(StepEntityInstance instance) {
-    return productResolver.resolveAssemblyOperation(instance);
-  }
 
-  StepAssemblySequence resolveAssemblySequence(StepEntityInstance instance) {
-    return productResolver.resolveAssemblySequence(instance);
-  }
 
-  StepAssemblyStructure resolveAssemblyStructure(StepEntityInstance instance) {
-    return productResolver.resolveAssemblyStructure(instance);
-  }
 
   StepCadModelReference resolveCadModelReference(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CAD_MODEL_REFERENCE");
@@ -2681,9 +1898,6 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 6));
   }
 
-  StepMechanismDefinition resolveMechanismDefinition(StepEntityInstance instance) {
-    return kinematicResolver.resolveMechanismDefinition(instance);
-  }
 
   StepModuleDefinition resolveModuleDefinition(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "MODULE_DEFINITION");
@@ -2712,9 +1926,6 @@ public final class StepEntityResolver {
         resolve(referenceId(instance, definition, 4)));
   }
 
-  StepProductVersion resolveProductVersion(StepEntityInstance instance) {
-    return productResolver.resolveProductVersion(instance);
-  }
 
   StepProjectInformation resolveProjectInformation(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PROJECT_INFORMATION");
@@ -2732,18 +1943,9 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 7));
   }
 
-  StepStructuralFeature resolveStructuralFeature(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveStructuralFeature(instance);
-  }
 
-  StepFillAreaWithOutline resolveFillAreaWithOutline(StepEntityInstance instance) {
-    return materialResolver.resolveFillAreaWithOutline(instance);
-  }
 
   // Annotation resolvers
-  StepAnnotationRecord resolveAnnotationRecord(StepEntityInstance instance) {
-    return annotationResolver.resolveAnnotationRecord(instance);
-  }
 
   StepDrawingReference resolveDrawingReference(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "DRAWING_REFERENCE");
@@ -2759,17 +1961,8 @@ public final class StepEntityResolver {
         resolve(referenceId(instance, definition, 6)));
   }
 
-  StepExternallyDefinedHatchStyle resolveExternallyDefinedHatchStyle(StepEntityInstance instance) {
-    return materialResolver.resolveExternallyDefinedHatchStyle(instance);
-  }
 
-  StepExternallyDefinedTileStyle resolveExternallyDefinedTileStyle(StepEntityInstance instance) {
-    return materialResolver.resolveExternallyDefinedTileStyle(instance);
-  }
 
-  StepMarkingFeature resolveMarkingFeature(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveMarkingFeature(instance);
-  }
 
   StepTechnicalNote resolveTechnicalNote(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "TECHNICAL_NOTE");
@@ -2786,25 +1979,10 @@ public final class StepEntityResolver {
   }
 
   // Tolerance/dimension representation resolvers
-  StepAngularDimensionRepresentation resolveAngularDimensionRepresentation(StepEntityInstance instance) {
-    return annotationResolver.resolveAngularDimensionRepresentation(instance);
-  }
 
-  StepChainDimensionRepresentation resolveChainDimensionRepresentation(StepEntityInstance instance) {
-    return annotationResolver.resolveChainDimensionRepresentation(instance);
-  }
 
-  StepLinearDimensionRepresentation resolveLinearDimensionRepresentation(StepEntityInstance instance) {
-    return annotationResolver.resolveLinearDimensionRepresentation(instance);
-  }
 
-  StepOrdinateDimensionRepresentation resolveOrdinateDimensionRepresentation(StepEntityInstance instance) {
-    return annotationResolver.resolveOrdinateDimensionRepresentation(instance);
-  }
 
-  StepShapeDimensionRepresentationWithTolerance resolveShapeDimensionRepresentationWithTolerance(StepEntityInstance instance) {
-    return representationResolver.resolveShapeDimensionRepresentationWithTolerance(instance);
-  }
 
   // FEA resolvers
   StepBoundaryCondition resolveBoundaryCondition(StepEntityInstance instance) {
@@ -2857,26 +2035,14 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 3));
   }
 
-  StepCompositeShapeAspect resolveCompositeShapeAspect(StepEntityInstance instance) {
-    return representationResolver.resolveCompositeShapeAspect(instance);
-  }
 
   // Product resolvers
   StepAssemblyComponentUsage resolveAssemblyComponentUsage(StepEntityInstance instance) {
     return productResolver.resolveAssemblyComponentUsage(instance);
   }
 
-  StepBillOfMaterials resolveBillOfMaterials(StepEntityInstance instance) {
-    return materialResolver.resolveBillOfMaterials(instance);
-  }
 
-  StepMakeFromRelationship resolveMakeFromRelationship(StepEntityInstance instance) {
-    return productResolver.resolveMakeFromRelationship(instance);
-  }
 
-  StepTextLiteralWithDraughtingCallout resolveTextLiteralWithDraughtingCallout(StepEntityInstance instance) {
-    return annotationResolver.resolveTextLiteralWithDraughtingCallout(instance);
-  }
 
   StepComposedTextLiteral resolveComposedTextLiteral(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "COMPOSED_TEXT_LITERAL");
@@ -2888,65 +2054,20 @@ public final class StepEntityResolver {
             "COMPOSED_TEXT_LITERAL components must contain entity references"));
   }
 
-  StepTextFont resolveTextFont(StepEntityInstance instance) {
-    return materialResolver.resolveTextFont(instance);
-  }
 
-  StepCharacterGlyph resolveCharacterGlyph(StepEntityInstance instance) {
-    return draughtingResolver.resolveCharacterGlyph(instance);
-  }
 
-  StepCharacterGlyphOutline resolveCharacterGlyphOutline(StepEntityInstance instance) {
-    return draughtingResolver.resolveCharacterGlyphOutline(instance);
-  }
 
-  StepCharacterGlyphOutlineWithCharacteristics resolveCharacterGlyphOutlineWithCharacteristics(StepEntityInstance instance) {
-    return draughtingResolver.resolveCharacterGlyphOutlineWithCharacteristics(instance);
-  }
 
-  StepCharacterGlyphStroke resolveCharacterGlyphStroke(StepEntityInstance instance) {
-    return draughtingResolver.resolveCharacterGlyphStroke(instance);
-  }
 
-  StepPreDefinedSurfaceStyle resolvePreDefinedSurfaceStyle(StepEntityInstance instance) {
-    return materialResolver.resolvePreDefinedSurfaceStyle(instance);
-  }
 
-  StepSurfaceStyleParameterLines resolveSurfaceStyleParameterLines(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleParameterLines(instance);
-  }
 
-  StepFillAreaStyleOutline resolveFillAreaStyleOutline(StepEntityInstance instance) {
-    return materialResolver.resolveFillAreaStyleOutline(instance);
-  }
 
-  StepFillAreaStyleTransparent resolveFillAreaStyleTransparent(StepEntityInstance instance) {
-    return materialResolver.resolveFillAreaStyleTransparent(instance);
-  }
 
-  StepFillAreaStyleHatching resolveFillAreaStyleHatching(StepEntityInstance instance) {
-    return materialResolver.resolveFillAreaStyleHatching(instance);
-  }
 
-  StepFillAreaStyleTiling resolveFillAreaStyleTiling(StepEntityInstance instance) {
-    return materialResolver.resolveFillAreaStyleTiling(instance);
-  }
 
-  StepCurveStyleFont resolveCurveStyleFont(StepEntityInstance instance) {
-    return materialResolver.resolveCurveStyleFont(instance);
-  }
 
-  StepCurveStyleRendering resolveCurveStyleRendering(StepEntityInstance instance) {
-    return materialResolver.resolveCurveStyleRendering(instance);
-  }
 
-  StepCurveStyleWithFont resolveCurveStyleWithFont(StepEntityInstance instance) {
-    return materialResolver.resolveCurveStyleWithFont(instance);
-  }
 
-  StepDraughtingPreDefinedTerminatorSymbol resolveDraughtingPreDefinedTerminatorSymbol(StepEntityInstance instance) {
-    return annotationResolver.resolveDraughtingPreDefinedTerminatorSymbol(instance);
-  }
 
   // Tolerance/PMI resolvers
   StepPmiRequirement resolvePmiRequirement(StepEntityInstance instance) {
@@ -2959,14 +2080,8 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 2));
   }
 
-  StepPmiGroup resolvePmiGroup(StepEntityInstance instance) {
-    return propertyResolver.resolvePmiGroup(instance);
-  }
 
   // Manufacturing resolvers
-  StepFeatureElementDefinition resolveFeatureElementDefinition(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolveFeatureElementDefinition(instance);
-  }
 
   StepWebs resolveWebs(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "WEBS");
@@ -2988,21 +2103,9 @@ public final class StepEntityResolver {
   }
 
   // Document resolver
-  StepTextFileRepresentation resolveTextFileRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveTextFileRepresentation(instance);
-  }
 
-  StepPersonAndOrganizationAddress resolvePersonAndOrganizationAddress(StepEntityInstance instance) {
-    return assignmentResolver.resolvePersonAndOrganizationAddress(instance);
-  }
 
-  StepOrganizationAddress resolveOrganizationAddress(StepEntityInstance instance) {
-    return assignmentResolver.resolveOrganizationAddress(instance);
-  }
 
-  StepPersonAddress resolvePersonAddress(StepEntityInstance instance) {
-    return assignmentResolver.resolvePersonAddress(instance);
-  }
 
   StepAngularSize resolveAngularSize(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "ANGULAR_SIZE");
@@ -3014,9 +2117,6 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 2));
   }
 
-  StepGeneralizedDatum resolveGeneralizedDatum(StepEntityInstance instance) {
-    return annotationResolver.resolveGeneralizedDatum(instance);
-  }
 
   StepActionDirective resolveActionDirective(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "ACTION_DIRECTIVE");
@@ -3068,13 +2168,7 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 1));
   }
 
-  StepColorSpecification resolveColorSpecification(StepEntityInstance instance) {
-    return materialResolver.resolveColorSpecification(instance);
-  }
 
-  StepWithDescriptiveRepresentationItem resolveWithDescriptiveRepresentationItem(StepEntityInstance instance) {
-    return representationResolver.resolveWithDescriptiveRepresentationItem(instance);
-  }
 
   boolean isOpenShellEntity(StepEntity entity) {
     return topologyResolver.isOpenShellEntity(entity);
@@ -3142,9 +2236,6 @@ public final class StepEntityResolver {
         requireClosedShellEntities(instance, definition, 2, "FACETED_BREP_AND_BREP_WITH_VOIDS voids must contain CLOSED_SHELL references"));
   }
 
-  StepBooleanResult resolveBooleanResult(StepEntityInstance instance) {
-    return solidResolver.resolveBooleanResult(instance);
-  }
 
   StepBooleanResult resolveBooleanResult(StepEntityInstance instance, String entityName) {
     return solidResolver.resolveBooleanResult(instance, entityName);
@@ -3176,9 +2267,6 @@ public final class StepEntityResolver {
     return shells;
   }
 
-  StepRepresentationContext resolveRepresentationContext(StepEntityInstance instance) {
-    return representationResolver.resolveRepresentationContext(instance);
-  }
 
   StepApplicationContext resolveApplicationContext(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "APPLICATION_CONTEXT");
@@ -3210,27 +2298,18 @@ public final class StepEntityResolver {
     return productResolver.resolveProductContext(instance, entityName);
   }
 
-  StepProduct resolveProduct(StepEntityInstance instance) {
-    return productResolver.resolveProduct(instance);
-  }
 
   StepProductRelatedProductCategory resolveProductRelatedProductCategory(
       StepEntityInstance instance) {
     return productResolver.resolveProductRelatedProductCategory(instance);
   }
 
-  StepProductCategory resolveProductCategory(StepEntityInstance instance) {
-    return productResolver.resolveProductCategory(instance);
-  }
 
   StepProductCategoryRelationship resolveProductCategoryRelationship(
       StepEntityInstance instance) {
     return productResolver.resolveProductCategoryRelationship(instance);
   }
 
-  StepProductRelationship resolveProductRelationship(StepEntityInstance instance) {
-    return productResolver.resolveProductRelationship(instance);
-  }
 
   StepProductRelationship resolveProductRelationship(
       StepEntityInstance instance, String entityName) {
@@ -3242,9 +2321,6 @@ public final class StepEntityResolver {
     return productResolver.resolveProductDefinitionFormation(instance);
   }
 
-  StepProductDefinitionFormationRelationship resolveProductDefinitionFormationRelationship(StepEntityInstance instance) {
-    return productResolver.resolveProductDefinitionFormationRelationship(instance);
-  }
 
   StepProductDefinitionContext resolveProductDefinitionContext(
       StepEntityInstance instance) {
@@ -3286,25 +2362,16 @@ public final class StepEntityResolver {
     return productResolver.resolveProductDefinitionRelationshipRelationship(instance, entityName);
   }
 
-  StepProductDefinitionShape resolveProductDefinitionShape(StepEntityInstance instance) {
-    return productResolver.resolveProductDefinitionShape(instance);
-  }
 
   StepPropertyDefinition resolvePropertyDefinition(StepEntityInstance instance) {
     return propertyResolver.resolvePropertyDefinition(instance);
   }
 
-  StepPropertyDefinitionRelationship resolvePropertyDefinitionRelationship(StepEntityInstance instance) {
-    return propertyResolver.resolvePropertyDefinitionRelationship(instance);
-  }
 
   StepPropertyDefinitionRelationship resolvePropertyDefinitionRelationship(StepEntityInstance instance, String entityName) {
     return propertyResolver.resolvePropertyDefinitionRelationship(instance, entityName);
   }
 
-  StepGeneralProperty resolveGeneralProperty(StepEntityInstance instance) {
-    return propertyResolver.resolveGeneralProperty(instance);
-  }
 
   StepGeneralPropertyRelationship resolveGeneralPropertyRelationship(StepEntityInstance instance) {
     return propertyResolver.resolveGeneralPropertyRelationship(instance);
@@ -3318,45 +2385,24 @@ public final class StepEntityResolver {
     return propertyResolver.resolveGroup(instance, entityName);
   }
 
-  StepGroupRelationship resolveGroupRelationship(StepEntityInstance instance) {
-    return propertyResolver.resolveGroupRelationship(instance);
-  }
 
   StepGroupRelationship resolveGroupRelationship(StepEntityInstance instance, String entityName) {
     return propertyResolver.resolveGroupRelationship(instance, entityName);
   }
 
-  StepGroupAssignment resolveGroupAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveGroupAssignment(instance);
-  }
 
-  StepAppliedGroupAssignment resolveAppliedGroupAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveAppliedGroupAssignment(instance);
-  }
 
   StepAddress resolveAddress(StepEntityInstance instance) {
     return assignmentResolver.resolveAddress(instance);
   }
 
-  StepDocumentType resolveDocumentType(StepEntityInstance instance) {
-    return productResolver.resolveDocumentType(instance);
-  }
 
   StepDocument resolveDocument(StepEntityInstance instance) {
     return productResolver.resolveDocument(instance);
   }
 
-  StepDocumentRelationship resolveDocumentRelationship(StepEntityInstance instance) {
-    return productResolver.resolveDocumentRelationship(instance);
-  }
 
-  StepDocumentUsageConstraint resolveDocumentUsageConstraint(StepEntityInstance instance) {
-    return productResolver.resolveDocumentUsageConstraint(instance);
-  }
 
-  StepDocumentReference resolveDocumentReference(StepEntityInstance instance) {
-    return productResolver.resolveDocumentReference(instance);
-  }
 
   StepAppliedDocumentReference resolveAppliedDocumentReference(StepEntityInstance instance) {
     return productResolver.resolveAppliedDocumentReference(instance);
@@ -3366,29 +2412,17 @@ public final class StepEntityResolver {
     return productResolver.resolveAppliedDocumentReference(instance, entityName);
   }
 
-  StepPerson resolvePerson(StepEntityInstance instance) {
-    return assignmentResolver.resolvePerson(instance);
-  }
 
   StepOrganization resolveOrganization(StepEntityInstance instance) {
     return assignmentResolver.resolveOrganization(instance);
   }
 
-  StepPersonAndOrganization resolvePersonAndOrganization(StepEntityInstance instance) {
-    return assignmentResolver.resolvePersonAndOrganization(instance);
-  }
 
   StepOrganizationRelationship resolveOrganizationRelationship(StepEntityInstance instance) {
     return assignmentResolver.resolveOrganizationRelationship(instance);
   }
 
-  StepOrganizationRole resolveOrganizationRole(StepEntityInstance instance) {
-    return assignmentResolver.resolveOrganizationRole(instance);
-  }
 
-  StepOrganizationAssignment resolveOrganizationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveOrganizationAssignment(instance);
-  }
 
   StepAppliedOrganizationAssignment resolveAppliedOrganizationAssignment(StepEntityInstance instance) {
     return assignmentResolver.resolveAppliedOrganizationAssignment(instance);
@@ -3404,21 +2438,9 @@ public final class StepEntityResolver {
     return new StepLanguage(instance.id(), stringValue(instance, definition, 0));
   }
 
-  StepEntity resolveLanguageAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveLanguageAssignment(instance);
-  }
 
-  StepAppliedLanguageAssignment resolveAppliedLanguageAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveAppliedLanguageAssignment(instance);
-  }
 
-  StepPersonAndOrganizationRole resolvePersonAndOrganizationRole(StepEntityInstance instance) {
-    return assignmentResolver.resolvePersonAndOrganizationRole(instance);
-  }
 
-  StepPersonAndOrganizationAssignment resolvePersonAndOrganizationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolvePersonAndOrganizationAssignment(instance);
-  }
 
   StepAppliedPersonAndOrganizationAssignment resolveAppliedPersonAndOrganizationAssignment(StepEntityInstance instance) {
     return assignmentResolver.resolveAppliedPersonAndOrganizationAssignment(instance);
@@ -3478,13 +2500,7 @@ public final class StepEntityResolver {
             "DATE_AND_TIME time_component must reference LOCAL_TIME"));
   }
 
-  StepDateRole resolveDateRole(StepEntityInstance instance) {
-    return assignmentResolver.resolveDateRole(instance);
-  }
 
-  StepDateAssignment resolveDateAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveDateAssignment(instance);
-  }
 
   StepAppliedDateAssignment resolveAppliedDateAssignment(StepEntityInstance instance) {
     return assignmentResolver.resolveAppliedDateAssignment(instance);
@@ -3494,13 +2510,7 @@ public final class StepEntityResolver {
     return assignmentResolver.resolveAppliedDateAssignment(instance, entityName);
   }
 
-  StepDateTimeRole resolveDateTimeRole(StepEntityInstance instance) {
-    return assignmentResolver.resolveDateTimeRole(instance);
-  }
 
-  StepDateTimeAssignment resolveDateTimeAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveDateTimeAssignment(instance);
-  }
 
   StepAppliedDateTimeAssignment resolveAppliedDateTimeAssignment(StepEntityInstance instance) {
     return assignmentResolver.resolveAppliedDateTimeAssignment(instance);
@@ -3510,21 +2520,12 @@ public final class StepEntityResolver {
     return assignmentResolver.resolveAppliedDateTimeAssignment(instance, entityName);
   }
 
-  StepApprovalStatus resolveApprovalStatus(StepEntityInstance instance) {
-    return assignmentResolver.resolveApprovalStatus(instance);
-  }
 
   StepApproval resolveApproval(StepEntityInstance instance) {
     return assignmentResolver.resolveApproval(instance);
   }
 
-  StepApprovalRole resolveApprovalRole(StepEntityInstance instance) {
-    return assignmentResolver.resolveApprovalRole(instance);
-  }
 
-  StepApprovalAssignment resolveApprovalAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveApprovalAssignment(instance);
-  }
 
   StepAppliedApprovalAssignment resolveAppliedApprovalAssignment(StepEntityInstance instance) {
     return assignmentResolver.resolveAppliedApprovalAssignment(instance);
@@ -3534,25 +2535,10 @@ public final class StepEntityResolver {
     return assignmentResolver.resolveAppliedApprovalAssignment(instance, entityName);
   }
 
-  StepApprovalPersonOrganization resolveApprovalPersonOrganization(StepEntityInstance instance) {
-    return assignmentResolver.resolveApprovalPersonOrganization(instance);
-  }
 
-  StepApprovalDateTime resolveApprovalDateTime(StepEntityInstance instance) {
-    return assignmentResolver.resolveApprovalDateTime(instance);
-  }
 
-  StepSecurityClassificationLevel resolveSecurityClassificationLevel(StepEntityInstance instance) {
-    return assignmentResolver.resolveSecurityClassificationLevel(instance);
-  }
 
-  StepSecurityClassification resolveSecurityClassification(StepEntityInstance instance) {
-    return assignmentResolver.resolveSecurityClassification(instance);
-  }
 
-  StepSecurityClassificationAssignment resolveSecurityClassificationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveSecurityClassificationAssignment(instance);
-  }
 
   StepAppliedSecurityClassificationAssignment resolveAppliedSecurityClassificationAssignment(StepEntityInstance instance) {
     return assignmentResolver.resolveAppliedSecurityClassificationAssignment(instance);
@@ -3562,17 +2548,11 @@ public final class StepEntityResolver {
     return assignmentResolver.resolveAppliedSecurityClassificationAssignment(instance, entityName);
   }
 
-  StepContractType resolveContractType(StepEntityInstance instance) {
-    return assignmentResolver.resolveContractType(instance);
-  }
 
   StepContract resolveContract(StepEntityInstance instance) {
     return assignmentResolver.resolveContract(instance);
   }
 
-  StepContractAssignment resolveContractAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveContractAssignment(instance);
-  }
 
   StepAppliedContractAssignment resolveAppliedContractAssignment(StepEntityInstance instance) {
     return assignmentResolver.resolveAppliedContractAssignment(instance);
@@ -3582,17 +2562,11 @@ public final class StepEntityResolver {
     return assignmentResolver.resolveAppliedContractAssignment(instance, entityName);
   }
 
-  StepCertificationType resolveCertificationType(StepEntityInstance instance) {
-    return assignmentResolver.resolveCertificationType(instance);
-  }
 
   StepCertification resolveCertification(StepEntityInstance instance) {
     return assignmentResolver.resolveCertification(instance);
   }
 
-  StepCertificationAssignment resolveCertificationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveCertificationAssignment(instance);
-  }
 
   StepAppliedCertificationAssignment resolveAppliedCertificationAssignment(StepEntityInstance instance) {
     return assignmentResolver.resolveAppliedCertificationAssignment(instance);
@@ -3611,49 +2585,16 @@ public final class StepEntityResolver {
     return productResolver.resolveProductDefinitionEffectivity(instance);
   }
 
-  StepEffectivityRelationship resolveEffectivityRelationship(StepEntityInstance instance) {
-    return assignmentResolver.resolveEffectivityRelationship(instance);
-  }
 
-  StepClassificationRole resolveClassificationRole(StepEntityInstance instance) {
-    return assignmentResolver.resolveClassificationRole(instance);
-  }
 
-  StepClassificationAssignment resolveClassificationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveClassificationAssignment(instance);
-  }
 
-  StepAppliedClassificationAssignment resolveAppliedClassificationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveAppliedClassificationAssignment(instance);
-  }
 
-  StepIdentificationRole resolveIdentificationRole(StepEntityInstance instance) {
-    return assignmentResolver.resolveIdentificationRole(instance);
-  }
 
-  StepIdentificationAssignment resolveIdentificationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveIdentificationAssignment(instance);
-  }
 
-  StepAppliedIdentificationAssignment resolveAppliedIdentificationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveAppliedIdentificationAssignment(instance);
-  }
 
-  StepExternalIdentificationAssignment resolveExternalIdentificationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveExternalIdentificationAssignment(instance);
-  }
 
-  StepAppliedExternalIdentificationAssignment resolveAppliedExternalIdentificationAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveAppliedExternalIdentificationAssignment(instance);
-  }
 
-  StepNameAssignment resolveNameAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveNameAssignment(instance);
-  }
 
-  StepAppliedNameAssignment resolveAppliedNameAssignment(StepEntityInstance instance) {
-    return assignmentResolver.resolveAppliedNameAssignment(instance);
-  }
 
   StepDescriptionAttribute resolveDescriptionAttribute(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "DESCRIPTION_ATTRIBUTE");
@@ -3855,37 +2796,13 @@ public final class StepEntityResolver {
             "BACK_CHAINING_RULE_BODY used_representation must reference REPRESENTATION"));
   }
 
-  StepActionPropertyRepresentation resolveActionPropertyRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveActionPropertyRepresentation(instance);
-  }
 
-  StepContactRatioRepresentation resolveContactRatioRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveContactRatioRepresentation(instance);
-  }
 
-  StepKinematicPropertyDefinitionRepresentation resolveKinematicPropertyDefinitionRepresentation(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicPropertyDefinitionRepresentation(instance);
-  }
 
-  StepKinematicPropertyMechanismRepresentation resolveKinematicPropertyMechanismRepresentation(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicPropertyMechanismRepresentation(instance);
-  }
 
-  StepKinematicPropertyRepresentationRelation resolveKinematicPropertyRepresentationRelation(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicPropertyRepresentationRelation(instance);
-  }
 
-  StepKinematicPropertyTopologyRepresentation resolveKinematicPropertyTopologyRepresentation(StepEntityInstance instance) {
-    return kinematicResolver.resolveKinematicPropertyTopologyRepresentation(instance);
-  }
 
-  StepPlacedDatumTargetFeature resolvePlacedDatumTargetFeature(StepEntityInstance instance) {
-    return geometricFeatureResolver.resolvePlacedDatumTargetFeature(instance);
-  }
 
-  StepResourcePropertyRepresentation resolveResourcePropertyRepresentation(StepEntityInstance instance) {
-    return representationResolver.resolveResourcePropertyRepresentation(instance);
-  }
 
   StepRepresentationMap resolveRepresentationMap(StepEntityInstance instance) {
     return productResolver.resolveRepresentationMap(instance);
@@ -3900,33 +2817,15 @@ public final class StepEntityResolver {
     return productResolver.resolveMappedItem(instance);
   }
 
-  StepCartesianTransformationOperator resolveCartesianTransformationOperator2D(StepEntityInstance instance) {
-    return transformationResolver.resolveCartesianTransformationOperator2D(instance);
-  }
 
-  StepCartesianTransformationOperator resolveCartesianTransformationOperator3D(StepEntityInstance instance) {
-    return transformationResolver.resolveCartesianTransformationOperator3D(instance);
-  }
 
-  StepUserDefinedMarker resolveUserDefinedMarker(StepEntityInstance instance) {
-    return materialResolver.resolveUserDefinedMarker(instance);
-  }
 
-  StepUserDefinedCurveFont resolveUserDefinedCurveFont(StepEntityInstance instance) {
-    return materialResolver.resolveUserDefinedCurveFont(instance);
-  }
 
-  StepUserDefinedTerminatorSymbol resolveUserDefinedTerminatorSymbol(StepEntityInstance instance) {
-    return draughtingResolver.resolveUserDefinedTerminatorSymbol(instance);
-  }
 
   StepItemDefinedTransformation resolveItemDefinedTransformation(StepEntityInstance instance) {
     return transformationResolver.resolveItemDefinedTransformation(instance);
   }
 
-  StepRepresentationRelationshipWithTransformation resolveRepresentationRelationshipWithTransformation(StepEntityInstance instance) {
-    return transformationResolver.resolveRepresentationRelationshipWithTransformation(instance);
-  }
 
   StepRepresentationRelationship resolveRepresentationRelationship(StepEntityInstance instance) {
     return representationResolver.resolveRepresentationRelationship(instance);
@@ -3936,13 +2835,7 @@ public final class StepEntityResolver {
     return representationResolver.resolveRepresentationRelationship(instance, entityName);
   }
 
-  StepShapeRepresentationRelationship resolveShapeRepresentationRelationship(StepEntityInstance instance) {
-    return representationResolver.resolveShapeRepresentationRelationship(instance);
-  }
 
-  StepUncertaintyMeasureWithUnit resolveUncertaintyMeasureWithUnit(StepEntityInstance instance) {
-    return unitResolver.resolveUncertaintyMeasureWithUnit(instance);
-  }
 
   StepGlobalUnitAssignedContext resolveGlobalUnitAssignedContext(
       StepEntityInstance instance) {
@@ -3981,57 +2874,30 @@ public final class StepEntityResolver {
     return productResolver.resolveContextDependentShapeRepresentation(instance);
   }
 
-  StepMeasureWithUnit resolveMeasureWithUnit(StepEntityInstance instance) {
-    return unitResolver.resolveMeasureWithUnit(instance);
-  }
 
   StepTypedMeasureWithUnit resolveTypedMeasureWithUnit(StepEntityInstance instance, String entityName, String expectedUnitKind) {
     return unitResolver.resolveTypedMeasureWithUnit(instance, entityName, expectedUnitKind);
   }
 
-  StepDerivedUnitElement resolveDerivedUnitElement(StepEntityInstance instance) {
-    return unitResolver.resolveDerivedUnitElement(instance);
-  }
 
-  StepDerivedUnit resolveDerivedUnit(StepEntityInstance instance) {
-    return unitResolver.resolveDerivedUnit(instance);
-  }
 
-  StepGeometricRepresentationContext resolveGeometricRepresentationContext(StepEntityInstance instance) {
-    return representationResolver.resolveGeometricRepresentationContext(instance);
-  }
 
-  StepNamedUnit resolveNamedUnit(StepEntityInstance instance) {
-    return unitResolver.resolveNamedUnit(instance);
-  }
 
-  StepDimensionalExponents resolveDimensionalExponents(StepEntityInstance instance) {
-    return unitResolver.resolveDimensionalExponents(instance);
-  }
 
   StepNamedUnit resolveStandaloneUnitKind(StepEntityInstance instance, String entityName) {
     return unitResolver.resolveStandaloneUnitKind(instance, entityName);
   }
 
-  StepContextDependentUnit resolveContextDependentUnit(StepEntityInstance instance) {
-    return unitResolver.resolveContextDependentUnit(instance);
-  }
 
   StepConversionBasedUnit resolveConversionBasedUnit(StepEntityInstance instance, String entityName) {
     return unitResolver.resolveConversionBasedUnit(instance, entityName);
   }
 
-  StepConversionBasedUnitWithOffset resolveConversionBasedUnitWithOffset(StepEntityInstance instance) {
-    return unitResolver.resolveConversionBasedUnitWithOffset(instance);
-  }
 
   StepDerivedUnit resolveStandaloneDerivedUnitKind(StepEntityInstance instance, String entityName) {
     return unitResolver.resolveStandaloneDerivedUnitKind(instance, entityName);
   }
 
-  StepSiUnit resolveSiUnit(StepEntityInstance instance) {
-    return unitResolver.resolveSiUnit(instance);
-  }
 
   void validateNamedUnitDimensions(StepEntityInstance instance) {
     if (!instance.hasDefinition("NAMED_UNIT")) {
@@ -4082,9 +2948,6 @@ public final class StepEntityResolver {
     return new StepCurve(instance.id(), inheritedRepresentationItemName(instance));
   }
 
-  StepSurface resolveSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveSurface(instance);
-  }
 
   StepBoundedCurve resolveBoundedCurve(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "BOUNDED_CURVE");
@@ -4092,41 +2955,14 @@ public final class StepEntityResolver {
     return new StepBoundedCurve(instance.id(), inheritedRepresentationItemName(instance));
   }
 
-  StepUniformCurve resolveUniformCurve(StepEntityInstance instance) {
-    return bezierResolver.resolveUniformCurve(instance);
-  }
 
-  StepBezierCurve resolveBezierCurve(StepEntityInstance instance) {
-    return bezierResolver.resolveBezierCurve(instance);
-  }
 
-  StepPiecewiseBezierCurve resolvePiecewiseBezierCurve(StepEntityInstance instance) {
-    return bezierResolver.resolvePiecewiseBezierCurve(instance);
-  }
 
-  StepQuasiUniformCurve resolveQuasiUniformCurve(StepEntityInstance instance) {
-    return bezierResolver.resolveQuasiUniformCurve(instance);
-  }
 
-  StepBoundedSurface resolveBoundedSurface(StepEntityInstance instance) {
-    return bezierResolver.resolveBoundedSurface(instance);
-  }
 
-  StepUniformSurface resolveUniformSurface(StepEntityInstance instance) {
-    return bezierResolver.resolveUniformSurface(instance);
-  }
 
-  StepBezierSurface resolveBezierSurface(StepEntityInstance instance) {
-    return bezierResolver.resolveBezierSurface(instance);
-  }
 
-  StepPiecewiseBezierSurface resolvePiecewiseBezierSurface(StepEntityInstance instance) {
-    return bezierResolver.resolvePiecewiseBezierSurface(instance);
-  }
 
-  StepQuasiUniformSurface resolveQuasiUniformSurface(StepEntityInstance instance) {
-    return bezierResolver.resolveQuasiUniformSurface(instance);
-  }
 
   ResolvedBSplineCurveData resolveInheritedBSplineCurveData(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "B_SPLINE_CURVE");
@@ -4165,21 +3001,9 @@ public final class StepEntityResolver {
         booleanValue(instance, definition, 6));
   }
 
-  StepSurfaceModel resolveSurfaceModel(StepEntityInstance instance) {
-    return surfaceResolver.resolveSurfaceModel(instance);
-  }
 
-  StepSolidModel resolveSolidModel(StepEntityInstance instance) {
-    return solidResolver.resolveSolidModel(instance);
-  }
 
-  StepCsgSolid resolveCsgSolid(StepEntityInstance instance) {
-    return solidResolver.resolveCsgSolid(instance);
-  }
 
-  StepSolidReplica resolveSolidReplica(StepEntityInstance instance) {
-    return solidResolver.resolveSolidReplica(instance);
-  }
 
   StepCsgPrimitive resolveCsgPrimitive(StepEntityInstance instance,
       String entityName,
@@ -4189,13 +3013,7 @@ public final class StepEntityResolver {
     return solidResolver.resolveCsgPrimitive(instance, entityName, positionType, positionTypeName, dimensionCount);
   }
 
-  StepProfileDef resolveCircleProfileDef(StepEntityInstance instance) {
-    return profileResolver.resolveCircleProfileDef(instance);
-  }
 
-  StepProfileDef resolveRectangleProfileDef(StepEntityInstance instance) {
-    return profileResolver.resolveRectangleProfileDef(instance);
-  }
 
   StepProfileDef resolveParameterizedProfileDef(StepEntityInstance instance, String entityName, int parameterCount) {
     return profileResolver.resolveParameterizedProfileDef(instance, entityName, parameterCount);
@@ -4205,17 +3023,11 @@ public final class StepEntityResolver {
     return profileResolver.resolveArbitraryClosedProfileDef(instance);
   }
 
-  StepProfileDef resolveArbitraryProfileDefWithVoids(StepEntityInstance instance) {
-    return profileResolver.resolveArbitraryProfileDefWithVoids(instance);
-  }
 
   StepProfileDef resolveArbitraryProfileDef(StepEntityInstance instance, String entityName) {
     return profileResolver.resolveArbitraryProfileDef(instance, entityName);
   }
 
-  StepProfileDef resolveProfileDef(StepEntityInstance instance) {
-    return profileResolver.resolveProfileDef(instance);
-  }
 
   StepProfileDef resolveProfileDefSubtype(StepEntityInstance instance, StepEntityDefinition concrete) {
     return profileResolver.resolveProfileDefSubtype(instance, concrete);
@@ -4227,13 +3039,7 @@ public final class StepEntityResolver {
         || curve instanceof StepCompositeCurve;
   }
 
-  StepSweptAreaSolid resolveExtrudedAreaSolid(StepEntityInstance instance) {
-    return solidResolver.resolveExtrudedAreaSolid(instance);
-  }
 
-  StepSweptAreaSolid resolveRevolvedAreaSolid(StepEntityInstance instance) {
-    return solidResolver.resolveRevolvedAreaSolid(instance);
-  }
 
   StepBoxDomain resolveBoxDomain(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "BOX_DOMAIN");
@@ -4250,13 +3056,7 @@ public final class StepEntityResolver {
             numberValue(instance, definition, 3)));
   }
 
-  StepHalfSpaceSolid resolveHalfSpaceSolid(StepEntityInstance instance) {
-    return solidResolver.resolveHalfSpaceSolid(instance);
-  }
 
-  StepHalfSpaceSolid resolveBoxedHalfSpace(StepEntityInstance instance) {
-    return solidResolver.resolveBoxedHalfSpace(instance);
-  }
 
   StepEntity requireSurfaceReference(
       StepEntityInstance instance, StepEntityDefinition definition, int index, String fieldName) {
@@ -4276,9 +3076,6 @@ public final class StepEntityResolver {
     return surface;
   }
 
-  StepTopologicalRepresentationItem resolveTopologicalRepresentationItem(StepEntityInstance instance) {
-    return representationResolver.resolveTopologicalRepresentationItem(instance);
-  }
 
   StepVertex resolveVertex(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "VERTEX");
@@ -4298,25 +3095,10 @@ public final class StepEntityResolver {
     return new StepFace(instance.id(), StepResolverValueHelpers.inheritedTopologicalRepresentationItemName(instance));
   }
 
-  StepColourRgb resolveColourRgb(StepEntityInstance instance) {
-    return materialResolver.resolveColourRgb(instance);
-  }
 
-  StepColour resolveColour(StepEntityInstance instance) {
-    return materialResolver.resolveColour(instance);
-  }
 
-  StepColourSpecification resolveColourSpecification(StepEntityInstance instance) {
-    return materialResolver.resolveColourSpecification(instance);
-  }
 
-  StepDraughtingPreDefinedCurveFont resolveDraughtingPreDefinedCurveFont(StepEntityInstance instance) {
-    return draughtingResolver.resolveDraughtingPreDefinedCurveFont(instance);
-  }
 
-  StepPreDefinedCurveFont resolvePreDefinedCurveFont(StepEntityInstance instance) {
-    return materialResolver.resolvePreDefinedCurveFont(instance);
-  }
 
   StepPreDefinedItem resolvePreDefinedItem(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PRE_DEFINED_ITEM");
@@ -4324,9 +3106,6 @@ public final class StepEntityResolver {
     return new StepPreDefinedItem(instance.id(), stringValue(instance, definition, 0));
   }
 
-  StepPreDefinedMarker resolvePreDefinedMarker(StepEntityInstance instance) {
-    return materialResolver.resolvePreDefinedMarker(instance);
-  }
 
   StepPreDefinedSymbol resolvePreDefinedSymbol(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PRE_DEFINED_SYMBOL");
@@ -4357,61 +3136,19 @@ public final class StepEntityResolver {
         instance.id(), stringValue(instance, definition, 0));
   }
 
-  StepPreDefinedTerminatorSymbol resolvePreDefinedTerminatorSymbol(StepEntityInstance instance) {
-    return draughtingResolver.resolvePreDefinedTerminatorSymbol(instance);
-  }
 
-  StepPreDefinedSurfaceSideStyle resolvePreDefinedSurfaceSideStyle(StepEntityInstance instance) {
-    return materialResolver.resolvePreDefinedSurfaceSideStyle(instance);
-  }
 
-  StepDraughtingPreDefinedTextFont resolveDraughtingPreDefinedTextFont(StepEntityInstance instance) {
-    return draughtingResolver.resolveDraughtingPreDefinedTextFont(instance);
-  }
 
-  StepPreDefinedTextFont resolvePreDefinedTextFont(StepEntityInstance instance) {
-    return materialResolver.resolvePreDefinedTextFont(instance);
-  }
 
-  StepDraughtingPreDefinedColour resolveDraughtingPreDefinedColour(StepEntityInstance instance) {
-    return draughtingResolver.resolveDraughtingPreDefinedColour(instance);
-  }
 
-  StepPreDefinedColour resolvePreDefinedColour(StepEntityInstance instance) {
-    return materialResolver.resolvePreDefinedColour(instance);
-  }
 
-  StepCurveStyle resolveCurveStyle(StepEntityInstance instance) {
-    return materialResolver.resolveCurveStyle(instance);
-  }
 
-  StepPointStyle resolvePointStyle(StepEntityInstance instance) {
-    return materialResolver.resolvePointStyle(instance);
-  }
 
-  StepCharacterGlyphStyleStroke resolveCharacterGlyphStyleStroke(StepEntityInstance instance) {
-    return draughtingResolver.resolveCharacterGlyphStyleStroke(instance);
-  }
 
-  StepCharacterGlyphStyleOutline resolveCharacterGlyphStyleOutline(StepEntityInstance instance) {
-    return draughtingResolver.resolveCharacterGlyphStyleOutline(instance);
-  }
 
-  StepCharacterGlyphStyleOutlineWithCharacteristics resolveCharacterGlyphStyleOutlineWithCharacteristics(StepEntityInstance instance) {
-    return draughtingResolver.resolveCharacterGlyphStyleOutlineWithCharacteristics(instance);
-  }
 
-  StepTextStyleForDefinedFont resolveTextStyleForDefinedFont(StepEntityInstance instance) {
-    return materialResolver.resolveTextStyleForDefinedFont(instance);
-  }
 
-  StepTextStyle resolveTextStyle(StepEntityInstance instance) {
-    return materialResolver.resolveTextStyle(instance);
-  }
 
-  StepTextStyleWithSpacing resolveTextStyleWithSpacing(StepEntityInstance instance) {
-    return materialResolver.resolveTextStyleWithSpacing(instance);
-  }
 
   StepTextStyleWithJustification resolveTextStyleWithJustification(
       StepEntityInstance instance) {
@@ -4429,9 +3166,6 @@ public final class StepEntityResolver {
         enumValue(instance, definition, 2));
   }
 
-  StepTextStyleWithMirror resolveTextStyleWithMirror(StepEntityInstance instance) {
-    return materialResolver.resolveTextStyleWithMirror(instance);
-  }
 
   StepTextStyleWithBoxCharacteristics resolveTextStyleWithBoxCharacteristics(
       StepEntityInstance instance) {
@@ -4458,25 +3192,10 @@ public final class StepEntityResolver {
         boxCharacteristics);
   }
 
-  StepSymbolColour resolveSymbolColour(StepEntityInstance instance) {
-    return materialResolver.resolveSymbolColour(instance);
-  }
 
-  StepSymbolStyle resolveSymbolStyle(StepEntityInstance instance) {
-    return materialResolver.resolveSymbolStyle(instance);
-  }
 
-  StepFillAreaStyleColour resolveFillAreaStyleColour(StepEntityInstance instance) {
-    return materialResolver.resolveFillAreaStyleColour(instance);
-  }
 
-  StepFillAreaStyle resolveFillAreaStyle(StepEntityInstance instance) {
-    return materialResolver.resolveFillAreaStyle(instance);
-  }
 
-  StepSurfaceStyleFillArea resolveSurfaceStyleFillArea(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleFillArea(instance);
-  }
 
   StepCurveStyle requireCurveStyleReference(
       StepEntityInstance instance, StepEntityDefinition definition, String entityName) {
@@ -4486,49 +3205,16 @@ public final class StepEntityResolver {
         entityName + " style must reference CURVE_STYLE");
   }
 
-  StepSurfaceStyleBoundary resolveSurfaceStyleBoundary(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleBoundary(instance);
-  }
 
-  StepSurfaceStyleControlGrid resolveSurfaceStyleControlGrid(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleControlGrid(instance);
-  }
 
-  StepSurfaceStyleSegmentationCurve resolveSurfaceStyleSegmentationCurve(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleSegmentationCurve(instance);
-  }
 
-  StepSurfaceStyleSilhouette resolveSurfaceStyleSilhouette(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleSilhouette(instance);
-  }
 
-  StepSurfaceStyleTransparent resolveSurfaceStyleTransparent(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleTransparent(instance);
-  }
 
-  StepSurfaceStyleReflectanceAmbient resolveSurfaceStyleReflectanceAmbient(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleReflectanceAmbient(instance);
-  }
 
-  StepSurfaceStyleReflectanceAmbientDiffuse resolveSurfaceStyleReflectanceAmbientDiffuse(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleReflectanceAmbientDiffuse(instance);
-  }
 
-  StepSurfaceStyleReflectanceAmbientDiffuseSpecular resolveSurfaceStyleReflectanceAmbientDiffuseSpecular(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleReflectanceAmbientDiffuseSpecular(instance);
-  }
 
-  StepSurfaceStyleParameterLine resolveSurfaceStyleParameterLine(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleParameterLine(instance);
-  }
 
-  StepSurfaceSideStyle resolveSurfaceSideStyle(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceSideStyle(instance);
-  }
 
-  StepSurfaceStyleUsage resolveSurfaceStyleUsage(StepEntityInstance instance) {
-    return materialResolver.resolveSurfaceStyleUsage(instance);
-  }
 
   StepPresentationStyleAssignment resolvePresentationStyleAssignment(
       StepEntityInstance instance) {
@@ -4543,13 +3229,7 @@ public final class StepEntityResolver {
             "PRESENTATION_STYLE_ASSIGNMENT styles must contain entity references"));
   }
 
-  StepStyledItem resolveStyledItem(StepEntityInstance instance) {
-    return materialResolver.resolveStyledItem(instance);
-  }
 
-  StepOverRidingStyledItem resolveOverRidingStyledItem(StepEntityInstance instance) {
-    return materialResolver.resolveOverRidingStyledItem(instance);
-  }
 
   StepPresentationLayerAssignment resolvePresentationLayerAssignment(
       StepEntityInstance instance) {
@@ -4566,37 +3246,13 @@ public final class StepEntityResolver {
             "PRESENTATION_LAYER_ASSIGNMENT assigned items must contain entity references"));
   }
 
-  StepAnnotationTextOccurrence resolveAnnotationTextOccurrence(StepEntityInstance instance) {
-    return draughtingResolver.resolveAnnotationTextOccurrence(instance);
-  }
 
-  StepAnnotationText resolveAnnotationText(StepEntityInstance instance) {
-    return annotationResolver.resolveAnnotationText(instance);
-  }
 
-  StepAnnotationTextCharacter resolveAnnotationTextCharacter(StepEntityInstance instance) {
-    return draughtingResolver.resolveAnnotationTextCharacter(instance);
-  }
 
-  StepAnnotationSymbol resolveAnnotationSymbol(StepEntityInstance instance) {
-    return annotationResolver.resolveAnnotationSymbol(instance);
-  }
 
-  StepAnnotationSymbolOccurrence resolveAnnotationSymbolOccurrence(StepEntityInstance instance) {
-    return draughtingResolver.resolveAnnotationSymbolOccurrence(instance);
-  }
 
-  StepAnnotationSubfigureOccurrence resolveAnnotationSubfigureOccurrence(StepEntityInstance instance) {
-    return draughtingResolver.resolveAnnotationSubfigureOccurrence(instance);
-  }
 
-  StepDraughtingAnnotationOccurrence resolveDraughtingAnnotationOccurrence(StepEntityInstance instance) {
-    return draughtingResolver.resolveDraughtingAnnotationOccurrence(instance);
-  }
 
-  StepTerminatorSymbol resolveTerminatorSymbol(StepEntityInstance instance) {
-    return draughtingResolver.resolveTerminatorSymbol(instance);
-  }
 
   StepAnnotationOccurrenceRelationship resolveAnnotationOccurrenceRelationship(StepEntityInstance instance) {
     return draughtingResolver.resolveAnnotationOccurrenceRelationship(instance);
@@ -4606,37 +3262,13 @@ public final class StepEntityResolver {
     return draughtingResolver.resolveAnnotationOccurrenceRelationship(instance, entityName);
   }
 
-  StepAnnotationPointOccurrence resolveAnnotationPointOccurrence(StepEntityInstance instance) {
-    return draughtingResolver.resolveAnnotationPointOccurrence(instance);
-  }
 
-  StepAnnotationCurveOccurrence resolveAnnotationCurveOccurrence(StepEntityInstance instance) {
-    return draughtingResolver.resolveAnnotationCurveOccurrence(instance);
-  }
 
-  StepLeaderCurve resolveLeaderCurve(StepEntityInstance instance) {
-    return annotationResolver.resolveLeaderCurve(instance);
-  }
 
-  StepProjectionCurve resolveProjectionCurve(StepEntityInstance instance) {
-    return annotationResolver.resolveProjectionCurve(instance);
-  }
 
-  StepDimensionCurve resolveDimensionCurve(StepEntityInstance instance) {
-    return annotationResolver.resolveDimensionCurve(instance);
-  }
 
-  StepAnnotationFillArea resolveAnnotationFillArea(StepEntityInstance instance) {
-    return annotationResolver.resolveAnnotationFillArea(instance);
-  }
 
-  StepAnnotationFillAreaOccurrence resolveAnnotationFillAreaOccurrence(StepEntityInstance instance) {
-    return draughtingResolver.resolveAnnotationFillAreaOccurrence(instance);
-  }
 
-  StepAnnotationPlaceholderOccurrence resolveAnnotationPlaceholderOccurrence(StepEntityInstance instance) {
-    return draughtingResolver.resolveAnnotationPlaceholderOccurrence(instance);
-  }
 
   StepEntity requireSupportedPlaceholderItem(StepEntity item) {
     if (!isSupportedAnnotationPlaneElement(item)) {
@@ -4646,9 +3278,6 @@ public final class StepEntityResolver {
     return item;
   }
 
-  StepAnnotationPlane resolveAnnotationPlane(StepEntityInstance instance) {
-    return annotationResolver.resolveAnnotationPlane(instance);
-  }
 
   StepGeometricCurveSet resolveGeometricCurveSet(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "GEOMETRIC_CURVE_SET");
@@ -4665,9 +3294,6 @@ public final class StepEntityResolver {
     return new StepGeometricCurveSet(instance.id(), stringValue(instance, definition, 0), elements);
   }
 
-  StepGeometricSurfaceSet resolveGeometricSurfaceSet(StepEntityInstance instance) {
-    return surfaceResolver.resolveGeometricSurfaceSet(instance);
-  }
 
   StepClothoid resolveClothoid(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "CLOTHOID");
@@ -4685,25 +3311,10 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 3));
   }
 
-  StepIndexedPolyCurve resolveIndexedPolyCurve(StepEntityInstance instance) {
-    return curveResolver.resolveIndexedPolyCurve(instance);
-  }
 
-  StepSurfaceOfConstantRadius resolveSurfaceOfConstantRadius(StepEntityInstance instance) {
-    return surfaceResolver.resolveSurfaceOfConstantRadius(instance);
-  }
 
-  StepDegenerateCurve resolveDegenerateCurve(StepEntityInstance instance) {
-    return curveResolver.resolveDegenerateCurve(instance);
-  }
 
-  StepCircle2D resolveCircle2D(StepEntityInstance instance) {
-    return geometryResolver.resolveCircle2D(instance);
-  }
 
-  StepEllipse2D resolveEllipse2D(StepEntityInstance instance) {
-    return geometryResolver.resolveEllipse2D(instance);
-  }
 
   StepHyperbola2D resolveHyperbola2D(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "HYPERBOLA_2D");
@@ -4732,13 +3343,7 @@ public final class StepEntityResolver {
         numberValue(instance, definition, 2));
   }
 
-  StepLine2D resolveLine2D(StepEntityInstance instance) {
-    return geometryResolver.resolveLine2D(instance);
-  }
 
-  StepPolyline2D resolvePolyline2D(StepEntityInstance instance) {
-    return geometryResolver.resolvePolyline2D(instance);
-  }
 
   StepTrimmedCurve2D resolveTrimmedCurve2D(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "TRIMMED_CURVE_2D");
@@ -4770,25 +3375,10 @@ public final class StepEntityResolver {
         booleanValue(instance, definition, 2));
   }
 
-  StepBSplineCurve2D resolveBSplineCurve2D(StepEntityInstance instance) {
-    return geometryResolver.resolveBSplineCurve2D(instance);
-  }
 
-  StepRationalBSplineCurve2D resolveRationalBSplineCurve2D(StepEntityInstance instance) {
-    return geometryResolver.resolveRationalBSplineCurve2D(instance);
-  }
 
-  StepBezierCurve2D resolveBezierCurve2D(StepEntityInstance instance) {
-    return geometryResolver.resolveBezierCurve2D(instance);
-  }
 
-  StepQuasiUniformCurve2D resolveQuasiUniformCurve2D(StepEntityInstance instance) {
-    return geometryResolver.resolveQuasiUniformCurve2D(instance);
-  }
 
-  StepUniformCurve2D resolveUniformCurve2D(StepEntityInstance instance) {
-    return geometryResolver.resolveUniformCurve2D(instance);
-  }
 
   StepPiecewiseBezierCurve2D resolvePiecewiseBezierCurve2D(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PIECEWISE_BEZIER_CURVE_2D");
@@ -4806,13 +3396,7 @@ public final class StepEntityResolver {
             "PIECEWISE_BEZIER_CURVE_2D control points must reference CARTESIAN_POINT"));
   }
 
-  StepIndexedPolyCurve2D resolveIndexedPolyCurve2D(StepEntityInstance instance) {
-    return curveResolver.resolveIndexedPolyCurve2D(instance);
-  }
 
-  StepDegenerateCurve2D resolveDegenerateCurve2D(StepEntityInstance instance) {
-    return curveResolver.resolveDegenerateCurve2D(instance);
-  }
 
   StepBoundedCurve2D resolveBoundedCurve2D(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "BOUNDED_CURVE_2D");
@@ -4826,17 +3410,11 @@ public final class StepEntityResolver {
             "BOUNDED_CURVE_2D curve must reference a 2D curve entity"));
   }
 
-  StepCurve2D resolveCurve2D(StepEntityInstance instance) {
-    return curveResolver.resolveCurve2D(instance);
-  }
 
   StepSweptAreaSolid resolveSweptAreaSolid(StepEntityInstance instance, String entityName) {
     return solidResolver.resolveSweptAreaSolid(instance, entityName);
   }
 
-  StepMachinedSurface resolveMachinedSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveMachinedSurface(instance);
-  }
 
   StepEdgeWire resolveEdgeWire(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "EDGE_WIRE");
@@ -4853,17 +3431,8 @@ public final class StepEntityResolver {
     return new StepEdgeWire(instance.id(), stringValue(instance, definition, 0), edges);
   }
 
-  StepRectangularCompositeSurface resolveRectangularCompositeSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveRectangularCompositeSurface(instance);
-  }
 
-  StepSurfacePatch resolveSurfacePatch(StepEntityInstance instance) {
-    return surfaceResolver.resolveSurfacePatch(instance);
-  }
 
-  StepCompositeCurveOnSurface3D resolveCompositeCurveOnSurface3D(StepEntityInstance instance) {
-    return curveResolver.resolveCompositeCurveOnSurface3D(instance);
-  }
 
   StepLineSegment resolveLineSegment(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "LINE_SEGMENT");
@@ -4881,13 +3450,7 @@ public final class StepEntityResolver {
             "LINE_SEGMENT end_point must reference CARTESIAN_POINT"));
   }
 
-  StepOffsetSurface2 resolveOffsetSurface2(StepEntityInstance instance) {
-    return surfaceResolver.resolveOffsetSurface2(instance);
-  }
 
-  StepPolygonalBoundedHalfSpace resolvePolygonalBoundedHalfSpace(StepEntityInstance instance) {
-    return tessellationResolver.resolvePolygonalBoundedHalfSpace(instance);
-  }
 
   StepSubface resolveSubface(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "SUBFACE");
@@ -4918,69 +3481,24 @@ public final class StepEntityResolver {
         booleanValue(instance, definition, 3));
   }
 
-  StepRectangleHollowProfileDef resolveRectangleHollowProfileDef(StepEntityInstance instance) {
-    return profileResolver.resolveRectangleHollowProfileDef(instance);
-  }
 
-  StepCentreLineArcProfileDef resolveCentreLineArcProfileDef(StepEntityInstance instance) {
-    return profileResolver.resolveCentreLineArcProfileDef(instance);
-  }
 
-  StepSweptDiskSolid resolveSweptDiskSolid(StepEntityInstance instance) {
-    return solidResolver.resolveSweptDiskSolid(instance);
-  }
 
-  StepRuledSurface resolveRuledSurface(StepEntityInstance instance) {
-    return surfaceResolver.resolveRuledSurface(instance);
-  }
 
-  StepCenteredCircleProfileDef resolveCenteredCircleProfileDef(StepEntityInstance instance) {
-    return profileResolver.resolveCenteredCircleProfileDef(instance);
-  }
 
-  StepRevolvedAreaSolidTapered resolveRevolvedAreaSolidTapered(StepEntityInstance instance) {
-    return solidResolver.resolveRevolvedAreaSolidTapered(instance);
-  }
 
-  StepExtrudedAreaSolidTapered resolveExtrudedAreaSolidTapered(StepEntityInstance instance) {
-    return solidResolver.resolveExtrudedAreaSolidTapered(instance);
-  }
 
-  StepSurfaceCurveSweptAreaSolid resolveSurfaceCurveSweptAreaSolid(StepEntityInstance instance) {
-    return solidResolver.resolveSurfaceCurveSweptAreaSolid(instance);
-  }
 
   // Advanced CSG volume resolve methods
 
-  StepCylinderVolume resolveCylinderVolume(StepEntityInstance instance) {
-    return solidResolver.resolveCylinderVolume(instance);
-  }
 
-  StepRightCircularConeVolume resolveRightCircularConeVolume(StepEntityInstance instance) {
-    return solidResolver.resolveRightCircularConeVolume(instance);
-  }
 
-  StepSphereVolume resolveSphereVolume(StepEntityInstance instance) {
-    return solidResolver.resolveSphereVolume(instance);
-  }
 
-  StepTorusVolume resolveTorusVolume(StepEntityInstance instance) {
-    return solidResolver.resolveTorusVolume(instance);
-  }
 
-  StepPrismVolume resolvePrismVolume(StepEntityInstance instance) {
-    return solidResolver.resolvePrismVolume(instance);
-  }
 
   // Swept face solid resolve methods
 
-  StepExtrudedFaceSolid resolveExtrudedFaceSolid(StepEntityInstance instance) {
-    return solidResolver.resolveExtrudedFaceSolid(instance);
-  }
 
-  StepRevolvedFaceSolid resolveRevolvedFaceSolid(StepEntityInstance instance) {
-    return solidResolver.resolveRevolvedFaceSolid(instance);
-  }
 
   StepSweptFaceSolid resolveSweptFaceSolid(StepEntityInstance instance, String entityName) {
     return solidResolver.resolveSweptFaceSolid(instance, entityName);
@@ -5067,17 +3585,8 @@ public final class StepEntityResolver {
         edgeEnd);
   }
 
-  StepTessellatedFace resolveTessellatedFace(StepEntityInstance instance) {
-    return tessellationResolver.resolveTessellatedFace(instance);
-  }
 
-  StepTessellatedTriangle resolveTessellatedTriangle(StepEntityInstance instance) {
-    return tessellationResolver.resolveTessellatedTriangle(instance);
-  }
 
-  StepFiniteElementMesh resolveFiniteElementMesh(StepEntityInstance instance) {
-    return tessellationResolver.resolveFiniteElementMesh(instance);
-  }
 
   boolean isSupportedAnnotationCurveCarrier(StepEntity item) {
     return StepResolverValueHelpers.isSupportedCurveReference(item)
@@ -5226,9 +3735,6 @@ public final class StepEntityResolver {
     return new StepPointSet(instance.id(), stringValue(instance, definition, 0), points);
   }
 
-  StepMotionPath resolveMotionPath(StepEntityInstance instance) {
-    return kinematicResolver.resolveMotionPath(instance);
-  }
 
   StepAngularLocation resolveAngularLocation(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "ANGULAR_LOCATION");
@@ -5249,45 +3755,18 @@ public final class StepEntityResolver {
     return annotationResolver.resolveDraughtingCallout(instance, entityName);
   }
 
-  StepDraughtingCalloutRelationship resolveDraughtingCalloutRelationship(StepEntityInstance instance) {
-    return annotationResolver.resolveDraughtingCalloutRelationship(instance);
-  }
 
   StepDraughtingCalloutRelationship resolveDraughtingCalloutRelationship(StepEntityInstance instance, String entityName) {
     return annotationResolver.resolveDraughtingCalloutRelationship(instance, entityName);
   }
 
-  StepMeasureRepresentationItem resolveMeasureRepresentationItem(StepEntityInstance instance) {
-    return unitResolver.resolveMeasureRepresentationItem(instance);
-  }
 
-  StepDescriptiveRepresentationItem resolveDescriptiveRepresentationItem(StepEntityInstance instance) {
-    return representationResolver.resolveDescriptiveRepresentationItem(instance);
-  }
 
-  StepValueRepresentationItem resolveValueRepresentationItem(StepEntityInstance instance) {
-    return representationResolver.resolveValueRepresentationItem(instance);
-  }
 
-  StepItemIdentifiedRepresentationUsage resolveItemIdentifiedRepresentationUsage(StepEntityInstance instance) {
-    return representationResolver.resolveItemIdentifiedRepresentationUsage(instance);
-  }
 
-  StepChainBasedItemIdentifiedRepresentationUsage resolveChainBasedItemIdentifiedRepresentationUsage(StepEntityInstance instance) {
-    return associationResolver.resolveChainBasedItemIdentifiedRepresentationUsage(instance);
-  }
 
-  StepChainBasedGeometricItemSpecificUsage resolveChainBasedGeometricItemSpecificUsage(StepEntityInstance instance) {
-    return associationResolver.resolveChainBasedGeometricItemSpecificUsage(instance);
-  }
 
-  StepPmiRequirementItemAssociation resolvePmiRequirementItemAssociation(StepEntityInstance instance) {
-    return associationResolver.resolvePmiRequirementItemAssociation(instance);
-  }
 
-  StepMechanicalDesignRequirementItemAssociation resolveMechanicalDesignRequirementItemAssociation(StepEntityInstance instance) {
-    return associationResolver.resolveMechanicalDesignRequirementItemAssociation(instance);
-  }
 
   StepPlacedTarget resolvePlacedTarget(StepEntityInstance instance) {
     StepEntityDefinition definition = definition(instance, "PLACED_TARGET");
@@ -5309,17 +3788,8 @@ public final class StepEntityResolver {
         identifiedItem);
   }
 
-  StepDraughtingModelItemAssociation resolveDraughtingModelItemAssociation(StepEntityInstance instance) {
-    return associationResolver.resolveDraughtingModelItemAssociation(instance);
-  }
 
-  StepDraughtingModelItemAssociationWithPlaceholder resolveDraughtingModelItemAssociationWithPlaceholder(StepEntityInstance instance) {
-    return associationResolver.resolveDraughtingModelItemAssociationWithPlaceholder(instance);
-  }
 
-  StepGeometricItemSpecificUsage resolveGeometricItemSpecificUsage(StepEntityInstance instance) {
-    return associationResolver.resolveGeometricItemSpecificUsage(instance);
-  }
 
   // Manufacturing resolvers
 
@@ -5339,9 +3809,6 @@ public final class StepEntityResolver {
             "FLAT_PATTERN unfoldingSequence must contain entity references"));
   }
 
-  StepThread resolveThread(StepEntityInstance instance) {
-    return machiningResolver.resolveThread(instance);
-  }
 
   StepShapeAspectOccurrence resolveShapeAspectOccurrence(StepEntityInstance instance) {
     return representationResolver.resolveShapeAspectOccurrence(instance);

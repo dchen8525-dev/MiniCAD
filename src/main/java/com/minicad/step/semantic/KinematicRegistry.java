@@ -153,81 +153,81 @@ public final class KinematicRegistry {
           (resolver, instance) -> resolver.resolveRepresentationItem(instance));
 
 // Entity: KINEMATIC_LINK
-      registry.put("KINEMATIC_LINK", StepEntityResolver::resolveKinematicLink);
+      registry.put("KINEMATIC_LINK", (resolver, instance) -> resolver.kinematicResolver.resolveKinematicLink(instance));
 
 // Entity: KINEMATIC_STRUCTURE
-      registry.put("KINEMATIC_STRUCTURE", StepEntityResolver::resolveKinematicStructure);
+      registry.put("KINEMATIC_STRUCTURE", (resolver, instance) -> resolver.kinematicResolver.resolveKinematicStructure(instance));
 
 // Entity: PRISMATIC_PAIR
-      registry.put("PRISMATIC_PAIR", StepEntityResolver::resolvePrismaticPair);
+      registry.put("PRISMATIC_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolvePrismaticPair(instance));
 
 // Entity: REVOLUTE_PAIR
-      registry.put("REVOLUTE_PAIR", StepEntityResolver::resolveRevolutePair);
+      registry.put("REVOLUTE_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolveRevolutePair(instance));
 
 // Entity: CYLINDRICAL_PAIR
-      registry.put("CYLINDRICAL_PAIR", StepEntityResolver::resolveCylindricalPair);
+      registry.put("CYLINDRICAL_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolveCylindricalPair(instance));
 
 // Entity: PLANAR_PAIR
-      registry.put("PLANAR_PAIR", StepEntityResolver::resolvePlanarPair);
+      registry.put("PLANAR_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolvePlanarPair(instance));
 
 // Entity: UNIVERSAL_PAIR
-      registry.put("UNIVERSAL_PAIR", StepEntityResolver::resolveUniversalPair);
+      registry.put("UNIVERSAL_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolveUniversalPair(instance));
 
 // Entity: SCREW_PAIR
-      registry.put("SCREW_PAIR", StepEntityResolver::resolveScrewPair);
+      registry.put("SCREW_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolveScrewPair(instance));
 
 // Entity: GEAR_PAIR
-      registry.put("GEAR_PAIR", StepEntityResolver::resolveGearPair);
+      registry.put("GEAR_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolveGearPair(instance));
 
 // Entity: GEAR_PAIR_WITH_RANGE
-      registry.put("GEAR_PAIR_WITH_RANGE", StepEntityResolver::resolveGearPairWithRange);
+      registry.put("GEAR_PAIR_WITH_RANGE", (resolver, instance) -> resolver.kinematicResolver.resolveGearPairWithRange(instance));
 
 // Entity: RACK_AND_PINION_PAIR
-      registry.put("RACK_AND_PINION_PAIR", StepEntityResolver::resolveRackAndPinionPair);
+      registry.put("RACK_AND_PINION_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolveRackAndPinionPair(instance));
 
 // Entity: REVOLUTE_JOINT
-      registry.put("REVOLUTE_JOINT", StepEntityResolver::resolveRevoluteJoint);
+      registry.put("REVOLUTE_JOINT", (resolver, instance) -> resolver.kinematicResolver.resolveRevoluteJoint(instance));
 
 // Entity: PRISMATIC_JOINT
-      registry.put("PRISMATIC_JOINT", StepEntityResolver::resolvePrismaticJoint);
+      registry.put("PRISMATIC_JOINT", (resolver, instance) -> resolver.kinematicResolver.resolvePrismaticJoint(instance));
 
 // Entity: CYLINDRICAL_JOINT
-      registry.put("CYLINDRICAL_JOINT", StepEntityResolver::resolveCylindricalJoint);
+      registry.put("CYLINDRICAL_JOINT", (resolver, instance) -> resolver.kinematicResolver.resolveCylindricalJoint(instance));
 
 // Entity: PLANAR_JOINT
-      registry.put("PLANAR_JOINT", StepEntityResolver::resolvePlanarJoint);
+      registry.put("PLANAR_JOINT", (resolver, instance) -> resolver.kinematicResolver.resolvePlanarJoint(instance));
 
 // Entity: SCREW_JOINT
-      registry.put("SCREW_JOINT", StepEntityResolver::resolveScrewJoint);
+      registry.put("SCREW_JOINT", (resolver, instance) -> resolver.kinematicResolver.resolveScrewJoint(instance));
 
 // Entity: GENERAL_JOINT
-      registry.put("GENERAL_JOINT", StepEntityResolver::resolveGeneralJoint);
+      registry.put("GENERAL_JOINT", (resolver, instance) -> resolver.kinematicResolver.resolveGeneralJoint(instance));
 
 // Entity: JOINT_VALUE
-      registry.put("JOINT_VALUE", StepEntityResolver::resolveJointValue);
+      registry.put("JOINT_VALUE", (resolver, instance) -> resolver.kinematicResolver.resolveJointValue(instance));
 
 // Entity: KINEMATIC_CHAIN
-      registry.put("KINEMATIC_CHAIN", StepEntityResolver::resolveKinematicChain);
+      registry.put("KINEMATIC_CHAIN", (resolver, instance) -> resolver.kinematicResolver.resolveKinematicChain(instance));
 
 // Entity: KINEMATIC_MODEL
-      registry.put("KINEMATIC_MODEL", StepEntityResolver::resolveKinematicModel);
+      registry.put("KINEMATIC_MODEL", (resolver, instance) -> resolver.analysisResolver.resolveKinematicModel(instance));
 
 // Entity: KINEMATIC_PROPERTY
-      registry.put("KINEMATIC_PROPERTY", StepEntityResolver::resolveKinematicProperty);
+      registry.put("KINEMATIC_PROPERTY", (resolver, instance) -> resolver.kinematicResolver.resolveKinematicProperty(instance));
 
 // Entity: VALUE_REASON_PAIR
       registry.put("VALUE_REASON_PAIR", StepEntityResolver::resolveValueReasonPair);
 
 // Entity: LOW_ORDER_KINEMATIC_PAIR_WITH_RANGE
       registry.put("LOW_ORDER_KINEMATIC_PAIR_WITH_RANGE",
-          StepEntityResolver::resolveLowOrderKinematicPairWithRange);
+          (resolver, instance) -> resolver.kinematicResolver.resolveLowOrderKinematicPairWithRange(instance));
 
 // Entity: ACTUATED_KINEMATIC_PAIR
-      registry.put("ACTUATED_KINEMATIC_PAIR", StepEntityResolver::resolveActuatedKinematicPair);
+      registry.put("ACTUATED_KINEMATIC_PAIR", (resolver, instance) -> resolver.kinematicResolver.resolveActuatedKinematicPair(instance));
 
 // Entity: KINEMATIC_FRAME_BASED_TRANSFORMATION
       registry.put("KINEMATIC_FRAME_BASED_TRANSFORMATION",
-          StepEntityResolver::resolveKinematicFrameBasedTransformation);
+          (resolver, instance) -> resolver.kinematicResolver.resolveKinematicFrameBasedTransformation(instance));
 
 // Entity: DIMENSION_PAIR
       registry.put(
@@ -245,13 +245,13 @@ public final class KinematicRegistry {
           (resolver, instance) -> resolver.resolveRepresentationItem(instance));
 
 // Entity: KINEMATIC_LINK_REFERENCE
-      registry.put("KINEMATIC_LINK_REFERENCE", StepEntityResolver::resolveKinematicLinkReference);
+      registry.put("KINEMATIC_LINK_REFERENCE", (resolver, instance) -> resolver.kinematicResolver.resolveKinematicLinkReference(instance));
 
 // Entity: KINEMATIC_JOINT_REFERENCE
-      registry.put("KINEMATIC_JOINT_REFERENCE", StepEntityResolver::resolveKinematicJointReference);
+      registry.put("KINEMATIC_JOINT_REFERENCE", (resolver, instance) -> resolver.kinematicResolver.resolveKinematicJointReference(instance));
 
 // Entity: MECHANISM_DEFINITION
-      registry.put("MECHANISM_DEFINITION", StepEntityResolver::resolveMechanismDefinition);
+      registry.put("MECHANISM_DEFINITION", (resolver, instance) -> resolver.kinematicResolver.resolveMechanismDefinition(instance));
 
 // Entity: KINEMATIC_FRAME_REPRESENTATION_RELATIONSHIP
       registry.put(

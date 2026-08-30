@@ -38,17 +38,17 @@ public final class TopologyRegistry {
                   4));
 
 // Entity: EXTRUDED_FACE_SOLID
-      registry.put("EXTRUDED_FACE_SOLID", StepEntityResolver::resolveExtrudedFaceSolid);
+      registry.put("EXTRUDED_FACE_SOLID", (resolver, instance) -> resolver.solidResolver.resolveExtrudedFaceSolid(instance));
 
 // Entity: REVOLVED_FACE_SOLID
-      registry.put("REVOLVED_FACE_SOLID", StepEntityResolver::resolveRevolvedFaceSolid);
+      registry.put("REVOLVED_FACE_SOLID", (resolver, instance) -> resolver.solidResolver.resolveRevolvedFaceSolid(instance));
 
 // Entity: SWEPT_FACE_SOLID
       registry.put("SWEPT_FACE_SOLID", (resolver, instance) ->
           resolver.resolveSweptFaceSolid(instance, "SWEPT_FACE_SOLID"));
 
 // Entity: POLYGONAL_BOUNDED_HALF_SPACE
-      registry.put("POLYGONAL_BOUNDED_HALF_SPACE", StepEntityResolver::resolvePolygonalBoundedHalfSpace);
+      registry.put("POLYGONAL_BOUNDED_HALF_SPACE", (resolver, instance) -> resolver.tessellationResolver.resolvePolygonalBoundedHalfSpace(instance));
 
 // Entity: FACETED_BREP
       registry.put(
@@ -579,13 +579,13 @@ public final class TopologyRegistry {
       registry.put("VERTEX", StepEntityResolver::resolveVertex);
 
 // Entity: EDGE_BASED_WIREFRAME_MODEL
-      registry.put("EDGE_BASED_WIREFRAME_MODEL", StepEntityResolver::resolveEdgeBasedWireframeModel);
+      registry.put("EDGE_BASED_WIREFRAME_MODEL", (resolver, instance) -> resolver.topologyResolver.resolveEdgeBasedWireframeModel(instance));
 
 // Entity: CONNECTED_EDGE_SET
-      registry.put("CONNECTED_EDGE_SET", StepEntityResolver::resolveConnectedEdgeSet);
+      registry.put("CONNECTED_EDGE_SET", (resolver, instance) -> resolver.topologyResolver.resolveConnectedEdgeSet(instance));
 
 // Entity: SUBEDGE
-      registry.put("SUBEDGE", StepEntityResolver::resolveSubedge);
+      registry.put("SUBEDGE", (resolver, instance) -> resolver.topologyResolver.resolveSubedge(instance));
 
 // Entity: EDGE
       registry.put("EDGE", StepEntityResolver::resolveEdge);
@@ -594,7 +594,7 @@ public final class TopologyRegistry {
       registry.put("FACE", StepEntityResolver::resolveFace);
 
 // Entity: FACETTED_BREP
-      registry.put("FACETTED_BREP", StepEntityResolver::resolveFacettedBrep);
+      registry.put("FACETTED_BREP", (resolver, instance) -> resolver.topologyResolver.resolveFacettedBrep(instance));
 
 // Entity: KINEMATIC_PATH
       registry.put(
@@ -602,7 +602,7 @@ public final class TopologyRegistry {
           (resolver, instance) -> resolver.resolveRepresentationItem(instance));
 
 // Entity: MOTION_PATH
-      registry.put("MOTION_PATH", StepEntityResolver::resolveMotionPath);
+      registry.put("MOTION_PATH", (resolver, instance) -> resolver.kinematicResolver.resolveMotionPath(instance));
 
 // Entity: POLYGONAL_FACE_SET
       registry.put(
@@ -610,34 +610,34 @@ public final class TopologyRegistry {
           (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
 
 // Entity: CHAMFER_EDGE
-      registry.put("CHAMFER_EDGE", StepEntityResolver::resolveChamferEdge);
+      registry.put("CHAMFER_EDGE", (resolver, instance) -> resolver.geometricFeatureResolver.resolveChamferEdge(instance));
 
 // Entity: FILLET_EDGE
-      registry.put("FILLET_EDGE", StepEntityResolver::resolveFilletEdge);
+      registry.put("FILLET_EDGE", (resolver, instance) -> resolver.geometricFeatureResolver.resolveFilletEdge(instance));
 
 // Entity: ORIENTED_EDGE
-      registry.put("ORIENTED_EDGE", StepEntityResolver::resolveOrientedEdge);
+      registry.put("ORIENTED_EDGE", (resolver, instance) -> resolver.topologyResolver.resolveOrientedEdge(instance));
 
 // Entity: VERTEX_LOOP
-      registry.put("VERTEX_LOOP", StepEntityResolver::resolveVertexLoop);
+      registry.put("VERTEX_LOOP", (resolver, instance) -> resolver.topologyResolver.resolveVertexLoop(instance));
 
 // Entity: POLY_LOOP
-      registry.put("POLY_LOOP", StepEntityResolver::resolvePolyLoop);
+      registry.put("POLY_LOOP", (resolver, instance) -> resolver.topologyResolver.resolvePolyLoop(instance));
 
 // Entity: OPEN_PATH
-      registry.put("OPEN_PATH", StepEntityResolver::resolveOpenPath);
+      registry.put("OPEN_PATH", (resolver, instance) -> resolver.topologyResolver.resolveOpenPath(instance));
 
 // Entity: SUBPATH
-      registry.put("SUBPATH", StepEntityResolver::resolveSubpath);
+      registry.put("SUBPATH", (resolver, instance) -> resolver.topologyResolver.resolveSubpath(instance));
 
 // Entity: ORIENTED_PATH
-      registry.put("ORIENTED_PATH", StepEntityResolver::resolveOrientedPath);
+      registry.put("ORIENTED_PATH", (resolver, instance) -> resolver.topologyResolver.resolveOrientedPath(instance));
 
 // Entity: PATH
-      registry.put("PATH", StepEntityResolver::resolvePath);
+      registry.put("PATH", (resolver, instance) -> resolver.topologyResolver.resolvePath(instance));
 
 // Entity: EDGE_LOOP
-      registry.put("EDGE_LOOP", StepEntityResolver::resolveEdgeLoop);
+      registry.put("EDGE_LOOP", (resolver, instance) -> resolver.topologyResolver.resolveEdgeLoop(instance));
 
 // Entity: EDGE_WIRE
       registry.put("EDGE_WIRE", StepEntityResolver::resolveEdgeWire);
@@ -650,22 +650,22 @@ public final class TopologyRegistry {
       registry.put("FACE_BOUND", (resolver, instance) -> resolver.resolveFaceBound(instance, false));
 
 // Entity: ADVANCED_FACE
-      registry.put("ADVANCED_FACE", StepEntityResolver::resolveAdvancedFace);
+      registry.put("ADVANCED_FACE", (resolver, instance) -> resolver.topologyResolver.resolveAdvancedFace(instance));
 
 // Entity: ORIENTED_FACE
-      registry.put("ORIENTED_FACE", StepEntityResolver::resolveOrientedFace);
+      registry.put("ORIENTED_FACE", (resolver, instance) -> resolver.topologyResolver.resolveOrientedFace(instance));
 
 // Entity: VERTEX_SHELL
-      registry.put("VERTEX_SHELL", StepEntityResolver::resolveVertexShell);
+      registry.put("VERTEX_SHELL", (resolver, instance) -> resolver.topologyResolver.resolveVertexShell(instance));
 
 // Entity: WIRE_SHELL
-      registry.put("WIRE_SHELL", StepEntityResolver::resolveWireShell);
+      registry.put("WIRE_SHELL", (resolver, instance) -> resolver.topologyResolver.resolveWireShell(instance));
 
 // Entity: CONNECTED_FACE_SUB_SET
-      registry.put("CONNECTED_FACE_SUB_SET", StepEntityResolver::resolveConnectedFaceSubSet);
+      registry.put("CONNECTED_FACE_SUB_SET", (resolver, instance) -> resolver.topologyResolver.resolveConnectedFaceSubSet(instance));
 
 // Entity: CONNECTED_FACE_SET
-      registry.put("CONNECTED_FACE_SET", StepEntityResolver::resolveConnectedFaceSet);
+      registry.put("CONNECTED_FACE_SET", (resolver, instance) -> resolver.topologyResolver.resolveConnectedFaceSet(instance));
 
 // Entity: TESSELLATED_FACE_SET
       registry.put("TESSELLATED_FACE_SET", StepEntityResolver::resolveTessellatedFaceSet);
@@ -674,10 +674,10 @@ public final class TopologyRegistry {
       registry.put("SEAM_EDGE", StepEntityResolver::resolveSeamEdge);
 
 // Entity: TESSELLATED_FACE
-      registry.put("TESSELLATED_FACE", StepEntityResolver::resolveTessellatedFace);
+      registry.put("TESSELLATED_FACE", (resolver, instance) -> resolver.tessellationResolver.resolveTessellatedFace(instance));
 
 // Entity: TESSELLATED_TRIANGLE
-      registry.put("TESSELLATED_TRIANGLE", StepEntityResolver::resolveTessellatedTriangle);
+      registry.put("TESSELLATED_TRIANGLE", (resolver, instance) -> resolver.tessellationResolver.resolveTessellatedTriangle(instance));
 
 // Entity: TRIANGULATED_FACE
       registry.put(
@@ -685,22 +685,30 @@ public final class TopologyRegistry {
           (resolver, instance) -> resolver.resolveTessellatedFaceSet(instance));
 
 // Entity: COMPLEX_TRIANGULATED_FACE
-      registry.put("COMPLEX_TRIANGULATED_FACE", StepEntityResolver::resolveComplexTriangulatedFace);
+      registry.put("COMPLEX_TRIANGULATED_FACE", (resolver, instance) -> resolver.tessellationResolver.resolveComplexTriangulatedFace(instance));
 
 // Entity: VELOCITY_BOUNDARY_CONDITION
-      registry.put("VELOCITY_BOUNDARY_CONDITION", StepEntityResolver::resolveVelocityBoundaryCondition);
+      registry.put(
+          "VELOCITY_BOUNDARY_CONDITION",
+          (resolver, instance) -> resolver.boundaryConditionResolver.resolveVelocityBoundaryCondition(instance));
 
 // Entity: ACCELERATION_BOUNDARY_CONDITION
-      registry.put("ACCELERATION_BOUNDARY_CONDITION", StepEntityResolver::resolveAccelerationBoundaryCondition);
+      registry.put(
+          "ACCELERATION_BOUNDARY_CONDITION",
+          (resolver, instance) -> resolver.boundaryConditionResolver.resolveAccelerationBoundaryCondition(instance));
 
 // Entity: FORCE_BOUNDARY_CONDITION
-      registry.put("FORCE_BOUNDARY_CONDITION", StepEntityResolver::resolveForceBoundaryCondition);
+      registry.put("FORCE_BOUNDARY_CONDITION", (resolver, instance) -> resolver.boundaryConditionResolver.resolveForceBoundaryCondition(instance));
 
 // Entity: PRESSURE_BOUNDARY_CONDITION
-      registry.put("PRESSURE_BOUNDARY_CONDITION", StepEntityResolver::resolvePressureBoundaryCondition);
+      registry.put(
+          "PRESSURE_BOUNDARY_CONDITION",
+          (resolver, instance) -> resolver.boundaryConditionResolver.resolvePressureBoundaryCondition(instance));
 
 // Entity: THERMAL_BOUNDARY_CONDITION
-      registry.put("THERMAL_BOUNDARY_CONDITION", StepEntityResolver::resolveThermalBoundaryCondition);
+      registry.put(
+          "THERMAL_BOUNDARY_CONDITION",
+          (resolver, instance) -> resolver.boundaryConditionResolver.resolveThermalBoundaryCondition(instance));
 
 // Entity: TRIANGULATED_FACE_SET
       registry.put(
@@ -714,19 +722,19 @@ public final class TopologyRegistry {
       registry.put("ORIENTED_SUBFACE", StepEntityResolver::resolveOrientedSubface);
 
 // Entity: ORIENTED_OPEN_SHELL
-      registry.put("ORIENTED_OPEN_SHELL", StepEntityResolver::resolveOrientedOpenShell);
+      registry.put("ORIENTED_OPEN_SHELL", (resolver, instance) -> resolver.topologyResolver.resolveOrientedOpenShell(instance));
 
 // Entity: ORIENTED_CLOSED_SHELL
-      registry.put("ORIENTED_CLOSED_SHELL", StepEntityResolver::resolveOrientedClosedShell);
+      registry.put("ORIENTED_CLOSED_SHELL", (resolver, instance) -> resolver.topologyResolver.resolveOrientedClosedShell(instance));
 
 // Entity: SHELL_BASED_WIREFRAME_MODEL
       registry.put("SHELL_BASED_WIREFRAME_MODEL", StepEntityResolver::resolveShellBasedWireframeModel);
 
 // Entity: OPEN_SHELL
-      registry.put("OPEN_SHELL", StepEntityResolver::resolveOpenShell);
+      registry.put("OPEN_SHELL", (resolver, instance) -> resolver.topologyResolver.resolveOpenShell(instance));
 
 // Entity: CLOSED_SHELL
-      registry.put("CLOSED_SHELL", StepEntityResolver::resolveClosedShell);
+      registry.put("CLOSED_SHELL", (resolver, instance) -> resolver.topologyResolver.resolveClosedShell(instance));
 
 // Entity: POLYGONAL_FACE
       registry.put(
@@ -869,7 +877,7 @@ public final class TopologyRegistry {
           (resolver, instance) -> resolver.resolveGeometricRepresentationItem(instance));
 
 // Entity: FEA_SHELL_ELEMENT_PROPERTY
-      registry.put("FEA_SHELL_ELEMENT_PROPERTY", StepEntityResolver::resolveFeaShellElementProperty);
+      registry.put("FEA_SHELL_ELEMENT_PROPERTY", (resolver, instance) -> resolver.analysisResolver.resolveFeaShellElementProperty(instance));
 
 // Entity: BOUNDARY_CONDITION
       registry.put("BOUNDARY_CONDITION", StepEntityResolver::resolveBoundaryCondition);

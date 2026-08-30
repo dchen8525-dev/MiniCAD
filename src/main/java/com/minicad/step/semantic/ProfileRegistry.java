@@ -11,8 +11,8 @@ public final class ProfileRegistry {
   private ProfileRegistry() {}
 
   public static void register(Map<String, EntityFactory> registry) {
-      registry.put("RECTANGLE_PROFILE_DEF", StepEntityResolver::resolveRectangleProfileDef);
-      registry.put("RECTANGLE_HOLLOW_PROFILE_DEF", StepEntityResolver::resolveRectangleHollowProfileDef);
+      registry.put("RECTANGLE_PROFILE_DEF", (resolver, instance) -> resolver.profileResolver.resolveRectangleProfileDef(instance));
+      registry.put("RECTANGLE_HOLLOW_PROFILE_DEF", (resolver, instance) -> resolver.profileResolver.resolveRectangleHollowProfileDef(instance));
       registry.put(
           "CENTERED_RECTANGLE_PROFILE_DEF",
           (resolver, instance) ->
@@ -30,7 +30,9 @@ public final class ProfileRegistry {
           resolver.resolveArbitraryClosedProfileDef(instance));
       registry.put("ARBITRARY_PROFILE_DEF", (resolver, instance) ->
           resolver.resolveArbitraryProfileDef(instance, "ARBITRARY_PROFILE_DEF"));
-      registry.put("ARBITRARY_PROFILE_DEF_WITH_VOIDS", StepEntityResolver::resolveArbitraryProfileDefWithVoids);
+      registry.put(
+          "ARBITRARY_PROFILE_DEF_WITH_VOIDS",
+          (resolver, instance) -> resolver.profileResolver.resolveArbitraryProfileDefWithVoids(instance));
       registry.put(
           "ARBITRARY_OPEN_PROFILE_DEF",
           (resolver, instance) ->
@@ -105,6 +107,6 @@ public final class ProfileRegistry {
               resolver.resolveParameterizedProfileDef(instance, "DOVE_TAIL_PROFILE_DEF", 4));
       registry.put("PARAMETERIZED_PROFILE_DEF", (resolver, instance) ->
           resolver.resolveParameterizedProfileDef(instance, "PARAMETERIZED_PROFILE_DEF", 3));
-      registry.put("PROFILE_DEF", StepEntityResolver::resolveProfileDef);
+      registry.put("PROFILE_DEF", (resolver, instance) -> resolver.profileResolver.resolveProfileDef(instance));
   }
 }

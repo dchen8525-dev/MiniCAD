@@ -27,13 +27,13 @@ public final class GeometryRegistry1 {
               resolver.resolveRepresentation(instance, "DIRECTION_SHAPE_REPRESENTATION", true));
 
 // Entity: CYLINDER_VOLUME
-      registry.put("CYLINDER_VOLUME", StepEntityResolver::resolveCylinderVolume);
+      registry.put("CYLINDER_VOLUME", (resolver, instance) -> resolver.solidResolver.resolveCylinderVolume(instance));
 
 // Entity: TORUS_VOLUME
-      registry.put("TORUS_VOLUME", StepEntityResolver::resolveTorusVolume);
+      registry.put("TORUS_VOLUME", (resolver, instance) -> resolver.solidResolver.resolveTorusVolume(instance));
 
 // Entity: RIGHT_CIRCULAR_CYLINDER_VOLUME
-      registry.put("RIGHT_CIRCULAR_CYLINDER_VOLUME", StepEntityResolver::resolveCylinderVolume);
+      registry.put("RIGHT_CIRCULAR_CYLINDER_VOLUME", (resolver, instance) -> resolver.solidResolver.resolveCylinderVolume(instance));
 
 // Entity: RIGHT_CIRCULAR_CYLINDER
       registry.put(
@@ -54,7 +54,7 @@ public final class GeometryRegistry1 {
                   instance, "TORUS", StepAxis1Placement.class, "AXIS1_PLACEMENT", 2));
 
 // Entity: CIRCLE_PROFILE_DEF
-      registry.put("CIRCLE_PROFILE_DEF", StepEntityResolver::resolveCircleProfileDef);
+      registry.put("CIRCLE_PROFILE_DEF", (resolver, instance) -> resolver.profileResolver.resolveCircleProfileDef(instance));
 
 // Entity: POINT_REPLICA
       registry.put("POINT_REPLICA", (resolver, instance) -> resolver.resolveGeometricReplica(instance, "POINT_REPLICA"));
@@ -72,17 +72,17 @@ public final class GeometryRegistry1 {
               instance, "ELLIPSE_PROFILE_DEF", 2));
 
 // Entity: CENTRE_LINE_ARC_PROFILE_DEF
-      registry.put("CENTRE_LINE_ARC_PROFILE_DEF", StepEntityResolver::resolveCentreLineArcProfileDef);
+      registry.put("CENTRE_LINE_ARC_PROFILE_DEF", (resolver, instance) -> resolver.profileResolver.resolveCentreLineArcProfileDef(instance));
 
 // Entity: CENTERED_CIRCLE_PROFILE_DEF
-      registry.put("CENTERED_CIRCLE_PROFILE_DEF", StepEntityResolver::resolveCenteredCircleProfileDef);
+      registry.put("CENTERED_CIRCLE_PROFILE_DEF", (resolver, instance) -> resolver.profileResolver.resolveCenteredCircleProfileDef(instance));
 
 // Entity: SURFACE_CURVE_SWEPT_FACE_SOLID
       registry.put("SURFACE_CURVE_SWEPT_FACE_SOLID", (resolver, instance) ->
           resolver.resolveSweptFaceSolid(instance, "SURFACE_CURVE_SWEPT_FACE_SOLID"));
 
 // Entity: SURFACE_CURVE_SWEPT_AREA_SOLID
-      registry.put("SURFACE_CURVE_SWEPT_AREA_SOLID", StepEntityResolver::resolveSurfaceCurveSweptAreaSolid);
+      registry.put("SURFACE_CURVE_SWEPT_AREA_SOLID", (resolver, instance) -> resolver.solidResolver.resolveSurfaceCurveSweptAreaSolid(instance));
 
 // Entity: MANIFOLD_SURFACE_SHAPE_REPRESENTATION
       registry.put(
@@ -177,7 +177,7 @@ public final class GeometryRegistry1 {
               resolver.resolveRepresentation(instance, "SURFACE_TEXTURE_REPRESENTATION", false));
 
 // Entity: USER_DEFINED_CURVE_FONT
-      registry.put("USER_DEFINED_CURVE_FONT", StepEntityResolver::resolveUserDefinedCurveFont);
+      registry.put("USER_DEFINED_CURVE_FONT", (resolver, instance) -> resolver.materialResolver.resolveUserDefinedCurveFont(instance));
 
 // Entity: SURFACE_DISTANCE_ASSEMBLY_CONSTRAINT_WITH_DIMENSION
       registry.put(

@@ -388,70 +388,70 @@ public final class FeaRegistry {
               resolver.resolveGenericAssignment(instance, "ASSIGNED_ANALYSIS"));
 
 // Entity: MAKE_FROM_FEATURE
-      registry.put("MAKE_FROM_FEATURE", StepEntityResolver::resolveMakeFromFeature);
+      registry.put("MAKE_FROM_FEATURE", (resolver, instance) -> resolver.productResolver.resolveMakeFromFeature(instance));
 
 // Entity: ANALYSIS_RESULT
-      registry.put("ANALYSIS_RESULT", StepEntityResolver::resolveAnalysisResult);
+      registry.put("ANALYSIS_RESULT", (resolver, instance) -> resolver.analysisResolver.resolveAnalysisResult(instance));
 
 // Entity: ANALYSIS_INSTANCE
-      registry.put("ANALYSIS_INSTANCE", StepEntityResolver::resolveAnalysisInstance);
+      registry.put("ANALYSIS_INSTANCE", (resolver, instance) -> resolver.analysisResolver.resolveAnalysisInstance(instance));
 
 // Entity: FINITE_ELEMENT_MESH
-      registry.put("FINITE_ELEMENT_MESH", StepEntityResolver::resolveFiniteElementMesh);
+      registry.put("FINITE_ELEMENT_MESH", (resolver, instance) -> resolver.tessellationResolver.resolveFiniteElementMesh(instance));
 
 // Entity: NODE
-      registry.put("NODE", StepEntityResolver::resolveFeaNode);
+      registry.put("NODE", (resolver, instance) -> resolver.analysisResolver.resolveFeaNode(instance));
 
 // Entity: ELEMENT
-      registry.put("ELEMENT", StepEntityResolver::resolveFeaElement);
+      registry.put("ELEMENT", (resolver, instance) -> resolver.analysisResolver.resolveFeaElement(instance));
 
 // Entity: LOAD
-      registry.put("LOAD", StepEntityResolver::resolveFeaLoad);
+      registry.put("LOAD", (resolver, instance) -> resolver.analysisResolver.resolveFeaLoad(instance));
 
 // Entity: FEA_MASS_DENSITY
-      registry.put("FEA_MASS_DENSITY", StepEntityResolver::resolveFeaMassDensity);
+      registry.put("FEA_MASS_DENSITY", (resolver, instance) -> resolver.analysisResolver.resolveFeaMassDensity(instance));
 
 // Entity: FEA_YIELD_STRESS
-      registry.put("FEA_YIELD_STRESS", StepEntityResolver::resolveFeaYieldStress);
+      registry.put("FEA_YIELD_STRESS", (resolver, instance) -> resolver.analysisResolver.resolveFeaYieldStress(instance));
 
 // Entity: FEA_ULTIMATE_STRESS
-      registry.put("FEA_ULTIMATE_STRESS", StepEntityResolver::resolveFeaUltimateStress);
+      registry.put("FEA_ULTIMATE_STRESS", (resolver, instance) -> resolver.analysisResolver.resolveFeaUltimateStress(instance));
 
 // Entity: STRESS_ANALYSIS
-      registry.put("STRESS_ANALYSIS", StepEntityResolver::resolveStressAnalysis);
+      registry.put("STRESS_ANALYSIS", (resolver, instance) -> resolver.analysisResolver.resolveStressAnalysis(instance));
 
 // Entity: BUCKLING_ANALYSIS
-      registry.put("BUCKLING_ANALYSIS", StepEntityResolver::resolveBucklingAnalysis);
+      registry.put("BUCKLING_ANALYSIS", (resolver, instance) -> resolver.analysisResolver.resolveBucklingAnalysis(instance));
 
 // Entity: MODAL_ANALYSIS
-      registry.put("MODAL_ANALYSIS", StepEntityResolver::resolveModalAnalysis);
+      registry.put("MODAL_ANALYSIS", (resolver, instance) -> resolver.analysisResolver.resolveModalAnalysis(instance));
 
 // Entity: THERMAL_ANALYSIS
-      registry.put("THERMAL_ANALYSIS", StepEntityResolver::resolveThermalAnalysis);
+      registry.put("THERMAL_ANALYSIS", (resolver, instance) -> resolver.analysisResolver.resolveThermalAnalysis(instance));
 
 // Entity: STRUCTURAL_ANALYSIS_MODEL
-      registry.put("STRUCTURAL_ANALYSIS_MODEL", StepEntityResolver::resolveStructuralAnalysisModel);
+      registry.put("STRUCTURAL_ANALYSIS_MODEL", (resolver, instance) -> resolver.analysisResolver.resolveStructuralAnalysisModel(instance));
 
 // Entity: MASS_ELEMENT
-      registry.put("MASS_ELEMENT", StepEntityResolver::resolveMassElement);
+      registry.put("MASS_ELEMENT", (resolver, instance) -> resolver.feaElementResolver.resolveMassElement(instance));
 
 // Entity: CONNECTIVITY_ELEMENT
-      registry.put("CONNECTIVITY_ELEMENT", StepEntityResolver::resolveConnectivityElement);
+      registry.put("CONNECTIVITY_ELEMENT", (resolver, instance) -> resolver.feaElementResolver.resolveConnectivityElement(instance));
 
 // Entity: ELEMENT_GEOMETRIC_DESCRIPTION
-      registry.put("ELEMENT_GEOMETRIC_DESCRIPTION", StepEntityResolver::resolveElementGeometricDescription);
+      registry.put("ELEMENT_GEOMETRIC_DESCRIPTION", (resolver, instance) -> resolver.feaElementResolver.resolveElementGeometricDescription(instance));
 
 // Entity: NODE_SET
-      registry.put("NODE_SET", StepEntityResolver::resolveNodeSet);
+      registry.put("NODE_SET", (resolver, instance) -> resolver.feaElementResolver.resolveNodeSet(instance));
 
 // Entity: ELEMENT_SET
-      registry.put("ELEMENT_SET", StepEntityResolver::resolveElementSet);
+      registry.put("ELEMENT_SET", (resolver, instance) -> resolver.feaElementResolver.resolveElementSet(instance));
 
 // Entity: FEA_SECURED_VARIABLE
-      registry.put("FEA_SECURED_VARIABLE", StepEntityResolver::resolveFeaSecuredVariable);
+      registry.put("FEA_SECURED_VARIABLE", (resolver, instance) -> resolver.analysisResolver.resolveFeaSecuredVariable(instance));
 
 // Entity: FEA_CONSTANT_FUNCTION_3D
-      registry.put("FEA_CONSTANT_FUNCTION_3D", StepEntityResolver::resolveFeaConstantFunction3d);
+      registry.put("FEA_CONSTANT_FUNCTION_3D", (resolver, instance) -> resolver.analysisResolver.resolveFeaConstantFunction3d(instance));
 
 // Entity: FEATURE_COMPONENT_DEFINITION
       registry.put(
@@ -504,31 +504,31 @@ public final class FeaRegistry {
           (resolver, instance) -> resolver.resolveRepresentation(instance, "FEA_MODEL_2D", true));
 
 // Entity: FEA_BEAM_ELEMENT_PROPERTY
-      registry.put("FEA_BEAM_ELEMENT_PROPERTY", StepEntityResolver::resolveFeaBeamElementProperty);
+      registry.put("FEA_BEAM_ELEMENT_PROPERTY", (resolver, instance) -> resolver.analysisResolver.resolveFeaBeamElementProperty(instance));
 
 // Entity: FEA_2D_ELEMENT_PROPERTY
-      registry.put("FEA_2D_ELEMENT_PROPERTY", StepEntityResolver::resolveFea2DElementProperty);
+      registry.put("FEA_2D_ELEMENT_PROPERTY", (resolver, instance) -> resolver.analysisResolver.resolveFea2DElementProperty(instance));
 
 // Entity: FEA_3D_ELEMENT_PROPERTY
-      registry.put("FEA_3D_ELEMENT_PROPERTY", StepEntityResolver::resolveFea3DElementProperty);
+      registry.put("FEA_3D_ELEMENT_PROPERTY", (resolver, instance) -> resolver.analysisResolver.resolveFea3DElementProperty(instance));
 
 // Entity: FEA_TRUSS_ELEMENT_PROPERTY
-      registry.put("FEA_TRUSS_ELEMENT_PROPERTY", StepEntityResolver::resolveFeaTrussElementProperty);
+      registry.put("FEA_TRUSS_ELEMENT_PROPERTY", (resolver, instance) -> resolver.analysisResolver.resolveFeaTrussElementProperty(instance));
 
 // Entity: FEA_SPRING_ELEMENT_PROPERTY
-      registry.put("FEA_SPRING_ELEMENT_PROPERTY", StepEntityResolver::resolveFeaSpringElementProperty);
+      registry.put("FEA_SPRING_ELEMENT_PROPERTY", (resolver, instance) -> resolver.analysisResolver.resolveFeaSpringElementProperty(instance));
 
 // Entity: MARKING_FEATURE
-      registry.put("MARKING_FEATURE", StepEntityResolver::resolveMarkingFeature);
+      registry.put("MARKING_FEATURE", (resolver, instance) -> resolver.geometricFeatureResolver.resolveMarkingFeature(instance));
 
 // Entity: FEATURE_ELEMENT_DEFINITION
-      registry.put("FEATURE_ELEMENT_DEFINITION", StepEntityResolver::resolveFeatureElementDefinition);
+      registry.put("FEATURE_ELEMENT_DEFINITION", (resolver, instance) -> resolver.geometricFeatureResolver.resolveFeatureElementDefinition(instance));
 
 // Entity: LOAD_CASE
       registry.put("LOAD_CASE", StepEntityResolver::resolveLoadCase);
 
 // Entity: STRUCTURAL_FEATURE
-      registry.put("STRUCTURAL_FEATURE", StepEntityResolver::resolveStructuralFeature);
+      registry.put("STRUCTURAL_FEATURE", (resolver, instance) -> resolver.geometricFeatureResolver.resolveStructuralFeature(instance));
 
 
   }

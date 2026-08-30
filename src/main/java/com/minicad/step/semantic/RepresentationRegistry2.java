@@ -18,7 +18,9 @@ public final class RepresentationRegistry2 {
                   instance, "VARIATIONAL_CURRENT_REPRESENTATION_RELATIONSHIP"));
 
 // Entity: SHAPE_REPRESENTATION_RELATIONSHIP
-      registry.put("SHAPE_REPRESENTATION_RELATIONSHIP", StepEntityResolver::resolveShapeRepresentationRelationship);
+      registry.put(
+          "SHAPE_REPRESENTATION_RELATIONSHIP",
+          (resolver, instance) -> resolver.representationResolver.resolveShapeRepresentationRelationship(instance));
 
 // Entity: CONTEXT_DEPENDENT_SHAPE_REPRESENTATION
       registry.put("CONTEXT_DEPENDENT_SHAPE_REPRESENTATION", StepEntityResolver::resolveContextDependentShapeRepresentation);
@@ -30,7 +32,7 @@ public final class RepresentationRegistry2 {
       registry.put("GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT", StepEntityResolver::resolveGlobalUncertaintyAssignedContext);
 
 // Entity: CONTEXT_DEPENDENT_UNIT
-      registry.put("CONTEXT_DEPENDENT_UNIT", StepEntityResolver::resolveContextDependentUnit);
+      registry.put("CONTEXT_DEPENDENT_UNIT", (resolver, instance) -> resolver.unitResolver.resolveContextDependentUnit(instance));
 
 // Entity: A3MA_LENGTH_MEASURE_AND_CONTEXT_DEPENDENT_MEASURE_PAIR
       registry.put(
@@ -380,43 +382,59 @@ public final class RepresentationRegistry2 {
 
 // Entity: WITH_DESCRIPTIVE_REPRESENTATION_ITEM
       registry.put("WITH_DESCRIPTIVE_REPRESENTATION_ITEM",
-          StepEntityResolver::resolveWithDescriptiveRepresentationItem);
+          (resolver, instance) -> resolver.representationResolver.resolveWithDescriptiveRepresentationItem(instance));
 
 // Entity: QUALIFIED_REPRESENTATION_ITEM
-      registry.put("QUALIFIED_REPRESENTATION_ITEM", StepEntityResolver::resolveQualifiedRepresentationItem);
+      registry.put(
+          "QUALIFIED_REPRESENTATION_ITEM",
+          (resolver, instance) -> resolver.representationResolver.resolveQualifiedRepresentationItem(instance));
 
 // Entity: MEASURE_REPRESENTATION_ITEM_WITH_UNIT
-      registry.put("MEASURE_REPRESENTATION_ITEM_WITH_UNIT", StepEntityResolver::resolveMeasureRepresentationItemWithUnit);
+      registry.put(
+          "MEASURE_REPRESENTATION_ITEM_WITH_UNIT",
+          (resolver, instance) -> resolver.unitResolver.resolveMeasureRepresentationItemWithUnit(instance));
 
 // Entity: SHAPE_ASPECT_SHAPE_REPRESENTATION
-      registry.put("SHAPE_ASPECT_SHAPE_REPRESENTATION", StepEntityResolver::resolveShapeAspectShapeRepresentation);
+      registry.put(
+          "SHAPE_ASPECT_SHAPE_REPRESENTATION",
+          (resolver, instance) -> resolver.representationResolver.resolveShapeAspectShapeRepresentation(instance));
 
 // Entity: MECHANICAL_DESIGN_SHAPE_REPRESENTATION
-      registry.put("MECHANICAL_DESIGN_SHAPE_REPRESENTATION", StepEntityResolver::resolveMechanicalDesignShapeRepresentation);
+      registry.put(
+          "MECHANICAL_DESIGN_SHAPE_REPRESENTATION",
+          (resolver, instance) -> resolver.productResolver.resolveMechanicalDesignShapeRepresentation(instance));
 
 // Entity: SHAPE_REPRESENTATION_TRANSFORMATION
-      registry.put("SHAPE_REPRESENTATION_TRANSFORMATION", StepEntityResolver::resolveShapeRepresentationTransformation);
+      registry.put(
+          "SHAPE_REPRESENTATION_TRANSFORMATION",
+          (resolver, instance) -> resolver.representationResolver.resolveShapeRepresentationTransformation(instance));
 
 // Entity: REPRESENTATION_CONTEXT_3D
-      registry.put("REPRESENTATION_CONTEXT_3D", StepEntityResolver::resolveRepresentationContext3d);
+      registry.put("REPRESENTATION_CONTEXT_3D", (resolver, instance) -> resolver.representationResolver.resolveRepresentationContext3d(instance));
 
 // Entity: STRUCTURAL_ANALYSIS_REPRESENTATION
-      registry.put("STRUCTURAL_ANALYSIS_REPRESENTATION", StepEntityResolver::resolveStructuralAnalysisRepresentation);
+      registry.put(
+          "STRUCTURAL_ANALYSIS_REPRESENTATION",
+          (resolver, instance) -> resolver.analysisResolver.resolveStructuralAnalysisRepresentation(instance));
 
 // Entity: STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS
-      registry.put("STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS", StepEntityResolver::resolveStructuralAnalysisRepresentationParameters);
+      registry.put(
+          "STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS",
+          (resolver, instance) -> resolver.analysisResolver.resolveStructuralAnalysisRepresentationParameters(instance));
 
 // Entity: GEOMETRIC_REPRESENTATION_ITEM
       registry.put("GEOMETRIC_REPRESENTATION_ITEM", StepEntityResolver::resolveGeometricRepresentationItem);
 
 // Entity: TOPOLOGICAL_REPRESENTATION_ITEM
-      registry.put("TOPOLOGICAL_REPRESENTATION_ITEM", StepEntityResolver::resolveTopologicalRepresentationItem);
+      registry.put(
+          "TOPOLOGICAL_REPRESENTATION_ITEM",
+          (resolver, instance) -> resolver.representationResolver.resolveTopologicalRepresentationItem(instance));
 
 // Entity: REPRESENTATION_ITEM
       registry.put("REPRESENTATION_ITEM", StepEntityResolver::resolveRepresentationItem);
 
 // Entity: REPRESENTATION_CONTEXT
-      registry.put("REPRESENTATION_CONTEXT", StepEntityResolver::resolveRepresentationContext);
+      registry.put("REPRESENTATION_CONTEXT", (resolver, instance) -> resolver.representationResolver.resolveRepresentationContext(instance));
 
 // Entity: DEFINITIONAL_REPRESENTATION
       registry.put(
@@ -427,31 +445,33 @@ public final class RepresentationRegistry2 {
 // Entity: CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE
       registry.put(
           "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE",
-          StepEntityResolver::resolveChainBasedItemIdentifiedRepresentationUsage);
+          (resolver, instance) -> resolver.associationResolver.resolveChainBasedItemIdentifiedRepresentationUsage(instance));
 
 // Entity: ITEM_IDENTIFIED_REPRESENTATION_USAGE
       registry.put(
           "ITEM_IDENTIFIED_REPRESENTATION_USAGE",
-          StepEntityResolver::resolveItemIdentifiedRepresentationUsage);
+          (resolver, instance) -> resolver.representationResolver.resolveItemIdentifiedRepresentationUsage(instance));
 
 // Entity: MEASURE_REPRESENTATION_ITEM
-      registry.put("MEASURE_REPRESENTATION_ITEM", StepEntityResolver::resolveMeasureRepresentationItem);
+      registry.put("MEASURE_REPRESENTATION_ITEM", (resolver, instance) -> resolver.unitResolver.resolveMeasureRepresentationItem(instance));
 
 // Entity: DESCRIPTIVE_REPRESENTATION_ITEM
-      registry.put("DESCRIPTIVE_REPRESENTATION_ITEM", StepEntityResolver::resolveDescriptiveRepresentationItem);
+      registry.put(
+          "DESCRIPTIVE_REPRESENTATION_ITEM",
+          (resolver, instance) -> resolver.representationResolver.resolveDescriptiveRepresentationItem(instance));
 
 // Entity: VALUE_REPRESENTATION_ITEM
-      registry.put("VALUE_REPRESENTATION_ITEM", StepEntityResolver::resolveValueRepresentationItem);
+      registry.put("VALUE_REPRESENTATION_ITEM", (resolver, instance) -> resolver.representationResolver.resolveValueRepresentationItem(instance));
 
 // Entity: FEA_MATERIAL_PROPERTY_REPRESENTATION
       registry.put("FEA_MATERIAL_PROPERTY_REPRESENTATION",
-          StepEntityResolver::resolveFeaMaterialPropertyRepresentation);
+          (resolver, instance) -> resolver.representationResolver.resolveFeaMaterialPropertyRepresentation(instance));
 
 // Entity: NODE_REPRESENTATION
-      registry.put("NODE_REPRESENTATION", StepEntityResolver::resolveNodeRepresentation);
+      registry.put("NODE_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveNodeRepresentation(instance));
 
 // Entity: FEA_GROUP_REPRESENTATION
-      registry.put("FEA_GROUP_REPRESENTATION", StepEntityResolver::resolveFeaGroupRepresentation);
+      registry.put("FEA_GROUP_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveFeaGroupRepresentation(instance));
 
 // Entity: DIMENSIONAL_CHARACTERISTIC_REPRESENTATION
       registry.put(
@@ -555,53 +575,63 @@ public final class RepresentationRegistry2 {
 
 // Entity: VALIDATION_PROPERTY_REPRESENTATION
       registry.put("VALIDATION_PROPERTY_REPRESENTATION",
-          StepEntityResolver::resolveValidationPropertyRepresentation);
+          (resolver, instance) -> resolver.representationResolver.resolveValidationPropertyRepresentation(instance));
 
 // Entity: CALCULATED_GEOMETRIC_REPRESENTATION_ITEM
       registry.put("CALCULATED_GEOMETRIC_REPRESENTATION_ITEM",
-          StepEntityResolver::resolveCalculatedGeometricRepresentationItem);
+          (resolver, instance) -> resolver.representationResolver.resolveCalculatedGeometricRepresentationItem(instance));
 
 // Entity: HYBRID_SHAPE_REPRESENTATION
-      registry.put("HYBRID_SHAPE_REPRESENTATION", StepEntityResolver::resolveHybridShapeRepresentation);
+      registry.put("HYBRID_SHAPE_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveHybridShapeRepresentation(instance));
 
 // Entity: DRAWING_REPRESENTATION
-      registry.put("DRAWING_REPRESENTATION", StepEntityResolver::resolveDrawingRepresentation);
+      registry.put("DRAWING_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveDrawingRepresentation(instance));
 
 // Entity: SCHEMATIC_REPRESENTATION
-      registry.put("SCHEMATIC_REPRESENTATION", StepEntityResolver::resolveSchematicRepresentation);
+      registry.put("SCHEMATIC_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveSchematicRepresentation(instance));
 
 // Entity: SKETCH_REPRESENTATION
-      registry.put("SKETCH_REPRESENTATION", StepEntityResolver::resolveSketchRepresentation);
+      registry.put("SKETCH_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveSketchRepresentation(instance));
 
 // Entity: SECTION_REPRESENTATION
-      registry.put("SECTION_REPRESENTATION", StepEntityResolver::resolveSectionRepresentation);
+      registry.put("SECTION_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveSectionRepresentation(instance));
 
 // Entity: TABULATION_REPRESENTATION
-      registry.put("TABULATION_REPRESENTATION", StepEntityResolver::resolveTabulationRepresentation);
+      registry.put("TABULATION_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveTabulationRepresentation(instance));
 
 // Entity: ZONE_REPRESENTATION
-      registry.put("ZONE_REPRESENTATION", StepEntityResolver::resolveZoneRepresentation);
+      registry.put("ZONE_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveZoneRepresentation(instance));
 
 // Entity: COMPOUND_REPRESENTATION_ITEM
       registry.put("COMPOUND_REPRESENTATION_ITEM", (resolver, instance) -> resolver.resolveCompoundRepresentationItem(instance, "COMPOUND_REPRESENTATION_ITEM"));
 
 // Entity: CONTEXT_DEPENDENT_GEOMETRIC_SHAPE_REPRESENTATION
-      registry.put("CONTEXT_DEPENDENT_GEOMETRIC_SHAPE_REPRESENTATION", StepEntityResolver::resolveContextDependentGeometricShapeRepresentation);
+      registry.put(
+          "CONTEXT_DEPENDENT_GEOMETRIC_SHAPE_REPRESENTATION",
+          (resolver, instance) -> resolver.representationResolver.resolveContextDependentGeometricShapeRepresentation(instance));
 
 // Entity: ANGULAR_DIMENSION_REPRESENTATION
-      registry.put("ANGULAR_DIMENSION_REPRESENTATION", StepEntityResolver::resolveAngularDimensionRepresentation);
+      registry.put(
+          "ANGULAR_DIMENSION_REPRESENTATION",
+          (resolver, instance) -> resolver.annotationResolver.resolveAngularDimensionRepresentation(instance));
 
 // Entity: CHAIN_DIMENSION_REPRESENTATION
-      registry.put("CHAIN_DIMENSION_REPRESENTATION", StepEntityResolver::resolveChainDimensionRepresentation);
+      registry.put(
+          "CHAIN_DIMENSION_REPRESENTATION",
+          (resolver, instance) -> resolver.annotationResolver.resolveChainDimensionRepresentation(instance));
 
 // Entity: ORDINATE_DIMENSION_REPRESENTATION
-      registry.put("ORDINATE_DIMENSION_REPRESENTATION", StepEntityResolver::resolveOrdinateDimensionRepresentation);
+      registry.put(
+          "ORDINATE_DIMENSION_REPRESENTATION",
+          (resolver, instance) -> resolver.annotationResolver.resolveOrdinateDimensionRepresentation(instance));
 
 // Entity: SHAPE_DIMENSION_REPRESENTATION_WITH_TOLERANCE
-      registry.put("SHAPE_DIMENSION_REPRESENTATION_WITH_TOLERANCE", StepEntityResolver::resolveShapeDimensionRepresentationWithTolerance);
+      registry.put(
+          "SHAPE_DIMENSION_REPRESENTATION_WITH_TOLERANCE",
+          (resolver, instance) -> resolver.representationResolver.resolveShapeDimensionRepresentationWithTolerance(instance));
 
 // Entity: TEXT_FILE_REPRESENTATION
-      registry.put("TEXT_FILE_REPRESENTATION", StepEntityResolver::resolveTextFileRepresentation);
+      registry.put("TEXT_FILE_REPRESENTATION", (resolver, instance) -> resolver.representationResolver.resolveTextFileRepresentation(instance));
 
 // Entity: GEOMETRIC_SET_SHAPE_REPRESENTATION (shape representation)
       registry.put(

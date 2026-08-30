@@ -13,10 +13,10 @@ public final class ConfigManagementRegistry {
   public static void register(Map<String, EntityFactory> registry) {
 // Entity: DOCUMENT_USAGE_CONSTRAINT
       registry.put(
-          "DOCUMENT_USAGE_CONSTRAINT", StepEntityResolver::resolveDocumentUsageConstraint);
+          "DOCUMENT_USAGE_CONSTRAINT", (resolver, instance) -> resolver.productResolver.resolveDocumentUsageConstraint(instance));
 
 // Entity: DOCUMENT_REFERENCE
-      registry.put("DOCUMENT_REFERENCE", StepEntityResolver::resolveDocumentReference);
+      registry.put("DOCUMENT_REFERENCE", (resolver, instance) -> resolver.productResolver.resolveDocumentReference(instance));
 
 // Entity: APPLIED_DOCUMENT_REFERENCE
       registry.put(
@@ -35,19 +35,19 @@ public final class ConfigManagementRegistry {
 // Entity: APPROVAL_PERSON_ORGANIZATION
       registry.put(
           "APPROVAL_PERSON_ORGANIZATION",
-          StepEntityResolver::resolveApprovalPersonOrganization);
+          (resolver, instance) -> resolver.assignmentResolver.resolveApprovalPersonOrganization(instance));
 
 // Entity: APPROVAL_DATE_TIME
-      registry.put("APPROVAL_DATE_TIME", StepEntityResolver::resolveApprovalDateTime);
+      registry.put("APPROVAL_DATE_TIME", (resolver, instance) -> resolver.assignmentResolver.resolveApprovalDateTime(instance));
 
 // Entity: CONTRACT_TYPE
-      registry.put("CONTRACT_TYPE", StepEntityResolver::resolveContractType);
+      registry.put("CONTRACT_TYPE", (resolver, instance) -> resolver.assignmentResolver.resolveContractType(instance));
 
 // Entity: CONTRACT
       registry.put("CONTRACT", StepEntityResolver::resolveContract);
 
 // Entity: CONTRACT_ASSIGNMENT
-      registry.put("CONTRACT_ASSIGNMENT", StepEntityResolver::resolveContractAssignment);
+      registry.put("CONTRACT_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveContractAssignment(instance));
 
 // Entity: APPLIED_CONTRACT_ASSIGNMENT
       registry.put(
@@ -63,7 +63,7 @@ public final class ConfigManagementRegistry {
       registry.put("EFFECTIVITY", StepEntityResolver::resolveEffectivity);
 
 // Entity: EFFECTIVITY_RELATIONSHIP
-      registry.put("EFFECTIVITY_RELATIONSHIP", StepEntityResolver::resolveEffectivityRelationship);
+      registry.put("EFFECTIVITY_RELATIONSHIP", (resolver, instance) -> resolver.assignmentResolver.resolveEffectivityRelationship(instance));
 
 // Entity: APPLIED_EFFECTIVITY_ASSIGNMENT
       registry.put(
@@ -192,7 +192,7 @@ public final class ConfigManagementRegistry {
               resolver.resolveGenericAssignment(instance, "CONDITIONAL_EFFECTIVITY"));
 
 // Entity: CONFIGURATION_ITEM
-      registry.put("CONFIGURATION_ITEM", StepEntityResolver::resolveConfigurationItem);
+      registry.put("CONFIGURATION_ITEM", (resolver, instance) -> resolver.analysisResolver.resolveConfigurationItem(instance));
 
 // Entity: CONFIGURATION_EFFECTIVITY
       registry.put(
@@ -208,13 +208,13 @@ public final class ConfigManagementRegistry {
       registry.put("INTERPOLATED_CONFIGURATION_SEGMENT", StepEntityResolver::resolveInterpolatedConfigurationSegment);
 
 // Entity: DESIGNED_PART_DESIGN_VERSION
-      registry.put("DESIGNED_PART_DESIGN_VERSION", StepEntityResolver::resolveDesignedPartDesignVersion);
+      registry.put("DESIGNED_PART_DESIGN_VERSION", (resolver, instance) -> resolver.productResolver.resolveDesignedPartDesignVersion(instance));
 
 // Entity: CHANGE
       registry.put("CHANGE", StepEntityResolver::resolveChange);
 
 // Entity: CONFIGURATION_INSTANCE
-      registry.put("CONFIGURATION_INSTANCE", StepEntityResolver::resolveConfigurationInstance);
+      registry.put("CONFIGURATION_INSTANCE", (resolver, instance) -> resolver.analysisResolver.resolveConfigurationInstance(instance));
 
 // Entity: DRAWING_DOCUMENT
       registry.put(
@@ -437,19 +437,19 @@ public final class ConfigManagementRegistry {
           (resolver, instance) -> resolver.resolveExternallyDefinedItem(instance, "APPLIED_EXTERNAL_DOCUMENT_ASSIGNMENT"));
 
 // Entity: DATE_TIME_EFFECTIVITY
-      registry.put("DATE_TIME_EFFECTIVITY", StepEntityResolver::resolveDateTimeEffectivity);
+      registry.put("DATE_TIME_EFFECTIVITY", (resolver, instance) -> resolver.assignmentResolver.resolveDateTimeEffectivity(instance));
 
 // Entity: DATE_EFFECTIVITY
-      registry.put("DATE_EFFECTIVITY", StepEntityResolver::resolveDateEffectivity);
+      registry.put("DATE_EFFECTIVITY", (resolver, instance) -> resolver.assignmentResolver.resolveDateEffectivity(instance));
 
 // Entity: LOT_EFFECTIVITY
-      registry.put("LOT_EFFECTIVITY", StepEntityResolver::resolveLotEffectivity);
+      registry.put("LOT_EFFECTIVITY", (resolver, instance) -> resolver.assignmentResolver.resolveLotEffectivity(instance));
 
 // Entity: SERIAL_NUMBER_EFFECTIVITY
-      registry.put("SERIAL_NUMBER_EFFECTIVITY", StepEntityResolver::resolveSerialNumberEffectivity);
+      registry.put("SERIAL_NUMBER_EFFECTIVITY", (resolver, instance) -> resolver.assignmentResolver.resolveSerialNumberEffectivity(instance));
 
 // Entity: PRODUCT_VERSION
-      registry.put("PRODUCT_VERSION", StepEntityResolver::resolveProductVersion);
+      registry.put("PRODUCT_VERSION", (resolver, instance) -> resolver.productResolver.resolveProductVersion(instance));
 
 
   }

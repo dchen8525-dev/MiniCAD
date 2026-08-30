@@ -15,14 +15,14 @@ public final class ClassificationRegistry {
       registry.put("ADDRESS", StepEntityResolver::resolveAddress);
 
 // Entity: PERSON
-      registry.put("PERSON", StepEntityResolver::resolvePerson);
+      registry.put("PERSON", (resolver, instance) -> resolver.assignmentResolver.resolvePerson(instance));
 
 // Entity: ORGANIZATION
       registry.put("ORGANIZATION", StepEntityResolver::resolveOrganization);
 
 // Entity: PERSON_AND_ORGANIZATION
       registry.put(
-          "PERSON_AND_ORGANIZATION", StepEntityResolver::resolvePersonAndOrganization);
+          "PERSON_AND_ORGANIZATION", (resolver, instance) -> resolver.assignmentResolver.resolvePersonAndOrganization(instance));
 
 // Entity: ORGANIZATION_RELATIONSHIP
       registry.put(
@@ -30,10 +30,10 @@ public final class ClassificationRegistry {
           (resolver, instance) -> resolver.resolveOrganizationRelationship(instance));
 
 // Entity: ORGANIZATION_ROLE
-      registry.put("ORGANIZATION_ROLE", StepEntityResolver::resolveOrganizationRole);
+      registry.put("ORGANIZATION_ROLE", (resolver, instance) -> resolver.assignmentResolver.resolveOrganizationRole(instance));
 
 // Entity: ORGANIZATION_ASSIGNMENT
-      registry.put("ORGANIZATION_ASSIGNMENT", StepEntityResolver::resolveOrganizationAssignment);
+      registry.put("ORGANIZATION_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveOrganizationAssignment(instance));
 
 // Entity: APPLIED_ORGANIZATION_ASSIGNMENT
       registry.put(
@@ -50,12 +50,12 @@ public final class ClassificationRegistry {
 // Entity: PERSON_AND_ORGANIZATION_ROLE
       registry.put(
           "PERSON_AND_ORGANIZATION_ROLE",
-          StepEntityResolver::resolvePersonAndOrganizationRole);
+          (resolver, instance) -> resolver.assignmentResolver.resolvePersonAndOrganizationRole(instance));
 
 // Entity: PERSON_AND_ORGANIZATION_ASSIGNMENT
       registry.put(
           "PERSON_AND_ORGANIZATION_ASSIGNMENT",
-          StepEntityResolver::resolvePersonAndOrganizationAssignment);
+          (resolver, instance) -> resolver.assignmentResolver.resolvePersonAndOrganizationAssignment(instance));
 
 // Entity: APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT
       registry.put(
@@ -83,10 +83,10 @@ public final class ClassificationRegistry {
       registry.put("DATE_AND_TIME", StepEntityResolver::resolveDateAndTime);
 
 // Entity: DATE_ROLE
-      registry.put("DATE_ROLE", StepEntityResolver::resolveDateRole);
+      registry.put("DATE_ROLE", (resolver, instance) -> resolver.assignmentResolver.resolveDateRole(instance));
 
 // Entity: DATE_ASSIGNMENT
-      registry.put("DATE_ASSIGNMENT", StepEntityResolver::resolveDateAssignment);
+      registry.put("DATE_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveDateAssignment(instance));
 
 // Entity: APPLIED_DATE_ASSIGNMENT
       registry.put("APPLIED_DATE_ASSIGNMENT", StepEntityResolver::resolveAppliedDateAssignment);
@@ -98,10 +98,10 @@ public final class ClassificationRegistry {
               resolver.resolveAppliedDateAssignment(instance, "CC_DESIGN_DATE_ASSIGNMENT"));
 
 // Entity: DATE_TIME_ROLE
-      registry.put("DATE_TIME_ROLE", StepEntityResolver::resolveDateTimeRole);
+      registry.put("DATE_TIME_ROLE", (resolver, instance) -> resolver.assignmentResolver.resolveDateTimeRole(instance));
 
 // Entity: DATE_TIME_ASSIGNMENT
-      registry.put("DATE_TIME_ASSIGNMENT", StepEntityResolver::resolveDateTimeAssignment);
+      registry.put("DATE_TIME_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveDateTimeAssignment(instance));
 
 // Entity: APPLIED_DATE_AND_TIME_ASSIGNMENT
       registry.put(
@@ -124,16 +124,16 @@ public final class ClassificationRegistry {
 // Entity: SECURITY_CLASSIFICATION_LEVEL
       registry.put(
           "SECURITY_CLASSIFICATION_LEVEL",
-          StepEntityResolver::resolveSecurityClassificationLevel);
+          (resolver, instance) -> resolver.assignmentResolver.resolveSecurityClassificationLevel(instance));
 
 // Entity: SECURITY_CLASSIFICATION
       registry.put(
-          "SECURITY_CLASSIFICATION", StepEntityResolver::resolveSecurityClassification);
+          "SECURITY_CLASSIFICATION", (resolver, instance) -> resolver.assignmentResolver.resolveSecurityClassification(instance));
 
 // Entity: SECURITY_CLASSIFICATION_ASSIGNMENT
       registry.put(
           "SECURITY_CLASSIFICATION_ASSIGNMENT",
-          StepEntityResolver::resolveSecurityClassificationAssignment);
+          (resolver, instance) -> resolver.assignmentResolver.resolveSecurityClassificationAssignment(instance));
 
 // Entity: APPLIED_SECURITY_CLASSIFICATION_ASSIGNMENT
       registry.put(
@@ -148,14 +148,14 @@ public final class ClassificationRegistry {
                   instance, "CC_DESIGN_SECURITY_CLASSIFICATION"));
 
 // Entity: CERTIFICATION_TYPE
-      registry.put("CERTIFICATION_TYPE", StepEntityResolver::resolveCertificationType);
+      registry.put("CERTIFICATION_TYPE", (resolver, instance) -> resolver.assignmentResolver.resolveCertificationType(instance));
 
 // Entity: CERTIFICATION
       registry.put("CERTIFICATION", StepEntityResolver::resolveCertification);
 
 // Entity: CERTIFICATION_ASSIGNMENT
       registry.put(
-          "CERTIFICATION_ASSIGNMENT", StepEntityResolver::resolveCertificationAssignment);
+          "CERTIFICATION_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveCertificationAssignment(instance));
 
 // Entity: APPLIED_CERTIFICATION_ASSIGNMENT
       registry.put(
@@ -241,13 +241,15 @@ public final class ClassificationRegistry {
               resolver.resolveGenericRole(instance, "TIME_INTERVAL_ROLE"));
 
 // Entity: PERSON_AND_ORGANIZATION_ADDRESS
-      registry.put("PERSON_AND_ORGANIZATION_ADDRESS", StepEntityResolver::resolvePersonAndOrganizationAddress);
+      registry.put(
+          "PERSON_AND_ORGANIZATION_ADDRESS",
+          (resolver, instance) -> resolver.assignmentResolver.resolvePersonAndOrganizationAddress(instance));
 
 // Entity: ORGANIZATION_ADDRESS
-      registry.put("ORGANIZATION_ADDRESS", StepEntityResolver::resolveOrganizationAddress);
+      registry.put("ORGANIZATION_ADDRESS", (resolver, instance) -> resolver.assignmentResolver.resolveOrganizationAddress(instance));
 
 // Entity: PERSON_ADDRESS
-      registry.put("PERSON_ADDRESS", StepEntityResolver::resolvePersonAddress);
+      registry.put("PERSON_ADDRESS", (resolver, instance) -> resolver.assignmentResolver.resolvePersonAddress(instance));
 
 // Entity: DESIGN_CERTIFICATION
       registry.put(
@@ -313,22 +315,22 @@ public final class ClassificationRegistry {
       registry.put("APPROVAL", StepEntityResolver::resolveApproval);
 
 // Entity: APPROVAL_STATUS (moved from ConfigManagementRegistry for test organization)
-      registry.put("APPROVAL_STATUS", StepEntityResolver::resolveApprovalStatus);
+      registry.put("APPROVAL_STATUS", (resolver, instance) -> resolver.assignmentResolver.resolveApprovalStatus(instance));
 
 // Entity: APPROVAL_ROLE (moved from ConfigManagementRegistry for test organization)
-      registry.put("APPROVAL_ROLE", StepEntityResolver::resolveApprovalRole);
+      registry.put("APPROVAL_ROLE", (resolver, instance) -> resolver.assignmentResolver.resolveApprovalRole(instance));
 
 // Entity: APPROVAL_ASSIGNMENT (moved from ConfigManagementRegistry for test organization)
-      registry.put("APPROVAL_ASSIGNMENT", StepEntityResolver::resolveApprovalAssignment);
+      registry.put("APPROVAL_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveApprovalAssignment(instance));
 
 // Entity: DOCUMENT (moved from ConfigManagementRegistry for test organization)
       registry.put("DOCUMENT", StepEntityResolver::resolveDocument);
 
 // Entity: DOCUMENT_TYPE (moved from ConfigManagementRegistry for test organization)
-      registry.put("DOCUMENT_TYPE", StepEntityResolver::resolveDocumentType);
+      registry.put("DOCUMENT_TYPE", (resolver, instance) -> resolver.productResolver.resolveDocumentType(instance));
 
 // Entity: DOCUMENT_RELATIONSHIP (moved from ConfigManagementRegistry for test organization)
-      registry.put("DOCUMENT_RELATIONSHIP", StepEntityResolver::resolveDocumentRelationship);
+      registry.put("DOCUMENT_RELATIONSHIP", (resolver, instance) -> resolver.productResolver.resolveDocumentRelationship(instance));
 
 // Entity: EXTERNAL_SOURCE (moved from MiscellaneousRegistry1 for test organization)
       registry.put("EXTERNAL_SOURCE", StepEntityResolver::resolveExternalSource);

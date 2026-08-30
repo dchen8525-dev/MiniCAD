@@ -85,10 +85,10 @@ public final class MiscellaneousRegistry1 {
           StepEntityResolver::resolveApplicationProtocolDefinition);
 
 // Entity: PRODUCT
-      registry.put("PRODUCT", StepEntityResolver::resolveProduct);
+      registry.put("PRODUCT", (resolver, instance) -> resolver.productResolver.resolveProduct(instance));
 
 // Entity: PRODUCT_CATEGORY
-      registry.put("PRODUCT_CATEGORY", StepEntityResolver::resolveProductCategory);
+      registry.put("PRODUCT_CATEGORY", (resolver, instance) -> resolver.productResolver.resolveProductCategory(instance));
 
 // Entity: PRODUCT_CATEGORY_RELATIONSHIP
       registry.put(
@@ -101,7 +101,7 @@ public final class MiscellaneousRegistry1 {
           StepEntityResolver::resolveProductRelatedProductCategory);
 
 // Entity: PRODUCT_RELATIONSHIP
-      registry.put("PRODUCT_RELATIONSHIP", StepEntityResolver::resolveProductRelationship);
+      registry.put("PRODUCT_RELATIONSHIP", (resolver, instance) -> resolver.productResolver.resolveProductRelationship(instance));
 
 // Entity: PROPERTY_DEFINITION
       registry.put("PROPERTY_DEFINITION", StepEntityResolver::resolvePropertyDefinition);
@@ -109,10 +109,10 @@ public final class MiscellaneousRegistry1 {
 // Entity: PROPERTY_DEFINITION_RELATIONSHIP
       registry.put(
           "PROPERTY_DEFINITION_RELATIONSHIP",
-          StepEntityResolver::resolvePropertyDefinitionRelationship);
+          (resolver, instance) -> resolver.propertyResolver.resolvePropertyDefinitionRelationship(instance));
 
 // Entity: GENERAL_PROPERTY
-      registry.put("GENERAL_PROPERTY", StepEntityResolver::resolveGeneralProperty);
+      registry.put("GENERAL_PROPERTY", (resolver, instance) -> resolver.propertyResolver.resolveGeneralProperty(instance));
 
 // Entity: GENERAL_PROPERTY_RELATIONSHIP
       registry.put(
@@ -130,13 +130,13 @@ public final class MiscellaneousRegistry1 {
           "CLASS_SYSTEM", (resolver, instance) -> resolver.resolveGroup(instance, "CLASS_SYSTEM"));
 
 // Entity: GROUP_RELATIONSHIP
-      registry.put("GROUP_RELATIONSHIP", StepEntityResolver::resolveGroupRelationship);
+      registry.put("GROUP_RELATIONSHIP", (resolver, instance) -> resolver.propertyResolver.resolveGroupRelationship(instance));
 
 // Entity: GROUP_ASSIGNMENT
-      registry.put("GROUP_ASSIGNMENT", StepEntityResolver::resolveGroupAssignment);
+      registry.put("GROUP_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveGroupAssignment(instance));
 
 // Entity: APPLIED_GROUP_ASSIGNMENT
-      registry.put("APPLIED_GROUP_ASSIGNMENT", StepEntityResolver::resolveAppliedGroupAssignment);
+      registry.put("APPLIED_GROUP_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveAppliedGroupAssignment(instance));
 
 // Entity: CC_DESIGN_SPECIFICATION_REFERENCE
       registry.put(
@@ -148,51 +148,51 @@ public final class MiscellaneousRegistry1 {
       registry.put("LANGUAGE", StepEntityResolver::resolveLanguage);
 
 // Entity: LANGUAGE_ASSIGNMENT
-      registry.put("LANGUAGE_ASSIGNMENT", StepEntityResolver::resolveLanguageAssignment);
+      registry.put("LANGUAGE_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveLanguageAssignment(instance));
 
 // Entity: APPLIED_LANGUAGE_ASSIGNMENT
       registry.put(
-          "APPLIED_LANGUAGE_ASSIGNMENT", StepEntityResolver::resolveAppliedLanguageAssignment);
+          "APPLIED_LANGUAGE_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveAppliedLanguageAssignment(instance));
 
 // Entity: CLASSIFICATION_ROLE
-      registry.put("CLASSIFICATION_ROLE", StepEntityResolver::resolveClassificationRole);
+      registry.put("CLASSIFICATION_ROLE", (resolver, instance) -> resolver.assignmentResolver.resolveClassificationRole(instance));
 
 // Entity: CLASSIFICATION_ASSIGNMENT
       registry.put(
-          "CLASSIFICATION_ASSIGNMENT", StepEntityResolver::resolveClassificationAssignment);
+          "CLASSIFICATION_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveClassificationAssignment(instance));
 
 // Entity: APPLIED_CLASSIFICATION_ASSIGNMENT
       registry.put(
           "APPLIED_CLASSIFICATION_ASSIGNMENT",
-          StepEntityResolver::resolveAppliedClassificationAssignment);
+          (resolver, instance) -> resolver.assignmentResolver.resolveAppliedClassificationAssignment(instance));
 
 // Entity: IDENTIFICATION_ROLE
-      registry.put("IDENTIFICATION_ROLE", StepEntityResolver::resolveIdentificationRole);
+      registry.put("IDENTIFICATION_ROLE", (resolver, instance) -> resolver.assignmentResolver.resolveIdentificationRole(instance));
 
 // Entity: IDENTIFICATION_ASSIGNMENT
       registry.put(
-          "IDENTIFICATION_ASSIGNMENT", StepEntityResolver::resolveIdentificationAssignment);
+          "IDENTIFICATION_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveIdentificationAssignment(instance));
 
 // Entity: APPLIED_IDENTIFICATION_ASSIGNMENT
       registry.put(
           "APPLIED_IDENTIFICATION_ASSIGNMENT",
-          StepEntityResolver::resolveAppliedIdentificationAssignment);
+          (resolver, instance) -> resolver.assignmentResolver.resolveAppliedIdentificationAssignment(instance));
 
 // Entity: EXTERNAL_IDENTIFICATION_ASSIGNMENT
       registry.put(
           "EXTERNAL_IDENTIFICATION_ASSIGNMENT",
-          StepEntityResolver::resolveExternalIdentificationAssignment);
+          (resolver, instance) -> resolver.assignmentResolver.resolveExternalIdentificationAssignment(instance));
 
 // Entity: APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT
       registry.put(
           "APPLIED_EXTERNAL_IDENTIFICATION_ASSIGNMENT",
-          StepEntityResolver::resolveAppliedExternalIdentificationAssignment);
+          (resolver, instance) -> resolver.assignmentResolver.resolveAppliedExternalIdentificationAssignment(instance));
 
 // Entity: NAME_ASSIGNMENT
-      registry.put("NAME_ASSIGNMENT", StepEntityResolver::resolveNameAssignment);
+      registry.put("NAME_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveNameAssignment(instance));
 
 // Entity: APPLIED_NAME_ASSIGNMENT
-      registry.put("APPLIED_NAME_ASSIGNMENT", StepEntityResolver::resolveAppliedNameAssignment);
+      registry.put("APPLIED_NAME_ASSIGNMENT", (resolver, instance) -> resolver.assignmentResolver.resolveAppliedNameAssignment(instance));
 
 // Entity: DESCRIPTION_ATTRIBUTE
       registry.put("DESCRIPTION_ATTRIBUTE", StepEntityResolver::resolveDescriptionAttribute);
@@ -414,15 +414,15 @@ public final class MiscellaneousRegistry1 {
 // Entity: CARTESIAN_TRANSFORMATION_OPERATOR_2D
       registry.put(
           "CARTESIAN_TRANSFORMATION_OPERATOR_2D",
-          StepEntityResolver::resolveCartesianTransformationOperator2D);
+          (resolver, instance) -> resolver.transformationResolver.resolveCartesianTransformationOperator2D(instance));
 
 // Entity: CARTESIAN_TRANSFORMATION_OPERATOR_3D
       registry.put(
           "CARTESIAN_TRANSFORMATION_OPERATOR_3D",
-          StepEntityResolver::resolveCartesianTransformationOperator3D);
+          (resolver, instance) -> resolver.transformationResolver.resolveCartesianTransformationOperator3D(instance));
 
 // Entity: USER_DEFINED_MARKER
-      registry.put("USER_DEFINED_MARKER", StepEntityResolver::resolveUserDefinedMarker);
+      registry.put("USER_DEFINED_MARKER", (resolver, instance) -> resolver.materialResolver.resolveUserDefinedMarker(instance));
 
 // Entity: ITEM_DEFINED_TRANSFORMATION
       registry.put(
