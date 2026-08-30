@@ -78,8 +78,24 @@ src/main/java/com/minicad/
   helper/       unit extraction, math utilities
   preview/      tessellation and UV mapping for preview mesh
   step/         STEP syntax (ANTLR) and semantic resolution
-  tool/         EXPRESS schema → Java code generation
+  tool/         EXPRESS schema → Java code generation (see below)
   topology/     solids, faces, loops, edges, validation
+```
+
+### The `tool` code-generation package
+
+`com.minicad.tool` is a development-time CLI, not part of the runtime
+pipeline: `ExpressSchemaParser` reads an EXPRESS schema catalog,
+`CapabilityScanner`/`EntityPrioritizer` inventory entity coverage, and
+`ModelClassGenerator`/`ResolverMethodGenerator` emit the 1265 generated
+classes in `com.minicad.step.model` plus their resolver dispatch table.
+The generated sources are checked in and excluded from coverage and
+formatting gates; the generator itself has no unit tests (it is exercised
+by regenerating and diffing). Entry points expose `main` methods and are
+run ad hoc, e.g.:
+
+```sh
+mvn -q exec:java -Dexec.mainClass=com.minicad.tool.ModelClassGenerator
 ```
 
 ## Documentation
