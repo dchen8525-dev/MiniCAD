@@ -196,19 +196,23 @@ public final class Face {
      */
     public double area() {
         if (surface instanceof Plane && bounds != null && !bounds.isEmpty()) {
-            // Calculate area using shoelace formula for planar polygons
             FaceBound outer = outerBound();
-            if (outer != null && outer.getLoop() instanceof EdgeLoop) {
-                EdgeLoop loop = (EdgeLoop) outer.getLoop();
-                java.util.List<Vertex> verts = loop.vertices();
-                if (verts.size() >= 3) {
-                    double area = 0.0;
-                    for (int i = 0; i < verts.size(); i++) {
-                        Vertex v1 = verts.get(i);
-                        Vertex v2 = verts.get((i + 1) % verts.size());
-                        area += v1.point().getX() * v2.point().getY() - v2.point().getX() * v1.point().getY();
+            if (outer != null) {
+                java.util.List<CartesianPoint> points = boundaryPoints(outer.getLoop());
+                if (points.size() >= 3) {
+                    // Newell's method: valid in any plane orientation, unlike an
+                    // XY shoelace which silently returns the projected area.
+                    double x = 0.0;
+                    double y = 0.0;
+                    double z = 0.0;
+                    for (int i = 0; i < points.size(); i++) {
+                        CartesianPoint current = points.get(i);
+                        CartesianPoint next = points.get((i + 1) % points.size());
+                        x += current.getY() * next.getZ() - current.getZ() * next.getY();
+                        y += current.getZ() * next.getX() - current.getX() * next.getZ();
+                        z += current.getX() * next.getY() - current.getY() * next.getX();
                     }
-                    return Math.abs(area) / 2.0;
+                    return 0.5 * Math.sqrt(x * x + y * y + z * z);
                 }
             }
         }
@@ -284,10 +288,31 @@ public final class Face {
             com.minicad.geometry.Direction3 dir = plane.getNormal();
             return dir.asVector();
         }
-        // For other surfaces, compute normal at center
+        // Curved surfaces: Newell normal of the outer loop. Calling
+        // surface.normalAt(0.5, 0.5) mixed normalized coordinates (the interface
+        // default) with natural-domain parameters (the B-spline overrides), and
+        // the interface default cost a 64x64 sample grid per call.
+        java.util.List<CartesianPoint> points = bounds != null && !bounds.isEmpty() && outerBound() != null
+                ? boundaryPoints(outerBound().getLoop())
+                : java.util.List.of();
+        if (points.size() >= 3) {
+            double x = 0.0;
+            double y = 0.0;
+            double z = 0.0;
+            for (int i = 0; i < points.size(); i++) {
+                CartesianPoint current = points.get(i);
+                CartesianPoint next = points.get((i + 1) % points.size());
+                x += current.getY() * next.getZ() - current.getZ() * next.getY();
+                y += current.getZ() * next.getX() - current.getX() * next.getZ();
+                z += current.getX() * next.getY() - current.getY() * next.getX();
+            }
+            com.minicad.geometry.Vector3 newell = new com.minicad.geometry.Vector3(x, y, z);
+            if (newell.norm() > Epsilon.EPS) {
+                return newell.normalize().asVector();
+            }
+        }
         CartesianPoint center = surface != null ? surface.boundingBox().center() : null;
         if (center != null) {
-            // Use parameterized normalAt(0.5, 0.5) as approximation
             return surface.normalAt(0.5, 0.5);
         }
         return new com.minicad.geometry.Vector3(0, 0, 1);
