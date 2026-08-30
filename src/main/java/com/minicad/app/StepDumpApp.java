@@ -1659,6 +1659,50 @@ public final class StepDumpApp {
     }
 
     private static int validateSummaryEntity(StepEntity entity, StepCadBuilder builder) {
+        Integer count = validateGeometricPrimitiveEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validateSurfaceEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validateTopologyEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validateAnnotationEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validatePresentationStyleEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validateContextUnitEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validateAssignmentEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validateProductStructureEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validateRepresentationUsageEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        count = validateManagementAssignmentEntity(entity, builder);
+        if (count != null) {
+            return count;
+        }
+        throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " dump validation is unsupported");
+    }
+
+    private static Integer validateGeometricPrimitiveEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepCartesianPoint) {
             StepCartesianPoint point = (StepCartesianPoint) entity;
             validatePoint(point, builder);
@@ -1782,6 +1826,10 @@ public final class StepDumpApp {
             return validateSummaryEntity(replica.parent(), builder)
                     + validateSummaryEntity(replica.transformation(), builder);
         }
+        return null;
+    }
+
+    private static Integer validateSurfaceEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepPlane) {
             StepPlane plane = (StepPlane) entity;
             builder.buildPlane(plane.id());
@@ -1891,6 +1939,10 @@ public final class StepDumpApp {
             builder.buildPlacement(transformation.transformItem2().id());
             return 1;
         }
+        return null;
+    }
+
+    private static Integer validateTopologyEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepEdgeCurve) {
             StepEdgeCurve edgeCurve = (StepEdgeCurve) entity;
             builder.buildEdge(edgeCurve.id());
@@ -2071,6 +2123,10 @@ public final class StepDumpApp {
             StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
             return validateShapeRepresentationRelationship(relationship, builder);
         }
+        return null;
+    }
+
+    private static Integer validateAnnotationEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepAnnotationCurveOccurrence) {
             StepAnnotationCurveOccurrence annotationCurveOccurrence = (StepAnnotationCurveOccurrence) entity;
             return validateAnnotationCurveOccurrence(annotationCurveOccurrence.item(), builder);
@@ -2164,6 +2220,10 @@ public final class StepDumpApp {
             int count = validateSummaryEntity(annotationTextCharacter.mappingSource(), builder);
             return count + validateSummaryEntity(annotationTextCharacter.mappingTarget(), builder);
         }
+        return null;
+    }
+
+    private static Integer validatePresentationStyleEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepPresentationLayerAssignment) {
             StepPresentationLayerAssignment layerAssignment = (StepPresentationLayerAssignment) entity;
             return validateSummaryItems(layerAssignment.assignedItems(), builder);
@@ -2291,6 +2351,10 @@ public final class StepDumpApp {
             return validateRepresentationMap(userDefinedTerminatorSymbol.mappingSource(), builder)
                     + validateSummaryEntity(userDefinedTerminatorSymbol.mappingTarget(), builder);
         }
+        return null;
+    }
+
+    private static Integer validateContextUnitEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepGeometricRepresentationContext) {
             StepGeometricRepresentationContext geometricRepresentationContext = (StepGeometricRepresentationContext) entity;
             int count = 1;
@@ -2426,6 +2490,10 @@ public final class StepDumpApp {
                 || entity instanceof StepDateTimeRole) {
             return 1;
         }
+        return null;
+    }
+
+    private static Integer validateAssignmentEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepIdentificationAssignment) {
             StepIdentificationAssignment identificationAssignment = (StepIdentificationAssignment) entity;
             return validateSummaryEntity(identificationAssignment.role(), builder);
@@ -2550,6 +2618,10 @@ public final class StepDumpApp {
             return validateSummaryEntity(organizationRelationship.relatingOrganization(), builder)
                     + validateSummaryEntity(organizationRelationship.relatedOrganization(), builder);
         }
+        return null;
+    }
+
+    private static Integer validateProductStructureEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepApplicationContext) {
             return 1;
         }
@@ -2683,6 +2755,10 @@ public final class StepDumpApp {
             return validateSummaryEntity(shapeAspectRelationship.relatingShapeAspect(), builder)
                     + validateSummaryEntity(shapeAspectRelationship.relatedShapeAspect(), builder);
         }
+        return null;
+    }
+
+    private static Integer validateRepresentationUsageEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepItemIdentifiedRepresentationUsage) {
             StepItemIdentifiedRepresentationUsage itemIdentifiedRepresentationUsage = (StepItemIdentifiedRepresentationUsage) entity;
             return validateRepresentationUsage(itemIdentifiedRepresentationUsage.definition(),
@@ -2750,6 +2826,10 @@ public final class StepDumpApp {
             }
             return count;
         }
+        return null;
+    }
+
+    private static Integer validateManagementAssignmentEntity(StepEntity entity, StepCadBuilder builder) {
         if (entity instanceof StepGroupAssignment) {
             StepGroupAssignment groupAssignment = (StepGroupAssignment) entity;
             return validateSummaryEntity(groupAssignment.assignedGroup(), builder);
@@ -2895,7 +2975,7 @@ public final class StepDumpApp {
             }
             return count;
         }
-        throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " dump validation is unsupported");
+        return null;
     }
 
     private static void validatePoint(StepCartesianPoint point, StepCadBuilder builder) {
