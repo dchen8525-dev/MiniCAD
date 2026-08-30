@@ -90,6 +90,10 @@ public final class StepViewerApp {
         ServletContextHandler context = new ServletContextHandler();
         context.addServlet(new ServletHolder(new StaticServlet()), "/");
         context.addServlet(new ServletHolder(new StaticServlet()), "/viewer.js");
+        // The viewer entry point is split into ES modules under /viewer/.
+        // resolveStaticResource prefixes every path with /static, so this maps
+        // /viewer/scene.js to the classpath resource /static/viewer/scene.js.
+        context.addServlet(new ServletHolder(new StaticServlet()), "/viewer/*");
         context.addServlet(new ServletHolder(new StaticServlet()), "/vendor/*");
         context.addServlet(new ServletHolder(new ConfigServlet(config)), "/api/config");
         ServletHolder previewHolder = new ServletHolder(new PreviewServlet(config));
