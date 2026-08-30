@@ -27,7 +27,7 @@ mesh usable by the bundled browser viewer.
 
 ## Requirements
 
-- JDK 11+
+- JDK 17+ (Jetty 12 requires it; the build itself targets bytecode 17)
 - Maven 3.9+ (or use the bundled wrapper: `./mvnw` / `mvnw.cmd`, pinned to 3.9.16)
 
 ## Build & test

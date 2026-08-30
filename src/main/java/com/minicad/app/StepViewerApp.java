@@ -14,10 +14,10 @@ import jakarta.servlet.http.Part;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -85,7 +85,9 @@ public final class StepViewerApp {
         connector.setHost(config.host());
         connector.setPort(config.port());
         server.addConnector(connector);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+        // Jetty 12: sessions are opt-in via SessionHandler, so the default
+        // (session-less) handler replaces the old NO_SESSIONS flag.
+        ServletContextHandler context = new ServletContextHandler();
         context.addServlet(new ServletHolder(new StaticServlet()), "/");
         context.addServlet(new ServletHolder(new StaticServlet()), "/viewer.js");
         context.addServlet(new ServletHolder(new StaticServlet()), "/vendor/*");
