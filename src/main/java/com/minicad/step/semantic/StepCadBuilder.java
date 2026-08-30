@@ -388,30 +388,11 @@ public final class StepCadBuilder {
         this.booleanBuilder = new StepCadBooleanBuilder(this, this.entitiesById);
         this.surfaceBuilder = new StepCadSurfaceBuilder(
             this.entitiesById,
-            geometryBuilder,
-            geometryOps,
-            curveBuilder,
             planes,
             cylindricalSurfaces,
             conicalSurfaces,
             toroidalSurfaces,
-            sphericalSurfaces,
-            ruledSurfaces,
-            constantRadiusSurfaces,
-            linearExtrusionSurfaces,
-            revolutionSurfaces,
-            paraboloidSurfaces,
-            hyperboloidSurfaces,
-            translationSurfaces,
-            projectionSurfaces,
-            bsplineSurfaces,
-            rationalBsplineSurfaces,
-            this::buildPlacement,
-            this::buildAxis1Placement,
-            this::buildCurve3ById,
-            id -> buildCurve2(requireExistingEntity(id)),
-            this::buildPcurve2,
-            this::buildCompositeCurve
+            this::buildPlacement
         );
     }
 
