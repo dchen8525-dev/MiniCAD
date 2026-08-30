@@ -77,13 +77,65 @@ public final class SurfaceOfRevolution3 implements SurfaceGeometry {
         return axisOrigin.add(axial).add(rotatedRadial);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>U is swept through the generatrix's own sampling (its parameter domain
+     * is curve-specific) and V over one full turn, {@code [0, 2PI)}.</p>
+     */
+    @Override
+    public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
+        int uCount = Math.max(uSegments, 1);
+        int vCount = Math.max(vSegments, 1);
+        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>(uCount + 1);
+        for (int iu = 0; iu <= uCount; iu++) {
+            double u = (double) iu / uCount;
+            java.util.List<CartesianPoint> row = new java.util.ArrayList<>(vCount + 1);
+            for (int iv = 0; iv <= vCount; iv++) {
+                row.add(pointAt(u, 2.0 * Math.PI * iv / vCount));
+            }
+            grid.add(java.util.List.copyOf(row));
+        }
+        return java.util.List.copyOf(grid);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Revolving the generatrix gives {@code ∂P/∂u = α·e_r + t_axial·A} (in the
+     * rotated frame) and {@code ∂P/∂v = |radial|·(A × e_r)}, so the normal is
+     * {@code α·A − t_axial·e_r} — it only degenerates to a pure radial
+     * direction when the generatrix runs parallel to the axis. The previous
+     * implementation always returned the radial direction, which is wrong for
+     * every other generatrix (a profile perpendicular to the axis revolves into
+     * an annulus whose normal is the axis, not the radius).</p>
+     */
     @Override
     public Vector3 normalAt(double u, double v) {
-        CartesianPoint point = pointAt(u, v);
         Vector3 axis = axisDirection.asVector();
-        Vector3 offset = point.subtract(axisOrigin);
+
+        // Radial direction and axial rate of the generatrix, in its own frame.
+        Vector3 generatrixOffset = sweptCurve.pointAt(u).subtract(axisOrigin);
+        Vector3 generatrixRadial = generatrixOffset.subtract(axis.scale(generatrixOffset.dot(axis)));
+        double generatrixRadius = generatrixRadial.norm();
+        if (generatrixRadius < Epsilon.EPS) {
+            return axis; // generatrix on the axis: the surface is degenerate there
+        }
+        Vector3 tangent = sweptCurve.tangentAt(u);
+        double axialRate = tangent.dot(axis);
+        double radialRate = tangent.subtract(axis.scale(axialRate)).dot(generatrixRadial.normalize());
+
+        // Same radial direction, rotated to the requested angle.
+        Vector3 offset = pointAt(u, v).subtract(axisOrigin);
         Vector3 radial = offset.subtract(axis.scale(offset.dot(axis)));
-        return radial.normalize();
+        if (radial.norm() < Epsilon.EPS) {
+            return axis;
+        }
+        Vector3 normal = axis.scale(radialRate).subtract(radial.normalize().scale(axialRate));
+        if (normal.norm() <= Epsilon.EPS) {
+            return axis;
+        }
+        return normal.normalize();
     }
 
     @Override

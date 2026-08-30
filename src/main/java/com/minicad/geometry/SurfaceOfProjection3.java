@@ -44,6 +44,58 @@ public final class SurfaceOfProjection3 implements SurfaceGeometry {
     public Curve3 profile() { return getProfile(); }
     public Vector3 projectionDirection() { return getProjectionDirection(); }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Projection-swept form: {@code P(u, v) = profile(u) + v · projectionDirection}.
+     * The full STEP projection clamps V to the projection target's extent,
+     * which this kernel does not model; V spans translation units freely.</p>
+     */
+    @Override
+    public CartesianPoint pointAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        return profile.pointAt(u).add(projectionDirection.scale(v));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>{@code ∂P/∂u} is the profile tangent and {@code ∂P/∂v} the projection
+     * direction, so the normal is their cross product — constant along each
+     * ruling of the swept surface.</p>
+     */
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        Preconditions.requireFinite(u, "u");
+        Preconditions.requireFinite(v, "v");
+        return SurfaceGeometry.normalFromTangents(profile.tangentAt(u), projectionDirection);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The profile's parameter domain is curve-type-specific (a line has no
+     * finite one), so U is swept through {@code Curve3.sample} instead of a
+     * guessed range. V is swept over 0..1 projection units.</p>
+     */
+    @Override
+    public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
+        int uCount = Math.max(uSegments, 1);
+        int vCount = Math.max(vSegments, 1);
+        java.util.List<CartesianPoint> profilePoints =
+                new java.util.ArrayList<>(SweptSurfaceSampling.sampleProfile(profile, uCount));
+        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>(profilePoints.size());
+        for (CartesianPoint profilePoint : profilePoints) {
+            java.util.List<CartesianPoint> row = new java.util.ArrayList<>(vCount + 1);
+            for (int iv = 0; iv <= vCount; iv++) {
+                row.add(profilePoint.add(projectionDirection.scale((double) iv / vCount)));
+            }
+            grid.add(java.util.List.copyOf(row));
+        }
+        return java.util.List.copyOf(grid);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

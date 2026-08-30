@@ -4,9 +4,22 @@ import com.minicad.common.Epsilon;
 import com.minicad.common.Preconditions;
 
 /**
- * Marker interface for supported face surface geometry.
+ * Interface for supported face surface geometry. Parameters are always in the
+ * implementation's <b>natural domain</b> — the values its {@code pointAt}
+ * accepts (angle in radians for revolution surfaces, arc parameter for
+ * extrusion profiles, knot-domain values for B-splines).
  */
 public interface SurfaceGeometry {
+
+    /**
+     * Returns the surface point at natural-domain parameters {@code (u, v)}.
+     * Each implementation defines its own domain and parameterization.
+     *
+     * @param u natural U-domain parameter
+     * @param v natural V-domain parameter
+     * @return point on the surface
+     */
+    CartesianPoint pointAt(double u, double v);
 
     /**
      * Returns the approximate bounding box of the surface by sampling.
@@ -42,33 +55,61 @@ public interface SurfaceGeometry {
     }
 
     /**
-     * Returns the surface normal at a point.
-     * Default implementation computes using numerical partial derivatives.
+     * Returns the unit surface normal at natural-domain parameters {@code (u, v)}.
      *
-     * @param u parameter along U direction
-     * @param v parameter along V direction
+     * <p><b>Contract.</b> The normal is the normalized cross product of the two
+     * parametric tangents, {@code normalize(∂P/∂u × ∂P/∂v)}, taken at the same
+     * {@code (u, v)} and in the same natural domain as {@link #pointAt}. That
+     * single rule is what ties the three methods together: a normal is only
+     * meaningful for the point it belongs to, so an implementation may not
+     * interpret {@code u} or {@code v} one way in {@code pointAt} and another
+     * way here.</p>
+     *
+     * <p>Because the orientation follows each implementation's own parameter
+     * order, it is not guaranteed to point "outward" — a surface swept as
+     * {@code (azimuth, height)} and one swept as {@code (profile, angle)} come
+     * out with opposite handedness, which is inherent to their
+     * parameterizations rather than a defect. Face-level orientation is decided
+     * downstream by the face's {@code sameSense} flag.</p>
+     *
+     * <p>Implementations override this with a closed-form normal. This default
+     * estimates it by central differences on {@code pointAt}, so it stays valid
+     * for any implementation, but it is only accurate to about the step size;
+     * prefer a closed form wherever the parameterization is known.</p>
+     *
+     * @param u natural U-domain parameter
+     * @param v natural V-domain parameter
      * @return unit normal vector
      */
     default Vector3 normalAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
         Preconditions.requireFinite(v, "v");
-        java.util.List<java.util.List<CartesianPoint>> grid = sampleGrid(64, 64);
-        if (grid.isEmpty() || grid.get(0).isEmpty()) {
+        // Central differences, with the step scaled to the parameter magnitude
+        // so wide domains still get a usable delta.
+        double h = 1.0e-5 * Math.max(1.0, Math.abs(u) + Math.abs(v));
+        Vector3 tangentU = pointAt(u + h, v).subtract(pointAt(u - h, v));
+        Vector3 tangentV = pointAt(u, v + h).subtract(pointAt(u, v - h));
+        return normalFromTangents(tangentU, tangentV);
+    }
+
+    /**
+     * Normalizes {@code ∂P/∂u × ∂P/∂v} into a unit normal, substituting a
+     * well-defined axis-aligned normal where the parameterization degenerates
+     * (a pole, a seam, or a collapsed tangent).
+     *
+     * <p>Closed-form {@code normalAt} implementations should route through this
+     * so every surface degenerates the same way instead of each inventing its
+     * own fallback.</p>
+     *
+     * @param tangentU partial derivative with respect to u
+     * @param tangentV partial derivative with respect to v
+     * @return unit normal vector
+     */
+    static Vector3 normalFromTangents(Vector3 tangentU, Vector3 tangentV) {
+        if (tangentU.norm() <= Epsilon.EPS || tangentV.norm() <= Epsilon.EPS) {
             return new Vector3(0, 0, 1);
         }
-        int ui = (int) (u * (grid.size() - 1));
-        int vi = (int) (v * (grid.get(0).size() - 1));
-        ui = Math.max(0, Math.min(ui, grid.size() - 2));
-        vi = Math.max(0, Math.min(vi, grid.get(0).size() - 2));
-
-        CartesianPoint pu = grid.get(ui).get(vi);
-        CartesianPoint pu2 = grid.get(ui + 1).get(vi);
-        CartesianPoint pv = grid.get(ui).get(vi + 1);
-
-        Vector3 tangentU = pu2.subtract(pu);
-        Vector3 tangentV = pv.subtract(pu);
         Vector3 normal = tangentU.cross(tangentV);
-
         double norm = normal.norm();
         if (norm <= Epsilon.EPS) {
             return new Vector3(0, 0, 1);

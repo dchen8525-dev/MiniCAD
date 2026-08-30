@@ -135,13 +135,18 @@ public final class SphericalSurface implements SurfaceGeometry {
         return "SphericalSurface{" + "position=" + position + "radius=" + radius + "}";
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>{@code v} is a <em>latitude</em> here, matching {@code pointAt} and
+     * {@code sampleGrid}: {@code v = 0} is the equator and {@code v = ±PI/2}
+     * the poles. (This method previously read {@code v} as a polar angle, which
+     * put the normals a quarter turn away from the points they described.)</p>
+     */
     @Override
     public Vector3 normalAt(double u, double v) {
-        Vector3 x = position.xDirection().asVector();
-        Vector3 y = position.yDirection().asVector();
-        Vector3 z = position.getAxis().asVector();
-        return x.scale(Math.sin(v) * Math.cos(u))
-            .add(y.scale(Math.sin(v) * Math.sin(u)))
-            .add(z.scale(Math.cos(v))).normalize();
+        // The outward normal of a sphere is the radial direction, which is
+        // exactly ∂P/∂u × ∂P/∂v for the (azimuth, latitude) parameterization.
+        return pointAt(u, v).subtract(position.getLocation()).normalize();
     }
 }

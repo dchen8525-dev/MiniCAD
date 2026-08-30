@@ -3,24 +3,20 @@ package com.minicad.export.json;
 import com.minicad.builder.StepAssemblyGraphBuilder;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Vector3;
-import com.minicad.helper.MathUtilityHelper;
-import com.minicad.preview.payload.EdgeCurvePayload;
-import com.minicad.preview.payload.EdgePayload;
-import com.minicad.preview.payload.FacePayload;
-import com.minicad.preview.payload.PointPayload;
-import com.minicad.preview.payload.VectorPayload;
 import com.minicad.step.model.*;
 import com.minicad.step.semantic.StepCadBuilder;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Utility class for placement and transformation operations.
  * Extracted from StepPreviewJsonExporter to improve maintainability.
  *
- * <p>This class handles matrix calculations for STEP entity placements,
- * coordinate system transformations, and mapped item transformations.
+ * <p>This class handles matrix calculations for STEP entity placements and
+ * coordinate system transformations. Transforming mapped-item payloads by a
+ * matrix lives in {@link StepMappedItemTransformer}, which is the single
+ * implementation — this class used to carry a second, divergent copy that
+ * nothing called.</p>
  */
 public final class StepPlacementTransformer {
 
@@ -162,78 +158,6 @@ public final class StepPlacementTransformer {
     }
 
     /**
-     * Transforms an edge payload using a transformation matrix.
-     *
-     * @param edge the edge payload to transform
-     * @param mappedItemId the mapped item ID
-     * @param matrix the 4x4 transformation matrix
-     * @return the transformed edge payload
-     */
-    public static EdgePayload transformMappedEdge(EdgePayload edge, int mappedItemId, double[] matrix) {
-        return transformMappedEdge(edge, mappedItemId, matrix, null, null);
-    }
-
-    /**
-     * Transforms an edge payload using a transformation matrix with source information.
-     *
-     * @param edge the edge payload to transform
-     * @param mappedItemId the mapped item ID
-     * @param matrix the 4x4 transformation matrix
-     * @param sourceType the source geometry type (optional)
-     * @param sourceStepId the source STEP ID (optional)
-     * @return the transformed edge payload
-     */
-    public static EdgePayload transformMappedEdge(
-            EdgePayload edge,
-            int mappedItemId,
-            double[] matrix,
-            String sourceType,
-            Integer sourceStepId
-    ) {
-        List<PointPayload> points = edge.points().stream()
-                .map(point -> MathUtilityHelper.transform(point, matrix))
-                .collect(Collectors.toList());
-        return new EdgePayload(
-                mappedPayloadId(mappedItemId, edge.stepId(), 1),
-                points,
-                transformMappedCurve(edge.curve(), matrix, sourceType, sourceStepId),
-                edge.color()
-        );
-    }
-
-    /**
-     * Transforms a face payload using a transformation matrix.
-     *
-     * @param face the face payload to transform
-     * @param mappedItemId the mapped item ID
-     * @param matrix the 4x4 transformation matrix
-     * @return the transformed face payload
-     */
-    public static FacePayload transformMappedFace(FacePayload face, int mappedItemId, double[] matrix) {
-        List<PointPayload> points = face.triangles().stream()
-                .map(point -> MathUtilityHelper.transform(point, matrix))
-                .collect(Collectors.toList());
-        VectorPayload normal = MathUtilityHelper.transform(face.normal(), matrix);
-        PointPayload origin = MathUtilityHelper.transform(face.origin(), matrix);
-        return new FacePayload(
-                mappedPayloadId(mappedItemId, face.stepId(), 0),
-                face.name(),
-                face.surfaceType(),
-                origin,
-                normal,
-                face.sameSense(),
-                face.color(),
-                face.transparency(),
-                face.pbr(),
-                face.layers(),
-                face.loops(),
-                points,
-                face.surface(),
-                face.uvLoops()
-        );
-    }
-
-    /**
      * Creates a CartesianPoint from a STEP CartesianPoint.
      * Handles 2D and 3D points by padding missing coordinates with zero.
      *
@@ -258,55 +182,4 @@ public final class StepPlacementTransformer {
         return new CartesianPoint(coords.get(0), coords.size() > 1 ? coords.get(1) : 0.0, z);
     }
 
-    private static EdgeCurvePayload transformMappedCurve(
-            EdgeCurvePayload curve,
-            double[] matrix,
-            String sourceType,
-            Integer sourceStepId
-    ) {
-        if (curve == null) {
-            return null;
-        }
-        List<Double> center = curve.center() == null
-                ? null
-                : PreviewSerializers.pointList(MathUtilityHelper.transform(new PointPayload(curve.center().get(0), curve.center().get(1), curve.center().get(2)), matrix));
-        List<Double> axis = curve.axis() == null
-                ? null
-                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.axis().get(0), curve.axis().get(1), curve.axis().get(2)), matrix));
-        List<Double> xDirection = curve.xDirection() == null
-                ? null
-                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.xDirection().get(0), curve.xDirection().get(1), curve.xDirection().get(2)), matrix));
-        List<Double> refDirection = curve.refDirection() == null
-                ? null
-                : PreviewSerializers.vectorList(MathUtilityHelper.transform(new VectorPayload(curve.refDirection().get(0), curve.refDirection().get(1), curve.refDirection().get(2)), matrix));
-        return new EdgeCurvePayload(
-                curve.stepId(),
-                curve.type(),
-                curve.basisType(),
-                curve.basisStepId(),
-                center,
-                axis,
-                xDirection,
-                curve.radius(),
-                curve.semiAxis1(),
-                curve.semiAxis2(),
-                curve.orientation(),
-                curve.senseAgreement(),
-                curve.offsetDistance(),
-                curve.selfIntersect(),
-                refDirection,
-                curve.transformScale(),
-                curve.masterRepresentation(),
-                curve.associatedSurfaceTypes(),
-                curve.associatedSurfaceStepIds(),
-                sourceType != null ? sourceType : curve.sourceType(),
-                sourceStepId != null ? sourceStepId : curve.sourceStepId(),
-                curve.startAngle(),
-                curve.sweepAngle()
-        );
-    }
-
-    private static int mappedPayloadId(int mappedItemId, int sourceId, int typeIndex) {
-        return mappedItemId * 1000000 + sourceId * 10 + typeIndex;
-    }
 }

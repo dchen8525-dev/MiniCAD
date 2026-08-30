@@ -68,6 +68,20 @@ public final class ConicalSurface implements SurfaceGeometry {
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * <p>A cone is developable, so its normal is constant along a generator and
+     * depends only on the azimuth — hence the delegation to
+     * {@link #normalAt(double)}. Without this override the interface's
+     * finite-difference default would win and the closed form below would never
+     * run.</p>
+     */
+    @Override
+    public Vector3 normalAt(double u, double v) {
+        return normalAt(u);
+    }
+
+    /**
      * Returns the surface normal at the given parametric coordinates.
      *
      * @param u angle around the cone axis (radians)

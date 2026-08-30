@@ -184,10 +184,11 @@ public final class StepRepresentationPayloadBuilder {
             );
             StepMetadataExtractor.DisplayMetadata relationshipMetadata = metadata.forItem(relationship.id());
             List<EdgePayload> edges = source.payload().edges().stream()
-                    .map(edge -> transformMappedEdge(edge, relationship.id(), matrix))
+                    .map(edge -> StepMappedItemTransformer.transformMappedEdge(edge, relationship.id(), matrix))
                     .collect(Collectors.toList());
             List<FacePayload> faces = source.payload().faces().stream()
-                    .map(face -> transformMappedFace(face, relationship.id(), matrix, relationshipMetadata))
+                    .map(face -> StepMappedItemTransformer.transformMappedFace(
+                            face, relationship.id(), matrix, relationshipMetadata))
                     .collect(Collectors.toList());
             geometry = StepLegacyGeometryBuilder.mergeGeometry(geometry, new GeometryCollection(edges, faces, source.unsupportedFaces()));
         }
@@ -217,10 +218,11 @@ public final class StepRepresentationPayloadBuilder {
         );
         StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(mappedItem.id());
         List<EdgePayload> edges = source.payload().edges().stream()
-                .map(edge -> transformMappedEdge(edge, mappedItem.id(), matrix))
+                .map(edge -> StepMappedItemTransformer.transformMappedEdge(edge, mappedItem.id(), matrix))
                 .collect(Collectors.toList());
         List<FacePayload> faces = source.payload().faces().stream()
-                .map(face -> transformMappedFace(face, mappedItem.id(), matrix, itemMetadata))
+                .map(face -> StepMappedItemTransformer.transformMappedFace(
+                        face, mappedItem.id(), matrix, itemMetadata))
                 .collect(Collectors.toList());
         return new GeometryCollection(edges, faces, source.unsupportedFaces());
     }
@@ -717,22 +719,6 @@ public final class StepRepresentationPayloadBuilder {
     ) {
         return StepPlacementTransformer.matrixForTransformationOperator(transformation, builder);
     }
-
-    // Delegate to StepMappedItemTransformer - extracted utility class
-    public static EdgePayload transformMappedEdge(EdgePayload edge, int mappedItemId, double[] matrix) {
-        return StepMappedItemTransformer.transformMappedEdge(edge, mappedItemId, matrix);
-    }
-
-    // Delegate to StepMappedItemTransformer - extracted utility class
-    public static FacePayload transformMappedFace(
-            FacePayload face,
-            int mappedItemId,
-            double[] matrix,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        return StepMappedItemTransformer.transformMappedFace(face, mappedItemId, matrix, metadata);
-    }
-
 
     private static AssemblyMetrics measureAssembly(
             List<RepresentationPayload> representations,

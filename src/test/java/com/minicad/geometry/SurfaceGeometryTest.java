@@ -44,23 +44,48 @@ class SurfaceGeometryTest {
                 Direction3.from(new Vector3(1, 0, 0)));
         SphericalSurface sphere = new SphericalSurface(position, 1.0);
 
-        // Normal at theta=0, phi=PI/2 should point along +X
-        Vector3 n0 = sphere.normalAt(0, Math.PI / 2);
-        assertEquals(1.0, n0.x(), 1e-10);
-        assertEquals(0.0, n0.y(), 1e-10);
-        assertEquals(0.0, n0.z(), 1e-10);
+        // v is a latitude here, matching pointAt/sampleGrid: v = 0 is the
+        // equator and v = ±PI/2 the poles. The normal is the radial direction.
 
-        // Normal at phi=0 (top) should point along +Z
-        Vector3 nTop = sphere.normalAt(0, 0);
-        assertEquals(0.0, nTop.x(), 1e-10);
-        assertEquals(0.0, nTop.y(), 1e-10);
-        assertEquals(1.0, nTop.z(), 1e-10);
+        // Equator at azimuth 0 -> +X
+        Vector3 nEquator = sphere.normalAt(0, 0);
+        assertEquals(1.0, nEquator.x(), 1e-10);
+        assertEquals(0.0, nEquator.y(), 1e-10);
+        assertEquals(0.0, nEquator.z(), 1e-10);
 
-        // Normal at phi=PI (bottom) should point along -Z
-        Vector3 nBottom = sphere.normalAt(0, Math.PI);
-        assertEquals(0.0, nBottom.x(), 1e-10);
-        assertEquals(0.0, nBottom.y(), 1e-10);
-        assertEquals(-1.0, nBottom.z(), 1e-10);
+        // North pole -> +Z
+        Vector3 nNorth = sphere.normalAt(0, Math.PI / 2);
+        assertEquals(0.0, nNorth.x(), 1e-10);
+        assertEquals(0.0, nNorth.y(), 1e-10);
+        assertEquals(1.0, nNorth.z(), 1e-10);
+
+        // South pole -> -Z
+        Vector3 nSouth = sphere.normalAt(0, -Math.PI / 2);
+        assertEquals(0.0, nSouth.x(), 1e-10);
+        assertEquals(0.0, nSouth.y(), 1e-10);
+        assertEquals(-1.0, nSouth.z(), 1e-10);
+    }
+
+    @Test
+    void sphericalSurfaceNormalFollowsLatitudeNotPolarAngle() {
+        Axis2Placement3D position = new Axis2Placement3D(
+                new CartesianPoint(0, 0, 0),
+                Direction3.from(new Vector3(0, 0, 1)),
+                Direction3.from(new Vector3(1, 0, 0)));
+        SphericalSurface sphere = new SphericalSurface(position, 2.0);
+
+        // The normal must be the radial direction of the point that pointAt
+        // actually returns; reading v as a polar angle instead of a latitude
+        // used to rotate the normals a quarter turn away from their points.
+        for (double v : new double[]{-1.2, -0.3, 0.0, 0.45, 1.1}) {
+            for (double u : new double[]{0.0, 0.9, 3.3}) {
+                Vector3 expected = sphere.pointAt(u, v).subtract(position.getLocation()).normalize();
+                Vector3 actual = sphere.normalAt(u, v);
+                assertEquals(expected.x(), actual.x(), 1e-10, "u=" + u + " v=" + v);
+                assertEquals(expected.y(), actual.y(), 1e-10, "u=" + u + " v=" + v);
+                assertEquals(expected.z(), actual.z(), 1e-10, "u=" + u + " v=" + v);
+            }
+        }
     }
 
     @Test
@@ -138,17 +163,37 @@ class SurfaceGeometryTest {
         CartesianPoint axisOrigin = new CartesianPoint(0, 0, 0);
         Direction3 axisDirection = Direction3.from(new Vector3(0, 0, 1));
 
-        // Create a line segment as the swept curve
-        Line3 line = new Line3(
+        // A generatrix tilted 45 degrees out of the axis revolves into a cone.
+        // Its normal tilts by the same angle: equal radial and axial parts, with
+        // the radial part pointing inward for this parameter order.
+        Line3 cone = new Line3(
+                new CartesianPoint(1, 0, 0),
+                Direction3.from(new Vector3(1, 0, 1)));
+        SurfaceOfRevolution3 revolution = new SurfaceOfRevolution3(cone, axisOrigin, axisDirection);
+
+        Vector3 n0 = revolution.normalAt(0, 0);
+        assertEquals(-1.0 / Math.sqrt(2.0), n0.x(), 1e-10);
+        assertEquals(0.0, n0.y(), 1e-10);
+        assertEquals(1.0 / Math.sqrt(2.0), n0.z(), 1e-10);
+    }
+
+    @Test
+    void surfaceOfRevolutionNormalIsAxialForAGeneratrixPerpendicularToTheAxis() {
+        CartesianPoint axisOrigin = new CartesianPoint(0, 0, 0);
+        Direction3 axisDirection = Direction3.from(new Vector3(0, 0, 1));
+
+        // Revolving a line that runs perpendicular to the axis sweeps out a flat
+        // annulus, so the normal is the axis — not the radius. (The previous
+        // implementation always answered "radial", which lies in the surface.)
+        Line3 spoke = new Line3(
                 new CartesianPoint(1, 0, 0),
                 Direction3.from(new Vector3(0, 1, 0)));
-        SurfaceOfRevolution3 revolution = new SurfaceOfRevolution3(line, axisOrigin, axisDirection);
+        SurfaceOfRevolution3 annulus = new SurfaceOfRevolution3(spoke, axisOrigin, axisDirection);
 
-        // Normal at curveParam=0, angle=0 should be radial (pointing from axis to surface)
-        Vector3 n0 = revolution.normalAt(0, 0);
-        assertEquals(1.0, n0.x(), 1e-10);
+        Vector3 n0 = annulus.normalAt(0, 0);
+        assertEquals(0.0, n0.x(), 1e-10);
         assertEquals(0.0, n0.y(), 1e-10);
-        assertEquals(0.0, n0.z(), 1e-10);
+        assertEquals(1.0, Math.abs(n0.z()), 1e-10);
     }
 
     @Test
