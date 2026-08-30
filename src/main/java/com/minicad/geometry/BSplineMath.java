@@ -56,6 +56,37 @@ public final class BSplineMath {
     }
 
     /**
+     * Values of the {@code degree + 1} non-zero B-spline basis functions over
+     * {@code span} at {@code parameter}, computed with the Cox-de Boor triangle
+     * (O(degree²), no recursive re-evaluation of shared subproblems).
+     *
+     * @param span span index from {@link #findSpan}
+     * @param parameter query parameter (already clamped to the valid domain)
+     * @param degree spline degree
+     * @param knots expanded knot vector
+     * @return array of {@code degree + 1} values; entry {@code i} belongs to basis index {@code span - degree + i}
+     */
+    public static double[] basisFunctions(int span, double parameter, int degree, List<Double> knots) {
+        double[] values = new double[degree + 1];
+        double[] left = new double[degree + 1];
+        double[] right = new double[degree + 1];
+        values[0] = 1.0;
+        for (int j = 1; j <= degree; j++) {
+            left[j] = parameter - knots.get(span + 1 - j);
+            right[j] = knots.get(span + j) - parameter;
+            double saved = 0.0;
+            for (int r = 0; r < j; r++) {
+                double denominator = right[r + 1] + left[j - r];
+                double temp = denominator == 0.0 ? 0.0 : values[r] / denominator;
+                values[r] = saved + right[r + 1] * temp;
+                saved = left[j - r] * temp;
+            }
+            values[j] = saved;
+        }
+        return values;
+    }
+
+    /**
      * Value of the {@code i}-th B-spline basis function of the given {@code degree}
      * at {@code parameter}.
      *
@@ -66,22 +97,12 @@ public final class BSplineMath {
      * @return basis function value
      */
     public static double basisValue(int i, int degree, double parameter, List<Double> knots) {
-        if (degree == 0) {
-            if ((parameter >= knots.get(i) && parameter < knots.get(i + 1))
-                    || (Epsilon.equals(parameter, knots.get(knots.size() - 1)) && Epsilon.equals(parameter, knots.get(i + 1)))) {
-                return 1.0;
-            }
+        int n = knots.size() - degree - 2;
+        int span = findSpan(n, degree, parameter, knots);
+        if (i < span - degree || i > span) {
             return 0.0;
         }
-        double leftDenominator = knots.get(i + degree) - knots.get(i);
-        double rightDenominator = knots.get(i + degree + 1) - knots.get(i + 1);
-        double left = Epsilon.isZero(leftDenominator)
-                ? 0.0
-                : (parameter - knots.get(i)) / leftDenominator * basisValue(i, degree - 1, parameter, knots);
-        double right = Epsilon.isZero(rightDenominator)
-                ? 0.0
-                : (knots.get(i + degree + 1) - parameter) / rightDenominator * basisValue(i + 1, degree - 1, parameter, knots);
-        return left + right;
+        return basisFunctions(span, parameter, degree, knots)[i - (span - degree)];
     }
 
     /**
@@ -125,16 +146,17 @@ public final class BSplineMath {
         int n = controlPoints.size() - 1;
         double clamped = clamp(parameter, expandedKnots.get(degree), expandedKnots.get(n + 1));
         int span = findSpan(n, degree, clamped, expandedKnots);
+        double[] basis = basisFunctions(span, clamped, degree, expandedKnots);
         double x = 0.0;
         double y = 0.0;
         double z = 0.0;
         for (int i = 0; i <= degree; i++) {
             int index = span - degree + i;
-            double basis = basisValue(index, degree, clamped, expandedKnots);
+            double b = basis[i];
             CartesianPoint cp = controlPoints.get(index);
-            x += basis * cp.getX();
-            y += basis * cp.getY();
-            z += basis * cp.getZ();
+            x += b * cp.getX();
+            y += b * cp.getY();
+            z += b * cp.getZ();
         }
         return new CartesianPoint(x, y, z);
     }
@@ -156,19 +178,20 @@ public final class BSplineMath {
         int n = controlPoints.size() - 1;
         double clamped = clamp(parameter, expandedKnots.get(degree), expandedKnots.get(n + 1));
         int span = findSpan(n, degree, clamped, expandedKnots);
+        double[] basis = basisFunctions(span, clamped, degree, expandedKnots);
         double x = 0.0;
         double y = 0.0;
         double z = 0.0;
         double w = 0.0;
         for (int i = 0; i <= degree; i++) {
             int index = span - degree + i;
-            double basis = basisValue(index, degree, clamped, expandedKnots);
+            double b = basis[i];
             double weight = weights.get(index);
             CartesianPoint cp = controlPoints.get(index);
-            x += basis * weight * cp.getX();
-            y += basis * weight * cp.getY();
-            z += basis * weight * cp.getZ();
-            w += basis * weight;
+            x += b * weight * cp.getX();
+            y += b * weight * cp.getY();
+            z += b * weight * cp.getZ();
+            w += b * weight;
         }
         if (!Double.isFinite(w) || w <= 0.0) {
             throw new GeometryException("non-positive homogeneous weight in rational B-spline evaluation");

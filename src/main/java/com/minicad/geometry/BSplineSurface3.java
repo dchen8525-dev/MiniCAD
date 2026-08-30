@@ -125,19 +125,29 @@ public final class BSplineSurface3 implements SurfaceGeometry {
 
         int uSpan = BSplineMath.findSpan(uCount - 1, uDegree, clampedU, uExp);
         int vSpan = BSplineMath.findSpan(vCount - 1, vDegree, clampedV, vExp);
+        double[] nu = BSplineMath.basisFunctions(uSpan, clampedU, uDegree, uExp);
+        double[] nv = BSplineMath.basisFunctions(vSpan, clampedV, vDegree, vExp);
 
-        Vector3 sum = new Vector3(0.0, 0.0, 0.0);
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
         for (int i = 0; i <= uDegree; i++) {
             int ui = uSpan - uDegree + i;
-            double nu = BSplineMath.basisValue(ui, uDegree, clampedU, uExp);
+            List<CartesianPoint> row = controlPoints.get(ui);
+            double bu = nu[i];
             for (int j = 0; j <= vDegree; j++) {
-                int vj = vSpan - vDegree + j;
-                double nv = BSplineMath.basisValue(vj, vDegree, clampedV, vExp);
-                CartesianPoint control = controlPoints.get(ui).get(vj);
-                sum = sum.add(new Vector3(control.getX() * nu * nv, control.getY() * nu * nv, control.getZ() * nu * nv));
+                double b = bu * nv[j];
+                CartesianPoint control = row.get(vj(vSpan, vDegree, j));
+                x += b * control.getX();
+                y += b * control.getY();
+                z += b * control.getZ();
             }
         }
-        return new CartesianPoint(sum.getX(), sum.getY(), sum.getZ());
+        return new CartesianPoint(x, y, z);
+    }
+
+    private static int vj(int vSpan, int vDegree, int j) {
+        return vSpan - vDegree + j;
     }
 
     public Vector3 normalAt(double u, double v) {
@@ -151,21 +161,24 @@ public final class BSplineSurface3 implements SurfaceGeometry {
 
         int uSpan = BSplineMath.findSpan(uCount - 1, uDegree, clampedU, uExp);
         int vSpan = BSplineMath.findSpan(vCount - 1, vDegree, clampedV, vExp);
+        double[] nu = BSplineMath.basisFunctions(uSpan, clampedU, uDegree, uExp);
+        double[] nv = BSplineMath.basisFunctions(vSpan, clampedV, vDegree, vExp);
 
         Vector3 dSdu = new Vector3(0.0, 0.0, 0.0);
         Vector3 dSdv = new Vector3(0.0, 0.0, 0.0);
         for (int i = 0; i <= uDegree; i++) {
             int ui = uSpan - uDegree + i;
-            double nu = BSplineMath.basisValue(ui, uDegree, clampedU, uExp);
-            double dNu = BSplineMath.derivativeBasisValue(ui, uDegree, clampedU, uExp);
+            List<CartesianPoint> row = controlPoints.get(ui);
+            double bu = nu[i];
+            double dBu = BSplineMath.derivativeBasisValue(uSpan - uDegree + i, uDegree, clampedU, uExp);
             for (int j = 0; j <= vDegree; j++) {
-                int vj = vSpan - vDegree + j;
-                double nv = BSplineMath.basisValue(vj, vDegree, clampedV, vExp);
-                double dNv = BSplineMath.derivativeBasisValue(vj, vDegree, clampedV, vExp);
-                CartesianPoint cp = controlPoints.get(ui).get(vj);
+                int vIndex = vj(vSpan, vDegree, j);
+                CartesianPoint cp = row.get(vIndex);
                 Vector3 cpVec = new Vector3(cp.getX(), cp.getY(), cp.getZ());
-                dSdu = dSdu.add(cpVec.scale(dNu * nv));
-                dSdv = dSdv.add(cpVec.scale(nu * dNv));
+                double bv = nv[j];
+                double dBv = BSplineMath.derivativeBasisValue(vIndex, vDegree, clampedV, vExp);
+                dSdu = dSdu.add(cpVec.scale(dBu * bv));
+                dSdv = dSdv.add(cpVec.scale(bu * dBv));
             }
         }
 

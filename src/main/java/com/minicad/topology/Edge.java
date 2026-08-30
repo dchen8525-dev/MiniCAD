@@ -40,6 +40,9 @@ public final class Edge {
     private final Vertex end;
     private final Curve3 curve;
     private final boolean sameSense;
+    // parameterAt is a 1024-sample scan on B-spline curves; sample()/length()/
+    // boundingBox() recompute it per call, so memoize the pair (Edge is immutable).
+    private volatile double[] endpointParameters;
 
     public Edge(Vertex start, Vertex end, Curve3 curve, boolean sameSense) {
         if (start == null || end == null || curve == null) {
@@ -279,8 +282,13 @@ public final class Edge {
             return result;
         }
         if (start != null && end != null && !start.point().equals(end.point())) {
-            double startParameter = curve.parameterAt(start.point());
-            double endParameter = curve.parameterAt(end.point());
+            double[] parameters = endpointParameters;
+            if (parameters == null) {
+                parameters = new double[] {curve.parameterAt(start.point()), curve.parameterAt(end.point())};
+                endpointParameters = parameters;
+            }
+            double startParameter = parameters[0];
+            double endParameter = parameters[1];
             java.util.List<CartesianPoint> result = new java.util.ArrayList<>();
             for (int i = 0; i <= count; i++) {
                 double fraction = (double) i / count;

@@ -134,35 +134,34 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
 
         int uCount = controlPoints.size();
         int vCount = controlPoints.get(0).size();
-        int uSpan = findSpan(uCount - 1, uDegree, clampedU, uExp);
-        int vSpan = findSpan(vCount - 1, vDegree, clampedV, vExp);
+        int uSpan = BSplineMath.findSpan(uCount - 1, uDegree, clampedU, uExp);
+        int vSpan = BSplineMath.findSpan(vCount - 1, vDegree, clampedV, vExp);
+        double[] nu = BSplineMath.basisFunctions(uSpan, clampedU, uDegree, uExp);
+        double[] nv = BSplineMath.basisFunctions(vSpan, clampedV, vDegree, vExp);
 
-        Vector3 numerator = new Vector3(0.0, 0.0, 0.0);
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
         double denominator = 0.0;
         for (int i = 0; i <= uDegree; i++) {
             int ui = uSpan - uDegree + i;
-            double nu = basisValue(ui, uDegree, clampedU, uExp);
+            List<CartesianPoint> row = controlPoints.get(ui);
+            List<Double> weightRow = weightsData.get(ui);
+            double bu = nu[i];
             for (int j = 0; j <= vDegree; j++) {
-                int vj = vSpan - vDegree + j;
-                double nv = basisValue(vj, vDegree, clampedV, vExp);
-                double weightedBasis = nu * nv * weightsData.get(ui).get(vj);
-                CartesianPoint control = controlPoints.get(ui).get(vj);
-                numerator = numerator.add(new Vector3(
-                        control.getX() * weightedBasis,
-                        control.getY() * weightedBasis,
-                        control.getZ() * weightedBasis
-                ));
+                int vIndex = vSpan - vDegree + j;
+                double weightedBasis = bu * nv[j] * weightRow.get(vIndex);
+                CartesianPoint control = row.get(vIndex);
+                x += control.getX() * weightedBasis;
+                y += control.getY() * weightedBasis;
+                z += control.getZ() * weightedBasis;
                 denominator += weightedBasis;
             }
         }
         if (Epsilon.isZero(denominator)) {
             throw new GeometryException("rational surface denominator is zero");
         }
-        return new CartesianPoint(
-                numerator.getX() / denominator,
-                numerator.getY() / denominator,
-                numerator.getZ() / denominator
-        );
+        return new CartesianPoint(x / denominator, y / denominator, z / denominator);
     }
 
     public Vector3 normalAt(double u, double v) {
@@ -174,8 +173,10 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
         int uCount = controlPoints.size();
         int vCount = controlPoints.get(0).size();
 
-        int uSpan = findSpan(uCount - 1, uDegree, clampedU, uExp);
-        int vSpan = findSpan(vCount - 1, vDegree, clampedV, vExp);
+        int uSpan = BSplineMath.findSpan(uCount - 1, uDegree, clampedU, uExp);
+        int vSpan = BSplineMath.findSpan(vCount - 1, vDegree, clampedV, vExp);
+        double[] nu = BSplineMath.basisFunctions(uSpan, clampedU, uDegree, uExp);
+        double[] nv = BSplineMath.basisFunctions(vSpan, clampedV, vDegree, vExp);
 
         Vector3 A = new Vector3(0.0, 0.0, 0.0);
         Vector3 dAdu = new Vector3(0.0, 0.0, 0.0);
@@ -185,22 +186,24 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
         double dWdv = 0.0;
         for (int i = 0; i <= uDegree; i++) {
             int ui = uSpan - uDegree + i;
-            double nu = basisValue(ui, uDegree, clampedU, uExp);
-            double dNu = derivativeBasisValue(ui, uDegree, clampedU, uExp);
+            List<CartesianPoint> row = controlPoints.get(ui);
+            List<Double> weightRow = weightsData.get(ui);
+            double bu = nu[i];
+            double dBu = BSplineMath.derivativeBasisValue(ui, uDegree, clampedU, uExp);
             for (int j = 0; j <= vDegree; j++) {
-                int vj = vSpan - vDegree + j;
-                double nv = basisValue(vj, vDegree, clampedV, vExp);
-                double dNv = derivativeBasisValue(vj, vDegree, clampedV, vExp);
-                double w = weightsData.get(ui).get(vj);
-                double weightedBasis = w * nu * nv;
-                CartesianPoint cp = controlPoints.get(ui).get(vj);
+                int vIndex = vSpan - vDegree + j;
+                double bv = nv[j];
+                double dBv = BSplineMath.derivativeBasisValue(vIndex, vDegree, clampedV, vExp);
+                double w = weightRow.get(vIndex);
+                double weightedBasis = w * bu * bv;
+                CartesianPoint cp = row.get(vIndex);
                 Vector3 cpVec = new Vector3(cp.getX(), cp.getY(), cp.getZ());
                 A = A.add(cpVec.scale(weightedBasis));
-                dAdu = dAdu.add(cpVec.scale(w * dNu * nv));
-                dAdv = dAdv.add(cpVec.scale(w * nu * dNv));
+                dAdu = dAdu.add(cpVec.scale(w * dBu * bv));
+                dAdv = dAdv.add(cpVec.scale(w * bu * dBv));
                 W += weightedBasis;
-                dWdu += w * dNu * nv;
-                dWdv += w * nu * dNv;
+                dWdu += w * dBu * bv;
+                dWdv += w * bu * dBv;
             }
         }
         double W2 = W * W;
@@ -214,20 +217,6 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
             return new Vector3(0.0, 0.0, 1.0);
         }
         return normal.normalize().asVector();
-    }
-
-    private static double derivativeBasisValue(int i, int degree, double parameter, List<Double> knots) {
-        double left = 0.0;
-        double right = 0.0;
-        double leftDenom = knots.get(i + degree) - knots.get(i);
-        if (!Epsilon.isZero(leftDenom)) {
-            left = degree / leftDenom * basisValue(i, degree - 1, parameter, knots);
-        }
-        double rightDenom = knots.get(i + degree + 1) - knots.get(i + 1);
-        if (!Epsilon.isZero(rightDenom)) {
-            right = degree / rightDenom * basisValue(i + 1, degree - 1, parameter, knots);
-        }
-        return left - right;
     }
 
     public List<List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
@@ -312,43 +301,6 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
         if (expandedCount != expected) {
             throw new GeometryException("expanded knot count must equal control point count + degree + 1");
         }
-    }
-
-    private static int findSpan(int n, int degree, double parameter, List<Double> knots) {
-        if (parameter >= knots.get(n + 1)) {
-            return n;
-        }
-        int low = degree;
-        int high = n + 1;
-        int mid = (low + high) / 2;
-        while (parameter < knots.get(mid) || parameter >= knots.get(mid + 1)) {
-            if (parameter < knots.get(mid)) {
-                high = mid;
-            } else {
-                low = mid;
-            }
-            mid = (low + high) / 2;
-        }
-        return mid;
-    }
-
-    private static double basisValue(int i, int degree, double parameter, List<Double> knots) {
-        if (degree == 0) {
-            if ((parameter >= knots.get(i) && parameter < knots.get(i + 1))
-                    || (Epsilon.equals(parameter, knots.get(knots.size() - 1)) && Epsilon.equals(parameter, knots.get(i + 1)))) {
-                return 1.0;
-            }
-            return 0.0;
-        }
-        double leftDenominator = knots.get(i + degree) - knots.get(i);
-        double rightDenominator = knots.get(i + degree + 1) - knots.get(i + 1);
-        double left = Epsilon.isZero(leftDenominator)
-                ? 0.0
-                : (parameter - knots.get(i)) / leftDenominator * basisValue(i, degree - 1, parameter, knots);
-        double right = Epsilon.isZero(rightDenominator)
-                ? 0.0
-                : (knots.get(i + degree + 1) - parameter) / rightDenominator * basisValue(i + 1, degree - 1, parameter, knots);
-        return left + right;
     }
 
     public CartesianPoint closestPointTo(CartesianPoint point) {
