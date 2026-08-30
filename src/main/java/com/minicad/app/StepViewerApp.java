@@ -388,7 +388,7 @@ public final class StepViewerApp {
                         cacheStatus = "disabled";
                         log.info("stage={} binaryLength={}", "export_cache_disabled", previewBinary.length);
                     } else {
-                        Path cachePath = previewCachePath(stepText, config.cacheDir());
+                        Path cachePath = previewCachePath(requestBody, config.cacheDir());
                         if (Files.exists(cachePath)) {
                             previewBinary = Files.readAllBytes(cachePath);
                             Files.setLastModifiedTime(cachePath, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis()));
@@ -585,8 +585,10 @@ public final class StepViewerApp {
         return (System.nanoTime() - startedAt) / 1_000_000L;
     }
 
-    static Path previewCachePath(String stepText, Path cacheDir) throws IOException {
-        String digest = sha256Hex(stepText.getBytes(StandardCharsets.UTF_8));
+    static Path previewCachePath(byte[] requestBody, Path cacheDir) throws IOException {
+        // Hash the raw request bytes; re-encoding a multi-MB stepText to UTF-8
+        // just for the digest doubles the request's peak footprint.
+        String digest = sha256Hex(requestBody);
         return cacheDir.resolve(digest + ".glb");
     }
 

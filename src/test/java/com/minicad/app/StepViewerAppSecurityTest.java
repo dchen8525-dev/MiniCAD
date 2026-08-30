@@ -471,7 +471,7 @@ class StepViewerAppSecurityTest {
     @Test
     void cachePathUsesSha256Hash() throws Exception {
         String stepText = "test step content";
-        Path cachePath = StepViewerApp.previewCachePath(stepText, tempDir);
+        Path cachePath = StepViewerApp.previewCachePath(stepText.getBytes(StandardCharsets.UTF_8), tempDir);
         assertTrue(cachePath.getFileName().toString().endsWith(".glb"));
         assertTrue(cachePath.getFileName().toString().matches("[a-f0-9]{64}\\.glb"));
     }

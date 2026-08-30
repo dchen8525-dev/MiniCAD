@@ -85,11 +85,44 @@ class PreviewPipelineTest {
                     PreviewCurveEvaluator.curveEvaluator(edge, builder);
             assertNotNull(evaluator, () -> "no evaluator for edge #" + edge.id());
             assertTrue(evaluator.end() > evaluator.start(), () -> "degenerate domain on edge #" + edge.id());
-            CartesianPoint startPoint = evaluator.pointAt(evaluator.start());
-            CartesianPoint endPoint = evaluator.pointAt(evaluator.end());
-            assertNotNull(startPoint);
-            assertNotNull(endPoint);
+            assertNotNull(evaluator.pointAt(evaluator.start()));
+            assertNotNull(evaluator.pointAt(evaluator.end()));
         }
+    }
+
+    @Test
+    void curveEvaluatorHandlesEveryCurveFamilyAcrossTheCorpus() throws Exception {
+        // Walking the whole corpus drives the line/circle/ellipse/bspline/
+        // trimmed/... evaluator branches on production-shaped data.
+        int evaluatorsBuilt = 0;
+        try (var walk = Files.walk(Path.of("samples"))) {
+            for (Path sample : walk.filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().toLowerCase().endsWith(".step"))
+                    .collect(java.util.stream.Collectors.toList())) {
+                String text = StepTextReader.readDecoded(Files.readAllBytes(sample)).text();
+                Map<Integer, StepEntity> sampleResolved =
+                        StepEntityResolver.resolveAll(StepParser.parse(text));
+                StepCadBuilder sampleBuilder = StepCadBuilder.fromResolved(sampleResolved);
+                for (StepEntity entity : sampleResolved.values()) {
+                    if (!(entity instanceof StepEdgeCurve)) {
+                        continue;
+                    }
+                    PreviewCurveEvaluator.CurveEvaluator evaluator =
+                            PreviewCurveEvaluator.curveEvaluator((StepEdgeCurve) entity, sampleBuilder);
+                    if (evaluator == null) {
+                        continue;
+                    }
+                    evaluatorsBuilt++;
+                    assertTrue(evaluator.end() >= evaluator.start(),
+                            () -> sample + " edge #" + entity.id() + " domain");
+                    evaluator.pointAt(evaluator.start());
+                    evaluator.pointAt((evaluator.start() + evaluator.end()) / 2.0);
+                    evaluator.pointAt(evaluator.end());
+                }
+            }
+        }
+        assertTrue(evaluatorsBuilt >= 100,
+                "corpus should exercise many evaluators, got " + evaluatorsBuilt);
     }
 
     @Test
