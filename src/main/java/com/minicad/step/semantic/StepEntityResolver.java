@@ -865,7 +865,10 @@ public final class StepEntityResolver {
     for (Integer id : instancesById.keySet()) {
       resolve(id);
     }
-    return Map.copyOf(resolved);
+    // Unmodifiable view, not a copy: keeps declaration order for downstream
+    // consumers (mesh face ordering follows this iteration order) and skips a
+    // 93k-entry rehash on large files.
+    return Collections.unmodifiableMap(resolved);
   }
 
   StepEntity resolve(int id) {

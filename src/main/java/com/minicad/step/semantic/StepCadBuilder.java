@@ -327,7 +327,9 @@ public final class StepCadBuilder {
     private final Map<Integer, Solid> solids = new LinkedHashMap<>();
 
     private StepCadBuilder(Map<Integer, StepEntity> entitiesById) {
-        this.entitiesById = Map.copyOf(entitiesById);
+        // Holds the caller's map directly: it is an unmodifiable view from
+        // StepEntityResolver.resolveAll and the builder only reads it.
+        this.entitiesById = entitiesById;
         this.geometryBuilder = new StepCadGeometryBuilder(
             this.entitiesById,
             points,

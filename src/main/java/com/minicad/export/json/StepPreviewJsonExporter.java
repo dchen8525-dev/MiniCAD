@@ -752,7 +752,7 @@ public final class StepPreviewJsonExporter {
         List<UnsupportedFacePayload> unsupportedFaces = assemblyMode
                 ? assembly.unsupportedFaces()
                 : legacyGeometry.unsupportedFaces();
-        List<UnsupportedBooleanPayload> unsupportedBooleans = collectUnsupportedBooleans(resolved);
+        List<UnsupportedBooleanPayload> unsupportedBooleans = collectUnsupportedBooleans(resolved, builder);
         int faceCount = assemblyMode ? assembly.summary().faceCount() : legacyGeometry.faces().size();
         int edgeCount = assemblyMode ? assembly.summary().edgeCount() : legacyGeometry.edges().size();
 
@@ -824,8 +824,8 @@ public final class StepPreviewJsonExporter {
         return List.copyOf(issues);
     }
 
-    private static List<UnsupportedBooleanPayload> collectUnsupportedBooleans(Map<Integer, StepEntity> resolved) {
-        StepCadBuilder builder = StepCadBuilder.fromResolved(resolved);
+    private static List<UnsupportedBooleanPayload> collectUnsupportedBooleans(
+            Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
         List<UnsupportedBooleanPayload> list = new ArrayList<>();
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepBooleanClippingResult) {
