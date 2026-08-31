@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,7 +38,7 @@ class StepViewerStaticResourcesTest {
     @Test
     void viewerShouldValidateUploadsAndReleaseThreeResources() throws IOException {
         String html = resourceText("/static/index.html");
-        String js = resourceText("/static/viewer.js");
+        String js = viewerBundle();
 
         assertTrue(html.contains("accept=\".step,.stp,.p21\""));
         assertTrue(html.contains("#scene.drag-over"));
@@ -49,7 +50,7 @@ class StepViewerStaticResourcesTest {
         assertTrue(js.contains("let maxUploadBytes = defaultMaxUploadBytes;"));
         assertTrue(js.contains("async function loadViewerConfig()"));
         assertTrue(js.contains("fetch('/api/config', { method: 'GET' })"));
-        assertTrue(js.contains("void loadViewerConfig();"));
+        assertTrue(js.contains("loadViewerConfig();"));
         assertTrue(js.contains("acceptedStepExtensions = new Set(['.step', '.stp', '.p21'])"));
         assertTrue(js.contains("function validateStepFile(file)"));
         assertTrue(js.contains("viewer upload limit is"));
@@ -67,7 +68,7 @@ class StepViewerStaticResourcesTest {
     @Test
     void viewerShouldExposeUnsupportedFaceWarnings() throws IOException {
         String html = resourceText("/static/index.html");
-        String js = resourceText("/static/viewer.js");
+        String js = viewerBundle();
 
         assertTrue(html.contains("data-stat=\"unsupportedFaceCount\""));
         assertTrue(html.contains("Unsupported Faces"));
@@ -87,5 +88,21 @@ class StepViewerStaticResourcesTest {
             assertNotNull(input, path + " should be available on the classpath");
             return new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
+    }
+
+    /**
+     * The viewer was split into ES modules under /static/viewer/. Behaviour that used to
+     * live in the single viewer.js entry now ships across those modules, so assertions about
+     * the shipped bundle must scan the whole set rather than viewer.js alone.
+     */
+    private static String viewerBundle() throws IOException {
+        StringBuilder sb = new StringBuilder(resourceText("/static/viewer.js"));
+        for (String module : List.of(
+                "state.js", "scene.js", "selection.js", "pmi.js", "ui-panels.js",
+                "assembly.js", "model-io.js", "parametric-geometry.js", "bspline.js",
+                "format.js", "matrix.js", "log.js")) {
+            sb.append('\n').append(resourceText("/static/viewer/" + module));
+        }
+        return sb.toString();
     }
 }
