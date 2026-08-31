@@ -158,785 +158,13 @@ public final class StepPmiTargetBuilder {
         if (definition instanceof StepPropertyDefinitionRelationship) {
             appendPropertyDefinitionRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
         }
-        if (definition instanceof StepPropertyDefinition) {
-            appendPropertyDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeneralPropertyRelationship) {
-            appendGeneralPropertyRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepShapeAspectRelationship) {
-            appendShapeAspectRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeneralProperty) {
-            StepGeneralProperty generalProperty = (StepGeneralProperty) definition;
-            appendGeneralPropertyRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    generalProperty,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepShapeAspect) {
-            StepShapeAspect shapeAspect = (StepShapeAspect) definition;
-            appendShapeAspectRelationshipTargets(
-                    targetsByUsageId,
-                    identifiedItem.id(),
-                    shapeAspect,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepProduct) {
-            StepProduct product = (StepProduct) definition;
-            appendProductRelationshipTargets(targetsByUsageId, identifiedItem.id(), product, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionFormation) {
-            StepProductDefinitionFormation formation = (StepProductDefinitionFormation) definition;
-            appendProductDefinitionFormationRelationshipTargets(targetsByUsageId, identifiedItem.id(), formation, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinition) {
-            StepProductDefinition productDefinition = (StepProductDefinition) definition;
-            appendProductDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), productDefinition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductRelationship) {
-            appendProductRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionFormationRelationship) {
-            appendProductDefinitionFormationRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGroupRelationship) {
-            appendGroupRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentRelationship) {
-            appendDocumentRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrganizationRelationship) {
-            appendOrganizationRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEffectivityRelationship) {
-            appendEffectivityRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductCategoryRelationship) {
-            appendProductCategoryRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGroup) {
-            appendGroupTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocument) {
-            appendDocumentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentReference) {
-            appendDocumentReferenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedDocumentReference) {
-            appendAppliedDocumentReferenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApprovalAssignment) {
-            appendApprovalAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSecurityClassificationAssignment) {
-            appendSecurityClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepContractAssignment) {
-            appendContractAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCertificationAssignment) {
-            appendCertificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPersonAndOrganizationAssignment) {
-            appendPersonAndOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrganizationAssignment) {
-            appendOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepLanguageAssignment) {
-            appendLanguageAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGroupAssignment) {
-            appendGroupAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepClassificationAssignment) {
-            appendClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDateAssignment) {
-            appendDateAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDateTimeAssignment) {
-            appendDateTimeAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepIdentificationAssignment) {
-            appendIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepExternalIdentificationAssignment) {
-            appendExternalIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrganization) {
-            StepOrganization organization = (StepOrganization) definition;
-            appendOrganizationRelationshipTargets(targetsByUsageId, identifiedItem.id(), organization, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEffectivity) {
-            appendEffectivityTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductCategory) {
-            StepProductCategory category = (StepProductCategory) definition;
-            appendProductCategoryRelationshipTargets(targetsByUsageId, identifiedItem.id(), category, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepExternalSource) {
-            appendExternalSourceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepExternallyDefinedItem) {
-            appendExternallyDefinedItemDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentUsageConstraint) {
-            appendDocumentUsageConstraintTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentation) {
-            appendRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionShape) {
-            StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) definition;
-            appendProductDefinitionShapeRepresentationTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    productDefinitionShape,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepProductDefinition) {
-            StepProductDefinition productDefinition = (StepProductDefinition) definition;
-            appendProductDefinitionRepresentationTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    productDefinition,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepNextAssemblyUsageOccurrence) {
-            StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) definition;
-            appendOccurrenceRepresentationTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    occurrence,
-                    resolved,
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepShapeAspectOccurrence) {
-            appendShapeAspectOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionRelationshipRelationship) {
-            appendProductDefinitionRelationshipRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApprovalPersonOrganization) {
-            appendApprovalPersonOrganizationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApprovalDateTime) {
-            appendApprovalDateTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCalendarDate) {
-            appendCalendarDateTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepNameAttribute) {
-            appendNameAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDescriptionAttribute) {
-            appendDescriptionAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepIdAttribute) {
-            appendIdAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepNameAssignment) {
-            appendNameAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedNameAssignment) {
-            appendAppliedNameAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDateAndTime) {
-            appendDateAndTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepLocalTime) {
-            appendLocalTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCoordinatedUniversalTimeOffset) {
-            appendCoordinatedUniversalTimeOffsetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApprovalStatus) {
-            appendApprovalStatusTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSecurityClassificationLevel) {
-            appendSecurityClassificationLevelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepContractType) {
-            appendContractTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCertificationType) {
-            appendCertificationTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApprovalRole) {
-            appendApprovalRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrganizationRole) {
-            appendOrganizationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPersonAndOrganizationRole) {
-            appendPersonAndOrganizationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepClassificationRole) {
-            appendClassificationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDateRole) {
-            appendDateRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDateTimeRole) {
-            appendDateTimeRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepIdentificationRole) {
-            appendIdentificationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentType) {
-            appendDocumentTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApproval) {
-            appendApprovalTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSecurityClassification) {
-            appendSecurityClassificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepContract) {
-            appendContractTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCertification) {
-            appendCertificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPerson) {
-            appendPersonTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPersonAndOrganization) {
-            appendPersonAndOrganizationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepLanguage) {
-            appendLanguageTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedClassificationAssignment) {
-            appendAppliedClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedDateAssignment) {
-            appendAppliedDateAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedDateTimeAssignment) {
-            appendAppliedDateTimeAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedApprovalAssignment) {
-            appendAppliedApprovalAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedSecurityClassificationAssignment) {
-            appendAppliedSecurityClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedContractAssignment) {
-            appendAppliedContractAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedCertificationAssignment) {
-            appendAppliedCertificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedPersonAndOrganizationAssignment) {
-            appendAppliedPersonAndOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedOrganizationAssignment) {
-            appendAppliedOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedLanguageAssignment) {
-            appendAppliedLanguageAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedGroupAssignment) {
-            appendAppliedGroupAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedIdentificationAssignment) {
-            appendAppliedIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedExternalIdentificationAssignment) {
-            appendAppliedExternalIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationCurveOccurrence) {
-            appendAnnotationCurveOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationFillArea) {
-            appendAnnotationFillAreaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationFillAreaOccurrence) {
-            appendAnnotationFillAreaOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationPlaceholderOccurrence) {
-            appendAnnotationPlaceholderOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationPointOccurrence) {
-            appendAnnotationPointOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationSymbolOccurrence) {
-            appendAnnotationSymbolOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationSubfigureOccurrence) {
-            appendAnnotationSubfigureOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationTextOccurrence) {
-            appendAnnotationTextOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingAnnotationOccurrence) {
-            appendDraughtingAnnotationOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTerminatorSymbol) {
-            appendTerminatorSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPresentationStyleAssignment) {
-            appendPresentationStyleAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleUsage) {
-            appendSurfaceStyleUsageTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceSideStyle) {
-            appendSurfaceSideStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleFillArea) {
-            appendSurfaceStyleFillAreaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFillAreaStyle) {
-            appendFillAreaStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFillAreaStyleColour) {
-            appendFillAreaStyleColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCurveStyle) {
-            appendCurveStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleBoundary) {
-            appendSurfaceStyleBoundaryTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleParameterLine) {
-            appendSurfaceStyleParameterLineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleControlGrid) {
-            appendSurfaceStyleControlGridTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleSegmentationCurve) {
-            appendSurfaceStyleSegmentationCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleSilhouette) {
-            appendSurfaceStyleSilhouetteTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCharacterGlyphStyleStroke) {
-            appendCharacterGlyphStyleStrokeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCharacterGlyphStyleOutline) {
-            appendCharacterGlyphStyleOutlineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCharacterGlyphStyleOutlineWithCharacteristics) {
-            appendCharacterGlyphStyleOutlineWithCharacteristicsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyle) {
-            appendTextStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleWithSpacing) {
-            appendTextStyleWithSpacingTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleWithBoxCharacteristics) {
-            appendTextStyleWithBoxCharacteristicsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleWithJustification) {
-            appendTextStyleWithJustificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleWithMirror) {
-            appendTextStyleWithMirrorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTextStyleForDefinedFont) {
-            appendTextStyleForDefinedFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPointStyle) {
-            appendPointStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSymbolColour) {
-            appendSymbolColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSymbolStyle) {
-            appendSymbolStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleTransparent) {
-            StepSurfaceStyleTransparent style = (StepSurfaceStyleTransparent) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleReflectanceAmbient) {
-            StepSurfaceStyleReflectanceAmbient style = (StepSurfaceStyleReflectanceAmbient) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleReflectanceAmbientDiffuse) {
-            StepSurfaceStyleReflectanceAmbientDiffuse style = (StepSurfaceStyleReflectanceAmbientDiffuse) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular) {
-            appendSurfaceStyleReflectanceAmbientDiffuseSpecularTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedSurfaceSideStyle) {
-            appendPreDefinedSurfaceSideStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedColour) {
-            appendPreDefinedColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingPreDefinedColour) {
-            appendDraughtingPreDefinedColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepColourRgb) {
-            appendColourRgbTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepColourSpecification) {
-            appendColourSpecificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepColour) {
-            appendColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedCurveFont) {
-            appendPreDefinedCurveFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingPreDefinedCurveFont) {
-            appendDraughtingPreDefinedCurveFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedTextFont) {
-            appendPreDefinedTextFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingPreDefinedTextFont) {
-            appendDraughtingPreDefinedTextFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedTerminatorSymbol) {
-            appendPreDefinedTerminatorSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedSymbol) {
-            appendPreDefinedSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedDimensionSymbol) {
-            appendPreDefinedDimensionSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedGeometricalToleranceSymbol) {
-            appendPreDefinedGeometricalToleranceSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedItem) {
-            appendPreDefinedItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationPlane) {
-            appendAnnotationPlaneTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDraughtingCallout) {
-            appendDraughtingCalloutTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPresentationLayerAssignment) {
-            appendPresentationLayerAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepStyledItem) {
-            appendStyledItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOverRidingStyledItem) {
-            appendOverRidingStyledItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationMap) {
-            appendRepresentationMapTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSymbolRepresentationMap) {
-            appendSymbolRepresentationMapTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepMappedItem) {
-            appendMappedItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricReplica) {
-            appendGeometricReplicaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepItemDefinedTransformation) {
-            appendItemDefinedTransformationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCartesianTransformationOperator) {
-            appendCartesianTransformationOperatorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAxis1Placement) {
-            appendAxis1PlacementTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAxis2Placement2D) {
-            appendAxis2Placement2DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCartesianPoint) {
-            appendCartesianPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPoint) {
-            appendPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDirection) {
-            appendDirectionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVector) {
-            appendVectorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAxis2Placement3D) {
-            appendAxis2Placement3DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPlane) {
-            appendPlaneTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricSet) {
-            appendGeometricSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricCurveSet) {
-            appendGeometricCurveSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPointSet) {
-            appendPointSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPath) {
-            appendPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOpenPath) {
-            appendOpenPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedPath) {
-            appendOrientedPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSubpath) {
-            appendSubpathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEdgeLoop) {
-            appendEdgeLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPolyLoop) {
-            appendPolyLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConnectedEdgeSet) {
-            appendConnectedEdgeSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEdgeBasedWireframeModel) {
-            appendEdgeBasedWireframeModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepShellBasedWireframeModel) {
-            appendShellBasedWireframeModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepWireShell) {
-            appendWireShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVertexShell) {
-            appendVertexShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVertexLoop) {
-            appendVertexLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedEdge) {
-            appendOrientedEdgeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEdgeCurve) {
-            appendEdgeCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVertexPoint) {
-            appendVertexPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAdvancedFace) {
-            appendAdvancedFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFaceSurface) {
-            appendFaceSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedFace) {
-            appendOrientedFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConnectedFaceSet) {
-            appendConnectedFaceSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConnectedFaceSubSet) {
-            appendConnectedFaceSubSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOpenShell) {
-            appendOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfacedOpenShell) {
-            appendSurfacedOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepClosedShell) {
-            appendClosedShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedOpenShell) {
-            appendOrientedOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedClosedShell) {
-            appendOrientedClosedShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFaceBasedSurfaceModel) {
-            appendFaceBasedSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepShellBasedSurfaceModel) {
-            appendShellBasedSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepManifoldSolidBrep) {
-            appendManifoldSolidBrepTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBrepWithVoids) {
-            appendBrepWithVoidsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSweptAreaSolid) {
-            appendSweptAreaSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSweptDiskSolid) {
-            appendSweptDiskSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepComplexClippingResult) {
-            appendComplexClippingResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSolidReplica) {
-            appendSolidReplicaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepHalfSpaceSolid) {
-            appendHalfSpaceSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCsgSolid) {
-            appendCsgSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCsgPrimitive) {
-            appendCsgPrimitiveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProfileDef) {
-            appendProfileDefTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConicCurve) {
-            appendConicCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBSplineCurve) {
-            appendBSplineCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBSplineCurveWithKnots) {
-            appendBSplineCurveWithKnotsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRationalBSplineCurve) {
-            appendRationalBSplineCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBezierCurve) {
-            appendBezierCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepUniformCurve) {
-            appendUniformCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepQuasiUniformCurve) {
-            appendQuasiUniformCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPiecewiseBezierCurve) {
-            appendPiecewiseBezierCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepLine) {
-            appendLineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCircle) {
-            appendCircleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEllipse) {
-            appendEllipseTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCurve) {
-            appendCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPolyline) {
-            appendPolylineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTrimmedCurve) {
-            appendTrimmedCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOffsetCurve2D) {
-            appendOffsetCurve2DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOffsetCurve3D) {
-            appendOffsetCurve3DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPcurve) {
-            appendPcurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDegeneratePcurve) {
-            appendDegeneratePcurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceCurve) {
-            appendSurfaceCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSeamCurve) {
-            appendSeamCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCompositeCurve) {
-            appendCompositeCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCompositeCurveOnSurface) {
-            appendCompositeCurveOnSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCompositeCurveSegment) {
-            appendCompositeCurveSegmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCylindricalSurface) {
-            appendCylindricalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConicalSurface) {
-            appendConicalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSphericalSurface) {
-            appendSphericalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepToroidalSurface) {
-            appendToroidalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceOfLinearExtrusion) {
-            appendSurfaceOfLinearExtrusionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceOfRevolution) {
-            appendSurfaceOfRevolutionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRectangularTrimmedSurface) {
-            appendRectangularTrimmedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCurveBoundedSurface) {
-            appendCurveBoundedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOrientedSurface) {
-            appendOrientedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepOffsetSurface) {
-            appendOffsetSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBSplineSurface) {
-            appendBSplineSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBSplineSurfaceWithKnots) {
-            appendBSplineSurfaceWithKnotsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRationalBSplineSurface) {
-            appendRationalBSplineSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBezierSurface) {
-            appendBezierSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepUniformSurface) {
-            appendUniformSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepQuasiUniformSurface) {
-            appendQuasiUniformSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPiecewiseBezierSurface) {
-            appendPiecewiseBezierSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepFace) {
-            appendFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBoundedCurve) {
-            appendBoundedCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBoundedSurface) {
-            appendBoundedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurface) {
-            appendSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepMeasureRepresentationItem) {
-            appendMeasureRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDescriptiveRepresentationItem) {
-            appendDescriptiveRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepValueRepresentationItem) {
-            appendValueRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSurfaceModel) {
-            appendSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepSolidModel) {
-            appendSolidModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationItem) {
-            appendRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricRepresentationItem) {
-            appendGeometricRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTopologicalRepresentationItem) {
-            appendTopologicalRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepMeasureWithUnit) {
-            appendMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepTypedMeasureWithUnit) {
-            appendTypedMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepUncertaintyMeasureWithUnit) {
-            appendUncertaintyMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConversionBasedUnit) {
-            appendConversionBasedUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepConversionBasedUnitWithOffset) {
-            appendConversionBasedUnitWithOffsetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDerivedUnit) {
-            appendDerivedUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDerivedUnitElement) {
-            appendDerivedUnitElementTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepNamedUnit) {
-            StepNamedUnit unit = (StepNamedUnit) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-        } else if (definition instanceof StepSiUnit) {
-            StepSiUnit unit = (StepSiUnit) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-        } else if (definition instanceof StepContextDependentUnit) {
-            StepContextDependentUnit unit = (StepContextDependentUnit) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationContext) {
-            StepRepresentationContext context = (StepRepresentationContext) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeometricRepresentationContext) {
-            appendGeometricRepresentationContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGlobalUnitAssignedContext) {
-            appendGlobalUnitAssignedContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGlobalUncertaintyAssignedContext) {
-            appendGlobalUncertaintyAssignedContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAddress) {
-            appendAddressTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepCharacterizedObject) {
-            appendCharacterizedObjectTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDimensionalExponents) {
-            appendDimensionalExponentsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepVertex) {
-            appendVertexTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEdge) {
-            appendEdgeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAbstractVariable) {
-            appendAbstractVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRowVariable) {
-            appendRowVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepScalarVariable) {
-            appendScalarVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepForwardChainingRulePremise) {
-            appendForwardChainingRulePremiseTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBackChainingRuleBody) {
-            appendBackChainingRuleBodyTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPropertyDefinitionRepresentation) {
-            appendPropertyDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepActionPropertyRepresentation) {
-            appendActionPropertyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepContactRatioRepresentation) {
-            appendContactRatioRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepKinematicPropertyDefinitionRepresentation) {
-            appendKinematicPropertyDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepKinematicPropertyMechanismRepresentation) {
-            appendKinematicPropertyMechanismRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepKinematicPropertyRepresentationRelation) {
-            appendKinematicPropertyRepresentationRelationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepKinematicPropertyTopologyRepresentation) {
-            appendKinematicPropertyTopologyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepResourcePropertyRepresentation) {
-            appendResourcePropertyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAttributeAssertion) {
-            appendAttributeAssertionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepShapeDefinitionRepresentation) {
-            appendShapeDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApplicationProtocolDefinition) {
-            appendApplicationProtocolDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProduct) {
-            StepProduct product = (StepProduct) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, product, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, product, resolved, instanceIdsByTargetId);
-            for (StepProductContext context : product.frameOfReference()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, context, resolved, instanceIdsByTargetId);
-            }
-        } else if (definition instanceof StepProductDefinitionFormation) {
-            StepProductDefinitionFormation formation = (StepProductDefinitionFormation) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, formation, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, formation, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, formation.ofProduct(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinition) {
-            StepProductDefinition productDefinition = (StepProductDefinition) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productDefinition, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productDefinition, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinition.formation(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinition.frameOfReference(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionShape) {
-            StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionShape, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, productDefinitionShape, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, productDefinitionShape.definition(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductContext) {
-            appendProductContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionContext) {
-            appendProductDefinitionContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepApplicationContext) {
-            appendApplicationContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGroup) {
-            StepGroup group = (StepGroup) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, group, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, group, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocument) {
-            StepDocument document = (StepDocument) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, document, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, document, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, document.kind(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentReference) {
-            StepDocumentReference reference = (StepDocumentReference) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, reference.assignedDocument(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, reference.assignedDocument().kind(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAppliedDocumentReference) {
-            StepAppliedDocumentReference reference = (StepAppliedDocumentReference) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, reference, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, reference, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, reference.assignedDocument(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, reference.assignedDocument().kind(), resolved, instanceIdsByTargetId);
-            for (StepEntity item : reference.items()) {
-                appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-            }
-        } else if (definition instanceof StepExternalSource) {
-            StepExternalSource source = (StepExternalSource) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, source, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
-            appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
-            appendExternallyDefinedItemTargets(targetsByUsageId, identifiedItem, source, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepExternallyDefinedItem) {
-            StepExternallyDefinedItem item = (StepExternallyDefinedItem) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, item, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, item, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, item.source(), resolved, instanceIdsByTargetId);
-            appendExternalSourceRelationshipTargets(targetsByUsageId, identifiedItem, item.source(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepDocumentUsageConstraint) {
-            StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, documentUsageConstraint, resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint.source(), resolved, instanceIdsByTargetId);
-            appendNestedDefinitionTargets(targetsByUsageId, identifiedItem, documentUsageConstraint.source().kind(), resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductCategory) {
-            StepProductCategory category = (StepProductCategory) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, category, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, category, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductRelatedProductCategory) {
-            appendProductRelatedProductCategoryTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepGeneralProperty) {
-            StepGeneralProperty generalProperty = (StepGeneralProperty) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, generalProperty, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, generalProperty, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepProductDefinitionEffectivity) {
-            appendProductDefinitionEffectivityDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepEffectivity) {
-            StepEffectivity effectivity = (StepEffectivity) definition;
-            appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, effectivity, instanceIdsByTargetId);
-            appendIndirectPropertyRepresentationTargets(targetsByUsageId, identifiedItem, effectivity, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationRelationship) {
-            appendRepresentationRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepShapeRepresentationRelationship) {
-            appendShapeRepresentationRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepContextDependentShapeRepresentation) {
-            appendContextDependentShapeRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepRepresentationRelationshipWithTransformation) {
-            appendRepresentationRelationshipWithTransformationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBoxDomain) {
-            appendBoxDomainTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBooleanClippingResult) {
-            appendBooleanClippingResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepBooleanResult) {
-            appendBooleanResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedMarker) {
-            appendPreDefinedMarkerTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepPreDefinedPointMarkerSymbol) {
-            appendPreDefinedPointMarkerSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
-        } else if (definition instanceof StepAnnotationSymbol) {
-            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) definition;
-            appendMappedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    annotationSymbol.mappingSource(),
-                    annotationSymbol.mappingTarget(),
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepAnnotationText) {
-            StepAnnotationText annotationText = (StepAnnotationText) definition;
-            appendMappedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    annotationText.mappingSource(),
-                    annotationText.mappingTarget(),
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepAnnotationTextCharacter) {
-            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) definition;
-            appendMappedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    annotationTextCharacter.mappingSource(),
-                    annotationTextCharacter.mappingTarget(),
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepUserDefinedCurveFont) {
-            StepUserDefinedCurveFont curveFont = (StepUserDefinedCurveFont) definition;
-            appendMappedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    curveFont.mappingSource(),
-                    curveFont.mappingTarget(),
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepUserDefinedMarker) {
-            StepUserDefinedMarker marker = (StepUserDefinedMarker) definition;
-            appendMappedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    marker.mappingSource(),
-                    marker.mappingTarget(),
-                    instanceIdsByTargetId
-            );
-        } else if (definition instanceof StepUserDefinedTerminatorSymbol) {
-            StepUserDefinedTerminatorSymbol symbol = (StepUserDefinedTerminatorSymbol) definition;
-            appendMappedDefinitionTargets(
-                    targetsByUsageId,
-                    identifiedItem,
-                    symbol.mappingSource(),
-                    symbol.mappingTarget(),
-                    instanceIdsByTargetId
-            );
-        }
+        dispatchSemanticDefinitionTargets(
+                targetsByUsageId,
+                identifiedItem,
+                definition,
+                resolved,
+                instanceIdsByTargetId
+        );
         for (StepEntity target : collectSemanticTargets(definition, resolved, new LinkedHashSet<>())) {
             appendPmiTarget(
                     targetsByUsageId,
@@ -952,6 +180,2887 @@ public final class StepPmiTargetBuilder {
             );
         }
     }
+
+    /**
+     * Dispatch table behind appendSemanticDefinitionTargets.
+     *
+     * Replaces a ~779-line if/else-if {@code instanceof} chain. The order below is
+     * load bearing: {@code instanceof} also matches subtypes and the original chain
+     * was "first match wins", so entries keep their original relative order.
+     *
+     * Each branch body was moved verbatim into a lambda, so behaviour is unchanged
+     * -- including branches that call several handlers or run a loop.
+     *
+     * 15 later branches were unreachable in the original chain because the
+     * same type had already been matched earlier; they were dropped here. Keeping
+     * the first occurrence of each type means behaviour is unchanged.
+     */
+    @FunctionalInterface
+    private interface SemanticDefinitionHandler {
+        void handle(
+                Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+                StepEntity identifiedItem,
+                StepEntity definition,
+                Map<Integer, StepEntity> resolved,
+                Map<Integer, List<String>> instanceIdsByTargetId
+        );
+    }
+
+    private record SemanticDefinitionRule(Class<?> type, SemanticDefinitionHandler handler) {
+        boolean matches(StepEntity definition) {
+            return type.isInstance(definition);
+        }
+    }
+
+    private static SemanticDefinitionRule rule(Class<?> type, SemanticDefinitionHandler handler) {
+        return new SemanticDefinitionRule(type, handler);
+    }
+
+    private static final List<SemanticDefinitionRule> SEMANTIC_DEFINITION_RULES = List.of(
+            rule(StepPropertyDefinition.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPropertyDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGeneralPropertyRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGeneralPropertyRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepShapeAspectRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendShapeAspectRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGeneralProperty.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepGeneralProperty generalProperty = (StepGeneralProperty) definition;
+                        appendGeneralPropertyRelationshipTargets(
+                                targetsByUsageId,
+                                identifiedItem.id(),
+                                generalProperty,
+                                resolved,
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepShapeAspect.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepShapeAspect shapeAspect = (StepShapeAspect) definition;
+                        appendShapeAspectRelationshipTargets(
+                                targetsByUsageId,
+                                identifiedItem.id(),
+                                shapeAspect,
+                                resolved,
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepProduct.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepProduct product = (StepProduct) definition;
+                        appendProductRelationshipTargets(targetsByUsageId, identifiedItem.id(), product, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductDefinitionFormation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepProductDefinitionFormation formation = (StepProductDefinitionFormation) definition;
+                        appendProductDefinitionFormationRelationshipTargets(targetsByUsageId, identifiedItem.id(), formation, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductDefinition.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepProductDefinition productDefinition = (StepProductDefinition) definition;
+                        appendProductDefinitionRelationshipTargets(targetsByUsageId, identifiedItem.id(), productDefinition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProductRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductDefinitionFormationRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProductDefinitionFormationRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGroupRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGroupRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDocumentRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDocumentRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrganizationRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrganizationRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepEffectivityRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendEffectivityRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductCategoryRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProductCategoryRelationshipDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGroup.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGroupTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDocument.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDocumentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDocumentReference.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDocumentReferenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedDocumentReference.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedDocumentReferenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepApprovalAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendApprovalAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSecurityClassificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSecurityClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepContractAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendContractAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCertificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCertificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPersonAndOrganizationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPersonAndOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrganizationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepLanguageAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendLanguageAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGroupAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGroupAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepClassificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDateAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDateAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDateTimeAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDateTimeAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepIdentificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepExternalIdentificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendExternalIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrganization.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepOrganization organization = (StepOrganization) definition;
+                        appendOrganizationRelationshipTargets(targetsByUsageId, identifiedItem.id(), organization, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepEffectivity.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendEffectivityTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductCategory.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepProductCategory category = (StepProductCategory) definition;
+                        appendProductCategoryRelationshipTargets(targetsByUsageId, identifiedItem.id(), category, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepExternalSource.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendExternalSourceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepExternallyDefinedItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendExternallyDefinedItemDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDocumentUsageConstraint.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDocumentUsageConstraintTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductDefinitionShape.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) definition;
+                        appendProductDefinitionShapeRepresentationTargets(
+                                targetsByUsageId,
+                                identifiedItem,
+                                productDefinitionShape,
+                                resolved,
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepNextAssemblyUsageOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepNextAssemblyUsageOccurrence occurrence = (StepNextAssemblyUsageOccurrence) definition;
+                        appendOccurrenceRepresentationTargets(
+                                targetsByUsageId,
+                                identifiedItem,
+                                occurrence,
+                                resolved,
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepShapeAspectOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendShapeAspectOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductDefinitionRelationshipRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProductDefinitionRelationshipRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepApprovalPersonOrganization.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendApprovalPersonOrganizationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepApprovalDateTime.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendApprovalDateTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCalendarDate.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCalendarDateTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepNameAttribute.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendNameAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDescriptionAttribute.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDescriptionAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepIdAttribute.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendIdAttributeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepNameAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendNameAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedNameAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedNameAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDateAndTime.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDateAndTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepLocalTime.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendLocalTimeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCoordinatedUniversalTimeOffset.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCoordinatedUniversalTimeOffsetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepApprovalStatus.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendApprovalStatusTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSecurityClassificationLevel.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSecurityClassificationLevelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepContractType.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendContractTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCertificationType.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCertificationTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepApprovalRole.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendApprovalRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrganizationRole.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrganizationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPersonAndOrganizationRole.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPersonAndOrganizationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepClassificationRole.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendClassificationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDateRole.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDateRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDateTimeRole.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDateTimeRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepIdentificationRole.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendIdentificationRoleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDocumentType.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDocumentTypeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepApproval.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendApprovalTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSecurityClassification.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSecurityClassificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepContract.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendContractTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCertification.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCertificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPerson.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPersonTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPersonAndOrganization.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPersonAndOrganizationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepLanguage.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendLanguageTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedClassificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedDateAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedDateAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedDateTimeAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedDateTimeAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedApprovalAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedApprovalAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedSecurityClassificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedSecurityClassificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedContractAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedContractAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedCertificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedCertificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedPersonAndOrganizationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedPersonAndOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedOrganizationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedOrganizationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedLanguageAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedLanguageAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedGroupAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedGroupAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedIdentificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAppliedExternalIdentificationAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAppliedExternalIdentificationAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationCurveOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationCurveOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationFillArea.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationFillAreaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationFillAreaOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationFillAreaOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationPlaceholderOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationPlaceholderOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationPointOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationPointOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationSymbolOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationSymbolOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationSubfigureOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationSubfigureOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationTextOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationTextOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDraughtingAnnotationOccurrence.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDraughtingAnnotationOccurrenceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTerminatorSymbol.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTerminatorSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPresentationStyleAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPresentationStyleAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleUsage.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceStyleUsageTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceSideStyle.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceSideStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleFillArea.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceStyleFillAreaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepFillAreaStyle.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendFillAreaStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepFillAreaStyleColour.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendFillAreaStyleColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCurveStyle.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCurveStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleBoundary.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceStyleBoundaryTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleParameterLine.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceStyleParameterLineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleControlGrid.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceStyleControlGridTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleSegmentationCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceStyleSegmentationCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleSilhouette.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceStyleSilhouetteTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCharacterGlyphStyleStroke.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCharacterGlyphStyleStrokeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCharacterGlyphStyleOutline.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCharacterGlyphStyleOutlineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCharacterGlyphStyleOutlineWithCharacteristics.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCharacterGlyphStyleOutlineWithCharacteristicsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTextStyle.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTextStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTextStyleWithSpacing.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTextStyleWithSpacingTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTextStyleWithBoxCharacteristics.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTextStyleWithBoxCharacteristicsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTextStyleWithJustification.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTextStyleWithJustificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTextStyleWithMirror.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTextStyleWithMirrorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTextStyleForDefinedFont.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTextStyleForDefinedFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPointStyle.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPointStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSymbolColour.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSymbolColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSymbolStyle.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSymbolStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleTransparent.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepSurfaceStyleTransparent style = (StepSurfaceStyleTransparent) definition;
+                        appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleReflectanceAmbient.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepSurfaceStyleReflectanceAmbient style = (StepSurfaceStyleReflectanceAmbient) definition;
+                        appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleReflectanceAmbientDiffuse.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepSurfaceStyleReflectanceAmbientDiffuse style = (StepSurfaceStyleReflectanceAmbientDiffuse) definition;
+                        appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, style, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceStyleReflectanceAmbientDiffuseSpecular.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceStyleReflectanceAmbientDiffuseSpecularTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedSurfaceSideStyle.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedSurfaceSideStyleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedColour.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDraughtingPreDefinedColour.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDraughtingPreDefinedColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepColourRgb.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendColourRgbTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepColourSpecification.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendColourSpecificationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepColour.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendColourTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedCurveFont.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedCurveFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDraughtingPreDefinedCurveFont.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDraughtingPreDefinedCurveFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedTextFont.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedTextFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDraughtingPreDefinedTextFont.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDraughtingPreDefinedTextFontTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedTerminatorSymbol.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedTerminatorSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedSymbol.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedDimensionSymbol.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedDimensionSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedGeometricalToleranceSymbol.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedGeometricalToleranceSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationPlane.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAnnotationPlaneTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDraughtingCallout.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDraughtingCalloutTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPresentationLayerAssignment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPresentationLayerAssignmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepStyledItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendStyledItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOverRidingStyledItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOverRidingStyledItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRepresentationMap.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRepresentationMapTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSymbolRepresentationMap.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSymbolRepresentationMapTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepMappedItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendMappedItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGeometricReplica.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGeometricReplicaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepItemDefinedTransformation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendItemDefinedTransformationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCartesianTransformationOperator.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCartesianTransformationOperatorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAxis1Placement.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAxis1PlacementTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAxis2Placement2D.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAxis2Placement2DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCartesianPoint.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCartesianPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPoint.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDirection.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDirectionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepVector.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendVectorTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAxis2Placement3D.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAxis2Placement3DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPlane.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPlaneTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGeometricSet.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGeometricSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGeometricCurveSet.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGeometricCurveSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPointSet.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPointSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPath.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOpenPath.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOpenPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrientedPath.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrientedPathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSubpath.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSubpathTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepEdgeLoop.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendEdgeLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPolyLoop.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPolyLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepConnectedEdgeSet.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendConnectedEdgeSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepEdgeBasedWireframeModel.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendEdgeBasedWireframeModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepShellBasedWireframeModel.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendShellBasedWireframeModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepWireShell.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendWireShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepVertexShell.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendVertexShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepVertexLoop.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendVertexLoopTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrientedEdge.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrientedEdgeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepEdgeCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendEdgeCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepVertexPoint.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendVertexPointTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAdvancedFace.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAdvancedFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepFaceSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendFaceSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrientedFace.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrientedFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepConnectedFaceSet.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendConnectedFaceSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepConnectedFaceSubSet.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendConnectedFaceSubSetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOpenShell.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfacedOpenShell.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfacedOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepClosedShell.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendClosedShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrientedOpenShell.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrientedOpenShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrientedClosedShell.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrientedClosedShellTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepFaceBasedSurfaceModel.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendFaceBasedSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepShellBasedSurfaceModel.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendShellBasedSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepManifoldSolidBrep.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendManifoldSolidBrepTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBrepWithVoids.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBrepWithVoidsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSweptAreaSolid.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSweptAreaSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSweptDiskSolid.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSweptDiskSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepComplexClippingResult.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendComplexClippingResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSolidReplica.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSolidReplicaTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepHalfSpaceSolid.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendHalfSpaceSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCsgSolid.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCsgSolidTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCsgPrimitive.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCsgPrimitiveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProfileDef.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProfileDefTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepConicCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendConicCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBSplineCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBSplineCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBSplineCurveWithKnots.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBSplineCurveWithKnotsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRationalBSplineCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRationalBSplineCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBezierCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBezierCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepUniformCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendUniformCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepQuasiUniformCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendQuasiUniformCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPiecewiseBezierCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPiecewiseBezierCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepLine.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendLineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCircle.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCircleTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepEllipse.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendEllipseTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPolyline.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPolylineTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTrimmedCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTrimmedCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOffsetCurve2D.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOffsetCurve2DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOffsetCurve3D.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOffsetCurve3DTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPcurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPcurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDegeneratePcurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDegeneratePcurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSeamCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSeamCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCompositeCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCompositeCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCompositeCurveOnSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCompositeCurveOnSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCompositeCurveSegment.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCompositeCurveSegmentTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCylindricalSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCylindricalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepConicalSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendConicalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSphericalSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSphericalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepToroidalSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendToroidalSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceOfLinearExtrusion.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceOfLinearExtrusionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceOfRevolution.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceOfRevolutionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRectangularTrimmedSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRectangularTrimmedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCurveBoundedSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCurveBoundedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOrientedSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOrientedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepOffsetSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendOffsetSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBSplineSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBSplineSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBSplineSurfaceWithKnots.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBSplineSurfaceWithKnotsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRationalBSplineSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRationalBSplineSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBezierSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBezierSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepUniformSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendUniformSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepQuasiUniformSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendQuasiUniformSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPiecewiseBezierSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPiecewiseBezierSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepFace.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendFaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBoundedCurve.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBoundedCurveTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBoundedSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBoundedSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurface.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepMeasureRepresentationItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendMeasureRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDescriptiveRepresentationItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDescriptiveRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepValueRepresentationItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendValueRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSurfaceModel.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSurfaceModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepSolidModel.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendSolidModelTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRepresentationItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGeometricRepresentationItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGeometricRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTopologicalRepresentationItem.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTopologicalRepresentationItemTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepMeasureWithUnit.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepTypedMeasureWithUnit.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendTypedMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepUncertaintyMeasureWithUnit.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendUncertaintyMeasureWithUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepConversionBasedUnit.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendConversionBasedUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepConversionBasedUnitWithOffset.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendConversionBasedUnitWithOffsetTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDerivedUnit.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDerivedUnitTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDerivedUnitElement.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDerivedUnitElementTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepNamedUnit.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepNamedUnit unit = (StepNamedUnit) definition;
+                        appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
+            }),
+            rule(StepSiUnit.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepSiUnit unit = (StepSiUnit) definition;
+                        appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
+            }),
+            rule(StepContextDependentUnit.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepContextDependentUnit unit = (StepContextDependentUnit) definition;
+                        appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, unit, instanceIdsByTargetId);
+            }),
+            rule(StepRepresentationContext.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepRepresentationContext context = (StepRepresentationContext) definition;
+                        appendCarrierDefinitionTargets(targetsByUsageId, identifiedItem, context, instanceIdsByTargetId);
+            }),
+            rule(StepGeometricRepresentationContext.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGeometricRepresentationContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGlobalUnitAssignedContext.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGlobalUnitAssignedContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepGlobalUncertaintyAssignedContext.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendGlobalUncertaintyAssignedContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAddress.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAddressTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepCharacterizedObject.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendCharacterizedObjectTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepDimensionalExponents.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendDimensionalExponentsTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepVertex.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendVertexTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepEdge.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendEdgeTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAbstractVariable.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAbstractVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRowVariable.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRowVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepScalarVariable.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendScalarVariableTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepForwardChainingRulePremise.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendForwardChainingRulePremiseTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBackChainingRuleBody.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBackChainingRuleBodyTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPropertyDefinitionRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPropertyDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepActionPropertyRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendActionPropertyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepContactRatioRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendContactRatioRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepKinematicPropertyDefinitionRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendKinematicPropertyDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepKinematicPropertyMechanismRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendKinematicPropertyMechanismRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepKinematicPropertyRepresentationRelation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendKinematicPropertyRepresentationRelationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepKinematicPropertyTopologyRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendKinematicPropertyTopologyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepResourcePropertyRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendResourcePropertyRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAttributeAssertion.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendAttributeAssertionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepShapeDefinitionRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendShapeDefinitionRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepApplicationProtocolDefinition.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendApplicationProtocolDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductContext.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProductContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductDefinitionContext.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProductDefinitionContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepApplicationContext.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendApplicationContextTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductRelatedProductCategory.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProductRelatedProductCategoryTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepProductDefinitionEffectivity.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendProductDefinitionEffectivityDefinitionTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRepresentationRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRepresentationRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepShapeRepresentationRelationship.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendShapeRepresentationRelationshipTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepContextDependentShapeRepresentation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendContextDependentShapeRepresentationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepRepresentationRelationshipWithTransformation.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendRepresentationRelationshipWithTransformationTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBoxDomain.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBoxDomainTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBooleanClippingResult.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBooleanClippingResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepBooleanResult.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendBooleanResultTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedMarker.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedMarkerTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepPreDefinedPointMarkerSymbol.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        appendPreDefinedPointMarkerSymbolTargets(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+            }),
+            rule(StepAnnotationSymbol.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) definition;
+                        appendMappedDefinitionTargets(
+                                targetsByUsageId,
+                                identifiedItem,
+                                annotationSymbol.mappingSource(),
+                                annotationSymbol.mappingTarget(),
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepAnnotationText.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepAnnotationText annotationText = (StepAnnotationText) definition;
+                        appendMappedDefinitionTargets(
+                                targetsByUsageId,
+                                identifiedItem,
+                                annotationText.mappingSource(),
+                                annotationText.mappingTarget(),
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepAnnotationTextCharacter.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) definition;
+                        appendMappedDefinitionTargets(
+                                targetsByUsageId,
+                                identifiedItem,
+                                annotationTextCharacter.mappingSource(),
+                                annotationTextCharacter.mappingTarget(),
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepUserDefinedCurveFont.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepUserDefinedCurveFont curveFont = (StepUserDefinedCurveFont) definition;
+                        appendMappedDefinitionTargets(
+                                targetsByUsageId,
+                                identifiedItem,
+                                curveFont.mappingSource(),
+                                curveFont.mappingTarget(),
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepUserDefinedMarker.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepUserDefinedMarker marker = (StepUserDefinedMarker) definition;
+                        appendMappedDefinitionTargets(
+                                targetsByUsageId,
+                                identifiedItem,
+                                marker.mappingSource(),
+                                marker.mappingTarget(),
+                                instanceIdsByTargetId
+                        );
+            }),
+            rule(StepUserDefinedTerminatorSymbol.class, (
+                    targetsByUsageId,
+                    identifiedItem,
+                    definition,
+                    resolved,
+                    instanceIdsByTargetId
+            ) -> {
+                        StepUserDefinedTerminatorSymbol symbol = (StepUserDefinedTerminatorSymbol) definition;
+                        appendMappedDefinitionTargets(
+                                targetsByUsageId,
+                                identifiedItem,
+                                symbol.mappingSource(),
+                                symbol.mappingTarget(),
+                                instanceIdsByTargetId
+                        );
+            })
+    );
+
+    private static void dispatchSemanticDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity definition,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        for (SemanticDefinitionRule rule : SEMANTIC_DEFINITION_RULES) {
+            if (rule.matches(definition)) {
+                rule.handler().handle(targetsByUsageId, identifiedItem, definition, resolved, instanceIdsByTargetId);
+                return;
+            }
+        }
+    }
+
 
 
     private static void appendAnnotationOccurrenceRelationshipTargets(
