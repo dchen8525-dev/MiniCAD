@@ -1,0 +1,31 @@
+# Frozen dispatch order for the Region C chain in buildPmiPayloads.
+# Captured from the original if/else-if chain before table-driven conversion.
+# Order is load bearing: instanceof matches subtypes and the chain is
+# "first match wins", so the first matching entry must keep its position.
+StepDraughtingCallout
+StepAnnotationTextOccurrence
+StepAnnotationPointOccurrence
+StepAnnotationFillAreaOccurrence
+StepAnnotationPlaceholderOccurrence
+StepAnnotationSymbolOccurrence
+StepAnnotationSymbol
+StepAnnotationText
+StepAnnotationTextCharacter
+StepAnnotationFillArea
+StepAnnotationSubfigureOccurrence
+StepAnnotationPlane
+StepDraughtingAnnotationOccurrence
+StepAnnotationOccurrenceRelationship
+StepPointSet
+StepGeometricMeasurement
+StepVertexShell
+StepGeometricReplica
+StepFillAreaWithOutline
+StepGeometricTolerance
+StepGeometricToleranceWithDatumReference
+StepGeometricToleranceWithDefinedAreaUnit
+StepGeometricToleranceWithMaximumTolerance
+StepDimensionalLocation
+StepToleranceZone
+StepDatum
+StepDatumTarget

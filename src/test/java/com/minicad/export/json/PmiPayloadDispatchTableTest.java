@@ -19,36 +19,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Guards the table-driven dispatch introduced for the Region A usage-target
- * collection inside StepPmiPayloadBuilder.buildPmiPayloads.
+ * Guards the table-driven dispatch introduced for the Region C pmi-building
+ * chain inside StepPmiPayloadBuilder.buildPmiPayloads.
  *
- * Region A used to be a 9-branch if/else-if instanceof chain (lines 78..177 of
- * the original) that populated {@code targetsByUsageId}. It is now an ordered
- * list of (type, handler) rules. Two things can go wrong in that shape, and
- * neither is visible to the compiler:
+ * Region C used to be a ~27-branch if/else-if instanceof chain (the
+ * {@code for (StepEntity entity : resolved.values())} loop that built the pmi
+ * list) where each branch appended to {@code pmi}. It is now an ordered list of
+ * (type, handler) rules. Two things can go wrong in that shape, and neither is
+ * visible to the compiler:
  *
  *   1. a branch dropped, duplicated or reordered -- ordering is load bearing
  *      because instanceof also matches subtypes and the first match wins;
  *   2. a type wired to the wrong handler -- the compiler accepts any handler
  *      whose signature matches, so a copy/paste slip would compile cleanly.
  *
- * src/test/resources/pmi-usage-dispatch-order.txt freezes the type order
- * captured from the original chain (see tools/gen_pmi_usage_dispatch.py). This
- * test asserts the live table still matches it, which pins both the order and
- * the handler wiring-by-type.
+ * src/test/resources/pmi-payload-dispatch-order.txt freezes the type order
+ * captured from the original chain (see tools/gen_pmi_payload_dispatch.py).
+ * This test asserts the live table still matches it, which pins both the order
+ * and the handler wiring-by-type.
  *
- * Region B (a 1-branch chain) is intentionally NOT part of this table; it is
- * covered by the golden export test. Region C (which builds the pmi list and
- * contains continue) is its own table, PMI_PAYLOAD_RULES, guarded by
- * PmiPayloadDispatchTableTest.
+ * Region A (usage-target collection) is a separate table
+ * (PMI_USAGE_TARGET_RULES); Region B (a 1-branch callout-relationship chain) is
+ * intentionally NOT part of this table. Both are covered by the golden export
+ * test.
  */
-class PmiUsageDispatchTableTest {
+class PmiPayloadDispatchTableTest {
 
-    private static final Path FROZEN_ORDER = Paths.get("src/test/resources/pmi-usage-dispatch-order.txt");
-    private static final String TABLE_FIELD = "PMI_USAGE_TARGET_RULES";
+    private static final Path FROZEN_ORDER = Paths.get("src/test/resources/pmi-payload-dispatch-order.txt");
+    private static final String TABLE_FIELD = "PMI_PAYLOAD_RULES";
 
     @Test
-    @DisplayName("Usage dispatch table keeps the original Region A branch order")
+    @DisplayName("Payload dispatch table keeps the original Region C branch order")
     void dispatchTableShouldMatchFrozenOrder() throws Exception {
         List<String> expected = frozenTypes();
         List<String> actual = liveHandlerTypes();
@@ -63,7 +64,7 @@ class PmiUsageDispatchTableTest {
     }
 
     @Test
-    @DisplayName("Usage dispatch table has no duplicate types (duplicates would be dead branches)")
+    @DisplayName("Payload dispatch table has no duplicate types (duplicates would be dead branches)")
     void dispatchTableShouldHaveNoDuplicateTypes() throws Exception {
         List<String> actual = liveHandlerTypes();
         Set<String> seen = new HashSet<>();
@@ -81,7 +82,7 @@ class PmiUsageDispatchTableTest {
     private static List<String> frozenTypes() throws IOException {
         if (!Files.exists(FROZEN_ORDER)) {
             fail("Missing frozen dispatch order at " + FROZEN_ORDER.toAbsolutePath()
-                    + " - regenerate with tools/gen_pmi_usage_dispatch.py");
+                    + " - regenerate with tools/gen_pmi_payload_dispatch.py");
         }
         List<String> types = new ArrayList<>();
         for (String line : Files.readAllLines(FROZEN_ORDER, StandardCharsets.UTF_8)) {

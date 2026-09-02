@@ -30,6 +30,7 @@ import com.minicad.topology.Shell;
 import com.minicad.topology.Solid;
 import com.minicad.topology.VertexLoop;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.minicad.step.syntax.StepValue;
 
@@ -85,154 +86,7 @@ public final class StepPmiPayloadBuilder {
         }
         List<PmiPayload> pmi = new ArrayList<>();
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepDraughtingCallout) {
-            StepDraughtingCallout callout = (StepDraughtingCallout) entity;
-                PmiPayload payload = toPmiPayload(callout, targetsByUsageId.getOrDefault(callout.id(), List.of()), builder);
-                if (payload != null) {
-                    pmi.add(payload);
-                }
-            } else if (entity instanceof StepAnnotationTextOccurrence) {
-            StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) entity;
-                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(textOccurrence.position(), builder);
-                if (position == null) {
-                    continue;
-                }
-                List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(textOccurrence.id(), List.of());
-                pmi.add(new PmiPayload(
-                        textOccurrence.name(),
-                        textOccurrence.text(),
-                        PayloadConversionHelper.toPointPayload(position),
-                        List.of(),
-                        targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
-                        targets
-                ));
-            } else if (entity instanceof StepAnnotationPointOccurrence) {
-            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) entity;
-                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(pointOccurrence.item(), builder);
-                if (position != null) {
-                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(pointOccurrence.id(), List.of());
-                    pmi.add(toStandalonePointPmi(pointOccurrence.id(), pointOccurrence.name(), position, targets));
-                }
-            } else if (entity instanceof StepAnnotationFillAreaOccurrence) {
-            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) entity;
-                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
-                if (position != null) {
-                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(fillAreaOccurrence.id(), List.of());
-                    pmi.add(toStandalonePointPmi(fillAreaOccurrence.id(), fillAreaOccurrence.name(), position, targets));
-                }
-            } else if (entity instanceof StepAnnotationPlaceholderOccurrence) {
-            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) entity;
-                appendPlaceholderPmi(
-                        placeholderOccurrence,
-                        pmi,
-                        builder,
-                        targetsByUsageId.getOrDefault(placeholderOccurrence.id(), List.of()));
-            } else if (entity instanceof StepAnnotationSymbolOccurrence) {
-            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) entity;
-                CartesianPoint position = pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
-                if (position != null) {
-                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(symbolOccurrence.id(), List.of());
-                    pmi.add(toStandalonePointPmi(symbolOccurrence.id(), symbolOccurrence.name(), position, targets));
-                }
-            } else if (entity instanceof StepAnnotationSymbol) {
-            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) entity;
-                CartesianPoint position = pointFromAnnotationSymbol(annotationSymbol);
-                if (position != null) {
-                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationSymbol.id(), List.of());
-                    pmi.add(toStandalonePointPmi(annotationSymbol.id(), annotationSymbol.name(), position, targets));
-                }
-            } else if (entity instanceof StepAnnotationText) {
-            StepAnnotationText annotationText = (StepAnnotationText) entity;
-                CartesianPoint position = pointFromPlacement(annotationText.mappingTarget());
-                if (position != null) {
-                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationText.id(), List.of());
-                    pmi.add(toStandalonePointPmi(annotationText.id(), annotationText.name(), position, targets));
-                }
-            } else if (entity instanceof StepAnnotationTextCharacter) {
-            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) entity;
-                CartesianPoint position = pointFromPlacement(annotationTextCharacter.mappingTarget());
-                if (position != null) {
-                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationTextCharacter.id(), List.of());
-                    pmi.add(toStandalonePointPmi(annotationTextCharacter.id(), annotationTextCharacter.name(), position, targets));
-                }
-            } else if (entity instanceof StepAnnotationFillArea) {
-            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) entity;
-                CartesianPoint position = pointFromAnnotationFillArea(fillArea, builder);
-                if (position != null) {
-                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(fillArea.id(), List.of());
-                    pmi.add(toStandalonePointPmi(fillArea.id(), fillArea.name(), position, targets));
-                }
-            } else if (entity instanceof StepAnnotationSubfigureOccurrence) {
-            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) entity;
-                CartesianPoint position = pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
-                if (position != null) {
-                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(subfigureOccurrence.id(), List.of());
-                    pmi.add(toStandalonePointPmi(subfigureOccurrence.id(), subfigureOccurrence.name(), position, targets));
-                }
-            } else if (entity instanceof StepAnnotationPlane) {
-            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) entity;
-                appendAnnotationPlanePmi(
-                        annotationPlane,
-                        pmi,
-                        builder,
-                        targetsByUsageId.getOrDefault(annotationPlane.id(), List.of()));
-            } else if (entity instanceof StepDraughtingAnnotationOccurrence) {
-            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) entity;
-                appendDraughtingAnnotationPmi(
-                        annotationOccurrence,
-                        pmi,
-                        builder,
-                        targetsByUsageId.getOrDefault(annotationOccurrence.id(), List.of()));
-            } else if (entity instanceof StepAnnotationOccurrenceRelationship) {
-            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) entity;
-                appendAnnotationOccurrenceRelationshipPmi(relationship, pmi, builder);
-            } else if (entity instanceof StepPointSet) {
-            StepPointSet pointSet = (StepPointSet) entity;
-                appendPointSetPmi(pointSet, pmi, builder);
-            } else if (entity instanceof StepGeometricMeasurement) {
-            StepGeometricMeasurement measurement = (StepGeometricMeasurement) entity;
-                appendGeometricMeasurementPmi(measurement, pmi, builder);
-            } else if (entity instanceof StepVertexShell) {
-            StepVertexShell vertexShell = (StepVertexShell) entity;
-                pmi.add(toStandalonePointPmi(
-                        vertexShell.id(),
-                        vertexShell.name(),
-                        StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point())
-                ));
-            } else if (entity instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) entity).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) entity;
-                CartesianPoint position = StepPmiPayloadBuilder.pointFromReplica(replica, builder);
-                if (position != null) {
-                    pmi.add(toStandalonePointPmi(replica.id(), replica.name(), position));
-                }
-            } else if (entity instanceof StepFillAreaWithOutline) {
-            StepFillAreaWithOutline fillArea = (StepFillAreaWithOutline) entity;
-                appendFillAreaWithOutlinePmi(fillArea, pmi, builder);
-            } else if (entity instanceof StepGeometricTolerance) {
-            StepGeometricTolerance tolerance = (StepGeometricTolerance) entity;
-                appendGeometricTolerancePmi(tolerance, pmi, builder);
-            } else if (entity instanceof StepGeometricToleranceWithDatumReference) {
-            StepGeometricToleranceWithDatumReference tolerance = (StepGeometricToleranceWithDatumReference) entity;
-                appendGeometricToleranceWithDatumPmi(tolerance, pmi, builder);
-            } else if (entity instanceof StepGeometricToleranceWithDefinedAreaUnit) {
-            StepGeometricToleranceWithDefinedAreaUnit tolerance = (StepGeometricToleranceWithDefinedAreaUnit) entity;
-                appendGeometricToleranceWithAreaUnitPmi(tolerance, pmi, builder);
-            } else if (entity instanceof StepGeometricToleranceWithMaximumTolerance) {
-            StepGeometricToleranceWithMaximumTolerance tolerance = (StepGeometricToleranceWithMaximumTolerance) entity;
-                appendGeometricToleranceWithMaxPmi(tolerance, pmi, builder);
-            } else if (entity instanceof StepDimensionalLocation) {
-            StepDimensionalLocation location = (StepDimensionalLocation) entity;
-                appendDimensionalLocationPmi(location, pmi, builder);
-            } else if (entity instanceof StepToleranceZone) {
-            StepToleranceZone zone = (StepToleranceZone) entity;
-                appendToleranceZonePmi(zone, pmi, builder);
-            } else if (entity instanceof StepDatum) {
-            StepDatum datum = (StepDatum) entity;
-                appendDatumPmi(datum, pmi, builder);
-            } else if (entity instanceof StepDatumTarget) {
-            StepDatumTarget datumTarget = (StepDatumTarget) entity;
-                appendDatumTargetPmi(datumTarget, pmi, builder);
-            }
+            dispatchPmiPayloads(pmi, entity, targetsByUsageId, builder);
         }
         return List.copyOf(pmi);
     }
@@ -1536,6 +1390,239 @@ public final class StepPmiPayloadBuilder {
         for (PmiUsageTargetRule rule : PMI_USAGE_TARGET_RULES) {
             if (rule.matches(entity)) {
                 rule.handler().handle(entity, resolved, targetsByUsageId, instanceIdsByTargetId);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Dispatch table behind the Region C pmi-building chain in buildPmiPayloads.
+     *
+     * Replaces a ~27-branch if/else-if {@code instanceof} chain that built the
+     * pmi list. The order below is load bearing: {@code instanceof} also matches
+     * subtypes and the original chain was "first match wins", so entries keep
+     * their original relative order. Each branch body was moved verbatim into a
+     * handler that mutates the caller's pmi list (exactly what the branches did),
+     * so behaviour is unchanged.
+     *
+     * The {@code StepGeometricReplica} branch had a compound condition
+     * (instanceof AND an entityName() check) which a plain Class-based rule cannot
+     * express, so it is a predicate rule. Region A (usage-target collection) and
+     * Region B (the 1-branch callout propagation) are NOT part of this table.
+     */
+    @FunctionalInterface
+    private interface PmiPayloadHandler {
+        void handle(
+                List<PmiPayload> pmi,
+                StepEntity entity,
+                Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+                StepCadBuilder builder
+        );
+    }
+
+    private record PmiPayloadRule(Class<?> type, Predicate<StepEntity> predicate, PmiPayloadHandler handler) {
+        boolean matches(StepEntity entity) {
+            return type.isInstance(entity) && (predicate == null || predicate.test(entity));
+        }
+    }
+
+    private static PmiPayloadRule pmiPayloadRule(Class<?> type, PmiPayloadHandler handler) {
+        return new PmiPayloadRule(type, null, handler);
+    }
+
+    private static PmiPayloadRule pmiPayloadRule(Class<?> type, Predicate<StepEntity> predicate, PmiPayloadHandler handler) {
+        return new PmiPayloadRule(type, predicate, handler);
+    }
+
+    private static final List<PmiPayloadRule> PMI_PAYLOAD_RULES = List.of(
+            pmiPayloadRule(StepDraughtingCallout.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepDraughtingCallout callout = (StepDraughtingCallout) entity;
+                PmiPayload payload = toPmiPayload(callout, targetsByUsageId.getOrDefault(callout.id(), List.of()), builder);
+                if (payload != null) {
+                    pmi.add(payload);
+                }
+            }),
+            pmiPayloadRule(StepAnnotationTextOccurrence.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) entity;
+                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(textOccurrence.position(), builder);
+                if (position == null) {
+                    return;
+                }
+                List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(textOccurrence.id(), List.of());
+                pmi.add(new PmiPayload(
+                        textOccurrence.name(),
+                        textOccurrence.text(),
+                        PayloadConversionHelper.toPointPayload(position),
+                        List.of(),
+                        targets.stream().map(PmiTargetPayload::id).collect(Collectors.toList()),
+                        targets
+                ));
+            }),
+            pmiPayloadRule(StepAnnotationPointOccurrence.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) entity;
+                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(pointOccurrence.item(), builder);
+                if (position != null) {
+                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(pointOccurrence.id(), List.of());
+                    pmi.add(toStandalonePointPmi(pointOccurrence.id(), pointOccurrence.name(), position, targets));
+                }
+            }),
+            pmiPayloadRule(StepAnnotationFillAreaOccurrence.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) entity;
+                CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(fillAreaOccurrence.fillStyleTarget(), builder);
+                if (position != null) {
+                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(fillAreaOccurrence.id(), List.of());
+                    pmi.add(toStandalonePointPmi(fillAreaOccurrence.id(), fillAreaOccurrence.name(), position, targets));
+                }
+            }),
+            pmiPayloadRule(StepAnnotationPlaceholderOccurrence.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) entity;
+                appendPlaceholderPmi(
+                        placeholderOccurrence,
+                        pmi,
+                        builder,
+                        targetsByUsageId.getOrDefault(placeholderOccurrence.id(), List.of()));
+            }),
+            pmiPayloadRule(StepAnnotationSymbolOccurrence.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) entity;
+                CartesianPoint position = pointFromAnnotationOccurrence(symbolOccurrence.item(), builder);
+                if (position != null) {
+                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(symbolOccurrence.id(), List.of());
+                    pmi.add(toStandalonePointPmi(symbolOccurrence.id(), symbolOccurrence.name(), position, targets));
+                }
+            }),
+            pmiPayloadRule(StepAnnotationSymbol.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) entity;
+                CartesianPoint position = pointFromAnnotationSymbol(annotationSymbol);
+                if (position != null) {
+                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationSymbol.id(), List.of());
+                    pmi.add(toStandalonePointPmi(annotationSymbol.id(), annotationSymbol.name(), position, targets));
+                }
+            }),
+            pmiPayloadRule(StepAnnotationText.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationText annotationText = (StepAnnotationText) entity;
+                CartesianPoint position = pointFromPlacement(annotationText.mappingTarget());
+                if (position != null) {
+                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationText.id(), List.of());
+                    pmi.add(toStandalonePointPmi(annotationText.id(), annotationText.name(), position, targets));
+                }
+            }),
+            pmiPayloadRule(StepAnnotationTextCharacter.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) entity;
+                CartesianPoint position = pointFromPlacement(annotationTextCharacter.mappingTarget());
+                if (position != null) {
+                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(annotationTextCharacter.id(), List.of());
+                    pmi.add(toStandalonePointPmi(annotationTextCharacter.id(), annotationTextCharacter.name(), position, targets));
+                }
+            }),
+            pmiPayloadRule(StepAnnotationFillArea.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) entity;
+                CartesianPoint position = pointFromAnnotationFillArea(fillArea, builder);
+                if (position != null) {
+                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(fillArea.id(), List.of());
+                    pmi.add(toStandalonePointPmi(fillArea.id(), fillArea.name(), position, targets));
+                }
+            }),
+            pmiPayloadRule(StepAnnotationSubfigureOccurrence.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) entity;
+                CartesianPoint position = pointFromAnnotationOccurrence(subfigureOccurrence.item(), builder);
+                if (position != null) {
+                    List<PmiTargetPayload> targets = targetsByUsageId.getOrDefault(subfigureOccurrence.id(), List.of());
+                    pmi.add(toStandalonePointPmi(subfigureOccurrence.id(), subfigureOccurrence.name(), position, targets));
+                }
+            }),
+            pmiPayloadRule(StepAnnotationPlane.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) entity;
+                appendAnnotationPlanePmi(
+                        annotationPlane,
+                        pmi,
+                        builder,
+                        targetsByUsageId.getOrDefault(annotationPlane.id(), List.of()));
+            }),
+            pmiPayloadRule(StepDraughtingAnnotationOccurrence.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) entity;
+                appendDraughtingAnnotationPmi(
+                        annotationOccurrence,
+                        pmi,
+                        builder,
+                        targetsByUsageId.getOrDefault(annotationOccurrence.id(), List.of()));
+            }),
+            pmiPayloadRule(StepAnnotationOccurrenceRelationship.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) entity;
+                appendAnnotationOccurrenceRelationshipPmi(relationship, pmi, builder);
+            }),
+            pmiPayloadRule(StepPointSet.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepPointSet pointSet = (StepPointSet) entity;
+                appendPointSetPmi(pointSet, pmi, builder);
+            }),
+            pmiPayloadRule(StepGeometricMeasurement.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepGeometricMeasurement measurement = (StepGeometricMeasurement) entity;
+                appendGeometricMeasurementPmi(measurement, pmi, builder);
+            }),
+            pmiPayloadRule(StepVertexShell.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepVertexShell vertexShell = (StepVertexShell) entity;
+                pmi.add(toStandalonePointPmi(
+                        vertexShell.id(),
+                        vertexShell.name(),
+                        StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point())
+                ));
+            }),
+            pmiPayloadRule(
+                    StepGeometricReplica.class,
+                    e -> "POINT_REPLICA".equals(((StepGeometricReplica) e).entityName()),
+                    (pmi, entity, targetsByUsageId, builder) -> {
+            StepGeometricReplica replica = (StepGeometricReplica) entity;
+                CartesianPoint position = StepPmiPayloadBuilder.pointFromReplica(replica, builder);
+                if (position != null) {
+                    pmi.add(toStandalonePointPmi(replica.id(), replica.name(), position));
+                }
+            }),
+            pmiPayloadRule(StepFillAreaWithOutline.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepFillAreaWithOutline fillArea = (StepFillAreaWithOutline) entity;
+                appendFillAreaWithOutlinePmi(fillArea, pmi, builder);
+            }),
+            pmiPayloadRule(StepGeometricTolerance.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepGeometricTolerance tolerance = (StepGeometricTolerance) entity;
+                appendGeometricTolerancePmi(tolerance, pmi, builder);
+            }),
+            pmiPayloadRule(StepGeometricToleranceWithDatumReference.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepGeometricToleranceWithDatumReference tolerance = (StepGeometricToleranceWithDatumReference) entity;
+                appendGeometricToleranceWithDatumPmi(tolerance, pmi, builder);
+            }),
+            pmiPayloadRule(StepGeometricToleranceWithDefinedAreaUnit.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepGeometricToleranceWithDefinedAreaUnit tolerance = (StepGeometricToleranceWithDefinedAreaUnit) entity;
+                appendGeometricToleranceWithAreaUnitPmi(tolerance, pmi, builder);
+            }),
+            pmiPayloadRule(StepGeometricToleranceWithMaximumTolerance.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepGeometricToleranceWithMaximumTolerance tolerance = (StepGeometricToleranceWithMaximumTolerance) entity;
+                appendGeometricToleranceWithMaxPmi(tolerance, pmi, builder);
+            }),
+            pmiPayloadRule(StepDimensionalLocation.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepDimensionalLocation location = (StepDimensionalLocation) entity;
+                appendDimensionalLocationPmi(location, pmi, builder);
+            }),
+            pmiPayloadRule(StepToleranceZone.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepToleranceZone zone = (StepToleranceZone) entity;
+                appendToleranceZonePmi(zone, pmi, builder);
+            }),
+            pmiPayloadRule(StepDatum.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepDatum datum = (StepDatum) entity;
+                appendDatumPmi(datum, pmi, builder);
+            }),
+            pmiPayloadRule(StepDatumTarget.class, (pmi, entity, targetsByUsageId, builder) -> {
+            StepDatumTarget datumTarget = (StepDatumTarget) entity;
+                appendDatumTargetPmi(datumTarget, pmi, builder);
+            })
+    );
+
+    private static void dispatchPmiPayloads(
+            List<PmiPayload> pmi,
+            StepEntity entity,
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepCadBuilder builder
+    ) {
+        for (PmiPayloadRule rule : PMI_PAYLOAD_RULES) {
+            if (rule.matches(entity)) {
+                rule.handler().handle(pmi, entity, targetsByUsageId, builder);
                 return;
             }
         }
