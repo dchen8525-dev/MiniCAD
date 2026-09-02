@@ -38,6 +38,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -482,10 +483,9 @@ public final class PreviewSerializers {
             return;
         }
         if (value instanceof Map<?, ?>) {
-            Map<?, ?> map = (Map<?, ?>) value;
             json.append('{');
             boolean first = true;
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
+            for (Map.Entry<?, ?> entry : stableEntries((Map<?, ?>) value)) {
                 if (!first) {
                     json.append(',');
                 }
@@ -509,6 +509,30 @@ public final class PreviewSerializers {
             return;
         }
         throw new IllegalArgumentException("unsupported json value: " + value.getClass().getName());
+    }
+
+    /**
+     * Entries of {@code map} in an order that is stable across JVM runs.
+     *
+     * {@code Map.of(...)} / {@code Map.ofEntries(...)} return JDK immutable maps
+     * whose iteration order is deliberately randomised per JVM run
+     * (see {@code java.util.ImmutableCollections#SALT32L}). Serialising one
+     * directly therefore yields a different but equivalent JSON document on
+     * every run, which breaks any digest pinned over the export. Sorting the
+     * entries by their rendered key removes that instability at the single
+     * point where maps are written, so no call site can reintroduce it.
+     *
+     * Insertion-ordered maps (LinkedHashMap, the convention used by every map
+     * builder in this class) are passed through untouched so their intended
+     * field order is preserved.
+     */
+    private static List<Map.Entry<?, ?>> stableEntries(Map<?, ?> map) {
+        List<Map.Entry<?, ?>> entries = new ArrayList<>(map.entrySet());
+        if (!map.getClass().getName().startsWith("java.util.ImmutableCollections$")) {
+            return entries;
+        }
+        entries.sort(Comparator.comparing(e -> String.valueOf(e.getKey())));
+        return entries;
     }
 
     // ─── Map builders for nested payloads ────────────────────────────────
@@ -1231,12 +1255,15 @@ public final class PreviewSerializers {
     public static List<Map<String, Object>> previewUvLoopMaps(List<ParametricLoopPayload> loops) {
         List<Map<String, Object>> values = new ArrayList<>(loops.size());
         for (ParametricLoopPayload loop : loops) {
-            values.add(Map.of(
-                    "outer", loop.outer(),
-                    "points", loop.points().stream()
-                            .map(point -> List.of(point.u(), point.v()))
-                            .collect(Collectors.toList())
-            ));
+            // Insertion-ordered on purpose: Map.of() iterates its entries in an
+            // order that is randomised per JVM run, which makes the serialised
+            // JSON (and any digest pinned over it) unstable across runs.
+            Map<String, Object> value = new LinkedHashMap<>();
+            value.put("outer", loop.outer());
+            value.put("points", loop.points().stream()
+                    .map(point -> List.of(point.u(), point.v()))
+                    .collect(Collectors.toList()));
+            values.add(value);
         }
         return List.copyOf(values);
     }

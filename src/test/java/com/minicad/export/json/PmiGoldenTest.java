@@ -87,7 +87,9 @@ class PmiGoldenTest {
             return;
         }
 
-        String expected = Files.readString(GOLDEN_FILE, StandardCharsets.UTF_8);
+        // Normalise CRLF: the baseline is rendered with '\n', but git may check the
+        // file out with platform line endings. That must not look like a regression.
+        String expected = Files.readString(GOLDEN_FILE, StandardCharsets.UTF_8).replace("\r\n", "\n");
         assertEquals(expected, rendered,
                 "PMI target collection changed. If the change is intentional, delete "
                         + GOLDEN_FILE + " and re-run to record a new baseline.");
