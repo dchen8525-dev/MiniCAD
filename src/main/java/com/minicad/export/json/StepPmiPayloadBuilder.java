@@ -75,106 +75,7 @@ public final class StepPmiPayloadBuilder {
         Map<Integer, List<PmiTargetPayload>> targetsByUsageId = new LinkedHashMap<>();
         Map<Integer, List<String>> instanceIdsByTargetId = StepPmiTargetBuilder.buildInstanceIdsByTargetId(assembly);
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepGeometricItemSpecificUsage) {
-            StepGeometricItemSpecificUsage usage = (StepGeometricItemSpecificUsage) entity;
-                StepPmiTargetBuilder.appendPmiTarget(
-                        targetsByUsageId,
-                        usage.usage().id(),
-                        usage.identifiedItem(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        "GEOMETRIC_ITEM_SPECIFIC_USAGE",
-                        usage.id()
-                );
-            } else if (entity instanceof StepChainBasedGeometricItemSpecificUsage) {
-            StepChainBasedGeometricItemSpecificUsage usage = (StepChainBasedGeometricItemSpecificUsage) entity;
-                StepPmiTargetBuilder.appendPmiTarget(
-                        targetsByUsageId,
-                        usage.usage().id(),
-                        usage.identifiedItem(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE",
-                        usage.id()
-                );
-            } else if (entity instanceof StepItemIdentifiedRepresentationUsage) {
-            StepItemIdentifiedRepresentationUsage usage = (StepItemIdentifiedRepresentationUsage) entity;
-                StepPmiTargetBuilder.appendRepresentationBacklinkTarget(
-                        targetsByUsageId,
-                        usage.identifiedItem(),
-                        usage.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        "ITEM_IDENTIFIED_REPRESENTATION_USAGE",
-                        usage.id()
-                );
-                StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(
-                        targetsByUsageId,
-                        usage.identifiedItem(),
-                        usage.usedRepresentation(),
-                        resolved,
-                        instanceIdsByTargetId
-                );
-            } else if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage) {
-            StepChainBasedItemIdentifiedRepresentationUsage usage = (StepChainBasedItemIdentifiedRepresentationUsage) entity;
-                StepPmiTargetBuilder.appendRepresentationBacklinkTarget(
-                        targetsByUsageId,
-                        usage.identifiedItem(),
-                        usage.leaf(),
-                        instanceIdsByTargetId,
-                        "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE",
-                        usage.id()
-                );
-                StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(
-                        targetsByUsageId,
-                        usage.identifiedItem(),
-                        usage.leaf(),
-                        resolved,
-                        instanceIdsByTargetId
-                );
-            } else if (entity instanceof StepPlacedTarget) {
-            StepPlacedTarget usage = (StepPlacedTarget) entity;
-                StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "PLACED_TARGET", usage.id());
-                StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
-            } else if (entity instanceof StepDraughtingModelItemAssociation) {
-            StepDraughtingModelItemAssociation usage = (StepDraughtingModelItemAssociation) entity;
-                StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "DRAUGHTING_MODEL_ITEM_ASSOCIATION", usage.id());
-                StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
-            } else if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder) {
-            StepDraughtingModelItemAssociationWithPlaceholder usage = (StepDraughtingModelItemAssociationWithPlaceholder) entity;
-                StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER", usage.id());
-                StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
-            } else if (entity instanceof StepPmiRequirementItemAssociation) {
-            StepPmiRequirementItemAssociation usage = (StepPmiRequirementItemAssociation) entity;
-                StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "PMI_REQUIREMENT_ITEM_ASSOCIATION", usage.id());
-                StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.requirement(), resolved, instanceIdsByTargetId);
-            } else if (entity instanceof StepMechanicalDesignRequirementItemAssociation) {
-            StepMechanicalDesignRequirementItemAssociation usage = (StepMechanicalDesignRequirementItemAssociation) entity;
-                StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION", usage.id());
-                StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
-                StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.requirement(), resolved, instanceIdsByTargetId);
-            }
+            dispatchPmiUsageTargets(entity, resolved, targetsByUsageId, instanceIdsByTargetId);
         }
         for (StepEntity entity : resolved.values()) {
             if (entity instanceof StepDraughtingCalloutRelationship) {
@@ -1438,6 +1339,206 @@ public final class StepPmiPayloadBuilder {
             return StepPointExtractor.transformPoint(StepPointExtractor.pointFromStep(vertexPoint.point()), replica.transformation(), builder);
         }
         return null;
+    }
+
+
+    /**
+     * Dispatch table behind the Region A usage-target collection in
+     * buildPmiPayloads.
+     *
+     * Replaces a 9-branch if/else-if {@code instanceof} chain (lines 78..177 of
+     * the original). The order below is load bearing: {@code instanceof} also
+     * matches subtypes and the original chain was "first match wins", so entries
+     * keep their original relative order.
+     *
+     * Each branch body was moved verbatim into a handler; the handlers mutate the
+     * caller's targetsByUsageId map (exactly what the branches did), so behaviour
+     * is unchanged. Region B (a 1-branch chain) and Region C (which builds the
+     * pmi list and contains continue) are intentionally NOT part of this table.
+     */
+    @FunctionalInterface
+    private interface PmiUsageTargetHandler {
+        void handle(
+                StepEntity entity,
+                Map<Integer, StepEntity> resolved,
+                Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+                Map<Integer, List<String>> instanceIdsByTargetId
+        );
+    }
+
+    private record PmiUsageTargetRule(Class<?> type, PmiUsageTargetHandler handler) {
+        boolean matches(StepEntity entity) {
+            return type.isInstance(entity);
+        }
+    }
+
+    private static PmiUsageTargetRule pmiUsageTargetRule(Class<?> type, PmiUsageTargetHandler handler) {
+        return new PmiUsageTargetRule(type, handler);
+    }
+
+    private static final List<PmiUsageTargetRule> PMI_USAGE_TARGET_RULES = List.of(
+            pmiUsageTargetRule(StepGeometricItemSpecificUsage.class, (
+                    entity,
+                    resolved,
+                    targetsByUsageId,
+                    instanceIdsByTargetId
+            ) -> {
+            StepGeometricItemSpecificUsage usage = (StepGeometricItemSpecificUsage) entity;
+            StepPmiTargetBuilder.appendPmiTarget(
+            targetsByUsageId,
+            usage.usage().id(),
+            usage.identifiedItem(),
+            instanceIdsByTargetId,
+            null,
+            null,
+            "GEOMETRIC_ITEM_SPECIFIC_USAGE",
+            usage.id()
+            );
+            }),
+            pmiUsageTargetRule(StepChainBasedGeometricItemSpecificUsage.class, (
+                    entity,
+                    resolved,
+                    targetsByUsageId,
+                    instanceIdsByTargetId
+            ) -> {
+            StepChainBasedGeometricItemSpecificUsage usage = (StepChainBasedGeometricItemSpecificUsage) entity;
+            StepPmiTargetBuilder.appendPmiTarget(
+            targetsByUsageId,
+            usage.usage().id(),
+            usage.identifiedItem(),
+            instanceIdsByTargetId,
+            null,
+            null,
+            "CHAIN_BASED_GEOMETRIC_ITEM_SPECIFIC_USAGE",
+            usage.id()
+            );
+            }),
+            pmiUsageTargetRule(StepItemIdentifiedRepresentationUsage.class, (
+                    entity,
+                    resolved,
+                    targetsByUsageId,
+                    instanceIdsByTargetId
+            ) -> {
+            StepItemIdentifiedRepresentationUsage usage = (StepItemIdentifiedRepresentationUsage) entity;
+            StepPmiTargetBuilder.appendRepresentationBacklinkTarget(
+            targetsByUsageId,
+            usage.identifiedItem(),
+            usage.usedRepresentation(),
+            instanceIdsByTargetId,
+            "ITEM_IDENTIFIED_REPRESENTATION_USAGE",
+            usage.id()
+            );
+            StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(
+            targetsByUsageId,
+            usage.identifiedItem(),
+            usage.usedRepresentation(),
+            resolved,
+            instanceIdsByTargetId
+            );
+            }),
+            pmiUsageTargetRule(StepChainBasedItemIdentifiedRepresentationUsage.class, (
+                    entity,
+                    resolved,
+                    targetsByUsageId,
+                    instanceIdsByTargetId
+            ) -> {
+            StepChainBasedItemIdentifiedRepresentationUsage usage = (StepChainBasedItemIdentifiedRepresentationUsage) entity;
+            StepPmiTargetBuilder.appendRepresentationBacklinkTarget(
+            targetsByUsageId,
+            usage.identifiedItem(),
+            usage.leaf(),
+            instanceIdsByTargetId,
+            "CHAIN_BASED_ITEM_IDENTIFIED_REPRESENTATION_USAGE",
+            usage.id()
+            );
+            StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(
+            targetsByUsageId,
+            usage.identifiedItem(),
+            usage.leaf(),
+            resolved,
+            instanceIdsByTargetId
+            );
+            }),
+            pmiUsageTargetRule(StepPlacedTarget.class, (entity, resolved, targetsByUsageId, instanceIdsByTargetId) -> {
+            StepPlacedTarget usage = (StepPlacedTarget) entity;
+            StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "PLACED_TARGET", usage.id());
+            StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
+            }),
+            pmiUsageTargetRule(StepDraughtingModelItemAssociation.class, (
+                    entity,
+                    resolved,
+                    targetsByUsageId,
+                    instanceIdsByTargetId
+            ) -> {
+            StepDraughtingModelItemAssociation usage = (StepDraughtingModelItemAssociation) entity;
+            StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "DRAUGHTING_MODEL_ITEM_ASSOCIATION", usage.id());
+            StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
+            }),
+            pmiUsageTargetRule(StepDraughtingModelItemAssociationWithPlaceholder.class, (
+                    entity,
+                    resolved,
+                    targetsByUsageId,
+                    instanceIdsByTargetId
+            ) -> {
+            StepDraughtingModelItemAssociationWithPlaceholder usage = (StepDraughtingModelItemAssociationWithPlaceholder) entity;
+            StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "DRAUGHTING_MODEL_ITEM_ASSOCIATION_WITH_PLACEHOLDER", usage.id());
+            StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
+            }),
+            pmiUsageTargetRule(StepPmiRequirementItemAssociation.class, (
+                    entity,
+                    resolved,
+                    targetsByUsageId,
+                    instanceIdsByTargetId
+            ) -> {
+            StepPmiRequirementItemAssociation usage = (StepPmiRequirementItemAssociation) entity;
+            StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "PMI_REQUIREMENT_ITEM_ASSOCIATION", usage.id());
+            StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.requirement(), resolved, instanceIdsByTargetId);
+            }),
+            pmiUsageTargetRule(StepMechanicalDesignRequirementItemAssociation.class, (
+                    entity,
+                    resolved,
+                    targetsByUsageId,
+                    instanceIdsByTargetId
+            ) -> {
+            StepMechanicalDesignRequirementItemAssociation usage = (StepMechanicalDesignRequirementItemAssociation) entity;
+            StepPmiTargetBuilder.appendRepresentationBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), instanceIdsByTargetId, "MECHANICAL_DESIGN_REQUIREMENT_ITEM_ASSOCIATION", usage.id());
+            StepPmiTargetBuilder.appendAttachedRepresentationRelationshipTargets(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), resolved, instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendDefinitionBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.definition(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendRelationshipBacklinkTarget(targetsByUsageId, usage.identifiedItem(), usage.usedRepresentation(), usage.requirement(), instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.definition(), resolved, instanceIdsByTargetId);
+            StepPmiTargetBuilder.appendSemanticDefinitionTargets(targetsByUsageId, usage.identifiedItem(), usage.requirement(), resolved, instanceIdsByTargetId);
+            })
+    );
+
+    private static void dispatchPmiUsageTargets(
+            StepEntity entity,
+            Map<Integer, StepEntity> resolved,
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        for (PmiUsageTargetRule rule : PMI_USAGE_TARGET_RULES) {
+            if (rule.matches(entity)) {
+                rule.handler().handle(entity, resolved, targetsByUsageId, instanceIdsByTargetId);
+                return;
+            }
+        }
     }
 
 }
