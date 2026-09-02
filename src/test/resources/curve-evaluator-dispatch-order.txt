@@ -1,0 +1,66 @@
+# Frozen dispatch order for StepRepresentationPayloadBuilder.curveEvaluator.
+# 59 leaf curve types, in first-match-wins order. Edit ONLY by re-running
+# tools/gen_curve_evaluator_dispatch.py after a behaviour-preserving change.
+# The order is load-bearing: subtypes must precede their supertypes
+# (e.g. StepBSplineCurveWithKnots before StepBSplineCurve, StepCircle2D before
+# StepCurve2D, StepCurve/StepBoundedCurve are the trailing catch-alls).
+
+StepLine
+StepCircle
+StepEllipse
+StepBSplineCurveWithKnots
+StepTrimmedCurve
+StepSurfaceCurve
+StepRationalBSplineCurve
+StepPolyline
+StepCompositeCurve
+StepBezierCurve
+StepUniformCurve
+StepQuasiUniformCurve
+StepPiecewiseBezierCurve
+StepOffsetCurve3D
+StepConicCurve
+StepOrientedCurve
+StepGeometricReplica
+StepBSplineCurve
+StepSeamCurve
+StepCircle2D
+StepEllipse2D
+StepPolyline2D
+StepTrimmedCurve2D
+StepCompositeCurve2D
+StepBezierCurve2D
+StepQuasiUniformCurve2D
+StepUniformCurve2D
+StepPiecewiseBezierCurve2D
+StepIndexedPolyCurve2D
+StepDegenerateCurve2D
+StepBSplineCurve2D
+StepRationalBSplineCurve2D
+StepLine2D
+StepCurve2D
+StepHyperbola2D
+StepParabola2D
+StepOffsetCurve2D
+StepClothoid
+StepIndexedPolyCurve
+StepDegenerateCurve
+StepBSplineCurveWithKnotsAndBreakpoints
+StepCompositeCurveOnSurface
+StepCompositeCurveOnSurface3D
+StepLineSegment
+StepPath
+StepOpenPath
+StepSubpath
+StepOrientedPath
+StepEdgeCurve
+StepSurfacedEdgeCurve
+StepAnnotationCurveOccurrence
+StepDimensionCurve
+StepLeaderCurve
+StepProjectionCurve
+StepDraughtingAnnotationOccurrence
+StepTerminatorSymbol
+StepCurve
+StepBoundedCurve
+StepMappedItem

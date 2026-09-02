@@ -443,7 +443,29 @@ public final class StepRepresentationPayloadBuilder {
 
     public static CurveEvaluator curveEvaluator(StepEntity curve, StepCadBuilder builder) {
         // Converted from switch expression to if-else for Java 11 compatibility
-        if (curve instanceof StepLine) {
+        return dispatchCurveEvaluator(curve, builder);
+    }
+
+    // curveEvaluator dispatch table.
+    // First-match-wins, mirroring the original if/else-if chain. The order is
+    // load-bearing: a subtype rule must precede its supertype rule, otherwise the
+    // supertype would match first and drop the more specific evaluator.
+    private record CurveEvalRule(Class<?> type, CurveEvalHandler handler) {
+        boolean matches(StepEntity entity) {
+            return type.isInstance(entity);
+        }
+    }
+
+    private interface CurveEvalHandler {
+        CurveEvaluator handle(StepEntity curve, StepCadBuilder builder);
+    }
+
+    private static CurveEvalRule curveEvalRule(Class<?> type, CurveEvalHandler handler) {
+        return new CurveEvalRule(type, handler);
+    }
+
+    private static final List<CurveEvalRule> CURVE_EVALUATOR_RULES = List.of(
+        curveEvalRule(StepLine.class, (curve, builder) -> {
             StepLine line = (StepLine) curve;
             Line3 geometry = builder.buildLine(line.id());
             return new CurveEvaluator() {
@@ -456,7 +478,8 @@ public final class StepRepresentationPayloadBuilder {
                     return geometry.pointAt(parameter);
                 }
             };
-        } else if (curve instanceof StepCircle) {
+        }),
+        curveEvalRule(StepCircle.class, (curve, builder) -> {
             StepCircle circle = (StepCircle) curve;
             Circle geometry = builder.buildCircle(circle.id());
             return new CurveEvaluator() {
@@ -469,7 +492,8 @@ public final class StepRepresentationPayloadBuilder {
                     return geometry.pointAt(parameter);
                 }
             };
-        } else if (curve instanceof StepEllipse) {
+        }),
+        curveEvalRule(StepEllipse.class, (curve, builder) -> {
             StepEllipse ellipse = (StepEllipse) curve;
             Ellipse3 geometry = builder.buildEllipse(ellipse.id());
             return new CurveEvaluator() {
@@ -482,7 +506,8 @@ public final class StepRepresentationPayloadBuilder {
                     return geometry.pointAt(parameter);
                 }
             };
-        } else if (curve instanceof StepBSplineCurveWithKnots) {
+        }),
+        curveEvalRule(StepBSplineCurveWithKnots.class, (curve, builder) -> {
             StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) curve;
             BSplineCurve3 geometry = builder.buildBSplineCurve(spline.id());
             return new CurveEvaluator() {
@@ -495,13 +520,16 @@ public final class StepRepresentationPayloadBuilder {
                     return geometry.pointAt(parameter);
                 }
             };
-        } else if (curve instanceof StepTrimmedCurve) {
+        }),
+        curveEvalRule(StepTrimmedCurve.class, (curve, builder) -> {
             StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) curve;
             return curveEvaluator(trimmedCurve.basisCurve(), builder);
-        } else if (curve instanceof StepSurfaceCurve) {
+        }),
+        curveEvalRule(StepSurfaceCurve.class, (curve, builder) -> {
             StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) curve;
             return curveEvaluator(surfaceCurve.curve3d(), builder);
-        } else if (curve instanceof StepRationalBSplineCurve) {
+        }),
+        curveEvalRule(StepRationalBSplineCurve.class, (curve, builder) -> {
             StepRationalBSplineCurve spline = (StepRationalBSplineCurve) curve;
             com.minicad.geometry.RationalBSplineCurve3 geometry = builder.buildRationalBSplineCurve(spline.id());
             return new CurveEvaluator() {
@@ -509,7 +537,8 @@ public final class StepRepresentationPayloadBuilder {
                 @Override public double end() { return geometry.endParameter(); }
                 @Override public CartesianPoint pointAt(double parameter) { return geometry.pointAt(parameter); }
             };
-        } else if (curve instanceof StepPolyline) {
+        }),
+        curveEvalRule(StepPolyline.class, (curve, builder) -> {
             StepPolyline polyline = (StepPolyline) curve;
             Polyline3 geometry = builder.buildPolyline(polyline.id());
             return new CurveEvaluator() {
@@ -517,170 +546,229 @@ public final class StepRepresentationPayloadBuilder {
                 @Override public double end() { return 1.0; }
                 @Override public CartesianPoint pointAt(double parameter) { return geometry.pointAt(parameter); }
             };
-        } else if (curve instanceof StepCompositeCurve) {
+        }),
+        curveEvalRule(StepCompositeCurve.class, (curve, builder) -> {
             StepCompositeCurve compositeCurve = (StepCompositeCurve) curve;
             CompositeCurve3 geometry = builder.buildCompositeCurve(compositeCurve.id());
             return sampledCurveEvaluator(geometry);
-        } else if (curve instanceof StepBezierCurve) {
+        }),
+        curveEvalRule(StepBezierCurve.class, (curve, builder) -> {
             StepBezierCurve bezier = (StepBezierCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(bezier.id()));
-        } else if (curve instanceof StepUniformCurve) {
+        }),
+        curveEvalRule(StepUniformCurve.class, (curve, builder) -> {
             StepUniformCurve uniform = (StepUniformCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(uniform.id()));
-        } else if (curve instanceof StepQuasiUniformCurve) {
+        }),
+        curveEvalRule(StepQuasiUniformCurve.class, (curve, builder) -> {
             StepQuasiUniformCurve quasiUniform = (StepQuasiUniformCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(quasiUniform.id()));
-        } else if (curve instanceof StepPiecewiseBezierCurve) {
+        }),
+        curveEvalRule(StepPiecewiseBezierCurve.class, (curve, builder) -> {
             StepPiecewiseBezierCurve piecewiseBezier = (StepPiecewiseBezierCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(piecewiseBezier.id()));
-        } else if (curve instanceof StepOffsetCurve3D) {
+        }),
+        curveEvalRule(StepOffsetCurve3D.class, (curve, builder) -> {
             StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) curve;
             return sampledCurveEvaluator(builder.buildOffsetCurve3(offsetCurve3D.id()));
-        } else if (curve instanceof StepConicCurve) {
+        }),
+        curveEvalRule(StepConicCurve.class, (curve, builder) -> {
             StepConicCurve conic = (StepConicCurve) curve;
             List<CartesianPoint> points = ConicSamplingHelper.sampleConicCurvePoints(conic, builder);
             if (points == null || points.size() < 2) return null;
             return sampledCurveEvaluator(new Polyline3(points));
-        } else if (curve instanceof StepOrientedCurve) {
+        }),
+        curveEvalRule(StepOrientedCurve.class, (curve, builder) -> {
             StepOrientedCurve orientedCurve = (StepOrientedCurve) curve;
             return curveEvaluator(orientedCurve.curveElement(), builder);
-        } else if (curve instanceof StepGeometricReplica) {
+        }),
+        curveEvalRule(StepGeometricReplica.class, (curve, builder) -> {
             StepGeometricReplica replica = (StepGeometricReplica) curve;
             return curveEvaluator(replica.parent(), builder);
-        } else if (curve instanceof StepBSplineCurve) {
+        }),
+        curveEvalRule(StepBSplineCurve.class, (curve, builder) -> {
             StepBSplineCurve bspline = (StepBSplineCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(bspline.id()));
-        } else if (curve instanceof StepSeamCurve) {
+        }),
+        curveEvalRule(StepSeamCurve.class, (curve, builder) -> {
             StepSeamCurve seamCurve = (StepSeamCurve) curve;
             return sampledCurveEvaluator(builder.buildSeamCurve(seamCurve.id()).curve3d());
-        } else if (curve instanceof StepCircle2D) {
+        }),
+        curveEvalRule(StepCircle2D.class, (curve, builder) -> {
             StepCircle2D circle2D = (StepCircle2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(circle2D.id()));
-        } else if (curve instanceof StepEllipse2D) {
+        }),
+        curveEvalRule(StepEllipse2D.class, (curve, builder) -> {
             StepEllipse2D ellipse2D = (StepEllipse2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(ellipse2D.id()));
-        } else if (curve instanceof StepPolyline2D) {
+        }),
+        curveEvalRule(StepPolyline2D.class, (curve, builder) -> {
             StepPolyline2D polyline2D = (StepPolyline2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(polyline2D.id()));
-        } else if (curve instanceof StepTrimmedCurve2D) {
+        }),
+        curveEvalRule(StepTrimmedCurve2D.class, (curve, builder) -> {
             StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(trimmedCurve2D.id()));
-        } else if (curve instanceof StepCompositeCurve2D) {
+        }),
+        curveEvalRule(StepCompositeCurve2D.class, (curve, builder) -> {
             StepCompositeCurve2D compositeCurve2D = (StepCompositeCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(compositeCurve2D.id()));
-        } else if (curve instanceof StepBezierCurve2D) {
+        }),
+        curveEvalRule(StepBezierCurve2D.class, (curve, builder) -> {
             StepBezierCurve2D bezier2D = (StepBezierCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(bezier2D.id()));
-        } else if (curve instanceof StepQuasiUniformCurve2D) {
+        }),
+        curveEvalRule(StepQuasiUniformCurve2D.class, (curve, builder) -> {
             StepQuasiUniformCurve2D quasiUniform2D = (StepQuasiUniformCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(quasiUniform2D.id()));
-        } else if (curve instanceof StepUniformCurve2D) {
+        }),
+        curveEvalRule(StepUniformCurve2D.class, (curve, builder) -> {
             StepUniformCurve2D uniform2D = (StepUniformCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(uniform2D.id()));
-        } else if (curve instanceof StepPiecewiseBezierCurve2D) {
+        }),
+        curveEvalRule(StepPiecewiseBezierCurve2D.class, (curve, builder) -> {
             StepPiecewiseBezierCurve2D piecewiseBezier2D = (StepPiecewiseBezierCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(piecewiseBezier2D.id()));
-        } else if (curve instanceof StepIndexedPolyCurve2D) {
+        }),
+        curveEvalRule(StepIndexedPolyCurve2D.class, (curve, builder) -> {
             StepIndexedPolyCurve2D polyCurve2D = (StepIndexedPolyCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(polyCurve2D.id()));
-        } else if (curve instanceof StepDegenerateCurve2D) {
+        }),
+        curveEvalRule(StepDegenerateCurve2D.class, (curve, builder) -> {
             StepDegenerateCurve2D degenerateCurve2D = (StepDegenerateCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(degenerateCurve2D.id()));
-        } else if (curve instanceof StepBSplineCurve2D) {
+        }),
+        curveEvalRule(StepBSplineCurve2D.class, (curve, builder) -> {
             StepBSplineCurve2D bspline2D = (StepBSplineCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(bspline2D.id()));
-        } else if (curve instanceof StepRationalBSplineCurve2D) {
+        }),
+        curveEvalRule(StepRationalBSplineCurve2D.class, (curve, builder) -> {
             StepRationalBSplineCurve2D rationalBspline2D = (StepRationalBSplineCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(rationalBspline2D.id()));
-        } else if (curve instanceof StepLine2D) {
+        }),
+        curveEvalRule(StepLine2D.class, (curve, builder) -> {
             StepLine2D line2D = (StepLine2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(line2D.id()));
-        } else if (curve instanceof StepCurve2D) {
+        }),
+        curveEvalRule(StepCurve2D.class, (curve, builder) -> {
             StepCurve2D curve2D = (StepCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(curve2D.id()));
-        } else if (curve instanceof StepHyperbola2D) {
+        }),
+        curveEvalRule(StepHyperbola2D.class, (curve, builder) -> {
             StepHyperbola2D hyperbola2D = (StepHyperbola2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(hyperbola2D.id()));
-        } else if (curve instanceof StepParabola2D) {
+        }),
+        curveEvalRule(StepParabola2D.class, (curve, builder) -> {
             StepParabola2D parabola2D = (StepParabola2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(parabola2D.id()));
-        } else if (curve instanceof StepOffsetCurve2D) {
+        }),
+        curveEvalRule(StepOffsetCurve2D.class, (curve, builder) -> {
             StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) curve;
             return sampledCurveEvaluator(builder.buildCurve3From2D(offsetCurve2D.id()));
-        } else if (curve instanceof StepClothoid) {
+        }),
+        curveEvalRule(StepClothoid.class, (curve, builder) -> {
             StepClothoid clothoid = (StepClothoid) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(clothoid.id()));
-        } else if (curve instanceof StepIndexedPolyCurve) {
+        }),
+        curveEvalRule(StepIndexedPolyCurve.class, (curve, builder) -> {
             StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(polyCurve.id()));
-        } else if (curve instanceof StepDegenerateCurve) {
+        }),
+        curveEvalRule(StepDegenerateCurve.class, (curve, builder) -> {
             StepDegenerateCurve degenerate = (StepDegenerateCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(degenerate.id()));
-        } else if (curve instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
+        }),
+        curveEvalRule(StepBSplineCurveWithKnotsAndBreakpoints.class, (curve, builder) -> {
             StepBSplineCurveWithKnotsAndBreakpoints splineBreak = (StepBSplineCurveWithKnotsAndBreakpoints) curve;
             return sampledCurveEvaluator(builder.buildBSplineCurveWithBreakpoints(splineBreak.id()));
-        } else if (curve instanceof StepCompositeCurveOnSurface) {
+        }),
+        curveEvalRule(StepCompositeCurveOnSurface.class, (curve, builder) -> {
             StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(compositeOnSurface.id()));
-        } else if (curve instanceof StepCompositeCurveOnSurface3D) {
+        }),
+        curveEvalRule(StepCompositeCurveOnSurface3D.class, (curve, builder) -> {
             StepCompositeCurveOnSurface3D compositeOnSurface3D = (StepCompositeCurveOnSurface3D) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(compositeOnSurface3D.id()));
-        } else if (curve instanceof StepLineSegment) {
+        }),
+        curveEvalRule(StepLineSegment.class, (curve, builder) -> {
             StepLineSegment lineSeg = (StepLineSegment) curve;
             List<CartesianPoint> pts = List.of(
                     builder.buildPoint(lineSeg.startPoint().id()),
                     builder.buildPoint(lineSeg.endPoint().id())
             );
             return sampledCurveEvaluator(new Polyline3(pts));
-        } else if (curve instanceof StepPath) {
+        }),
+        curveEvalRule(StepPath.class, (curve, builder) -> {
             StepPath path = (StepPath) curve;
             return sampledCurveEvaluator(builder.buildPath(path.id()));
-        } else if (curve instanceof StepOpenPath) {
+        }),
+        curveEvalRule(StepOpenPath.class, (curve, builder) -> {
             StepOpenPath openPath = (StepOpenPath) curve;
             return sampledCurveEvaluator(builder.buildPath(openPath.id()));
-        } else if (curve instanceof StepSubpath) {
+        }),
+        curveEvalRule(StepSubpath.class, (curve, builder) -> {
             StepSubpath subpath = (StepSubpath) curve;
             return sampledCurveEvaluator(builder.buildPath(subpath.id()));
-        } else if (curve instanceof StepOrientedPath) {
+        }),
+        curveEvalRule(StepOrientedPath.class, (curve, builder) -> {
             StepOrientedPath orientedPath = (StepOrientedPath) curve;
             return sampledCurveEvaluator(builder.buildPath(orientedPath.id()));
-        } else if (curve instanceof StepEdgeCurve) {
+        }),
+        curveEvalRule(StepEdgeCurve.class, (curve, builder) -> {
             StepEdgeCurve edgeCurve = (StepEdgeCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(edgeCurve.id()));
-        } else if (curve instanceof StepSurfacedEdgeCurve) {
+        }),
+        curveEvalRule(StepSurfacedEdgeCurve.class, (curve, builder) -> {
             StepSurfacedEdgeCurve surfacedEdge = (StepSurfacedEdgeCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(surfacedEdge.id()));
-        } else if (curve instanceof StepAnnotationCurveOccurrence) {
+        }),
+        curveEvalRule(StepAnnotationCurveOccurrence.class, (curve, builder) -> {
             StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) curve;
             return curveEvaluator(occurrence.item(), builder);
-        } else if (curve instanceof StepDimensionCurve) {
+        }),
+        curveEvalRule(StepDimensionCurve.class, (curve, builder) -> {
             StepDimensionCurve dimensionCurve = (StepDimensionCurve) curve;
             return curveEvaluator(dimensionCurve.item(), builder);
-        } else if (curve instanceof StepLeaderCurve) {
+        }),
+        curveEvalRule(StepLeaderCurve.class, (curve, builder) -> {
             StepLeaderCurve leaderCurve = (StepLeaderCurve) curve;
             return curveEvaluator(leaderCurve.item(), builder);
-        } else if (curve instanceof StepProjectionCurve) {
+        }),
+        curveEvalRule(StepProjectionCurve.class, (curve, builder) -> {
             StepProjectionCurve projectionCurve = (StepProjectionCurve) curve;
             return curveEvaluator(projectionCurve.item(), builder);
-        } else if (curve instanceof StepDraughtingAnnotationOccurrence) {
+        }),
+        curveEvalRule(StepDraughtingAnnotationOccurrence.class, (curve, builder) -> {
             StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) curve;
             return curveEvaluator(annotationOccurrence.item(), builder);
-        } else if (curve instanceof StepTerminatorSymbol) {
+        }),
+        curveEvalRule(StepTerminatorSymbol.class, (curve, builder) -> {
             StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) curve;
             return curveEvaluator(terminatorSymbol.annotatedCurve(), builder);
-        } else if (curve instanceof StepCurve) {
+        }),
+        curveEvalRule(StepCurve.class, (curve, builder) -> {
             StepCurve abstractCurve = (StepCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(abstractCurve.id()));
-        } else if (curve instanceof StepBoundedCurve) {
+        }),
+        curveEvalRule(StepBoundedCurve.class, (curve, builder) -> {
             StepBoundedCurve boundedCurve = (StepBoundedCurve) curve;
             return sampledCurveEvaluator(builder.buildCurveReference3(boundedCurve.id()));
-        } else if (curve instanceof StepMappedItem) {
+        }),
+        curveEvalRule(StepMappedItem.class, (curve, builder) -> {
             StepMappedItem mappedItem = (StepMappedItem) curve;
             return curveEvaluator(mappedItem.mappingTarget(), builder);
-        } else {
-            return null;
+        })
+    );
+
+    private static CurveEvaluator dispatchCurveEvaluator(StepEntity curve, StepCadBuilder builder) {
+        for (CurveEvalRule rule : CURVE_EVALUATOR_RULES) {
+            if (rule.matches(curve)) {
+                return rule.handler().handle(curve, builder);
+            }
         }
+        return null;
     }
+
 
 
     private static CurveEvaluator sampledCurveEvaluator(Curve3 curve) {
