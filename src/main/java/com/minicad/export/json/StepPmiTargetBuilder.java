@@ -10356,42 +10356,6 @@ public final class StepPmiTargetBuilder {
             return Set.of();
         }
         Set<StepEntity> targets = new LinkedHashSet<>();
-        if (entity instanceof StepFaceEntity
-                || entity instanceof StepEdgeCurve
-                || entity instanceof StepPath
-                || entity instanceof StepOpenPath
-                || entity instanceof StepSubpath
-                || entity instanceof StepOrientedPath
-                || entity instanceof StepConnectedEdgeSet
-                || entity instanceof StepPointSet
-                || entity instanceof StepGeometricSet
-                || entity instanceof StepGeometricCurveSet
-                || entity instanceof StepOpenShell
-                || entity instanceof StepSurfacedOpenShell
-                || entity instanceof StepOrientedOpenShell
-                || entity instanceof StepClosedShell
-                || entity instanceof StepOrientedClosedShell
-                || entity instanceof StepWireShell
-                || entity instanceof StepVertexShell
-                || entity instanceof StepEdgeLoop
-                || entity instanceof StepPolyLoop
-                || entity instanceof StepConnectedFaceSet
-                || entity instanceof StepConnectedFaceSubSet
-                || entity instanceof StepFaceBasedSurfaceModel
-                || entity instanceof StepShellBasedSurfaceModel
-                || entity instanceof StepEdgeBasedWireframeModel
-                || entity instanceof StepShellBasedWireframeModel
-                || entity instanceof StepManifoldSolidBrep
-                || entity instanceof StepBrepWithVoids
-                || entity instanceof StepSweptAreaSolid
-                || entity instanceof StepSolidReplica
-                || entity instanceof StepCsgSolid
-                || entity instanceof StepCsgPrimitive
-                || entity instanceof StepBooleanResult
-                || entity instanceof StepBooleanClippingResult
-                || entity instanceof StepRepresentation) {
-            targets.add(entity);
-        }
         dispatchSemanticTargets(targets, entity, resolved, visiting, index);
         visiting.remove(entity.id());
         return Set.copyOf(targets);
@@ -10408,11 +10372,14 @@ public final class StepPmiTargetBuilder {
      * unchanged -- the handlers mutate the caller's target set instead of
      * returning one, matching what the branches did.
      *
-     * The leaf-type check that precedes the chain (the 34 types OR-ed together
-     * in {@code collectSemanticTargets}) is deliberately NOT part of this table: it
-     * is a standalone {@code if} with no {@code else}, so entities matching it still
-     * fall through into this dispatch. Folding it in would make the first match
-     * return and silently drop those extra targets.
+     * The 34 leaf types that are themselves semantic targets (the old OR-ed
+     * {@code instanceof} block) are now the frozen {@code SELF_TARGET_TYPES} list,
+     * checked as phase 1 inside {@code dispatchSemanticTargets} (add the entity)
+     * before this table runs as phase 2 (add related targets). Keeping them out of
+     * this table matters: it is "first match wins" and its handlers add related
+     * targets, so a leaf type folded in as a rule would return and silently drop
+     * the entity itself -- StepFaceEntity especially, a marker interface whose
+     * implementors are also matched by the StepTopologicalRepresentationItem rule.
      */
     @FunctionalInterface
     private interface SemanticTargetHandler {
@@ -12466,6 +12433,68 @@ public final class StepPmiTargetBuilder {
             })
     );
 
+    /**
+     * The 34 geometric/topological types that are themselves semantic targets.
+     * Replaces the standalone 34-type OR block that used to precede the
+     * SEMANTIC_TARGET_RULES dispatch inside collectSemanticTargets.
+     *
+     * It is kept separate from SEMANTIC_TARGET_RULES on purpose: that table is
+     * "first match wins" and its handlers add RELATED targets, so folding these
+     * leaf types in as rules would make the first match return and silently drop
+     * the entity itself. StepFaceEntity in particular is a marker interface whose
+     * implementors are also matched by the StepTopologicalRepresentationItem
+     * supertype rule, so they must keep getting both the entity and its related
+     * targets. Instead this list is checked as phase 1 (add the entity) before the
+     * related-target table runs as phase 2 -- identical to the old two-pass order.
+     *
+     * Order is frozen in src/test/resources/pmi-semantic-selftarget-order.txt.
+     */
+    private static final List<Class<?>> SELF_TARGET_TYPES = List.of(
+            StepFaceEntity.class,
+            StepEdgeCurve.class,
+            StepPath.class,
+            StepOpenPath.class,
+            StepSubpath.class,
+            StepOrientedPath.class,
+            StepConnectedEdgeSet.class,
+            StepPointSet.class,
+            StepGeometricSet.class,
+            StepGeometricCurveSet.class,
+            StepOpenShell.class,
+            StepSurfacedOpenShell.class,
+            StepOrientedOpenShell.class,
+            StepClosedShell.class,
+            StepOrientedClosedShell.class,
+            StepWireShell.class,
+            StepVertexShell.class,
+            StepEdgeLoop.class,
+            StepPolyLoop.class,
+            StepConnectedFaceSet.class,
+            StepConnectedFaceSubSet.class,
+            StepFaceBasedSurfaceModel.class,
+            StepShellBasedSurfaceModel.class,
+            StepEdgeBasedWireframeModel.class,
+            StepShellBasedWireframeModel.class,
+            StepManifoldSolidBrep.class,
+            StepBrepWithVoids.class,
+            StepSweptAreaSolid.class,
+            StepSolidReplica.class,
+            StepCsgSolid.class,
+            StepCsgPrimitive.class,
+            StepBooleanResult.class,
+            StepBooleanClippingResult.class,
+            StepRepresentation.class
+    );
+
+    private static boolean isSelfTarget(StepEntity entity) {
+        for (Class<?> type : SELF_TARGET_TYPES) {
+            if (type.isInstance(entity)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void dispatchSemanticTargets(
             Set<StepEntity> targets,
             StepEntity entity,
@@ -12473,6 +12502,9 @@ public final class StepPmiTargetBuilder {
             Set<Integer> visiting,
             PmiEntityIndex index
     ) {
+        if (isSelfTarget(entity)) {
+            targets.add(entity);
+        }
         for (SemanticTargetRule rule : SEMANTIC_TARGET_RULES) {
             if (rule.matches(entity)) {
                 rule.handler().handle(targets, entity, resolved, visiting, index);

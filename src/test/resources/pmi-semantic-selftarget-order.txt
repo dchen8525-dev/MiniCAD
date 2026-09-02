@@ -1,0 +1,42 @@
+# Frozen self-target order for collectSemanticTargets.
+# Captured from the original 34-type OR block that preceded the
+# SEMANTIC_TARGET_RULES dispatch inside collectSemanticTargets.
+# These types are added as the entity itself (phase 1) before the related-target
+# table runs (phase 2). Order here is informational (isSelfTarget short-circuits
+# with anyMatch), but the membership is frozen so a dropped or duplicated
+# self-target type is caught, and so the corpus-wide golden export keeps
+# digesting the exact same set of entities.
+StepFaceEntity
+StepEdgeCurve
+StepPath
+StepOpenPath
+StepSubpath
+StepOrientedPath
+StepConnectedEdgeSet
+StepPointSet
+StepGeometricSet
+StepGeometricCurveSet
+StepOpenShell
+StepSurfacedOpenShell
+StepOrientedOpenShell
+StepClosedShell
+StepOrientedClosedShell
+StepWireShell
+StepVertexShell
+StepEdgeLoop
+StepPolyLoop
+StepConnectedFaceSet
+StepConnectedFaceSubSet
+StepFaceBasedSurfaceModel
+StepShellBasedSurfaceModel
+StepEdgeBasedWireframeModel
+StepShellBasedWireframeModel
+StepManifoldSolidBrep
+StepBrepWithVoids
+StepSweptAreaSolid
+StepSolidReplica
+StepCsgSolid
+StepCsgPrimitive
+StepBooleanResult
+StepBooleanClippingResult
+StepRepresentation
