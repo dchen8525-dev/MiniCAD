@@ -1566,111 +1566,131 @@ final class StepCadCurveBuilder {
      * Internal dispatcher for building 3D curves from STEP entities.
      * Handles the core 3D curve types managed by this builder.
      */
-    Curve3 buildCurve3Internal(StepEntity curve) {
-        if (curve instanceof StepLine) {
+    // buildCurve3Internal dispatch table (first-match-return, mirrors the original sequential ifs).
+    private record CadCurve3Rule(Class<? extends StepEntity> type, CadCurve3Handler handler) {}
+
+    private interface CadCurve3Handler {
+        Curve3 build(StepCadCurveBuilder self, StepEntity curve);
+    }
+
+    private static CadCurve3Rule cadCurve3Rule(
+            Class<? extends StepEntity> type, CadCurve3Handler handler) {
+        return new CadCurve3Rule(type, handler);
+    }
+
+    private static final List<CadCurve3Rule> BUILD_CURVE3_RULES = List.of(
+        cadCurve3Rule(StepLine.class, (self, curve) -> {
             StepLine line = (StepLine) curve;
-            return buildLine3(line.id());
-        }
-        if (curve instanceof StepCircle) {
+            return self.buildLine3(line.id());
+        }),
+        cadCurve3Rule(StepCircle.class, (self, curve) -> {
             StepCircle circle = (StepCircle) curve;
-            return buildCircle3(circle.id());
-        }
-        if (curve instanceof StepEllipse) {
+            return self.buildCircle3(circle.id());
+        }),
+        cadCurve3Rule(StepEllipse.class, (self, curve) -> {
             StepEllipse ellipse = (StepEllipse) curve;
-            return buildEllipse3(ellipse.id());
-        }
-        if (curve instanceof StepPolyline) {
+            return self.buildEllipse3(ellipse.id());
+        }),
+        cadCurve3Rule(StepPolyline.class, (self, curve) -> {
             StepPolyline polyline = (StepPolyline) curve;
-            return buildPolyline3(polyline.id());
-        }
-        if (curve instanceof StepBezierCurve) {
-            return buildImplicitBSplineCurve3((StepBezierCurve) curve);
-        }
-        if (curve instanceof StepUniformCurve) {
-            return buildImplicitBSplineCurve3((StepUniformCurve) curve);
-        }
-        if (curve instanceof StepQuasiUniformCurve) {
-            return buildImplicitBSplineCurve3((StepQuasiUniformCurve) curve);
-        }
-        if (curve instanceof StepPiecewiseBezierCurve) {
-            return buildImplicitBSplineCurve3((StepPiecewiseBezierCurve) curve);
-        }
-        if (curve instanceof StepBSplineCurveWithKnots) {
+            return self.buildPolyline3(polyline.id());
+        }),
+        cadCurve3Rule(StepBezierCurve.class, (self, curve) -> {
+            return self.buildImplicitBSplineCurve3((StepBezierCurve) curve);
+        }),
+        cadCurve3Rule(StepUniformCurve.class, (self, curve) -> {
+            return self.buildImplicitBSplineCurve3((StepUniformCurve) curve);
+        }),
+        cadCurve3Rule(StepQuasiUniformCurve.class, (self, curve) -> {
+            return self.buildImplicitBSplineCurve3((StepQuasiUniformCurve) curve);
+        }),
+        cadCurve3Rule(StepPiecewiseBezierCurve.class, (self, curve) -> {
+            return self.buildImplicitBSplineCurve3((StepPiecewiseBezierCurve) curve);
+        }),
+        cadCurve3Rule(StepBSplineCurveWithKnots.class, (self, curve) -> {
             StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) curve;
-            return buildBSplineCurve3(spline.id());
-        }
-        if (curve instanceof StepBSplineCurve) {
+            return self.buildBSplineCurve3(spline.id());
+        }),
+        cadCurve3Rule(StepBSplineCurve.class, (self, curve) -> {
             StepBSplineCurve spline = (StepBSplineCurve) curve;
-            return buildBSplineCurve3(spline.id());
-        }
-        if (curve instanceof StepRationalBSplineCurve) {
+            return self.buildBSplineCurve3(spline.id());
+        }),
+        cadCurve3Rule(StepRationalBSplineCurve.class, (self, curve) -> {
             StepRationalBSplineCurve spline = (StepRationalBSplineCurve) curve;
-            return buildRationalBSplineCurve3(spline.id());
-        }
-        if (curve instanceof StepSurfaceCurve) {
+            return self.buildRationalBSplineCurve3(spline.id());
+        }),
+        cadCurve3Rule(StepSurfaceCurve.class, (self, curve) -> {
             StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) curve;
-            return buildSurfaceCurve3(surfaceCurve.id());
-        }
-        if (curve instanceof StepSeamCurve) {
+            return self.buildSurfaceCurve3(surfaceCurve.id());
+        }),
+        cadCurve3Rule(StepSeamCurve.class, (self, curve) -> {
             StepSeamCurve seamCurve = (StepSeamCurve) curve;
-            return buildSeamCurve(seamCurve.id());
-        }
-        if (curve instanceof StepTrimmedCurve) {
+            return self.buildSeamCurve(seamCurve.id());
+        }),
+        cadCurve3Rule(StepTrimmedCurve.class, (self, curve) -> {
             StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) curve;
-            return buildTrimmedCurve3(trimmedCurve.id());
-        }
-        if (curve instanceof StepCompositeCurve) {
+            return self.buildTrimmedCurve3(trimmedCurve.id());
+        }),
+        cadCurve3Rule(StepCompositeCurve.class, (self, curve) -> {
             StepCompositeCurve compositeCurve = (StepCompositeCurve) curve;
-            return buildCompositeCurve3(compositeCurve.id());
-        }
-        if (curve instanceof StepCompositeCurveOnSurface) {
+            return self.buildCompositeCurve3(compositeCurve.id());
+        }),
+        cadCurve3Rule(StepCompositeCurveOnSurface.class, (self, curve) -> {
             StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) curve;
-            return buildCompositeCurve3(compositeCurveOnSurface.id());
-        }
-        if (curve instanceof StepConicCurve) {
-            return buildConicCurve3((StepConicCurve) curve);
-        }
-        if (curve instanceof StepOffsetCurve3D) {
+            return self.buildCompositeCurve3(compositeCurveOnSurface.id());
+        }),
+        cadCurve3Rule(StepConicCurve.class, (self, curve) -> {
+            return self.buildConicCurve3((StepConicCurve) curve);
+        }),
+        cadCurve3Rule(StepOffsetCurve3D.class, (self, curve) -> {
             StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) curve;
-            return buildOffsetCurve3(offsetCurve3D.id());
-        }
-        if (curve instanceof StepOrientedCurve) {
+            return self.buildOffsetCurve3(offsetCurve3D.id());
+        }),
+        cadCurve3Rule(StepOrientedCurve.class, (self, curve) -> {
             StepOrientedCurve orientedCurve = (StepOrientedCurve) curve;
-            Curve3 baseCurve = buildCurve3Callback.apply(orientedCurve.curveElement().id());
+            Curve3 baseCurve = self.buildCurve3Callback.apply(orientedCurve.curveElement().id());
             if (!orientedCurve.isOrientation() && baseCurve instanceof CompositeCurve3) {
-                CompositeCurve3 composite = (CompositeCurve3) baseCurve;
-                return reverseCompositeCurve(composite);
+            CompositeCurve3 composite = (CompositeCurve3) baseCurve;
+            return self.reverseCompositeCurve(composite);
             }
             return baseCurve;
-        }
-        if (curve instanceof StepGeometricReplica) {
+        }),
+        cadCurve3Rule(StepGeometricReplica.class, (self, curve) -> {
             StepGeometricReplica replica = (StepGeometricReplica) curve;
-            Curve3 parent = buildCurve3Callback.apply(replica.parent().id());
-            return geometryOps.transformCurve3(parent, replica.transformation());
-        }
-        if (curve instanceof StepClothoid) {
+            Curve3 parent = self.buildCurve3Callback.apply(replica.parent().id());
+            return self.geometryOps.transformCurve3(parent, replica.transformation());
+        }),
+        cadCurve3Rule(StepClothoid.class, (self, curve) -> {
             StepClothoid clothoid = (StepClothoid) curve;
-            return buildClothoid3(clothoid.id());
-        }
-        if (curve instanceof StepIndexedPolyCurve) {
-            return buildIndexedPolyCurve3((StepIndexedPolyCurve) curve);
-        }
-        if (curve instanceof StepDegenerateCurve) {
-            return buildDegenerateCurve3((StepDegenerateCurve) curve);
-        }
-        if (curve instanceof StepBoundedCurve) {
+            return self.buildClothoid3(clothoid.id());
+        }),
+        cadCurve3Rule(StepIndexedPolyCurve.class, (self, curve) -> {
+            return self.buildIndexedPolyCurve3((StepIndexedPolyCurve) curve);
+        }),
+        cadCurve3Rule(StepDegenerateCurve.class, (self, curve) -> {
+            return self.buildDegenerateCurve3((StepDegenerateCurve) curve);
+        }),
+        cadCurve3Rule(StepBoundedCurve.class, (self, curve) -> {
             StepBoundedCurve boundedCurve = (StepBoundedCurve) curve;
-            StepEntity actual = entitiesById.get(boundedCurve.id());
+            StepEntity actual = self.entitiesById.get(boundedCurve.id());
             if (actual != null && actual != boundedCurve) {
-                return buildCurve3Internal(actual);
+            return self.buildCurve3Internal(actual);
             }
             throw new UnsupportedGeometryException("BOUNDED_CURVE requires an underlying curve type");
-        }
-        if (curve instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
+        }),
+        cadCurve3Rule(StepBSplineCurveWithKnotsAndBreakpoints.class, (self, curve) -> {
             StepBSplineCurveWithKnotsAndBreakpoints spline = (StepBSplineCurveWithKnotsAndBreakpoints) curve;
-            return buildBSplineCurveWithBreakpoints(spline.id());
+            return self.buildBSplineCurveWithBreakpoints(spline.id());
+        })
+    );
+
+    Curve3 buildCurve3Internal(StepEntity curve) {
+        for (CadCurve3Rule rule : BUILD_CURVE3_RULES) {
+            if (rule.type().isInstance(curve)) {
+                return rule.handler().build(this, curve);
+            }
         }
-        // For curve types not handled by this builder, delegate to the callback
+
         return buildCurve3Callback.apply(curve.id());
     }
 
