@@ -3,6 +3,8 @@ package com.minicad.export.json;
 import com.minicad.geometry.*;
 import com.minicad.step.model.*;
 
+import java.util.List;
+
 /**
  * Utility class for resolving STEP entity type names.
  * Extracted from StepPreviewJsonExporter to improve maintainability.
@@ -24,287 +26,12 @@ public final class StepTypeNameResolver {
      * @return the STEP entity type name as a string
      */
     public static String surfaceTypeName(StepEntity geometry) {
-        if (geometry instanceof StepLine) {
-            return "LINE";
-        }
-        if (geometry instanceof StepCircle) {
-            return "CIRCLE";
-        }
-        if (geometry instanceof StepEllipse) {
-            return "ELLIPSE";
-        }
-        if (geometry instanceof StepPolyline) {
-            return "POLYLINE";
-        }
-        if (geometry instanceof StepBSplineCurve) {
-            return "B_SPLINE_CURVE";
-        }
-        if (geometry instanceof StepBSplineCurveWithKnots) {
-            return "B_SPLINE_CURVE_WITH_KNOTS";
-        }
-        if (geometry instanceof StepBezierCurve) {
-            return "BEZIER_CURVE";
-        }
-        if (geometry instanceof StepUniformCurve) {
-            return "UNIFORM_CURVE";
-        }
-        if (geometry instanceof StepQuasiUniformCurve) {
-            return "QUASI_UNIFORM_CURVE";
-        }
-        if (geometry instanceof StepPiecewiseBezierCurve) {
-            return "PIECEWISE_BEZIER_CURVE";
-        }
-        if (geometry instanceof StepRationalBSplineCurve) {
-            return "RATIONAL_B_SPLINE_CURVE";
-        }
-        if (geometry instanceof StepOffsetCurve2D) {
-            return "OFFSET_CURVE_2D";
-        }
-        if (geometry instanceof StepOffsetCurve3D) {
-            return "OFFSET_CURVE_3D";
-        }
-        if (geometry instanceof StepTrimmedCurve) {
-            return "TRIMMED_CURVE";
-        }
-        if (geometry instanceof StepSurfaceCurve) {
-            return "SURFACE_CURVE";
-        }
-        if (geometry instanceof StepSeamCurve) {
-            return "SEAM_CURVE";
-        }
-        if (geometry instanceof StepPcurve) {
-            return "PCURVE";
-        }
-        if (geometry instanceof StepCompositeCurve) {
-            return "COMPOSITE_CURVE";
-        }
-        if (geometry instanceof StepCompositeCurveOnSurface) {
-            return "COMPOSITE_CURVE_ON_SURFACE";
-        }
-        if (geometry instanceof StepConicCurve) {
-            StepConicCurve conic = (StepConicCurve) geometry;
-            return conic.entityName();
-        }
-        if (geometry instanceof StepOrientedCurve) {
-            return "ORIENTED_CURVE";
-        }
-        if (geometry instanceof StepPath) {
-            return "PATH";
-        }
-        if (geometry instanceof StepOpenPath) {
-            return "OPEN_PATH";
-        }
-        if (geometry instanceof StepSubpath) {
-            return "SUBPATH";
-        }
-        if (geometry instanceof StepOrientedPath) {
-            return "ORIENTED_PATH";
-        }
-        if (geometry instanceof StepVertex) {
-            return "VERTEX";
-        }
-        if (geometry instanceof StepVertexPoint) {
-            return "VERTEX_POINT";
-        }
-        if (geometry instanceof StepEdgeCurve) {
-            return "EDGE_CURVE";
-        }
-        if (geometry instanceof StepSubedge) {
-            return "SUBEDGE";
-        }
-        if (geometry instanceof StepEdge) {
-            return "EDGE";
-        }
-        if (geometry instanceof StepLoop) {
-            return "LOOP";
-        }
-        if (geometry instanceof StepPolyLoop) {
-            return "POLY_LOOP";
-        }
-        if (geometry instanceof StepEdgeLoop) {
-            return "EDGE_LOOP";
-        }
-        if (geometry instanceof StepVertexLoop) {
-            return "VERTEX_LOOP";
-        }
-        if (geometry instanceof StepFaceBound) {
-            StepFaceBound faceBound = (StepFaceBound) geometry;
-            return faceBound.outer() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
-        }
-        if (geometry instanceof StepOrientedEdge) {
-            return "ORIENTED_EDGE";
-        }
-        if (geometry instanceof StepOrientedFace) {
-            return "ORIENTED_FACE";
-        }
-        if (geometry instanceof StepConnectedEdgeSet) {
-            return "CONNECTED_EDGE_SET";
-        }
-        if (geometry instanceof StepConnectedFaceSubSet) {
-            return "CONNECTED_FACE_SUB_SET";
-        }
-        if (geometry instanceof StepConnectedFaceSet) {
-            return "CONNECTED_FACE_SET";
-        }
-        if (geometry instanceof StepOpenShell) {
-            return "OPEN_SHELL";
-        }
-        if (geometry instanceof StepSurfacedOpenShell) {
-            return "SURFACED_OPEN_SHELL";
-        }
-        if (geometry instanceof StepOrientedOpenShell) {
-            return "ORIENTED_OPEN_SHELL";
-        }
-        if (geometry instanceof StepClosedShell) {
-            return "CLOSED_SHELL";
-        }
-        if (geometry instanceof StepOrientedClosedShell) {
-            return "ORIENTED_CLOSED_SHELL";
-        }
-        if (geometry instanceof StepWireShell) {
-            return "WIRE_SHELL";
-        }
-        if (geometry instanceof StepVertexShell) {
-            return "VERTEX_SHELL";
-        }
-        if (geometry instanceof StepShellBasedSurfaceModel) {
-            return "SHELL_BASED_SURFACE_MODEL";
-        }
-        if (geometry instanceof StepFaceBasedSurfaceModel) {
-            return "FACE_BASED_SURFACE_MODEL";
-        }
-        if (geometry instanceof StepEdgeBasedWireframeModel) {
-            return "EDGE_BASED_WIREFRAME_MODEL";
-        }
-        if (geometry instanceof StepShellBasedWireframeModel) {
-            return "SHELL_BASED_WIREFRAME_MODEL";
-        }
-        if (geometry instanceof StepGeometricCurveSet) {
-            return "GEOMETRIC_CURVE_SET";
-        }
-        if (geometry instanceof StepGeometricSet) {
-            return "GEOMETRIC_SET";
-        }
-        if (geometry instanceof StepRepresentation) {
-            return "REPRESENTATION";
-        }
-        if (geometry instanceof StepRepresentationMap) {
-            return "REPRESENTATION_MAP";
-        }
-        if (geometry instanceof StepRepresentationRelationshipWithTransformation) {
-            return "REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION";
-        }
-        if (geometry instanceof StepRepresentationRelationship) {
-            return "REPRESENTATION_RELATIONSHIP";
-        }
-        if (geometry instanceof StepMappedItem) {
-            return "MAPPED_ITEM";
-        }
-        if (geometry instanceof StepStyledItem) {
-            return "STYLED_ITEM";
-        }
-        if (geometry instanceof StepOverRidingStyledItem) {
-            return "OVER_RIDING_STYLED_ITEM";
-        }
-        if (geometry instanceof StepSurface) {
-            return "SURFACE";
-        }
-        if (geometry instanceof StepBoundedSurface) {
-            return "BOUNDED_SURFACE";
-        }
-        if (geometry instanceof StepBSplineSurface) {
-            return "B_SPLINE_SURFACE";
-        }
-        if (geometry instanceof StepBezierSurface) {
-            return "BEZIER_SURFACE";
-        }
-        if (geometry instanceof StepUniformSurface) {
-            return "UNIFORM_SURFACE";
-        }
-        if (geometry instanceof StepQuasiUniformSurface) {
-            return "QUASI_UNIFORM_SURFACE";
-        }
-        if (geometry instanceof StepPiecewiseBezierSurface) {
-            return "PIECEWISE_BEZIER_SURFACE";
-        }
-        if (geometry instanceof StepPlane) {
-            return "PLANE";
-        }
-        if (geometry instanceof StepCylindricalSurface) {
-            return "CYLINDRICAL_SURFACE";
-        }
-        if (geometry instanceof StepConicalSurface) {
-            return "CONICAL_SURFACE";
-        }
-        if (geometry instanceof StepToroidalSurface) {
-            return "TOROIDAL_SURFACE";
-        }
-        if (geometry instanceof StepSphericalSurface) {
-            return "SPHERICAL_SURFACE";
-        }
-        if (geometry instanceof StepDegenerateToroidalSurface) {
-            return "DEGENERATE_TOROIDAL_SURFACE";
-        }
-        if (geometry instanceof StepSurfaceOfLinearExtrusion) {
-            return "SURFACE_OF_LINEAR_EXTRUSION";
-        }
-        if (geometry instanceof StepSurfaceOfRevolution) {
-            return "SURFACE_OF_REVOLUTION";
-        }
-        if (geometry instanceof StepRationalBSplineSurface) {
-            return "RATIONAL_B_SPLINE_SURFACE";
-        }
-        if (geometry instanceof StepBSplineSurfaceWithKnots) {
-            return "B_SPLINE_SURFACE_WITH_KNOTS";
-        }
-        if (geometry instanceof StepRectangularTrimmedSurface) {
-            return "RECTANGULAR_TRIMMED_SURFACE";
-        }
-        if (geometry instanceof StepCurveBoundedSurface) {
-            return "CURVE_BOUNDED_SURFACE";
-        }
-        if (geometry instanceof StepOrientedSurface) {
-            return "ORIENTED_SURFACE";
-        }
-        if (geometry instanceof StepOffsetSurface) {
-            return "OFFSET_SURFACE";
-        }
-        if (geometry instanceof StepSweptAreaSolid) {
-            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) geometry;
-            return sweptAreaSolid.entityName();
-        }
-        if (geometry instanceof StepSolidReplica) {
-            return "SOLID_REPLICA";
-        }
-        if (geometry instanceof StepManifoldSolidBrep) {
-            return "MANIFOLD_SOLID_BREP";
-        }
-        if (geometry instanceof StepBrepWithVoids) {
-            return "BREP_WITH_VOIDS";
-        }
-        if (geometry instanceof StepCsgSolid) {
-            return "CSG_SOLID";
-        }
-        if (geometry instanceof StepCsgPrimitive) {
-            StepCsgPrimitive primitive = (StepCsgPrimitive) geometry;
-            return primitive.entityName();
-        }
-        if (geometry instanceof StepBooleanClippingResult) {
-            return "BOOLEAN_CLIPPING_RESULT";
-        }
-        if (geometry instanceof StepBooleanResult) {
-            return "BOOLEAN_RESULT";
-        }
-        if (geometry instanceof StepSweptDiskSolid) {
-            return "SWEPT_DISK_SOLID";
-        }
-        if (geometry instanceof StepComplexClippingResult) {
-            return "COMPLEX_CLIPPING_RESULT";
-        }
-        if (geometry instanceof StepGeometricReplica) {
-            StepGeometricReplica replica = (StepGeometricReplica) geometry;
-            return replica.entityName();
-        }
+        for (SurfaceTypeNameRule rule : SURFACE_TYPE_NAME_RULES) {
+            if (rule.type().isInstance(geometry)) {
+                return rule.handler().name(geometry);
+            }
+        }
+
         return geometry.getClass().getSimpleName();
     }
 
@@ -316,6 +43,128 @@ public final class StepTypeNameResolver {
      * @return "SHELL" for open shells, "SOLID" for closed shells/solids,
      *         or surfaceTypeName for other entities
      */
+    // surfaceTypeName dispatch table (first-match-return, mirrors the original sequential ifs).
+    private record SurfaceTypeNameRule(Class<? extends StepEntity> type, SurfaceTypeNameHandler handler) {}
+
+    private interface SurfaceTypeNameHandler {
+        String name(StepEntity geometry);
+    }
+
+    private static SurfaceTypeNameRule surfaceTypeNameRule(
+            Class<? extends StepEntity> type, SurfaceTypeNameHandler handler) {
+        return new SurfaceTypeNameRule(type, handler);
+    }
+
+    private static final List<SurfaceTypeNameRule> SURFACE_TYPE_NAME_RULES = List.of(
+        surfaceTypeNameRule(StepLine.class, (geometry) -> "LINE"),
+        surfaceTypeNameRule(StepCircle.class, (geometry) -> "CIRCLE"),
+        surfaceTypeNameRule(StepEllipse.class, (geometry) -> "ELLIPSE"),
+        surfaceTypeNameRule(StepPolyline.class, (geometry) -> "POLYLINE"),
+        surfaceTypeNameRule(StepBSplineCurve.class, (geometry) -> "B_SPLINE_CURVE"),
+        surfaceTypeNameRule(StepBSplineCurveWithKnots.class, (geometry) -> "B_SPLINE_CURVE_WITH_KNOTS"),
+        surfaceTypeNameRule(StepBezierCurve.class, (geometry) -> "BEZIER_CURVE"),
+        surfaceTypeNameRule(StepUniformCurve.class, (geometry) -> "UNIFORM_CURVE"),
+        surfaceTypeNameRule(StepQuasiUniformCurve.class, (geometry) -> "QUASI_UNIFORM_CURVE"),
+        surfaceTypeNameRule(StepPiecewiseBezierCurve.class, (geometry) -> "PIECEWISE_BEZIER_CURVE"),
+        surfaceTypeNameRule(StepRationalBSplineCurve.class, (geometry) -> "RATIONAL_B_SPLINE_CURVE"),
+        surfaceTypeNameRule(StepOffsetCurve2D.class, (geometry) -> "OFFSET_CURVE_2D"),
+        surfaceTypeNameRule(StepOffsetCurve3D.class, (geometry) -> "OFFSET_CURVE_3D"),
+        surfaceTypeNameRule(StepTrimmedCurve.class, (geometry) -> "TRIMMED_CURVE"),
+        surfaceTypeNameRule(StepSurfaceCurve.class, (geometry) -> "SURFACE_CURVE"),
+        surfaceTypeNameRule(StepSeamCurve.class, (geometry) -> "SEAM_CURVE"),
+        surfaceTypeNameRule(StepPcurve.class, (geometry) -> "PCURVE"),
+        surfaceTypeNameRule(StepCompositeCurve.class, (geometry) -> "COMPOSITE_CURVE"),
+        surfaceTypeNameRule(StepCompositeCurveOnSurface.class, (geometry) -> "COMPOSITE_CURVE_ON_SURFACE"),
+        surfaceTypeNameRule(StepConicCurve.class, (geometry) -> {
+            StepConicCurve conic = (StepConicCurve) geometry;
+            return conic.entityName();
+        }),
+        surfaceTypeNameRule(StepOrientedCurve.class, (geometry) -> "ORIENTED_CURVE"),
+        surfaceTypeNameRule(StepPath.class, (geometry) -> "PATH"),
+        surfaceTypeNameRule(StepOpenPath.class, (geometry) -> "OPEN_PATH"),
+        surfaceTypeNameRule(StepSubpath.class, (geometry) -> "SUBPATH"),
+        surfaceTypeNameRule(StepOrientedPath.class, (geometry) -> "ORIENTED_PATH"),
+        surfaceTypeNameRule(StepVertex.class, (geometry) -> "VERTEX"),
+        surfaceTypeNameRule(StepVertexPoint.class, (geometry) -> "VERTEX_POINT"),
+        surfaceTypeNameRule(StepEdgeCurve.class, (geometry) -> "EDGE_CURVE"),
+        surfaceTypeNameRule(StepSubedge.class, (geometry) -> "SUBEDGE"),
+        surfaceTypeNameRule(StepEdge.class, (geometry) -> "EDGE"),
+        surfaceTypeNameRule(StepLoop.class, (geometry) -> "LOOP"),
+        surfaceTypeNameRule(StepPolyLoop.class, (geometry) -> "POLY_LOOP"),
+        surfaceTypeNameRule(StepEdgeLoop.class, (geometry) -> "EDGE_LOOP"),
+        surfaceTypeNameRule(StepVertexLoop.class, (geometry) -> "VERTEX_LOOP"),
+        surfaceTypeNameRule(StepFaceBound.class, (geometry) -> {
+            StepFaceBound faceBound = (StepFaceBound) geometry;
+            return faceBound.outer() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
+        }),
+        surfaceTypeNameRule(StepOrientedEdge.class, (geometry) -> "ORIENTED_EDGE"),
+        surfaceTypeNameRule(StepOrientedFace.class, (geometry) -> "ORIENTED_FACE"),
+        surfaceTypeNameRule(StepConnectedEdgeSet.class, (geometry) -> "CONNECTED_EDGE_SET"),
+        surfaceTypeNameRule(StepConnectedFaceSubSet.class, (geometry) -> "CONNECTED_FACE_SUB_SET"),
+        surfaceTypeNameRule(StepConnectedFaceSet.class, (geometry) -> "CONNECTED_FACE_SET"),
+        surfaceTypeNameRule(StepOpenShell.class, (geometry) -> "OPEN_SHELL"),
+        surfaceTypeNameRule(StepSurfacedOpenShell.class, (geometry) -> "SURFACED_OPEN_SHELL"),
+        surfaceTypeNameRule(StepOrientedOpenShell.class, (geometry) -> "ORIENTED_OPEN_SHELL"),
+        surfaceTypeNameRule(StepClosedShell.class, (geometry) -> "CLOSED_SHELL"),
+        surfaceTypeNameRule(StepOrientedClosedShell.class, (geometry) -> "ORIENTED_CLOSED_SHELL"),
+        surfaceTypeNameRule(StepWireShell.class, (geometry) -> "WIRE_SHELL"),
+        surfaceTypeNameRule(StepVertexShell.class, (geometry) -> "VERTEX_SHELL"),
+        surfaceTypeNameRule(StepShellBasedSurfaceModel.class, (geometry) -> "SHELL_BASED_SURFACE_MODEL"),
+        surfaceTypeNameRule(StepFaceBasedSurfaceModel.class, (geometry) -> "FACE_BASED_SURFACE_MODEL"),
+        surfaceTypeNameRule(StepEdgeBasedWireframeModel.class, (geometry) -> "EDGE_BASED_WIREFRAME_MODEL"),
+        surfaceTypeNameRule(StepShellBasedWireframeModel.class, (geometry) -> "SHELL_BASED_WIREFRAME_MODEL"),
+        surfaceTypeNameRule(StepGeometricCurveSet.class, (geometry) -> "GEOMETRIC_CURVE_SET"),
+        surfaceTypeNameRule(StepGeometricSet.class, (geometry) -> "GEOMETRIC_SET"),
+        surfaceTypeNameRule(StepRepresentation.class, (geometry) -> "REPRESENTATION"),
+        surfaceTypeNameRule(StepRepresentationMap.class, (geometry) -> "REPRESENTATION_MAP"),
+        surfaceTypeNameRule(StepRepresentationRelationshipWithTransformation.class, (geometry) -> "REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION"),
+        surfaceTypeNameRule(StepRepresentationRelationship.class, (geometry) -> "REPRESENTATION_RELATIONSHIP"),
+        surfaceTypeNameRule(StepMappedItem.class, (geometry) -> "MAPPED_ITEM"),
+        surfaceTypeNameRule(StepStyledItem.class, (geometry) -> "STYLED_ITEM"),
+        surfaceTypeNameRule(StepOverRidingStyledItem.class, (geometry) -> "OVER_RIDING_STYLED_ITEM"),
+        surfaceTypeNameRule(StepSurface.class, (geometry) -> "SURFACE"),
+        surfaceTypeNameRule(StepBoundedSurface.class, (geometry) -> "BOUNDED_SURFACE"),
+        surfaceTypeNameRule(StepBSplineSurface.class, (geometry) -> "B_SPLINE_SURFACE"),
+        surfaceTypeNameRule(StepBezierSurface.class, (geometry) -> "BEZIER_SURFACE"),
+        surfaceTypeNameRule(StepUniformSurface.class, (geometry) -> "UNIFORM_SURFACE"),
+        surfaceTypeNameRule(StepQuasiUniformSurface.class, (geometry) -> "QUASI_UNIFORM_SURFACE"),
+        surfaceTypeNameRule(StepPiecewiseBezierSurface.class, (geometry) -> "PIECEWISE_BEZIER_SURFACE"),
+        surfaceTypeNameRule(StepPlane.class, (geometry) -> "PLANE"),
+        surfaceTypeNameRule(StepCylindricalSurface.class, (geometry) -> "CYLINDRICAL_SURFACE"),
+        surfaceTypeNameRule(StepConicalSurface.class, (geometry) -> "CONICAL_SURFACE"),
+        surfaceTypeNameRule(StepToroidalSurface.class, (geometry) -> "TOROIDAL_SURFACE"),
+        surfaceTypeNameRule(StepSphericalSurface.class, (geometry) -> "SPHERICAL_SURFACE"),
+        surfaceTypeNameRule(StepDegenerateToroidalSurface.class, (geometry) -> "DEGENERATE_TOROIDAL_SURFACE"),
+        surfaceTypeNameRule(StepSurfaceOfLinearExtrusion.class, (geometry) -> "SURFACE_OF_LINEAR_EXTRUSION"),
+        surfaceTypeNameRule(StepSurfaceOfRevolution.class, (geometry) -> "SURFACE_OF_REVOLUTION"),
+        surfaceTypeNameRule(StepRationalBSplineSurface.class, (geometry) -> "RATIONAL_B_SPLINE_SURFACE"),
+        surfaceTypeNameRule(StepBSplineSurfaceWithKnots.class, (geometry) -> "B_SPLINE_SURFACE_WITH_KNOTS"),
+        surfaceTypeNameRule(StepRectangularTrimmedSurface.class, (geometry) -> "RECTANGULAR_TRIMMED_SURFACE"),
+        surfaceTypeNameRule(StepCurveBoundedSurface.class, (geometry) -> "CURVE_BOUNDED_SURFACE"),
+        surfaceTypeNameRule(StepOrientedSurface.class, (geometry) -> "ORIENTED_SURFACE"),
+        surfaceTypeNameRule(StepOffsetSurface.class, (geometry) -> "OFFSET_SURFACE"),
+        surfaceTypeNameRule(StepSweptAreaSolid.class, (geometry) -> {
+            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) geometry;
+            return sweptAreaSolid.entityName();
+        }),
+        surfaceTypeNameRule(StepSolidReplica.class, (geometry) -> "SOLID_REPLICA"),
+        surfaceTypeNameRule(StepManifoldSolidBrep.class, (geometry) -> "MANIFOLD_SOLID_BREP"),
+        surfaceTypeNameRule(StepBrepWithVoids.class, (geometry) -> "BREP_WITH_VOIDS"),
+        surfaceTypeNameRule(StepCsgSolid.class, (geometry) -> "CSG_SOLID"),
+        surfaceTypeNameRule(StepCsgPrimitive.class, (geometry) -> {
+            StepCsgPrimitive primitive = (StepCsgPrimitive) geometry;
+            return primitive.entityName();
+        }),
+        surfaceTypeNameRule(StepBooleanClippingResult.class, (geometry) -> "BOOLEAN_CLIPPING_RESULT"),
+        surfaceTypeNameRule(StepBooleanResult.class, (geometry) -> "BOOLEAN_RESULT"),
+        surfaceTypeNameRule(StepSweptDiskSolid.class, (geometry) -> "SWEPT_DISK_SOLID"),
+        surfaceTypeNameRule(StepComplexClippingResult.class, (geometry) -> "COMPLEX_CLIPPING_RESULT"),
+        surfaceTypeNameRule(StepGeometricReplica.class, (geometry) -> {
+            StepGeometricReplica replica = (StepGeometricReplica) geometry;
+            return replica.entityName();
+        })
+    );
+
     public static String geometryTypeName(StepEntity entity) {
         if (entity == null) {
             return "SOLID"; // Default for unknown entities in solid context
