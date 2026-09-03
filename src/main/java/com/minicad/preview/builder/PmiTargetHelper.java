@@ -1,5 +1,6 @@
 package com.minicad.preview.builder;
 
+import java.util.List;
 import com.minicad.export.json.StepMetadataHelper;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.step.model.StepAdvancedFace;
@@ -147,179 +148,200 @@ public final class PmiTargetHelper {
         return "entity";
     }
 
-    public static String pmiTargetName(StepEntity target) {
-        if (target instanceof StepFaceEntity) {
+    // pmiTargetName dispatch table (first-match-return, mirrors the original sequential ifs).
+    private record PmiTargetNameRule(Class<? extends StepEntity> type, PmiTargetNameHandler handler) {}
+
+    private interface PmiTargetNameHandler {
+        String name(StepEntity target);
+    }
+
+    private static PmiTargetNameRule pmiTargetNameRule(
+            Class<? extends StepEntity> type, PmiTargetNameHandler handler) {
+        return new PmiTargetNameRule(type, handler);
+    }
+
+    private static final List<PmiTargetNameRule> PMI_TARGET_NAME_RULES = List.of(
+        pmiTargetNameRule(StepFaceEntity.class, (target) -> {
             StepFaceEntity face = (StepFaceEntity) target;
             return StepMetadataHelper.faceDisplayName(face);
-        }
-        if (target instanceof StepEdgeCurve) {
+        }),
+        pmiTargetNameRule(StepEdgeCurve.class, (target) -> {
             StepEdgeCurve edge = (StepEdgeCurve) target;
             return edge.name();
-        }
-        if (target instanceof StepSubedge) {
+        }),
+        pmiTargetNameRule(StepSubedge.class, (target) -> {
             StepSubedge subedge = (StepSubedge) target;
             return subedge.name();
-        }
-        if (target instanceof StepOrientedEdge) {
+        }),
+        pmiTargetNameRule(StepOrientedEdge.class, (target) -> {
             StepOrientedEdge orientedEdge = (StepOrientedEdge) target;
             return orientedEdge.name();
-        }
-        if (target instanceof StepPath) {
+        }),
+        pmiTargetNameRule(StepPath.class, (target) -> {
             StepPath path = (StepPath) target;
             return path.name();
-        }
-        if (target instanceof StepOpenPath) {
+        }),
+        pmiTargetNameRule(StepOpenPath.class, (target) -> {
             StepOpenPath path = (StepOpenPath) target;
             return path.name();
-        }
-        if (target instanceof StepSubpath) {
+        }),
+        pmiTargetNameRule(StepSubpath.class, (target) -> {
             StepSubpath subpath = (StepSubpath) target;
             return subpath.name();
-        }
-        if (target instanceof StepOrientedPath) {
+        }),
+        pmiTargetNameRule(StepOrientedPath.class, (target) -> {
             StepOrientedPath orientedPath = (StepOrientedPath) target;
             return orientedPath.name();
-        }
-        if (target instanceof StepConnectedEdgeSet) {
+        }),
+        pmiTargetNameRule(StepConnectedEdgeSet.class, (target) -> {
             StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) target;
             return edgeSet.name();
-        }
-        if (target instanceof StepPointSet) {
+        }),
+        pmiTargetNameRule(StepPointSet.class, (target) -> {
             StepPointSet pointSet = (StepPointSet) target;
             return pointSet.name();
-        }
-        if (target instanceof StepAnnotationSymbol) {
+        }),
+        pmiTargetNameRule(StepAnnotationSymbol.class, (target) -> {
             StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) target;
             return annotationSymbol.name();
-        }
-        if (target instanceof StepAnnotationText) {
+        }),
+        pmiTargetNameRule(StepAnnotationText.class, (target) -> {
             StepAnnotationText annotationText = (StepAnnotationText) target;
             return annotationText.name();
-        }
-        if (target instanceof StepAnnotationTextCharacter) {
+        }),
+        pmiTargetNameRule(StepAnnotationTextCharacter.class, (target) -> {
             StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) target;
             return annotationTextCharacter.name();
-        }
-        if (target instanceof StepAnnotationFillArea) {
+        }),
+        pmiTargetNameRule(StepAnnotationFillArea.class, (target) -> {
             StepAnnotationFillArea fillArea = (StepAnnotationFillArea) target;
             return fillArea.name();
-        }
-        if (target instanceof StepGeometricSet) {
+        }),
+        pmiTargetNameRule(StepGeometricSet.class, (target) -> {
             StepGeometricSet geometricSet = (StepGeometricSet) target;
             return geometricSet.name();
-        }
-        if (target instanceof StepGeometricCurveSet) {
+        }),
+        pmiTargetNameRule(StepGeometricCurveSet.class, (target) -> {
             StepGeometricCurveSet curveSet = (StepGeometricCurveSet) target;
             return curveSet.name();
-        }
-        if (target instanceof StepOpenShell) {
+        }),
+        pmiTargetNameRule(StepOpenShell.class, (target) -> {
             StepOpenShell openShell = (StepOpenShell) target;
             return openShell.name();
-        }
-        if (target instanceof StepSurfacedOpenShell) {
+        }),
+        pmiTargetNameRule(StepSurfacedOpenShell.class, (target) -> {
             StepSurfacedOpenShell openShell = (StepSurfacedOpenShell) target;
             return openShell.name();
-        }
-        if (target instanceof StepOrientedOpenShell) {
+        }),
+        pmiTargetNameRule(StepOrientedOpenShell.class, (target) -> {
             StepOrientedOpenShell openShell = (StepOrientedOpenShell) target;
             return openShell.name();
-        }
-        if (target instanceof StepClosedShell) {
+        }),
+        pmiTargetNameRule(StepClosedShell.class, (target) -> {
             StepClosedShell closedShell = (StepClosedShell) target;
             return closedShell.name();
-        }
-        if (target instanceof StepOrientedClosedShell) {
+        }),
+        pmiTargetNameRule(StepOrientedClosedShell.class, (target) -> {
             StepOrientedClosedShell closedShell = (StepOrientedClosedShell) target;
             return closedShell.name();
-        }
-        if (target instanceof StepWireShell) {
+        }),
+        pmiTargetNameRule(StepWireShell.class, (target) -> {
             StepWireShell wireShell = (StepWireShell) target;
             return wireShell.name();
-        }
-        if (target instanceof StepVertexShell) {
+        }),
+        pmiTargetNameRule(StepVertexShell.class, (target) -> {
             StepVertexShell vertexShell = (StepVertexShell) target;
             return vertexShell.name();
-        }
-        if (target instanceof StepEdgeLoop) {
+        }),
+        pmiTargetNameRule(StepEdgeLoop.class, (target) -> {
             StepEdgeLoop edgeLoop = (StepEdgeLoop) target;
             return edgeLoop.name();
-        }
-        if (target instanceof StepVertexLoop) {
+        }),
+        pmiTargetNameRule(StepVertexLoop.class, (target) -> {
             StepVertexLoop vertexLoop = (StepVertexLoop) target;
             return vertexLoop.name();
-        }
-        if (target instanceof StepPolyLoop) {
+        }),
+        pmiTargetNameRule(StepPolyLoop.class, (target) -> {
             StepPolyLoop polyLoop = (StepPolyLoop) target;
             return polyLoop.name();
-        }
-        if (target instanceof StepConnectedFaceSet) {
+        }),
+        pmiTargetNameRule(StepConnectedFaceSet.class, (target) -> {
             StepConnectedFaceSet faceSet = (StepConnectedFaceSet) target;
             return faceSet.name();
-        }
-        if (target instanceof StepConnectedFaceSubSet) {
+        }),
+        pmiTargetNameRule(StepConnectedFaceSubSet.class, (target) -> {
             StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) target;
             return faceSet.name();
-        }
-        if (target instanceof StepFaceBasedSurfaceModel) {
+        }),
+        pmiTargetNameRule(StepFaceBasedSurfaceModel.class, (target) -> {
             StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) target;
             return surfaceModel.name();
-        }
-        if (target instanceof StepShellBasedSurfaceModel) {
+        }),
+        pmiTargetNameRule(StepShellBasedSurfaceModel.class, (target) -> {
             StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) target;
             return surfaceModel.name();
-        }
-        if (target instanceof StepEdgeBasedWireframeModel) {
+        }),
+        pmiTargetNameRule(StepEdgeBasedWireframeModel.class, (target) -> {
             StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) target;
             return wireframeModel.name();
-        }
-        if (target instanceof StepShellBasedWireframeModel) {
+        }),
+        pmiTargetNameRule(StepShellBasedWireframeModel.class, (target) -> {
             StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) target;
             return wireframeModel.name();
-        }
-        if (target instanceof StepManifoldSolidBrep) {
+        }),
+        pmiTargetNameRule(StepManifoldSolidBrep.class, (target) -> {
             StepManifoldSolidBrep solid = (StepManifoldSolidBrep) target;
             return solid.name();
-        }
-        if (target instanceof StepBrepWithVoids) {
+        }),
+        pmiTargetNameRule(StepBrepWithVoids.class, (target) -> {
             StepBrepWithVoids solid = (StepBrepWithVoids) target;
             return solid.name();
-        }
-        if (target instanceof StepSweptAreaSolid) {
+        }),
+        pmiTargetNameRule(StepSweptAreaSolid.class, (target) -> {
             StepSweptAreaSolid solid = (StepSweptAreaSolid) target;
             return solid.name();
-        }
-        if (target instanceof StepSolidReplica) {
+        }),
+        pmiTargetNameRule(StepSolidReplica.class, (target) -> {
             StepSolidReplica solid = (StepSolidReplica) target;
             return solid.name();
-        }
-        if (target instanceof StepCsgSolid) {
+        }),
+        pmiTargetNameRule(StepCsgSolid.class, (target) -> {
             StepCsgSolid solid = (StepCsgSolid) target;
             return solid.name();
-        }
-        if (target instanceof StepCsgPrimitive) {
+        }),
+        pmiTargetNameRule(StepCsgPrimitive.class, (target) -> {
             StepCsgPrimitive solid = (StepCsgPrimitive) target;
             return solid.name();
-        }
-        if (target instanceof StepBooleanResult) {
+        }),
+        pmiTargetNameRule(StepBooleanResult.class, (target) -> {
             StepBooleanResult solid = (StepBooleanResult) target;
             return solid.name();
-        }
-        if (target instanceof StepBooleanClippingResult) {
+        }),
+        pmiTargetNameRule(StepBooleanClippingResult.class, (target) -> {
             StepBooleanClippingResult solid = (StepBooleanClippingResult) target;
             return solid.name();
-        }
-        if (target instanceof StepSweptDiskSolid) {
+        }),
+        pmiTargetNameRule(StepSweptDiskSolid.class, (target) -> {
             StepSweptDiskSolid solid = (StepSweptDiskSolid) target;
             return solid.name();
-        }
-        if (target instanceof StepComplexClippingResult) {
+        }),
+        pmiTargetNameRule(StepComplexClippingResult.class, (target) -> {
             StepComplexClippingResult solid = (StepComplexClippingResult) target;
             return solid.name();
-        }
-        if (target instanceof StepRepresentation) {
+        }),
+        pmiTargetNameRule(StepRepresentation.class, (target) -> {
             StepRepresentation representation = (StepRepresentation) target;
             return representation.name();
+        })
+    );
+
+    public static String pmiTargetName(StepEntity target) {
+        for (PmiTargetNameRule rule : PMI_TARGET_NAME_RULES) {
+            if (rule.type().isInstance(target)) {
+                return rule.handler().name(target);
+            }
         }
+
         return "";
     }
 }
