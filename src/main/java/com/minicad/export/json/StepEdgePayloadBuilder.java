@@ -1005,6 +1005,312 @@ public final class StepEdgePayloadBuilder {
      * @param builder the CAD builder
      * @param metadata the metadata extractor
      */
+    // collectStandaloneEdges dispatch table (first-match-return, mirrors the original sequential ifs).
+    private record EdgeCollectRule(Class<? extends StepEntity> type, EdgeCollectHandler handler) {}
+
+    private interface EdgeCollectHandler {
+        void collect(StepEntity item, Map<Integer, EdgePayload> edges,
+                Map<Integer, StepEntity> resolved, StepCadBuilder builder,
+                StepMetadataExtractor metadata);
+    }
+
+    private static EdgeCollectRule edgeCollectRule(
+            Class<? extends StepEntity> type, EdgeCollectHandler handler) {
+        return new EdgeCollectRule(type, handler);
+    }
+
+    private static final List<EdgeCollectRule> EDGE_COLLECT_RULES = List.of(
+        edgeCollectRule(StepStyledItem.class, (item, edges, resolved, builder, metadata) -> {
+            StepStyledItem styledItem = (StepStyledItem) item;
+            collectStandaloneEdges(styledItem.item(), edges, resolved, builder, metadata);
+            return;
+        }),
+        edgeCollectRule(StepOverRidingStyledItem.class, (item, edges, resolved, builder, metadata) -> {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) item;
+            collectStandaloneEdges(styledItem.item(), edges, resolved, builder, metadata);
+            return;
+        }),
+        edgeCollectRule(StepPolyline.class, (item, edges, resolved, builder, metadata) -> {
+            StepPolyline polyline = (StepPolyline) item;
+            edges.putIfAbsent(polyline.id(), toPolylineEdgePayload(polyline));
+            return;
+        }),
+        edgeCollectRule(StepGeometricCurveSet.class, (item, edges, resolved, builder, metadata) -> {
+            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
+            for (StepEntity element : curveSet.elements()) {
+            collectStandaloneEdges(element, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepGeometricSet.class, (item, edges, resolved, builder, metadata) -> {
+            StepGeometricSet geometricSet = (StepGeometricSet) item;
+            for (StepEntity element : geometricSet.elements()) {
+            collectStandaloneEdges(element, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepShellBasedWireframeModel.class, (item, edges, resolved, builder, metadata) -> {
+            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) item;
+            for (StepEntity boundary : wireframeModel.boundaries()) {
+            collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepEdgeBasedWireframeModel.class, (item, edges, resolved, builder, metadata) -> {
+            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) item;
+            for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
+            collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepConnectedEdgeSet.class, (item, edges, resolved, builder, metadata) -> {
+            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) item;
+            for (StepEntity edge : connectedEdgeSet.edges()) {
+            collectStandaloneEdges(edge, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepEdgeCurve.class, (item, edges, resolved, builder, metadata) -> {
+            StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
+            edges.putIfAbsent(edgeCurve.id(), buildEdgePayload(edgeCurve.id(), resolved, builder, metadata));
+            return;
+        }),
+        edgeCollectRule(StepFilletEdge.class, (item, edges, resolved, builder, metadata) -> {
+            StepFilletEdge filletEdge = (StepFilletEdge) item;
+            edges.putIfAbsent(filletEdge.id(), buildEdgePayload(filletEdge.id(), resolved, builder, metadata));
+            return;
+        }),
+        edgeCollectRule(StepChamferEdge.class, (item, edges, resolved, builder, metadata) -> {
+            StepChamferEdge chamferEdge = (StepChamferEdge) item;
+            edges.putIfAbsent(chamferEdge.id(), buildEdgePayload(chamferEdge.id(), resolved, builder, metadata));
+            return;
+        }),
+        edgeCollectRule(StepPath.class, (item, edges, resolved, builder, metadata) -> {
+            StepPath path = (StepPath) item;
+            for (StepOrientedEdge orientedEdge : path.edges()) {
+            edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+            }
+            return;
+        }),
+        edgeCollectRule(StepOpenPath.class, (item, edges, resolved, builder, metadata) -> {
+            StepOpenPath path = (StepOpenPath) item;
+            for (StepOrientedEdge orientedEdge : path.edges()) {
+            edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+            }
+            return;
+        }),
+        edgeCollectRule(StepSubpath.class, (item, edges, resolved, builder, metadata) -> {
+            StepSubpath subpath = (StepSubpath) item;
+            for (StepOrientedEdge orientedEdge : subpath.edges()) {
+            edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+            }
+            return;
+        }),
+        edgeCollectRule(StepOrientedPath.class, (item, edges, resolved, builder, metadata) -> {
+            StepOrientedPath orientedPath = (StepOrientedPath) item;
+            for (StepOrientedEdge orientedEdge : orientedPath.edges()) {
+            edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+            }
+            return;
+        }),
+        edgeCollectRule(StepWireShell.class, (item, edges, resolved, builder, metadata) -> {
+            StepWireShell wireShell = (StepWireShell) item;
+            for (StepEntity loop : wireShell.loops()) {
+            collectStandaloneEdges(loop, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepEdgeWire.class, (item, edges, resolved, builder, metadata) -> {
+            StepEdgeWire edgeWire = (StepEdgeWire) item;
+            for (StepEntity edge : edgeWire.edges()) {
+            collectStandaloneEdges(edge, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepGeometricSurfaceSet.class, (item, edges, resolved, builder, metadata) -> {
+            StepGeometricSurfaceSet surfaceSet = (StepGeometricSurfaceSet) item;
+            for (StepEntity element : surfaceSet.elements()) {
+            collectStandaloneEdges(element, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepEdgeLoop.class, (item, edges, resolved, builder, metadata) -> {
+            StepEdgeLoop edgeLoop = (StepEdgeLoop) item;
+            for (StepOrientedEdge orientedEdge : edgeLoop.edges()) {
+            edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
+            }
+            return;
+        }),
+        edgeCollectRule(StepPolyLoop.class, (item, edges, resolved, builder, metadata) -> {
+            StepPolyLoop polyLoop = (StepPolyLoop) item;
+            edges.putIfAbsent(polyLoop.id(), toPolyLoopEdgePayload(polyLoop));
+            return;
+        }),
+        edgeCollectRule(StepVertexShell.class, (item, edges, resolved, builder, metadata) -> {
+            return;
+        }),
+        edgeCollectRule(com.minicad.step.model.StepVertexLoop.class, (item, edges, resolved, builder, metadata) -> {
+            return;
+        }),
+        edgeCollectRule(StepAnnotationCurveOccurrence.class, (item, edges, resolved, builder, metadata) -> {
+            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
+            collectStandaloneEdges(occurrence.item(), edges, resolved, builder, metadata);
+            return;
+        }),
+        edgeCollectRule(StepAnnotationFillArea.class, (item, edges, resolved, builder, metadata) -> {
+            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) item;
+            for (StepEntity boundary : fillArea.boundaries()) {
+            collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepAnnotationFillAreaOccurrence.class, (item, edges, resolved, builder, metadata) -> {
+            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) item;
+            collectStandaloneEdges(fillAreaOccurrence.item(), edges, resolved, builder, metadata);
+            return;
+        }),
+        edgeCollectRule(StepAnnotationSymbol.class, (item, edges, resolved, builder, metadata) -> {
+            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
+            collectMappedAnnotationEdges(
+            annotationSymbol.id(),
+            annotationSymbol.mappingSource().mappedRepresentation(),
+            annotationSymbol.mappingSource().mappedOrigin(),
+            annotationSymbol.mappingTarget(),
+            null,
+            null,
+            edges,
+            resolved,
+            builder
+            );
+            return;
+        }),
+        edgeCollectRule(StepAnnotationSymbolOccurrence.class, (item, edges, resolved, builder, metadata) -> {
+            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
+            if (!collectMappedAnnotationCarrierEdges(
+            symbolOccurrence.id(),
+            "ANNOTATION_SYMBOL_OCCURRENCE",
+            symbolOccurrence.id(),
+            symbolOccurrence.item(),
+            edges,
+            resolved,
+            builder
+            )) {
+            collectStandaloneEdges(symbolOccurrence.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepAnnotationSubfigureOccurrence.class, (item, edges, resolved, builder, metadata) -> {
+            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
+            if (!collectMappedAnnotationCarrierEdges(
+            subfigureOccurrence.id(),
+            "ANNOTATION_SUBFIGURE_OCCURRENCE",
+            subfigureOccurrence.id(),
+            subfigureOccurrence.item(),
+            edges,
+            resolved,
+            builder
+            )) {
+            collectStandaloneEdges(subfigureOccurrence.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepAnnotationText.class, (item, edges, resolved, builder, metadata) -> {
+            StepAnnotationText annotationText = (StepAnnotationText) item;
+            collectMappedAnnotationEdges(
+            annotationText.id(),
+            annotationText.mappingSource().mappedRepresentation(),
+            annotationText.mappingSource().mappedOrigin(),
+            annotationText.mappingTarget(),
+            null,
+            null,
+            edges,
+            resolved,
+            builder
+            );
+            return;
+        }),
+        edgeCollectRule(StepAnnotationTextCharacter.class, (item, edges, resolved, builder, metadata) -> {
+            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
+            collectMappedAnnotationEdges(
+            annotationTextCharacter.id(),
+            annotationTextCharacter.mappingSource().mappedRepresentation(),
+            annotationTextCharacter.mappingSource().mappedOrigin(),
+            annotationTextCharacter.mappingTarget(),
+            null,
+            null,
+            edges,
+            resolved,
+            builder
+            );
+            return;
+        }),
+        edgeCollectRule(StepDimensionCurve.class, (item, edges, resolved, builder, metadata) -> {
+            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+            edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+            collectStandaloneEdges(dimensionCurve.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepLeaderCurve.class, (item, edges, resolved, builder, metadata) -> {
+            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+            edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+            collectStandaloneEdges(leaderCurve.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepProjectionCurve.class, (item, edges, resolved, builder, metadata) -> {
+            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+            edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+            collectStandaloneEdges(projectionCurve.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepDraughtingAnnotationOccurrence.class, (item, edges, resolved, builder, metadata) -> {
+            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+            edges.putIfAbsent(sampled.stepId(), sampled);
+            } else if (collectMappedAnnotationCarrierEdges(
+            annotationOccurrence.id(),
+            "DRAUGHTING_ANNOTATION_OCCURRENCE",
+            annotationOccurrence.id(),
+            annotationOccurrence.item(),
+            edges,
+            resolved,
+            builder
+            )) {
+            return;
+            } else {
+            collectStandaloneEdges(annotationOccurrence.item(), edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepTerminatorSymbol.class, (item, edges, resolved, builder, metadata) -> {
+            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
+            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
+            if (sampled != null) {
+            edges.putIfAbsent(sampled.stepId(), sampled);
+            } else {
+            collectStandaloneEdges(terminatorSymbol.annotatedCurve(), edges, resolved, builder, metadata);
+            }
+            return;
+        }),
+        edgeCollectRule(StepSubedge.class, (item, edges, resolved, builder, metadata) -> {
+            StepSubedge subedge = (StepSubedge) item;
+            collectStandaloneEdges(subedge.parentEdge(), edges, resolved, builder, metadata);
+            return;
+        })
+    );
+
     static void collectStandaloneEdges(
             StepEntity item,
             Map<Integer, EdgePayload> edges,
@@ -1012,312 +1318,13 @@ public final class StepEdgePayloadBuilder {
             StepCadBuilder builder,
             StepMetadataExtractor metadata
     ) {
-        if (item instanceof StepStyledItem) {
-            StepStyledItem styledItem = (StepStyledItem) item;
-            collectStandaloneEdges(styledItem.item(), edges, resolved, builder, metadata);
-            return;
-        }
-        if (item instanceof StepOverRidingStyledItem) {
-            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) item;
-            collectStandaloneEdges(styledItem.item(), edges, resolved, builder, metadata);
-            return;
-        }
-        if (item instanceof StepPolyline) {
-            StepPolyline polyline = (StepPolyline) item;
-            edges.putIfAbsent(polyline.id(), toPolylineEdgePayload(polyline));
-            return;
-        }
-        if (item instanceof StepGeometricCurveSet) {
-            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
-            for (StepEntity element : curveSet.elements()) {
-                collectStandaloneEdges(element, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepGeometricSet) {
-            StepGeometricSet geometricSet = (StepGeometricSet) item;
-            for (StepEntity element : geometricSet.elements()) {
-                collectStandaloneEdges(element, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepShellBasedWireframeModel) {
-            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) item;
-            for (StepEntity boundary : wireframeModel.boundaries()) {
-                collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepEdgeBasedWireframeModel) {
-            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) item;
-            for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
-                collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepConnectedEdgeSet) {
-            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) item;
-            for (StepEntity edge : connectedEdgeSet.edges()) {
-                collectStandaloneEdges(edge, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepEdgeCurve) {
-            StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
-            edges.putIfAbsent(edgeCurve.id(), buildEdgePayload(edgeCurve.id(), resolved, builder, metadata));
-            return;
-        }
-        if (item instanceof StepFilletEdge) {
-            StepFilletEdge filletEdge = (StepFilletEdge) item;
-            edges.putIfAbsent(filletEdge.id(), buildEdgePayload(filletEdge.id(), resolved, builder, metadata));
-            return;
-        }
-        if (item instanceof StepChamferEdge) {
-            StepChamferEdge chamferEdge = (StepChamferEdge) item;
-            edges.putIfAbsent(chamferEdge.id(), buildEdgePayload(chamferEdge.id(), resolved, builder, metadata));
-            return;
-        }
-        if (item instanceof StepPath) {
-            StepPath path = (StepPath) item;
-            for (StepOrientedEdge orientedEdge : path.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
-            }
-            return;
-        }
-        if (item instanceof StepOpenPath) {
-            StepOpenPath path = (StepOpenPath) item;
-            for (StepOrientedEdge orientedEdge : path.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
-            }
-            return;
-        }
-        if (item instanceof StepSubpath) {
-            StepSubpath subpath = (StepSubpath) item;
-            for (StepOrientedEdge orientedEdge : subpath.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
-            }
-            return;
-        }
-        if (item instanceof StepOrientedPath) {
-            StepOrientedPath orientedPath = (StepOrientedPath) item;
-            for (StepOrientedEdge orientedEdge : orientedPath.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
-            }
-            return;
-        }
-        if (item instanceof StepWireShell) {
-            StepWireShell wireShell = (StepWireShell) item;
-            for (StepEntity loop : wireShell.loops()) {
-                collectStandaloneEdges(loop, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepEdgeWire) {
-            StepEdgeWire edgeWire = (StepEdgeWire) item;
-            for (StepEntity edge : edgeWire.edges()) {
-                collectStandaloneEdges(edge, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepGeometricSurfaceSet) {
-            StepGeometricSurfaceSet surfaceSet = (StepGeometricSurfaceSet) item;
-            for (StepEntity element : surfaceSet.elements()) {
-                collectStandaloneEdges(element, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepEdgeLoop) {
-            StepEdgeLoop edgeLoop = (StepEdgeLoop) item;
-            for (StepOrientedEdge orientedEdge : edgeLoop.edges()) {
-                edges.putIfAbsent(orientedEdge.edgeElement().id(), buildEdgePayload(orientedEdge.edgeElement().id(), resolved, builder, metadata));
-            }
-            return;
-        }
-        if (item instanceof StepPolyLoop) {
-            StepPolyLoop polyLoop = (StepPolyLoop) item;
-            edges.putIfAbsent(polyLoop.id(), toPolyLoopEdgePayload(polyLoop));
-            return;
-        }
-        if (item instanceof StepVertexShell || item instanceof com.minicad.step.model.StepVertexLoop) {
-            return;
-        }
-        if (item instanceof StepAnnotationCurveOccurrence) {
-            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
-            collectStandaloneEdges(occurrence.item(), edges, resolved, builder, metadata);
-            return;
-        }
-        if (item instanceof StepAnnotationFillArea) {
-            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) item;
-            for (StepEntity boundary : fillArea.boundaries()) {
-                collectStandaloneEdges(boundary, edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepAnnotationFillAreaOccurrence) {
-            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) item;
-            collectStandaloneEdges(fillAreaOccurrence.item(), edges, resolved, builder, metadata);
-            return;
-        }
-        if (item instanceof StepAnnotationSymbol) {
-            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
-            collectMappedAnnotationEdges(
-                    annotationSymbol.id(),
-                    annotationSymbol.mappingSource().mappedRepresentation(),
-                    annotationSymbol.mappingSource().mappedOrigin(),
-                    annotationSymbol.mappingTarget(),
-                    null,
-                    null,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return;
-        }
-        if (item instanceof StepAnnotationSymbolOccurrence) {
-            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
-            if (!collectMappedAnnotationCarrierEdges(
-                    symbolOccurrence.id(),
-                    "ANNOTATION_SYMBOL_OCCURRENCE",
-                    symbolOccurrence.id(),
-                    symbolOccurrence.item(),
-                    edges,
-                    resolved,
-                    builder
-            )) {
-                collectStandaloneEdges(symbolOccurrence.item(), edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepAnnotationSubfigureOccurrence) {
-            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
-            if (!collectMappedAnnotationCarrierEdges(
-                    subfigureOccurrence.id(),
-                    "ANNOTATION_SUBFIGURE_OCCURRENCE",
-                    subfigureOccurrence.id(),
-                    subfigureOccurrence.item(),
-                    edges,
-                    resolved,
-                    builder
-            )) {
-                collectStandaloneEdges(subfigureOccurrence.item(), edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepAnnotationText) {
-            StepAnnotationText annotationText = (StepAnnotationText) item;
-            collectMappedAnnotationEdges(
-                    annotationText.id(),
-                    annotationText.mappingSource().mappedRepresentation(),
-                    annotationText.mappingSource().mappedOrigin(),
-                    annotationText.mappingTarget(),
-                    null,
-                    null,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return;
-        }
-        if (item instanceof StepAnnotationTextCharacter) {
-            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
-            collectMappedAnnotationEdges(
-                    annotationTextCharacter.id(),
-                    annotationTextCharacter.mappingSource().mappedRepresentation(),
-                    annotationTextCharacter.mappingSource().mappedOrigin(),
-                    annotationTextCharacter.mappingTarget(),
-                    null,
-                    null,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return;
-        }
-        if (item instanceof StepDimensionCurve) {
-            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
-            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
-            if (sampled != null) {
-                edges.putIfAbsent(sampled.stepId(), sampled);
-            } else {
-                collectStandaloneEdges(dimensionCurve.item(), edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepLeaderCurve) {
-            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
-            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
-            if (sampled != null) {
-                edges.putIfAbsent(sampled.stepId(), sampled);
-            } else {
-                collectStandaloneEdges(leaderCurve.item(), edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepProjectionCurve) {
-            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
-            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
-            if (sampled != null) {
-                edges.putIfAbsent(sampled.stepId(), sampled);
-            } else {
-                collectStandaloneEdges(projectionCurve.item(), edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepDraughtingAnnotationOccurrence) {
-            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
-            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
-            if (sampled != null) {
-                edges.putIfAbsent(sampled.stepId(), sampled);
-            } else if (collectMappedAnnotationCarrierEdges(
-                    annotationOccurrence.id(),
-                    "DRAUGHTING_ANNOTATION_OCCURRENCE",
-                    annotationOccurrence.id(),
-                    annotationOccurrence.item(),
-                    edges,
-                    resolved,
-                    builder
-            )) {
+        for (EdgeCollectRule rule : EDGE_COLLECT_RULES) {
+            if (rule.type().isInstance(item)) {
+                rule.handler().collect(item, edges, resolved, builder, metadata);
                 return;
-            } else {
-                collectStandaloneEdges(annotationOccurrence.item(), edges, resolved, builder, metadata);
             }
-            return;
         }
-        if (item instanceof StepTerminatorSymbol) {
-            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
-            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
-            if (sampled != null) {
-                edges.putIfAbsent(sampled.stepId(), sampled);
-            } else {
-                collectStandaloneEdges(terminatorSymbol.annotatedCurve(), edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepAnnotationCurveOccurrence) {
-            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
-            EdgePayload sampled = sampledCurveEdgePayload(item, builder);
-            if (sampled != null) {
-                edges.putIfAbsent(sampled.stepId(), sampled);
-            } else {
-                collectStandaloneEdges(occurrence.item(), edges, resolved, builder, metadata);
-            }
-            return;
-        }
-        if (item instanceof StepFilletEdge) {
-            StepFilletEdge filletEdge = (StepFilletEdge) item;
-            collectStandaloneEdges(filletEdge.originalEdge(), edges, resolved, builder, metadata);
-            return;
-        }
-        if (item instanceof StepChamferEdge) {
-            StepChamferEdge chamferEdge = (StepChamferEdge) item;
-            collectStandaloneEdges(chamferEdge.originalEdge(), edges, resolved, builder, metadata);
-            return;
-        }
-        if (item instanceof StepSubedge) {
-            StepSubedge subedge = (StepSubedge) item;
-            collectStandaloneEdges(subedge.parentEdge(), edges, resolved, builder, metadata);
-            return;
-        }
+
         if (isSampledCurveSource(item)) {
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
