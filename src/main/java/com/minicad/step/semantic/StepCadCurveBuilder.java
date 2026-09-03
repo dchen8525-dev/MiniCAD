@@ -592,190 +592,204 @@ final class StepCadCurveBuilder {
      * Builds a 2D curve from a STEP entity.
      * Dispatches to the appropriate build method based on entity type.
      */
-    Object buildCurve2(StepEntity item) {
-        if (item instanceof StepLine) {
+    // buildCurve2 dispatch table (first-match-return, mirrors the original sequential ifs).
+    private record CadCurve2Rule(Class<? extends StepEntity> type, CadCurve2Handler handler) {}
+
+    private interface CadCurve2Handler {
+        Object build(StepCadCurveBuilder self, StepEntity item);
+    }
+
+    private static CadCurve2Rule cadCurve2Rule(
+            Class<? extends StepEntity> type, CadCurve2Handler handler) {
+        return new CadCurve2Rule(type, handler);
+    }
+
+    private static final List<CadCurve2Rule> BUILD_CURVE2_RULES = List.of(
+        cadCurve2Rule(StepLine.class, (self, item) -> {
             StepLine line = (StepLine) item;
-            return buildLine2(line.id());
-        }
-        if (item instanceof StepCircle) {
+            return self.buildLine2(line.id());
+        }),
+        cadCurve2Rule(StepCircle.class, (self, item) -> {
             StepCircle circle = (StepCircle) item;
-            return buildCircle2(circle.id());
-        }
-        if (item instanceof StepEllipse) {
+            return self.buildCircle2(circle.id());
+        }),
+        cadCurve2Rule(StepEllipse.class, (self, item) -> {
             StepEllipse ellipse = (StepEllipse) item;
-            return buildEllipse2(ellipse.id());
-        }
-        if (item instanceof StepPolyline) {
+            return self.buildEllipse2(ellipse.id());
+        }),
+        cadCurve2Rule(StepPolyline.class, (self, item) -> {
             StepPolyline polyline = (StepPolyline) item;
-            return buildPolyline2(polyline.id());
-        }
-        if (item instanceof StepBezierCurve) {
+            return self.buildPolyline2(polyline.id());
+        }),
+        cadCurve2Rule(StepBezierCurve.class, (self, item) -> {
             StepBezierCurve curve = (StepBezierCurve) item;
-            return buildBezierCurve2(curve.id());
-        }
-        if (item instanceof StepUniformCurve) {
+            return self.buildBezierCurve2(curve.id());
+        }),
+        cadCurve2Rule(StepUniformCurve.class, (self, item) -> {
             StepUniformCurve curve = (StepUniformCurve) item;
-            return buildUniformCurve2(curve.id());
-        }
-        if (item instanceof StepQuasiUniformCurve) {
+            return self.buildUniformCurve2(curve.id());
+        }),
+        cadCurve2Rule(StepQuasiUniformCurve.class, (self, item) -> {
             StepQuasiUniformCurve curve = (StepQuasiUniformCurve) item;
-            return buildQuasiUniformCurve2(curve.id());
-        }
-        if (item instanceof StepPiecewiseBezierCurve) {
+            return self.buildQuasiUniformCurve2(curve.id());
+        }),
+        cadCurve2Rule(StepPiecewiseBezierCurve.class, (self, item) -> {
             StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) item;
-            return buildPiecewiseBezierCurve2(curve.id());
-        }
-        if (item instanceof StepCompositeCurve) {
+            return self.buildPiecewiseBezierCurve2(curve.id());
+        }),
+        cadCurve2Rule(StepCompositeCurve.class, (self, item) -> {
             StepCompositeCurve compositeCurve = (StepCompositeCurve) item;
-            return buildCompositeCurve2(compositeCurve.id());
-        }
-        if (item instanceof StepCompositeCurveOnSurface) {
+            return self.buildCompositeCurve2(compositeCurve.id());
+        }),
+        cadCurve2Rule(StepCompositeCurveOnSurface.class, (self, item) -> {
             StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) item;
-            return buildCompositeCurve2(compositeCurveOnSurface.id());
-        }
-        if (item instanceof StepConicCurve) {
+            return self.buildCompositeCurve2(compositeCurveOnSurface.id());
+        }),
+        cadCurve2Rule(StepConicCurve.class, (self, item) -> {
             StepConicCurve conic = (StepConicCurve) item;
-            return buildConicCurve2(conic);
-        }
-        if (item instanceof StepCircle2D) {
+            return self.buildConicCurve2(conic);
+        }),
+        cadCurve2Rule(StepCircle2D.class, (self, item) -> {
             StepCircle2D circle2D = (StepCircle2D) item;
-            return buildCircle2D(circle2D);
-        }
-        if (item instanceof StepEllipse2D) {
+            return self.buildCircle2D(circle2D);
+        }),
+        cadCurve2Rule(StepEllipse2D.class, (self, item) -> {
             StepEllipse2D ellipse2D = (StepEllipse2D) item;
-            return buildEllipse2D(ellipse2D);
-        }
-        if (item instanceof StepOffsetCurve2D) {
+            return self.buildEllipse2D(ellipse2D);
+        }),
+        cadCurve2Rule(StepOffsetCurve2D.class, (self, item) -> {
             StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
-            return buildOffsetCurve2(offsetCurve2D.id());
-        }
-        if (item instanceof StepOrientedCurve) {
+            return self.buildOffsetCurve2(offsetCurve2D.id());
+        }),
+        cadCurve2Rule(StepOrientedCurve.class, (self, item) -> {
             StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
-            return buildCurve2(orientedCurve.curveElement());
-        }
-        if (item instanceof StepGeometricReplica) {
+            return self.buildCurve2(orientedCurve.curveElement());
+        }),
+        cadCurve2Rule(StepGeometricReplica.class, (self, item) -> {
             StepGeometricReplica replica = (StepGeometricReplica) item;
-            return buildReplicaCurve2(replica);
-        }
-        if (item instanceof StepBSplineCurveWithKnots) {
+            return self.buildReplicaCurve2(replica);
+        }),
+        cadCurve2Rule(StepBSplineCurveWithKnots.class, (self, item) -> {
             StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) item;
-            return buildBSplineCurve2(spline.id());
-        }
-        if (item instanceof StepBSplineCurve) {
+            return self.buildBSplineCurve2(spline.id());
+        }),
+        cadCurve2Rule(StepBSplineCurve.class, (self, item) -> {
             StepBSplineCurve spline = (StepBSplineCurve) item;
-            return buildBSplineCurve2(spline.id());
-        }
-        if (item instanceof StepRationalBSplineCurve) {
+            return self.buildBSplineCurve2(spline.id());
+        }),
+        cadCurve2Rule(StepRationalBSplineCurve.class, (self, item) -> {
             StepRationalBSplineCurve spline = (StepRationalBSplineCurve) item;
-            return buildRationalBSplineCurve2(spline.id());
-        }
-        if (item instanceof StepTrimmedCurve) {
+            return self.buildRationalBSplineCurve2(spline.id());
+        }),
+        cadCurve2Rule(StepTrimmedCurve.class, (self, item) -> {
             StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
-            return buildTrimmedCurve2(trimmedCurve.id());
-        }
-        if (item instanceof StepIndexedPolyCurve) {
+            return self.buildTrimmedCurve2(trimmedCurve.id());
+        }),
+        cadCurve2Rule(StepIndexedPolyCurve.class, (self, item) -> {
             StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) item;
-            return buildIndexedPolyCurve2(polyCurve);
-        }
-        if (item instanceof StepDegenerateCurve) {
+            return self.buildIndexedPolyCurve2(polyCurve);
+        }),
+        cadCurve2Rule(StepDegenerateCurve.class, (self, item) -> {
             StepDegenerateCurve degenerateCurve = (StepDegenerateCurve) item;
-            return buildDegenerateCurve2(degenerateCurve);
-        }
-        if (item instanceof StepClothoid) {
+            return self.buildDegenerateCurve2(degenerateCurve);
+        }),
+        cadCurve2Rule(StepClothoid.class, (self, item) -> {
             StepClothoid clothoid = (StepClothoid) item;
-            return buildClothoid2(clothoid);
-        }
-        // 2D-specific curve types
-        if (item instanceof StepPolyline2D) {
+            return self.buildClothoid2(clothoid);
+        }),
+        cadCurve2Rule(StepPolyline2D.class, (self, item) -> {
             StepPolyline2D polyline2D = (StepPolyline2D) item;
-            return buildPolyline2D(polyline2D);
-        }
-        if (item instanceof StepTrimmedCurve2D) {
+            return self.buildPolyline2D(polyline2D);
+        }),
+        cadCurve2Rule(StepTrimmedCurve2D.class, (self, item) -> {
             StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
-            return buildTrimmedCurve2D(trimmedCurve2D);
-        }
-        if (item instanceof StepBSplineCurve2D) {
+            return self.buildTrimmedCurve2D(trimmedCurve2D);
+        }),
+        cadCurve2Rule(StepBSplineCurve2D.class, (self, item) -> {
             StepBSplineCurve2D spline2D = (StepBSplineCurve2D) item;
-            return buildBSplineCurve2D(spline2D);
-        }
-        if (item instanceof StepRationalBSplineCurve2D) {
+            return self.buildBSplineCurve2D(spline2D);
+        }),
+        cadCurve2Rule(StepRationalBSplineCurve2D.class, (self, item) -> {
             StepRationalBSplineCurve2D rationalSpline2D = (StepRationalBSplineCurve2D) item;
-            return buildRationalBSplineCurve2D(rationalSpline2D);
-        }
-        if (item instanceof StepBezierCurve2D) {
+            return self.buildRationalBSplineCurve2D(rationalSpline2D);
+        }),
+        cadCurve2Rule(StepBezierCurve2D.class, (self, item) -> {
             StepBezierCurve2D bezier2D = (StepBezierCurve2D) item;
-            return buildBezierCurve2D(bezier2D);
-        }
-        if (item instanceof StepQuasiUniformCurve2D) {
+            return self.buildBezierCurve2D(bezier2D);
+        }),
+        cadCurve2Rule(StepQuasiUniformCurve2D.class, (self, item) -> {
             StepQuasiUniformCurve2D quasiUniform2D = (StepQuasiUniformCurve2D) item;
-            return buildQuasiUniformCurve2D(quasiUniform2D);
-        }
-        if (item instanceof StepUniformCurve2D) {
+            return self.buildQuasiUniformCurve2D(quasiUniform2D);
+        }),
+        cadCurve2Rule(StepUniformCurve2D.class, (self, item) -> {
             StepUniformCurve2D uniform2D = (StepUniformCurve2D) item;
-            return buildUniformCurve2D(uniform2D);
-        }
-        if (item instanceof StepPiecewiseBezierCurve2D) {
+            return self.buildUniformCurve2D(uniform2D);
+        }),
+        cadCurve2Rule(StepPiecewiseBezierCurve2D.class, (self, item) -> {
             StepPiecewiseBezierCurve2D piecewiseBezier2D = (StepPiecewiseBezierCurve2D) item;
-            return buildPiecewiseBezierCurve2D(piecewiseBezier2D);
-        }
-        if (item instanceof StepIndexedPolyCurve2D) {
+            return self.buildPiecewiseBezierCurve2D(piecewiseBezier2D);
+        }),
+        cadCurve2Rule(StepIndexedPolyCurve2D.class, (self, item) -> {
             StepIndexedPolyCurve2D polyCurve2D = (StepIndexedPolyCurve2D) item;
-            return buildIndexedPolyCurve2D(polyCurve2D);
-        }
-        if (item instanceof StepDegenerateCurve2D) {
+            return self.buildIndexedPolyCurve2D(polyCurve2D);
+        }),
+        cadCurve2Rule(StepDegenerateCurve2D.class, (self, item) -> {
             StepDegenerateCurve2D degenerateCurve2D = (StepDegenerateCurve2D) item;
-            return buildDegenerateCurve2D(degenerateCurve2D);
-        }
-        if (item instanceof StepHyperbola2D) {
+            return self.buildDegenerateCurve2D(degenerateCurve2D);
+        }),
+        cadCurve2Rule(StepHyperbola2D.class, (self, item) -> {
             StepHyperbola2D hyperbola2D = (StepHyperbola2D) item;
-            return buildHyperbola2D(hyperbola2D);
-        }
-        if (item instanceof StepParabola2D) {
+            return self.buildHyperbola2D(hyperbola2D);
+        }),
+        cadCurve2Rule(StepParabola2D.class, (self, item) -> {
             StepParabola2D parabola2D = (StepParabola2D) item;
-            return buildParabola2D(parabola2D);
-        }
-        if (item instanceof StepLine2D) {
+            return self.buildParabola2D(parabola2D);
+        }),
+        cadCurve2Rule(StepLine2D.class, (self, item) -> {
             StepLine2D line2D = (StepLine2D) item;
-            return buildLine2D(line2D);
-        }
-        // Bounded curve wraps an underlying 2D curve
-        if (item instanceof StepBoundedCurve2D) {
+            return self.buildLine2D(line2D);
+        }),
+        cadCurve2Rule(StepBoundedCurve2D.class, (self, item) -> {
             StepBoundedCurve2D boundedCurve2D = (StepBoundedCurve2D) item;
-            return buildCurve2(boundedCurve2D.getCurve());
-        }
-        // Composite 2D curve
-        if (item instanceof StepCompositeCurve2D) {
+            return self.buildCurve2(boundedCurve2D.getCurve());
+        }),
+        cadCurve2Rule(StepCompositeCurve2D.class, (self, item) -> {
             StepCompositeCurve2D compositeCurve2D = (StepCompositeCurve2D) item;
-            return buildCompositeCurve2D(compositeCurve2D);
-        }
-        // Bounded curve marker (3D) - marker type with no geometry data
-        if (item instanceof StepBoundedCurve) {
+            return self.buildCompositeCurve2D(compositeCurve2D);
+        }),
+        cadCurve2Rule(StepBoundedCurve.class, (self, item) -> {
             StepBoundedCurve boundedCurve = (StepBoundedCurve) item;
-            StepEntity actual = entitiesById.get(boundedCurve.id());
+            StepEntity actual = self.entitiesById.get(boundedCurve.id());
             if (actual != null && actual != boundedCurve) {
-                return buildCurve2(actual);
+            return self.buildCurve2(actual);
             }
             throw new UnsupportedGeometryException("BOUNDED_CURVE requires an underlying curve type");
-        }
-        // PCURVE and DEGENERATE_PCURVE: parameter-space curves on surfaces
-        if (item instanceof StepPcurve) {
+        }),
+        cadCurve2Rule(StepPcurve.class, (self, item) -> {
             StepPcurve pcurve = (StepPcurve) item;
-            return buildPcurveCurve2(pcurve);
-        }
-        if (item instanceof StepDegeneratePcurve) {
+            return self.buildPcurveCurve2(pcurve);
+        }),
+        cadCurve2Rule(StepDegeneratePcurve.class, (self, item) -> {
             StepDegeneratePcurve pcurve = (StepDegeneratePcurve) item;
-            return buildPcurveCurve2(pcurve);
-        }
-        // CURVE_2D: parametric curve with polynomial equation coefficients
-        if (item instanceof StepCurve2D) {
+            return self.buildPcurveCurve2(pcurve);
+        }),
+        cadCurve2Rule(StepCurve2D.class, (self, item) -> {
             StepCurve2D curve2D = (StepCurve2D) item;
-            return buildCurve2DParametric(curve2D);
-        }
-        // MAPPED_ITEM: dispatch through to mapping target
-        if (item instanceof StepMappedItem) {
+            return self.buildCurve2DParametric(curve2D);
+        }),
+        cadCurve2Rule(StepMappedItem.class, (self, item) -> {
             StepMappedItem mappedItem = (StepMappedItem) item;
-            return buildCurve2(mappedItem.mappingTarget());
+            return self.buildCurve2(mappedItem.mappingTarget());
+        })
+    );
+
+    Object buildCurve2(StepEntity item) {
+        for (CadCurve2Rule rule : BUILD_CURVE2_RULES) {
+            if (rule.type().isInstance(item)) {
+                return rule.handler().build(this, item);
+            }
         }
+
         throw new UnsupportedGeometryException("2D curve type " + stepEntityTypeName(item) + " is not supported");
     }
 
