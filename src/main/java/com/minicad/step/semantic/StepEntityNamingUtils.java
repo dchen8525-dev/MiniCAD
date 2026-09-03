@@ -32,6 +32,8 @@ import com.minicad.topology.Loop;
 import com.minicad.topology.PolyLoop;
 import com.minicad.topology.VertexLoop;
 
+import java.util.List;
+
 /**
  * Utility class for naming STEP entities.
  * Provides methods to convert STEP entity types to standardized string representations.
@@ -42,6 +44,108 @@ public final class StepEntityNamingUtils {
         // Utility class
     }
 
+    // stepEntityTypeName dispatch table (first-match-return, mirrors the original
+    // sequential ifs). Branches that only return a constant literal and branches
+    // that delegate to the entity's own entityName() both live here unchanged.
+    private record EntityTypeNameRule(
+            Class<? extends StepEntity> type, EntityTypeNameHandler handler) {}
+
+    private interface EntityTypeNameHandler {
+        String name(StepEntity entity);
+    }
+
+    private static EntityTypeNameRule entityTypeNameRule(
+            Class<? extends StepEntity> type, EntityTypeNameHandler handler) {
+        return new EntityTypeNameRule(type, handler);
+    }
+
+    private static final List<EntityTypeNameRule> ENTITY_TYPE_NAME_RULES = List.of(
+        entityTypeNameRule(StepGeometricReplica.class, (entity) -> {
+            StepGeometricReplica replica = (StepGeometricReplica) entity;
+            return replica.entityName();
+        }),
+        entityTypeNameRule(StepCsgPrimitive.class, (entity) -> {
+            StepCsgPrimitive primitive = (StepCsgPrimitive) entity;
+            return primitive.entityName();
+        }),
+        entityTypeNameRule(StepSweptAreaSolid.class, (entity) -> {
+            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) entity;
+            return sweptAreaSolid.entityName();
+        }),
+        entityTypeNameRule(StepConicCurve.class, (entity) -> {
+            StepConicCurve conic = (StepConicCurve) entity;
+            return conic.entityName();
+        }),
+        entityTypeNameRule(StepFaceBound.class, (entity) -> {
+            StepFaceBound faceBound = (StepFaceBound) entity;
+            return faceBound.isOuter() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
+        }),
+        entityTypeNameRule(StepProfileDef.class, (entity) -> {
+            StepProfileDef profile = (StepProfileDef) entity;
+            return profile.entityName();
+        }),
+        entityTypeNameRule(StepBooleanClippingResult.class, (entity) -> {
+            return "BOOLEAN_CLIPPING_RESULT";
+        }),
+        entityTypeNameRule(StepBooleanResult.class, (entity) -> {
+            return "BOOLEAN_RESULT";
+        }),
+        entityTypeNameRule(StepManifoldSolidBrep.class, (entity) -> {
+            return "MANIFOLD_SOLID_BREP";
+        }),
+        entityTypeNameRule(StepBrepWithVoids.class, (entity) -> {
+            return "BREP_WITH_VOIDS";
+        }),
+        entityTypeNameRule(StepCsgSolid.class, (entity) -> {
+            return "CSG_SOLID";
+        }),
+        entityTypeNameRule(StepSolidReplica.class, (entity) -> {
+            return "SOLID_REPLICA";
+        }),
+        entityTypeNameRule(StepLine.class, (entity) -> {
+            return "LINE";
+        }),
+        entityTypeNameRule(StepCircle.class, (entity) -> {
+            return "CIRCLE";
+        }),
+        entityTypeNameRule(StepEllipse.class, (entity) -> {
+            return "ELLIPSE";
+        }),
+        entityTypeNameRule(StepPolyline.class, (entity) -> {
+            return "POLYLINE";
+        }),
+        entityTypeNameRule(StepBSplineCurveWithKnots.class, (entity) -> {
+            return "B_SPLINE_CURVE_WITH_KNOTS";
+        }),
+        entityTypeNameRule(StepRationalBSplineCurve.class, (entity) -> {
+            return "RATIONAL_B_SPLINE_CURVE";
+        }),
+        entityTypeNameRule(StepTrimmedCurve.class, (entity) -> {
+            return "TRIMMED_CURVE";
+        }),
+        entityTypeNameRule(StepSurfaceCurve.class, (entity) -> {
+            return "SURFACE_CURVE";
+        }),
+        entityTypeNameRule(StepSeamCurve.class, (entity) -> {
+            return "SEAM_CURVE";
+        }),
+        entityTypeNameRule(StepCompositeCurve.class, (entity) -> {
+            return "COMPOSITE_CURVE";
+        }),
+        entityTypeNameRule(StepCompositeCurveOnSurface.class, (entity) -> {
+            return "COMPOSITE_CURVE_ON_SURFACE";
+        }),
+        entityTypeNameRule(StepOffsetCurve2D.class, (entity) -> {
+            return "OFFSET_CURVE_2D";
+        }),
+        entityTypeNameRule(StepOffsetCurve3D.class, (entity) -> {
+            return "OFFSET_CURVE_3D";
+        }),
+        entityTypeNameRule(StepOrientedCurve.class, (entity) -> {
+            return "ORIENTED_CURVE";
+        })
+    );
+
     /**
      * Returns the STEP entity type name for the given entity.
      *
@@ -49,90 +153,12 @@ public final class StepEntityNamingUtils {
      * @return the entity type name
      */
     static String stepEntityTypeName(StepEntity entity) {
-        if (entity instanceof StepGeometricReplica) {
-            StepGeometricReplica replica = (StepGeometricReplica) entity;
-            return replica.entityName();
+        for (EntityTypeNameRule rule : ENTITY_TYPE_NAME_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().name(entity);
+            }
         }
-        if (entity instanceof StepCsgPrimitive) {
-            StepCsgPrimitive primitive = (StepCsgPrimitive) entity;
-            return primitive.entityName();
-        }
-        if (entity instanceof StepSweptAreaSolid) {
-            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) entity;
-            return sweptAreaSolid.entityName();
-        }
-        if (entity instanceof StepConicCurve) {
-            StepConicCurve conic = (StepConicCurve) entity;
-            return conic.entityName();
-        }
-        if (entity instanceof StepFaceBound) {
-            StepFaceBound faceBound = (StepFaceBound) entity;
-            return faceBound.isOuter() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
-        }
-        if (entity instanceof StepProfileDef) {
-            StepProfileDef profile = (StepProfileDef) entity;
-            return profile.entityName();
-        }
-        if (entity instanceof StepBooleanClippingResult) {
-            return "BOOLEAN_CLIPPING_RESULT";
-        }
-        if (entity instanceof StepBooleanResult) {
-            return "BOOLEAN_RESULT";
-        }
-        if (entity instanceof StepManifoldSolidBrep) {
-            return "MANIFOLD_SOLID_BREP";
-        }
-        if (entity instanceof StepBrepWithVoids) {
-            return "BREP_WITH_VOIDS";
-        }
-        if (entity instanceof StepCsgSolid) {
-            return "CSG_SOLID";
-        }
-        if (entity instanceof StepSolidReplica) {
-            return "SOLID_REPLICA";
-        }
-        if (entity instanceof StepLine) {
-            return "LINE";
-        }
-        if (entity instanceof StepCircle) {
-            return "CIRCLE";
-        }
-        if (entity instanceof StepEllipse) {
-            return "ELLIPSE";
-        }
-        if (entity instanceof StepPolyline) {
-            return "POLYLINE";
-        }
-        if (entity instanceof StepBSplineCurveWithKnots) {
-            return "B_SPLINE_CURVE_WITH_KNOTS";
-        }
-        if (entity instanceof StepRationalBSplineCurve) {
-            return "RATIONAL_B_SPLINE_CURVE";
-        }
-        if (entity instanceof StepTrimmedCurve) {
-            return "TRIMMED_CURVE";
-        }
-        if (entity instanceof StepSurfaceCurve) {
-            return "SURFACE_CURVE";
-        }
-        if (entity instanceof StepSeamCurve) {
-            return "SEAM_CURVE";
-        }
-        if (entity instanceof StepCompositeCurve) {
-            return "COMPOSITE_CURVE";
-        }
-        if (entity instanceof StepCompositeCurveOnSurface) {
-            return "COMPOSITE_CURVE_ON_SURFACE";
-        }
-        if (entity instanceof StepOffsetCurve2D) {
-            return "OFFSET_CURVE_2D";
-        }
-        if (entity instanceof StepOffsetCurve3D) {
-            return "OFFSET_CURVE_3D";
-        }
-        if (entity instanceof StepOrientedCurve) {
-            return "ORIENTED_CURVE";
-        }
+
         String simpleName = entity.getClass().getSimpleName();
         if (simpleName.startsWith("Step")) {
             simpleName = simpleName.substring(4);
