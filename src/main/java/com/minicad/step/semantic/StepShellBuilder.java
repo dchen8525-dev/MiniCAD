@@ -61,142 +61,162 @@ final class StepShellBuilder {
         this.builder = builder;
     }
 
-    Shell buildShell(int id) {
-        StepEntity entity = builder.requireExistingEntity(id);
-        if (entity instanceof StepOpenShell) {
+    // buildShell dispatch table (first-match-return, mirrors the original sequential ifs).
+    private record ShellRule(Class<? extends StepEntity> type, ShellHandler handler) {}
+
+    private interface ShellHandler {
+        Shell build(StepShellBuilder self, StepEntity entity, int id);
+    }
+
+    private static ShellRule shellRule(Class<? extends StepEntity> type, ShellHandler handler) {
+        return new ShellRule(type, handler);
+    }
+
+    private static final List<ShellRule> SHELL_RULES = List.of(
+        shellRule(StepOpenShell.class, (self, entity, id) -> {
             StepOpenShell openShell = (StepOpenShell) entity;
-            return buildFaceShell(openShell.faces(), false);
-        }
-        if (entity instanceof StepSurfacedOpenShell) {
+            return self.buildFaceShell(openShell.faces(), false);
+        }),
+        shellRule(StepSurfacedOpenShell.class, (self, entity, id) -> {
             StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
-            return buildFaceShell(surfacedOpenShell.faces(), false);
-        }
-        if (entity instanceof StepOrientedOpenShell) {
+            return self.buildFaceShell(surfacedOpenShell.faces(), false);
+        }),
+        shellRule(StepOrientedOpenShell.class, (self, entity, id) -> {
             StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
-            return buildFaceShell(orientedOpenShell.faces(), false);
-        }
-        if (entity instanceof StepClosedShell) {
+            return self.buildFaceShell(orientedOpenShell.faces(), false);
+        }),
+        shellRule(StepClosedShell.class, (self, entity, id) -> {
             StepClosedShell closedShell = (StepClosedShell) entity;
-            return buildFaceShell(closedShell.faces(), true);
-        }
-        if (entity instanceof StepOrientedClosedShell) {
+            return self.buildFaceShell(closedShell.faces(), true);
+        }),
+        shellRule(StepOrientedClosedShell.class, (self, entity, id) -> {
             StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
-            return buildFaceShell(orientedClosedShell.faces(), true);
-        }
-        if (entity instanceof StepTessellatedFace) {
+            return self.buildFaceShell(orientedClosedShell.faces(), true);
+        }),
+        shellRule(StepTessellatedFace.class, (self, entity, id) -> {
             StepTessellatedFace tessellated = (StepTessellatedFace) entity;
-            return builder.buildTessellatedFaceShell(tessellated);
-        }
-        if (entity instanceof StepTessellatedFaceSet) {
+            return self.builder.buildTessellatedFaceShell(tessellated);
+        }),
+        shellRule(StepTessellatedFaceSet.class, (self, entity, id) -> {
             StepTessellatedFaceSet tessellated = (StepTessellatedFaceSet) entity;
-            return builder.buildTessellatedShell(tessellated);
-        }
-        if (entity instanceof StepTriangulatedFace) {
+            return self.builder.buildTessellatedShell(tessellated);
+        }),
+        shellRule(StepTriangulatedFace.class, (self, entity, id) -> {
             StepTriangulatedFace triangulated = (StepTriangulatedFace) entity;
-            return builder.buildTriangulatedFaceShell(triangulated);
-        }
-        if (entity instanceof StepComplexTriangulatedFace) {
+            return self.builder.buildTriangulatedFaceShell(triangulated);
+        }),
+        shellRule(StepComplexTriangulatedFace.class, (self, entity, id) -> {
             StepComplexTriangulatedFace complex = (StepComplexTriangulatedFace) entity;
-            return builder.buildComplexTriangulatedFaceShell(complex);
-        }
-        if (entity instanceof StepCubicBezierTriangulatedFace) {
+            return self.builder.buildComplexTriangulatedFaceShell(complex);
+        }),
+        shellRule(StepCubicBezierTriangulatedFace.class, (self, entity, id) -> {
             StepCubicBezierTriangulatedFace bezier = (StepCubicBezierTriangulatedFace) entity;
-            return builder.buildCubicBezierTriangulatedFaceShell(bezier);
-        }
-        if (entity instanceof StepVertexShell) {
+            return self.builder.buildCubicBezierTriangulatedFaceShell(bezier);
+        }),
+        shellRule(StepVertexShell.class, (self, entity, id) -> {
             return new Shell(List.of(), false);
-        }
-        if (entity instanceof StepWireShell) {
+        }),
+        shellRule(StepWireShell.class, (self, entity, id) -> {
             return new Shell(List.of(), false);
-        }
-        if (entity instanceof StepConnectedFaceSet) {
+        }),
+        shellRule(StepConnectedFaceSet.class, (self, entity, id) -> {
             StepConnectedFaceSet connectedFaces = (StepConnectedFaceSet) entity;
-            return buildConnectedFaceSet(connectedFaces);
-        }
-        if (entity instanceof StepConnectedFaceSubSet) {
+            return self.buildConnectedFaceSet(connectedFaces);
+        }),
+        shellRule(StepConnectedFaceSubSet.class, (self, entity, id) -> {
             StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
-            return buildConnectedFaceSubSet(connectedFaceSubSet);
-        }
-        if (entity instanceof StepGeometricCurveSet) {
+            return self.buildConnectedFaceSubSet(connectedFaceSubSet);
+        }),
+        shellRule(StepGeometricCurveSet.class, (self, entity, id) -> {
             return new Shell(List.of(), false);
-        }
-        if (entity instanceof StepGeometricSet) {
+        }),
+        shellRule(StepGeometricSet.class, (self, entity, id) -> {
             return new Shell(List.of(), false);
-        }
-        if (entity instanceof StepGeometricSurfaceSet) {
+        }),
+        shellRule(StepGeometricSurfaceSet.class, (self, entity, id) -> {
             StepGeometricSurfaceSet surfaceSet = (StepGeometricSurfaceSet) entity;
-            return buildGeometricSurfaceSetShell(surfaceSet);
-        }
-        if (entity instanceof StepFaceBasedSurfaceModel) {
+            return self.buildGeometricSurfaceSetShell(surfaceSet);
+        }),
+        shellRule(StepFaceBasedSurfaceModel.class, (self, entity, id) -> {
             StepFaceBasedSurfaceModel faceModel = (StepFaceBasedSurfaceModel) entity;
-            return buildFaceBasedSurfaceModel(faceModel);
-        }
-        if (entity instanceof StepManifoldSurfaceModel) {
+            return self.buildFaceBasedSurfaceModel(faceModel);
+        }),
+        shellRule(StepManifoldSurfaceModel.class, (self, entity, id) -> {
             StepManifoldSurfaceModel manifoldModel = (StepManifoldSurfaceModel) entity;
-            return buildManifoldSurfaceModel(manifoldModel);
-        }
-        if (entity instanceof StepShellBasedSurfaceModel) {
+            return self.buildManifoldSurfaceModel(manifoldModel);
+        }),
+        shellRule(StepShellBasedSurfaceModel.class, (self, entity, id) -> {
             StepShellBasedSurfaceModel shellModel = (StepShellBasedSurfaceModel) entity;
-            return buildShellBasedSurfaceModel(shellModel);
-        }
-        if (entity instanceof StepShellBasedWireframeModel) {
+            return self.buildShellBasedSurfaceModel(shellModel);
+        }),
+        shellRule(StepShellBasedWireframeModel.class, (self, entity, id) -> {
             StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) entity;
-            return buildShellBasedWireframeModel(wireframeModel);
-        }
-        if (entity instanceof StepSurfacePatch) {
+            return self.buildShellBasedWireframeModel(wireframeModel);
+        }),
+        shellRule(StepSurfacePatch.class, (self, entity, id) -> {
             StepSurfacePatch surfacePatch = (StepSurfacePatch) entity;
-            return buildSurfacePatchShell(surfacePatch);
-        }
-        if (entity instanceof StepEdgeBasedWireframeModel) {
+            return self.buildSurfacePatchShell(surfacePatch);
+        }),
+        shellRule(StepEdgeBasedWireframeModel.class, (self, entity, id) -> {
             return new Shell(List.of(), false);
-        }
-        if (entity instanceof StepConnectedEdgeSet) {
+        }),
+        shellRule(StepConnectedEdgeSet.class, (self, entity, id) -> {
             return new Shell(List.of(), false);
-        }
-        if (entity instanceof StepEdgeWire) {
+        }),
+        shellRule(StepEdgeWire.class, (self, entity, id) -> {
             return new Shell(List.of(), false);
-        }
-        if (entity instanceof StepPlanarBox) {
+        }),
+        shellRule(StepPlanarBox.class, (self, entity, id) -> {
             StepPlanarBox planarBox = (StepPlanarBox) entity;
-            return buildPlanarBoxShell(planarBox);
-        }
-        if (entity instanceof StepPlanarExtent) {
+            return self.buildPlanarBoxShell(planarBox);
+        }),
+        shellRule(StepPlanarExtent.class, (self, entity, id) -> {
             StepPlanarExtent planarExtent = (StepPlanarExtent) entity;
-            return buildPlanarExtentShell(planarExtent);
-        }
-        if (entity instanceof StepPointSet) {
+            return self.buildPlanarExtentShell(planarExtent);
+        }),
+        shellRule(StepPointSet.class, (self, entity, id) -> {
             throw new UnsupportedGeometryException("POINT_SET cannot be converted to a B-Rep shell");
-        }
-        if (entity instanceof StepFiniteElementMesh) {
+        }),
+        shellRule(StepFiniteElementMesh.class, (self, entity, id) -> {
             StepFiniteElementMesh femMesh = (StepFiniteElementMesh) entity;
-            return builder.buildFiniteElementMeshShell(femMesh);
-        }
-        if (entity instanceof StepFlatPattern) {
+            return self.builder.buildFiniteElementMeshShell(femMesh);
+        }),
+        shellRule(StepFlatPattern.class, (self, entity, id) -> {
             StepFlatPattern flatPattern = (StepFlatPattern) entity;
             if (flatPattern.flatGeometry() instanceof StepFaceEntity) {
-                StepFaceEntity faceEntity = (StepFaceEntity) flatPattern.flatGeometry();
-                return new Shell(List.of(builder.buildFace(faceEntity.id())), false);
+            StepFaceEntity faceEntity = (StepFaceEntity) flatPattern.flatGeometry();
+            return new Shell(List.of(self.builder.buildFace(faceEntity.id())), false);
             }
             if (flatPattern.flatGeometry() instanceof StepOpenShell
-                    || flatPattern.flatGeometry() instanceof StepClosedShell) {
-                return builder.buildShell(flatPattern.flatGeometry().id());
+            || flatPattern.flatGeometry() instanceof StepClosedShell) {
+            return self.builder.buildShell(flatPattern.flatGeometry().id());
             }
             return new Shell(List.of(), false);
-        }
-        if (entity instanceof StepMappedItem) {
+        }),
+        shellRule(StepMappedItem.class, (self, entity, id) -> {
             StepMappedItem mappedItem = (StepMappedItem) entity;
-            return builder.buildShell(mappedItem.mappingTarget().id());
-        }
-        if (entity instanceof StepSurfaceModel) {
+            return self.builder.buildShell(mappedItem.mappingTarget().id());
+        }),
+        shellRule(StepSurfaceModel.class, (self, entity, id) -> {
             StepSurfaceModel surfaceModel = (StepSurfaceModel) entity;
-            StepEntity actual = builder.resolvedEntity(surfaceModel.id());
+            StepEntity actual = self.builder.resolvedEntity(surfaceModel.id());
             if (actual != null && actual != surfaceModel) {
-                return builder.buildShell(actual.id());
+            return self.builder.buildShell(actual.id());
             }
             throw new StepResolutionException(
-                    "entity #" + id + " is an abstract SURFACE_MODEL with no concrete subtype"
+            "entity #" + id + " is an abstract SURFACE_MODEL with no concrete subtype"
             );
+        })
+    );
+
+    Shell buildShell(int id) {
+        StepEntity entity = builder.requireExistingEntity(id);
+        for (ShellRule rule : SHELL_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().build(this, entity, id);
+            }
         }
+
         throw new StepResolutionException(
                 "entity #" + id + " is not an OPEN_SHELL, SURFACED_OPEN_SHELL, ORIENTED_OPEN_SHELL, CLOSED_SHELL or ORIENTED_CLOSED_SHELL"
         );
