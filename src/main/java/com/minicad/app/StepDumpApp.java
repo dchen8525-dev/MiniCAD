@@ -2621,140 +2621,163 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validateProductStructureEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepApplicationContext) {
+    // validateProductStructureEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record ProductStructureRule(
+            Class<? extends StepEntity> type, ProductStructureHandler handler) {}
+
+    private interface ProductStructureHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static ProductStructureRule productStructureRule(
+            Class<? extends StepEntity> type, ProductStructureHandler handler) {
+        return new ProductStructureRule(type, handler);
+    }
+
+    private static final List<ProductStructureRule> PRODUCT_STRUCTURE_RULES = List.of(
+        productStructureRule(StepApplicationContext.class, (entity, builder) -> {
             return 1;
-        }
-        if (entity instanceof StepApplicationProtocolDefinition) {
+        }),
+        productStructureRule(StepApplicationProtocolDefinition.class, (entity, builder) -> {
             StepApplicationProtocolDefinition applicationProtocolDefinition = (StepApplicationProtocolDefinition) entity;
             return validateSummaryEntity(applicationProtocolDefinition.application(), builder);
-        }
-        if (entity instanceof StepProduct) {
+        }),
+        productStructureRule(StepProduct.class, (entity, builder) -> {
             StepProduct product = (StepProduct) entity;
             return 1;
-        }
-        if (entity instanceof StepProductContext) {
+        }),
+        productStructureRule(StepProductContext.class, (entity, builder) -> {
             StepProductContext productContext = (StepProductContext) entity;
             return validateSummaryEntity(productContext.frameOfReference(), builder);
-        }
-        if (entity instanceof StepProductDefinitionContext) {
+        }),
+        productStructureRule(StepProductDefinitionContext.class, (entity, builder) -> {
             StepProductDefinitionContext productDefinitionContext = (StepProductDefinitionContext) entity;
             return validateSummaryEntity(productDefinitionContext.frameOfReference(), builder);
-        }
-        if (entity instanceof StepProductDefinitionFormation) {
+        }),
+        productStructureRule(StepProductDefinitionFormation.class, (entity, builder) -> {
             StepProductDefinitionFormation formation = (StepProductDefinitionFormation) entity;
             return validateSummaryEntity(formation.ofProduct(), builder);
-        }
-        if (entity instanceof StepProductDefinition) {
+        }),
+        productStructureRule(StepProductDefinition.class, (entity, builder) -> {
             StepProductDefinition definition = (StepProductDefinition) entity;
             return validateSummaryEntity(definition.formation(), builder)
-                    + validateSummaryEntity(definition.frameOfReference(), builder);
-        }
-        if (entity instanceof StepProductDefinitionShape) {
+            + validateSummaryEntity(definition.frameOfReference(), builder);
+        }),
+        productStructureRule(StepProductDefinitionShape.class, (entity, builder) -> {
             StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) entity;
             return validateSummaryEntity(productDefinitionShape.definition(), builder);
-        }
-        if (entity instanceof StepProductDefinitionEffectivity) {
+        }),
+        productStructureRule(StepProductDefinitionEffectivity.class, (entity, builder) -> {
             StepProductDefinitionEffectivity productDefinitionEffectivity = (StepProductDefinitionEffectivity) entity;
             return validateSummaryEntity(productDefinitionEffectivity.productDefinition(), builder);
-        }
-        if (entity instanceof StepProductRelationship) {
+        }),
+        productStructureRule(StepProductRelationship.class, (entity, builder) -> {
             StepProductRelationship productRelationship = (StepProductRelationship) entity;
             return validateSummaryEntity(productRelationship.relatingProduct(), builder)
-                    + validateSummaryEntity(productRelationship.relatedProduct(), builder);
-        }
-        if (entity instanceof StepProductDefinitionRelationship) {
+            + validateSummaryEntity(productRelationship.relatedProduct(), builder);
+        }),
+        productStructureRule(StepProductDefinitionRelationship.class, (entity, builder) -> {
             StepProductDefinitionRelationship productDefinitionRelationship = (StepProductDefinitionRelationship) entity;
             return validateSummaryEntity(productDefinitionRelationship.relatingProductDefinition(), builder)
-                    + validateSummaryEntity(productDefinitionRelationship.relatedProductDefinition(), builder);
-        }
-        if (entity instanceof StepProductDefinitionFormationRelationship) {
+            + validateSummaryEntity(productDefinitionRelationship.relatedProductDefinition(), builder);
+        }),
+        productStructureRule(StepProductDefinitionFormationRelationship.class, (entity, builder) -> {
             StepProductDefinitionFormationRelationship productDefinitionFormationRelationship = (StepProductDefinitionFormationRelationship) entity;
             return validateSummaryEntity(productDefinitionFormationRelationship.relatingFormation(), builder)
-                    + validateSummaryEntity(productDefinitionFormationRelationship.relatedFormation(), builder);
-        }
-        if (entity instanceof StepProductDefinitionRelationshipRelationship) {
+            + validateSummaryEntity(productDefinitionFormationRelationship.relatedFormation(), builder);
+        }),
+        productStructureRule(StepProductDefinitionRelationshipRelationship.class, (entity, builder) -> {
             StepProductDefinitionRelationshipRelationship relationshipRelationship = (StepProductDefinitionRelationshipRelationship) entity;
             return validateSummaryEntity(relationshipRelationship.relating(), builder)
-                    + validateSummaryEntity(relationshipRelationship.related(), builder);
-        }
-        if (entity instanceof StepPropertyDefinition) {
+            + validateSummaryEntity(relationshipRelationship.related(), builder);
+        }),
+        productStructureRule(StepPropertyDefinition.class, (entity, builder) -> {
             StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) entity;
             return validateSummaryEntity(propertyDefinition.definition(), builder);
-        }
-        if (entity instanceof StepPropertyDefinitionRepresentation) {
+        }),
+        productStructureRule(StepPropertyDefinitionRepresentation.class, (entity, builder) -> {
             StepPropertyDefinitionRepresentation propertyDefinitionRepresentation = (StepPropertyDefinitionRepresentation) entity;
             return validateSummaryEntity(propertyDefinitionRepresentation.definition(), builder)
-                    + validateSummaryEntity(propertyDefinitionRepresentation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepActionPropertyRepresentation) {
+            + validateSummaryEntity(propertyDefinitionRepresentation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepActionPropertyRepresentation.class, (entity, builder) -> {
             StepActionPropertyRepresentation actionPropertyRepresentation = (StepActionPropertyRepresentation) entity;
             return validateSummaryEntity(actionPropertyRepresentation.definition(), builder)
-                    + validateSummaryEntity(actionPropertyRepresentation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepContactRatioRepresentation) {
+            + validateSummaryEntity(actionPropertyRepresentation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepContactRatioRepresentation.class, (entity, builder) -> {
             StepContactRatioRepresentation contactRatioRepresentation = (StepContactRatioRepresentation) entity;
             return validateSummaryEntity(contactRatioRepresentation.definition(), builder)
-                    + validateSummaryEntity(contactRatioRepresentation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepKinematicPropertyDefinitionRepresentation) {
+            + validateSummaryEntity(contactRatioRepresentation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepKinematicPropertyDefinitionRepresentation.class, (entity, builder) -> {
             StepKinematicPropertyDefinitionRepresentation kinematicPropertyDefinitionRepresentation = (StepKinematicPropertyDefinitionRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyDefinitionRepresentation.definition(), builder)
-                    + validateSummaryEntity(kinematicPropertyDefinitionRepresentation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepKinematicPropertyMechanismRepresentation) {
+            + validateSummaryEntity(kinematicPropertyDefinitionRepresentation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepKinematicPropertyMechanismRepresentation.class, (entity, builder) -> {
             StepKinematicPropertyMechanismRepresentation kinematicPropertyMechanismRepresentation = (StepKinematicPropertyMechanismRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyMechanismRepresentation.definition(), builder)
-                    + validateSummaryEntity(kinematicPropertyMechanismRepresentation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepKinematicPropertyRepresentationRelation) {
+            + validateSummaryEntity(kinematicPropertyMechanismRepresentation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepKinematicPropertyRepresentationRelation.class, (entity, builder) -> {
             StepKinematicPropertyRepresentationRelation kinematicPropertyRepresentationRelation = (StepKinematicPropertyRepresentationRelation) entity;
             return validateSummaryEntity(kinematicPropertyRepresentationRelation.definition(), builder)
-                    + validateSummaryEntity(kinematicPropertyRepresentationRelation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepKinematicPropertyTopologyRepresentation) {
+            + validateSummaryEntity(kinematicPropertyRepresentationRelation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepKinematicPropertyTopologyRepresentation.class, (entity, builder) -> {
             StepKinematicPropertyTopologyRepresentation kinematicPropertyTopologyRepresentation = (StepKinematicPropertyTopologyRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyTopologyRepresentation.definition(), builder)
-                    + validateSummaryEntity(kinematicPropertyTopologyRepresentation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepResourcePropertyRepresentation) {
+            + validateSummaryEntity(kinematicPropertyTopologyRepresentation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepResourcePropertyRepresentation.class, (entity, builder) -> {
             StepResourcePropertyRepresentation resourcePropertyRepresentation = (StepResourcePropertyRepresentation) entity;
             return validateSummaryEntity(resourcePropertyRepresentation.definition(), builder)
-                    + validateSummaryEntity(resourcePropertyRepresentation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepShapeDefinitionRepresentation) {
+            + validateSummaryEntity(resourcePropertyRepresentation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepShapeDefinitionRepresentation.class, (entity, builder) -> {
             StepShapeDefinitionRepresentation shapeDefinitionRepresentation = (StepShapeDefinitionRepresentation) entity;
             return validateSummaryEntity(shapeDefinitionRepresentation.definition(), builder)
-                    + validateSummaryEntity(shapeDefinitionRepresentation.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepContextDependentShapeRepresentation) {
+            + validateSummaryEntity(shapeDefinitionRepresentation.usedRepresentation(), builder);
+        }),
+        productStructureRule(StepContextDependentShapeRepresentation.class, (entity, builder) -> {
             StepContextDependentShapeRepresentation contextDependentShapeRepresentation = (StepContextDependentShapeRepresentation) entity;
             return validateSummaryEntity(contextDependentShapeRepresentation.representationRelationship(), builder)
-                    + validateSummaryEntity(contextDependentShapeRepresentation.representedProductRelation(), builder);
-        }
-        if (entity instanceof StepNextAssemblyUsageOccurrence) {
+            + validateSummaryEntity(contextDependentShapeRepresentation.representedProductRelation(), builder);
+        }),
+        productStructureRule(StepNextAssemblyUsageOccurrence.class, (entity, builder) -> {
             StepNextAssemblyUsageOccurrence nextAssemblyUsageOccurrence = (StepNextAssemblyUsageOccurrence) entity;
             return validateSummaryEntity(nextAssemblyUsageOccurrence.relatingProductDefinition(), builder)
-                    + validateSummaryEntity(nextAssemblyUsageOccurrence.relatedProductDefinition(), builder);
-        }
-        if (entity instanceof StepPlacedDatumTargetFeature) {
+            + validateSummaryEntity(nextAssemblyUsageOccurrence.relatedProductDefinition(), builder);
+        }),
+        productStructureRule(StepPlacedDatumTargetFeature.class, (entity, builder) -> {
             StepPlacedDatumTargetFeature placedDatumTargetFeature = (StepPlacedDatumTargetFeature) entity;
             return validateSummaryEntity(placedDatumTargetFeature.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepShapeAspect) {
+        }),
+        productStructureRule(StepShapeAspect.class, (entity, builder) -> {
             StepShapeAspect shapeAspect = (StepShapeAspect) entity;
             return validateSummaryEntity(shapeAspect.ofShape(), builder);
-        }
-        if (entity instanceof StepShapeAspectOccurrence) {
+        }),
+        productStructureRule(StepShapeAspectOccurrence.class, (entity, builder) -> {
             StepShapeAspectOccurrence shapeAspectOccurrence = (StepShapeAspectOccurrence) entity;
             return validateSummaryEntity(shapeAspectOccurrence.ofShape(), builder)
-                    + validateSummaryEntity(shapeAspectOccurrence.definition(), builder);
-        }
-        if (entity instanceof StepShapeAspectRelationship) {
+            + validateSummaryEntity(shapeAspectOccurrence.definition(), builder);
+        }),
+        productStructureRule(StepShapeAspectRelationship.class, (entity, builder) -> {
             StepShapeAspectRelationship shapeAspectRelationship = (StepShapeAspectRelationship) entity;
             return validateSummaryEntity(shapeAspectRelationship.relatingShapeAspect(), builder)
-                    + validateSummaryEntity(shapeAspectRelationship.relatedShapeAspect(), builder);
+            + validateSummaryEntity(shapeAspectRelationship.relatedShapeAspect(), builder);
+        })
+    );
+
+    private static Integer validateProductStructureEntity(StepEntity entity, StepCadBuilder builder) {
+        for (ProductStructureRule rule : PRODUCT_STRUCTURE_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
