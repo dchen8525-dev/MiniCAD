@@ -2493,131 +2493,154 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validateAssignmentEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepIdentificationAssignment) {
+    // validateAssignmentEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record AssignmentRule(
+            Class<? extends StepEntity> type, AssignmentHandler handler) {}
+
+    private interface AssignmentHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static AssignmentRule assignmentRule(
+            Class<? extends StepEntity> type, AssignmentHandler handler) {
+        return new AssignmentRule(type, handler);
+    }
+
+    private static final List<AssignmentRule> ASSIGNMENT_RULES = List.of(
+        assignmentRule(StepIdentificationAssignment.class, (entity, builder) -> {
             StepIdentificationAssignment identificationAssignment = (StepIdentificationAssignment) entity;
             return validateSummaryEntity(identificationAssignment.role(), builder);
-        }
-        if (entity instanceof StepAppliedIdentificationAssignment) {
+        }),
+        assignmentRule(StepAppliedIdentificationAssignment.class, (entity, builder) -> {
             StepAppliedIdentificationAssignment appliedIdentificationAssignment = (StepAppliedIdentificationAssignment) entity;
             return validateSummaryEntity(appliedIdentificationAssignment.role(), builder)
                     + validateSummaryItems(appliedIdentificationAssignment.items(), builder);
-        }
-        if (entity instanceof StepPersonAndOrganization) {
+        }),
+        assignmentRule(StepPersonAndOrganization.class, (entity, builder) -> {
             StepPersonAndOrganization personAndOrganization = (StepPersonAndOrganization) entity;
             return validateSummaryEntity(personAndOrganization.person(), builder)
                     + validateSummaryEntity(personAndOrganization.organization(), builder);
-        }
-        if (entity instanceof StepPersonAndOrganizationAssignment) {
+        }),
+        assignmentRule(StepPersonAndOrganizationAssignment.class, (entity, builder) -> {
             StepPersonAndOrganizationAssignment personAndOrganizationAssignment = (StepPersonAndOrganizationAssignment) entity;
             return validateSummaryEntity(personAndOrganizationAssignment.assignedPersonAndOrganization(), builder)
                     + validateSummaryEntity(personAndOrganizationAssignment.role(), builder);
-        }
-        if (entity instanceof StepAppliedPersonAndOrganizationAssignment) {
+        }),
+        assignmentRule(StepAppliedPersonAndOrganizationAssignment.class, (entity, builder) -> {
             StepAppliedPersonAndOrganizationAssignment appliedPersonAndOrganizationAssignment = (StepAppliedPersonAndOrganizationAssignment) entity;
             return validateSummaryEntity(appliedPersonAndOrganizationAssignment.assignedPersonAndOrganization(), builder)
                     + validateSummaryEntity(appliedPersonAndOrganizationAssignment.role(), builder)
                     + validateSummaryItems(appliedPersonAndOrganizationAssignment.items(), builder);
-        }
-        if (entity instanceof StepLocalTime) {
+        }),
+        assignmentRule(StepLocalTime.class, (entity, builder) -> {
             StepLocalTime localTime = (StepLocalTime) entity;
             return 1 + validateSummaryEntity(localTime.zone(), builder);
-        }
-        if (entity instanceof StepDateAndTime) {
+        }),
+        assignmentRule(StepDateAndTime.class, (entity, builder) -> {
             StepDateAndTime dateAndTime = (StepDateAndTime) entity;
             return validateSummaryEntity(dateAndTime.dateComponent(), builder)
                     + validateSummaryEntity(dateAndTime.timeComponent(), builder);
-        }
-        if (entity instanceof StepDateAssignment) {
+        }),
+        assignmentRule(StepDateAssignment.class, (entity, builder) -> {
             StepDateAssignment dateAssignment = (StepDateAssignment) entity;
             return validateSummaryEntity(dateAssignment.assignedDate(), builder)
                     + validateSummaryEntity(dateAssignment.role(), builder);
-        }
-        if (entity instanceof StepAppliedDateAssignment) {
+        }),
+        assignmentRule(StepAppliedDateAssignment.class, (entity, builder) -> {
             StepAppliedDateAssignment appliedDateAssignment = (StepAppliedDateAssignment) entity;
             return validateSummaryEntity(appliedDateAssignment.assignedDate(), builder)
                     + validateSummaryEntity(appliedDateAssignment.role(), builder)
                     + validateSummaryItems(appliedDateAssignment.items(), builder);
-        }
-        if (entity instanceof StepDateTimeAssignment) {
+        }),
+        assignmentRule(StepDateTimeAssignment.class, (entity, builder) -> {
             StepDateTimeAssignment dateTimeAssignment = (StepDateTimeAssignment) entity;
             return validateSummaryEntity(dateTimeAssignment.assignedDateAndTime(), builder)
                     + validateSummaryEntity(dateTimeAssignment.role(), builder);
-        }
-        if (entity instanceof StepAppliedDateTimeAssignment) {
+        }),
+        assignmentRule(StepAppliedDateTimeAssignment.class, (entity, builder) -> {
             StepAppliedDateTimeAssignment appliedDateTimeAssignment = (StepAppliedDateTimeAssignment) entity;
             return validateSummaryEntity(appliedDateTimeAssignment.assignedDateAndTime(), builder)
                     + validateSummaryEntity(appliedDateTimeAssignment.role(), builder)
                     + validateSummaryItems(appliedDateTimeAssignment.items(), builder);
-        }
-        if (entity instanceof StepDocumentReference) {
+        }),
+        assignmentRule(StepDocumentReference.class, (entity, builder) -> {
             StepDocumentReference documentReference = (StepDocumentReference) entity;
             return validateSummaryEntity(documentReference.assignedDocument(), builder);
-        }
-        if (entity instanceof StepAppliedDocumentReference) {
+        }),
+        assignmentRule(StepAppliedDocumentReference.class, (entity, builder) -> {
             StepAppliedDocumentReference appliedDocumentReference = (StepAppliedDocumentReference) entity;
             return validateSummaryEntity(appliedDocumentReference.assignedDocument(), builder)
                     + validateSummaryItems(appliedDocumentReference.items(), builder);
-        }
-        if (entity instanceof StepDocumentRelationship) {
+        }),
+        assignmentRule(StepDocumentRelationship.class, (entity, builder) -> {
             StepDocumentRelationship documentRelationship = (StepDocumentRelationship) entity;
             return validateSummaryEntity(documentRelationship.relatingDocument(), builder)
                     + validateSummaryEntity(documentRelationship.relatedDocument(), builder);
-        }
-        if (entity instanceof StepPropertyDefinitionRelationship) {
+        }),
+        assignmentRule(StepPropertyDefinitionRelationship.class, (entity, builder) -> {
             StepPropertyDefinitionRelationship propertyDefinitionRelationship = (StepPropertyDefinitionRelationship) entity;
             return 2;
-        }
-        if (entity instanceof StepAbstractVariable) {
+        }),
+        assignmentRule(StepAbstractVariable.class, (entity, builder) -> {
             StepAbstractVariable abstractVariable = (StepAbstractVariable) entity;
             return validateSummaryEntity(abstractVariable.definition(), builder)
                     + validateSummaryEntity(abstractVariable.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepRowVariable) {
+        }),
+        assignmentRule(StepRowVariable.class, (entity, builder) -> {
             StepRowVariable rowVariable = (StepRowVariable) entity;
             return validateSummaryEntity(rowVariable.definition(), builder)
                     + validateSummaryEntity(rowVariable.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepScalarVariable) {
+        }),
+        assignmentRule(StepScalarVariable.class, (entity, builder) -> {
             StepScalarVariable scalarVariable = (StepScalarVariable) entity;
             return validateSummaryEntity(scalarVariable.definition(), builder)
                     + validateSummaryEntity(scalarVariable.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepForwardChainingRulePremise) {
+        }),
+        assignmentRule(StepForwardChainingRulePremise.class, (entity, builder) -> {
             StepForwardChainingRulePremise rulePremise = (StepForwardChainingRulePremise) entity;
             return validateSummaryEntity(rulePremise.definition(), builder)
                     + validateSummaryEntity(rulePremise.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepBackChainingRuleBody) {
+        }),
+        assignmentRule(StepBackChainingRuleBody.class, (entity, builder) -> {
             StepBackChainingRuleBody ruleBody = (StepBackChainingRuleBody) entity;
             return validateSummaryEntity(ruleBody.definition(), builder)
                     + validateSummaryEntity(ruleBody.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepAttributeAssertion) {
+        }),
+        assignmentRule(StepAttributeAssertion.class, (entity, builder) -> {
             StepAttributeAssertion attributeAssertion = (StepAttributeAssertion) entity;
             return validateSummaryEntity(attributeAssertion.usedRepresentation(), builder);
-        }
-        if (entity instanceof StepApprovalPersonOrganization) {
+        }),
+        assignmentRule(StepApprovalPersonOrganization.class, (entity, builder) -> {
             StepApprovalPersonOrganization approvalPersonOrganization = (StepApprovalPersonOrganization) entity;
             return validateSummaryEntity(approvalPersonOrganization.personOrganization(), builder)
                     + validateSummaryEntity(approvalPersonOrganization.authorizedApproval(), builder)
                     + validateSummaryEntity(approvalPersonOrganization.role(), builder);
-        }
-        if (entity instanceof StepApprovalDateTime) {
+        }),
+        assignmentRule(StepApprovalDateTime.class, (entity, builder) -> {
             StepApprovalDateTime approvalDateTime = (StepApprovalDateTime) entity;
             return validateSummaryEntity(approvalDateTime.dateTime(), builder)
                     + validateSummaryEntity(approvalDateTime.datedApproval(), builder);
-        }
-        if (entity instanceof StepGroupRelationship) {
+        }),
+        assignmentRule(StepGroupRelationship.class, (entity, builder) -> {
             StepGroupRelationship groupRelationship = (StepGroupRelationship) entity;
             return validateSummaryEntity(groupRelationship.relatingGroup(), builder)
                     + validateSummaryEntity(groupRelationship.relatedGroup(), builder);
-        }
-        if (entity instanceof StepOrganizationRelationship) {
+        }),
+        assignmentRule(StepOrganizationRelationship.class, (entity, builder) -> {
             StepOrganizationRelationship organizationRelationship = (StepOrganizationRelationship) entity;
             return validateSummaryEntity(organizationRelationship.relatingOrganization(), builder)
                     + validateSummaryEntity(organizationRelationship.relatedOrganization(), builder);
+        })
+    );
+
+    private static Integer validateAssignmentEntity(StepEntity entity, StepCadBuilder builder) {
+        for (AssignmentRule rule : ASSIGNMENT_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
