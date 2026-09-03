@@ -1,0 +1,31 @@
+# Frozen dispatch order for StepFacePayloadBuilder.buildPreviewFaceResult (previewGeometry rules).
+# 23 rules, in first-match-with-fallthrough order. Edit ONLY by re-running
+# tools/gen_preview_face_dispatch.py after a behaviour-preserving change.
+# Order is load-bearing: a wrapped-surface fallback (e.g. StepCylindricalSurface) sits AFTER the
+# dedicated block so a trimmed-wrapper surface falls through to the generic trimmed rule.
+# OR-compound rules list their first type as the primary; the no-duplicate guard is intentionally
+# skipped for this table because OR rules legitimately re-list types already handled earlier.
+
+StepPlane
+StepCylindricalSurface
+StepConicalSurface
+StepSphericalSurface
+StepRationalBSplineSurface
+StepBSplineSurfaceWithKnots
+StepSurfaceOfLinearExtrusion
+StepDegenerateToroidalSurface
+StepToroidalSurfaceWithSpecifiedBends
+StepToroidalSurface
+StepCylindricalSurface
+StepCylindricalSurfaceWithEllipticalAxis
+StepBSplineSurfaceWithKnotsAndBreakpoints
+StepFreeFormSurface
+StepRuledSurface
+StepSurfaceOfConstantRadius
+StepParaboloidSurface
+StepHyperboloidSurface
+StepSurfaceOfTranslation
+StepSurfaceOfProjection
+StepBlendedSurface
+StepFreeFormSurface
+StepMachinedSurface

@@ -116,6 +116,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.function.Predicate;
 import com.minicad.geometry.Circle;
 import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Line3;
@@ -181,7 +182,30 @@ public final class StepFacePayloadBuilder {
 
         StepEntity geometry = faceGeometry(stepFace);
         StepEntity previewGeometry = unwrapParametricPreviewSurface(geometry);
-        if (previewGeometry instanceof StepPlane) {
+        return dispatchPreviewFace(stepFace, geometry, previewGeometry, builder, metadata);
+    }
+
+    // buildPreviewFaceResult dispatch table (previewGeometry rules).
+    // First-match-with-fallthrough: a rule whose handler returns non-null is adopted; a
+    // null return continues to the next rule (replicating the original sequential ifs,
+    // where a wrapped surface falls through the dedicated block to the generic fallback).
+    private record PreviewFaceRule(Class<?> type, Predicate<StepEntity> matches, PreviewFaceHandler handler) {
+        boolean matches(StepEntity entity) {
+            return matches.test(entity);
+        }
+    }
+
+    private interface PreviewFaceHandler {
+        PreviewFaceResult handle(StepFaceEntity stepFace, StepEntity geometry, StepEntity previewGeometry,
+                StepCadBuilder builder, StepMetadataExtractor.DisplayMetadata metadata);
+    }
+
+    private static PreviewFaceRule previewFaceRule(Class<?> type, Predicate<StepEntity> matches, PreviewFaceHandler handler) {
+        return new PreviewFaceRule(type, matches, handler);
+    }
+
+    private static final List<PreviewFaceRule> PREVIEW_FACE_RULES = List.of(
+        previewFaceRule(StepPlane.class, StepPlane.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
                 if (trimmed.face() != null) {
@@ -203,8 +227,8 @@ public final class StepFacePayloadBuilder {
                 log.warn("Planar face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "planar face build failed"));
             }
-        }
-        if (previewGeometry instanceof StepCylindricalSurface) {
+        }),
+        previewFaceRule(StepCylindricalSurface.class, StepCylindricalSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) previewGeometry;
             try {
                 if (geometry instanceof StepCylindricalSurface) {
@@ -218,8 +242,9 @@ public final class StepFacePayloadBuilder {
                 log.warn("Cylindrical face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "cylindrical face build failed: " + ex.getMessage()));
             }
-        }
-        if (previewGeometry instanceof StepConicalSurface) {
+        return null;
+        }),
+        previewFaceRule(StepConicalSurface.class, StepConicalSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepConicalSurface conicalSurface = (StepConicalSurface) previewGeometry;
             try {
                 if (geometry instanceof StepConicalSurface) {
@@ -233,15 +258,16 @@ public final class StepFacePayloadBuilder {
                 log.warn("Conical face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "conical face build failed: " + ex.getMessage()));
             }
-        }
-        if (previewGeometry instanceof StepSphericalSurface) {
+        return null;
+        }),
+        previewFaceRule(StepSphericalSurface.class, StepSphericalSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
             if (trimmed.face() != null) {
                 logPreviewFacePayload("face_payload_built", trimmed.face());
             }
             return trimmed;
-        }
-        if (previewGeometry instanceof StepRationalBSplineSurface) {
+        }),
+        previewFaceRule(StepRationalBSplineSurface.class, StepRationalBSplineSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) previewGeometry;
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
@@ -262,13 +288,8 @@ public final class StepFacePayloadBuilder {
                         stepFace.id(), splineSurface.id(), ex.getMessage(), ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "rational b-spline surface preview failed"));
             }
-        }
-        if (previewGeometry instanceof StepBSplineSurfaceWithKnots
-                || previewGeometry instanceof StepBSplineSurface
-                || previewGeometry instanceof StepBezierSurface
-                || previewGeometry instanceof StepUniformSurface
-                || previewGeometry instanceof StepQuasiUniformSurface
-                || previewGeometry instanceof StepPiecewiseBezierSurface) {
+        }),
+        previewFaceRule(StepBSplineSurfaceWithKnots.class, e -> StepBSplineSurfaceWithKnots.class.isInstance(e) || StepBSplineSurface.class.isInstance(e) || StepBezierSurface.class.isInstance(e) || StepUniformSurface.class.isInstance(e) || StepQuasiUniformSurface.class.isInstance(e) || StepPiecewiseBezierSurface.class.isInstance(e), (stepFace, geometry, previewGeometry, builder, metadata) -> {
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
                 if (trimmed.face() != null || trimmed.unsupportedFace() != null) {
@@ -288,22 +309,22 @@ public final class StepFacePayloadBuilder {
                         stepFace.id(), previewGeometry.id(), ex.getMessage(), ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "b-spline surface preview failed"));
             }
-        }
-        if (previewGeometry instanceof StepSurfaceOfLinearExtrusion || previewGeometry instanceof StepSurfaceOfRevolution) {
+        }),
+        previewFaceRule(StepSurfaceOfLinearExtrusion.class, e -> StepSurfaceOfLinearExtrusion.class.isInstance(e) || StepSurfaceOfRevolution.class.isInstance(e), (stepFace, geometry, previewGeometry, builder, metadata) -> {
             PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
             if (trimmed.face() != null) {
                 logPreviewFacePayload("face_payload_built", trimmed.face());
             }
             return trimmed;
-        }
-        if (previewGeometry instanceof StepDegenerateToroidalSurface) {
+        }),
+        previewFaceRule(StepDegenerateToroidalSurface.class, StepDegenerateToroidalSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
             if (trimmed.face() != null) {
                 logPreviewFacePayload("face_payload_built", trimmed.face());
             }
             return trimmed;
-        }
-        if (previewGeometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
+        }),
+        previewFaceRule(StepToroidalSurfaceWithSpecifiedBends.class, StepToroidalSurfaceWithSpecifiedBends.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepToroidalSurfaceWithSpecifiedBends toroidalSurfaceWithBends = (StepToroidalSurfaceWithSpecifiedBends) previewGeometry;
             try {
                 if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
@@ -317,8 +338,9 @@ public final class StepFacePayloadBuilder {
                 log.warn("Toroidal surface with specified bends face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "toroidal surface with specified bends face build failed: " + ex.getMessage()));
             }
-        }
-        if (previewGeometry instanceof StepToroidalSurface) {
+        return null;
+        }),
+        previewFaceRule(StepToroidalSurface.class, StepToroidalSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepToroidalSurface toroidalSurface = (StepToroidalSurface) previewGeometry;
             try {
                 if (geometry instanceof StepToroidalSurface) {
@@ -332,44 +354,37 @@ public final class StepFacePayloadBuilder {
                 log.warn("Toroidal face build failed; returning unsupported face payload", ex);
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "toroidal face build failed: " + ex.getMessage()));
             }
-        }
-        if (previewGeometry instanceof StepCylindricalSurface
-                || previewGeometry instanceof StepConicalSurface
-                || previewGeometry instanceof StepDegenerateToroidalSurface
-                || previewGeometry instanceof StepToroidalSurface
-                || previewGeometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
+        return null;
+        }),
+        previewFaceRule(StepCylindricalSurface.class, e -> StepCylindricalSurface.class.isInstance(e) || StepConicalSurface.class.isInstance(e) || StepDegenerateToroidalSurface.class.isInstance(e) || StepToroidalSurface.class.isInstance(e) || StepToroidalSurfaceWithSpecifiedBends.class.isInstance(e), (stepFace, geometry, previewGeometry, builder, metadata) -> {
             PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
             if (trimmed.face() != null) {
                 logPreviewFacePayload("face_payload_built", trimmed.face());
             }
             return trimmed;
-        }
-        if (previewGeometry instanceof StepCylindricalSurfaceWithEllipticalAxis
-                || previewGeometry instanceof StepConicalSurfaceWithEllipticalAxis
-                || previewGeometry instanceof StepSphericalSurfaceWithEllipticalAxis
-                || previewGeometry instanceof StepToroidalSurfaceWithCylindricalAxis
-                || previewGeometry instanceof StepToroidalSurfaceWithEllipticalAxis) {
+        }),
+        previewFaceRule(StepCylindricalSurfaceWithEllipticalAxis.class, e -> StepCylindricalSurfaceWithEllipticalAxis.class.isInstance(e) || StepConicalSurfaceWithEllipticalAxis.class.isInstance(e) || StepSphericalSurfaceWithEllipticalAxis.class.isInstance(e) || StepToroidalSurfaceWithCylindricalAxis.class.isInstance(e) || StepToroidalSurfaceWithEllipticalAxis.class.isInstance(e), (stepFace, geometry, previewGeometry, builder, metadata) -> {
             PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
             if (trimmed.face() != null) {
                 logPreviewFacePayload("face_payload_built", trimmed.face());
             }
             return trimmed;
-        }
-        if (previewGeometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
+        }),
+        previewFaceRule(StepBSplineSurfaceWithKnotsAndBreakpoints.class, StepBSplineSurfaceWithKnotsAndBreakpoints.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
             if (trimmed.face() != null) {
                 logPreviewFacePayload("face_payload_built", trimmed.face());
             }
             return trimmed;
-        }
-        if (previewGeometry instanceof StepFreeFormSurface) {
+        }),
+        previewFaceRule(StepFreeFormSurface.class, StepFreeFormSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
             if (trimmed.face() != null) {
                 logPreviewFacePayload("face_payload_built", trimmed.face());
             }
             return trimmed;
-        }
-        if (previewGeometry instanceof StepRuledSurface) {
+        }),
+        previewFaceRule(StepRuledSurface.class, StepRuledSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepRuledSurface ruledSurface = (StepRuledSurface) previewGeometry;
             try {
                 FacePayload payload = toRuledSurfaceFacePayload(stepFace, ruledSurface, builder, metadata);
@@ -381,8 +396,8 @@ public final class StepFacePayloadBuilder {
                 log.warn("Ruled surface preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "ruled surface preview failed"));
-        }
-        if (previewGeometry instanceof StepSurfaceOfConstantRadius) {
+        }),
+        previewFaceRule(StepSurfaceOfConstantRadius.class, StepSurfaceOfConstantRadius.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepSurfaceOfConstantRadius surfaceOfConstantRadius = (StepSurfaceOfConstantRadius) previewGeometry;
             try {
                 FacePayload payload = toSurfaceOfConstantRadiusFacePayload(stepFace, surfaceOfConstantRadius, builder, metadata);
@@ -394,8 +409,8 @@ public final class StepFacePayloadBuilder {
                 log.warn("Surface of constant radius preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "surface of constant radius preview failed"));
-        }
-        if (previewGeometry instanceof StepParaboloidSurface) {
+        }),
+        previewFaceRule(StepParaboloidSurface.class, StepParaboloidSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepParaboloidSurface paraboloidSurface = (StepParaboloidSurface) previewGeometry;
             try {
                 FacePayload payload = toParametricSurfaceFacePayload(stepFace, paraboloidSurface, "PARABOLOID_SURFACE", builder, metadata);
@@ -407,8 +422,8 @@ public final class StepFacePayloadBuilder {
                 log.warn("Paraboloid surface preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "paraboloid surface preview failed"));
-        }
-        if (previewGeometry instanceof StepHyperboloidSurface) {
+        }),
+        previewFaceRule(StepHyperboloidSurface.class, StepHyperboloidSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepHyperboloidSurface hyperboloidSurface = (StepHyperboloidSurface) previewGeometry;
             try {
                 FacePayload payload = toParametricSurfaceFacePayload(stepFace, hyperboloidSurface, "HYPERBOLOID_SURFACE", builder, metadata);
@@ -420,8 +435,8 @@ public final class StepFacePayloadBuilder {
                 log.warn("Hyperboloid surface preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "hyperboloid surface preview failed"));
-        }
-        if (previewGeometry instanceof StepSurfaceOfTranslation) {
+        }),
+        previewFaceRule(StepSurfaceOfTranslation.class, StepSurfaceOfTranslation.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepSurfaceOfTranslation translationSurface = (StepSurfaceOfTranslation) previewGeometry;
             try {
                 FacePayload payload = toParametricSurfaceFacePayload(stepFace, translationSurface, "SURFACE_OF_TRANSLATION", builder, metadata);
@@ -433,8 +448,8 @@ public final class StepFacePayloadBuilder {
                 log.warn("Surface of translation preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "surface of translation preview failed"));
-        }
-        if (previewGeometry instanceof StepSurfaceOfProjection) {
+        }),
+        previewFaceRule(StepSurfaceOfProjection.class, StepSurfaceOfProjection.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepSurfaceOfProjection projectionSurface = (StepSurfaceOfProjection) previewGeometry;
             try {
                 FacePayload payload = toParametricSurfaceFacePayload(stepFace, projectionSurface, "SURFACE_OF_PROJECTION", builder, metadata);
@@ -446,8 +461,8 @@ public final class StepFacePayloadBuilder {
                 log.warn("Surface of projection preview failed; returning unsupported face payload", ex);
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "surface of projection preview failed"));
-        }
-        if (previewGeometry instanceof StepBlendedSurface) {
+        }),
+        previewFaceRule(StepBlendedSurface.class, StepBlendedSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepBlendedSurface blended = (StepBlendedSurface) previewGeometry;
             // Blended surface: approximate by rendering the primary surface with blend radius as metadata
             try {
@@ -461,9 +476,8 @@ public final class StepFacePayloadBuilder {
                 // C03: No silent geometry loss - continue to fallback
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "blended surface preview failed"));
-        }
-        // Free-form surfaces: try parametric mapping, fall back to sampled tessellation
-        if (previewGeometry instanceof StepFreeFormSurface) {
+        }),
+        previewFaceRule(StepFreeFormSurface.class, StepFreeFormSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepFreeFormSurface freeForm = (StepFreeFormSurface) previewGeometry;
             try {
                 PreviewFaceResult trimmed = toParametricTrimmedFaceResult(stepFace, geometry, metadata, builder);
@@ -495,11 +509,23 @@ public final class StepFacePayloadBuilder {
                 return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "free-form surface preview failed: unexpected error - " + ex.getMessage()));
             }
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "free-form surface preview failed"));
-        }
-        // Machined surface: delegate to the underlying face geometry
-        if (previewGeometry instanceof StepMachinedSurface) {
+        }),
+        previewFaceRule(StepMachinedSurface.class, StepMachinedSurface.class::isInstance, (stepFace, geometry, previewGeometry, builder, metadata) -> {
             StepMachinedSurface machinedSurface = (StepMachinedSurface) previewGeometry;
             return buildPreviewFaceResult((StepFaceEntity) machinedSurface.face(), builder, metadata);
+        })
+    );
+
+    private static PreviewFaceResult dispatchPreviewFace(
+            StepFaceEntity stepFace, StepEntity geometry, StepEntity previewGeometry,
+            StepCadBuilder builder, StepMetadataExtractor.DisplayMetadata metadata) {
+        for (PreviewFaceRule rule : PREVIEW_FACE_RULES) {
+            if (rule.matches(previewGeometry)) {
+                PreviewFaceResult result = rule.handler().handle(stepFace, geometry, previewGeometry, builder, metadata);
+                if (result != null) {
+                    return result;
+                }
+            }
         }
         String unsupportedSurface = describeUnsupportedPreviewSurface(geometry, builder);
         String reason = unsupportedSurface == null
@@ -507,6 +533,7 @@ public final class StepFacePayloadBuilder {
                 : unsupportedSurface + " preview is unsupported";
         return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, reason));
     }
+
 
     private static StepEntity unwrapParametricPreviewSurface(StepEntity geometry) {
         StepEntity current = geometry;
