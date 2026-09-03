@@ -88,35 +88,7 @@ public final class StepLegacyGeometryBuilder {
         }
         // Remove shells that are referenced by B-rep solids to avoid duplicate processing
         for (Integer solidId : solidIds) {
-            StepEntity solidEntity = resolved.get(solidId);
-            if (solidEntity instanceof StepManifoldSolidBrep) {
-            StepManifoldSolidBrep brep = (StepManifoldSolidBrep) solidEntity;
-                shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepFacettedBrep) {
-            StepFacettedBrep brep = (StepFacettedBrep) solidEntity;
-                shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepNonManifoldSolidBrep) {
-            StepNonManifoldSolidBrep brep = (StepNonManifoldSolidBrep) solidEntity;
-                shellIds.remove(brep.outer().id());
-            } else if (solidEntity instanceof StepAdvancedBrep) {
-            StepAdvancedBrep brep = (StepAdvancedBrep) solidEntity;
-                shellIds.remove(brep.outer().id());
-                for (StepEntity voidShell : brep.voids()) {
-                    shellIds.remove(voidShell.id());
-                }
-            } else if (solidEntity instanceof StepBrepWithVoids) {
-            StepBrepWithVoids brep = (StepBrepWithVoids) solidEntity;
-                shellIds.remove(brep.outer().id());
-                for (StepEntity voidShell : brep.voids()) {
-                    shellIds.remove(voidShell.id());
-                }
-            } else if (solidEntity instanceof StepFacetedBrepAndBrepWithVoids) {
-            StepFacetedBrepAndBrepWithVoids brep = (StepFacetedBrepAndBrepWithVoids) solidEntity;
-                shellIds.remove(brep.outer().id());
-                for (StepEntity voidShell : brep.voids()) {
-                    shellIds.remove(voidShell.id());
-                }
-            }
+            removeShellsReferencedBySolids(resolved.get(solidId), shellIds);
         }
         GeometryCollection shellGeometry = buildGeometryForShells(shellIds, resolved, builder, metadata, Map.of());
         GeometryCollection solidGeometry = buildGeometryForSolids(solidIds, resolved, builder, metadata, Map.of());
@@ -374,6 +346,65 @@ public final class StepLegacyGeometryBuilder {
                 || entity instanceof StepMappedItem
                 || entity instanceof StepSolidModel
                 || entity instanceof StepSurfacePatch;
+    }
+
+    // buildLegacyGeometry B-rep-solid shell-removal rules.
+    // Clean first-match else-if chain: the six B-rep types are mutually exclusive (no subtype
+    // relationship), so order is not load-bearing, but the table preserves the original order.
+    private record LegacySolidShellRule(Class<? extends StepEntity> type, LegacySolidShellHandler handler) {}
+
+    private interface LegacySolidShellHandler {
+        void removeShells(Set<Integer> shellIds, StepEntity solidEntity);
+    }
+
+    private static LegacySolidShellRule legacySolidShellRule(
+            Class<? extends StepEntity> type, LegacySolidShellHandler handler) {
+        return new LegacySolidShellRule(type, handler);
+    }
+
+    private static final List<LegacySolidShellRule> LEGACY_SOLID_SHELL_RULES = List.of(
+        legacySolidShellRule(StepManifoldSolidBrep.class, (shellIds, solidEntity) -> {
+            shellIds.remove(((StepManifoldSolidBrep) solidEntity).outer().id());
+        }),
+        legacySolidShellRule(StepFacettedBrep.class, (shellIds, solidEntity) -> {
+            shellIds.remove(((StepFacettedBrep) solidEntity).outer().id());
+        }),
+        legacySolidShellRule(StepNonManifoldSolidBrep.class, (shellIds, solidEntity) -> {
+            shellIds.remove(((StepNonManifoldSolidBrep) solidEntity).outer().id());
+        }),
+        legacySolidShellRule(StepAdvancedBrep.class, (shellIds, solidEntity) -> {
+            StepAdvancedBrep brep = (StepAdvancedBrep) solidEntity;
+            shellIds.remove(brep.outer().id());
+            for (StepEntity voidShell : brep.voids()) {
+                shellIds.remove(voidShell.id());
+            }
+        }),
+        legacySolidShellRule(StepBrepWithVoids.class, (shellIds, solidEntity) -> {
+            StepBrepWithVoids brep = (StepBrepWithVoids) solidEntity;
+            shellIds.remove(brep.outer().id());
+            for (StepEntity voidShell : brep.voids()) {
+                shellIds.remove(voidShell.id());
+            }
+        }),
+        legacySolidShellRule(StepFacetedBrepAndBrepWithVoids.class, (shellIds, solidEntity) -> {
+            StepFacetedBrepAndBrepWithVoids brep = (StepFacetedBrepAndBrepWithVoids) solidEntity;
+            shellIds.remove(brep.outer().id());
+            for (StepEntity voidShell : brep.voids()) {
+                shellIds.remove(voidShell.id());
+            }
+        })
+    );
+
+    private static void removeShellsReferencedBySolids(StepEntity solidEntity, Set<Integer> shellIds) {
+        if (solidEntity == null) {
+            return;
+        }
+        for (LegacySolidShellRule rule : LEGACY_SOLID_SHELL_RULES) {
+            if (rule.type().isInstance(solidEntity)) {
+                rule.handler().removeShells(shellIds, solidEntity);
+                return;
+            }
+        }
     }
 
     private static final int FACE_PROGRESS_INTERVAL = 25;

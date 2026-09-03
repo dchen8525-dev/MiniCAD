@@ -1,0 +1,11 @@
+# Frozen dispatch order for StepLegacyGeometryBuilder.buildLegacyGeometry (B-rep solid shell removal).
+# 6 rules, in first-match else-if order. Order is NOT load-bearing (the six B-rep types are
+# mutually exclusive -- no subtype relationship), but kept to pin the handler wiring-by-type.
+# Edit ONLY by re-running tools/gen_legacy_geometry_dispatch.py after a behaviour-preserving change.
+
+StepManifoldSolidBrep
+StepFacettedBrep
+StepNonManifoldSolidBrep
+StepAdvancedBrep
+StepBrepWithVoids
+StepFacetedBrepAndBrepWithVoids
