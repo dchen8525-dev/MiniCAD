@@ -2829,152 +2829,175 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validateManagementAssignmentEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepGroupAssignment) {
+    // validateManagementAssignmentEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record ManagementAssignmentRule(
+            Class<? extends StepEntity> type, ManagementAssignmentHandler handler) {}
+
+    private interface ManagementAssignmentHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static ManagementAssignmentRule managementAssignmentRule(
+            Class<? extends StepEntity> type, ManagementAssignmentHandler handler) {
+        return new ManagementAssignmentRule(type, handler);
+    }
+
+    private static final List<ManagementAssignmentRule> MANAGEMENT_ASSIGNMENT_RULES = List.of(
+        managementAssignmentRule(StepGroupAssignment.class, (entity, builder) -> {
             StepGroupAssignment groupAssignment = (StepGroupAssignment) entity;
             return validateSummaryEntity(groupAssignment.assignedGroup(), builder);
-        }
-        if (entity instanceof StepAppliedGroupAssignment) {
+        }),
+        managementAssignmentRule(StepAppliedGroupAssignment.class, (entity, builder) -> {
             StepAppliedGroupAssignment appliedGroupAssignment = (StepAppliedGroupAssignment) entity;
             return validateSummaryEntity(appliedGroupAssignment.assignedGroup(), builder)
-                    + validateSummaryItems(appliedGroupAssignment.items(), builder);
-        }
-        if (entity instanceof StepClassificationAssignment) {
+            + validateSummaryItems(appliedGroupAssignment.items(), builder);
+        }),
+        managementAssignmentRule(StepClassificationAssignment.class, (entity, builder) -> {
             StepClassificationAssignment classificationAssignment = (StepClassificationAssignment) entity;
             return validateSummaryEntity(classificationAssignment.assignedClass(), builder)
-                    + validateSummaryEntity(classificationAssignment.role(), builder);
-        }
-        if (entity instanceof StepAppliedClassificationAssignment) {
+            + validateSummaryEntity(classificationAssignment.role(), builder);
+        }),
+        managementAssignmentRule(StepAppliedClassificationAssignment.class, (entity, builder) -> {
             StepAppliedClassificationAssignment appliedClassificationAssignment = (StepAppliedClassificationAssignment) entity;
             return validateSummaryEntity(appliedClassificationAssignment.assignedClass(), builder)
-                    + validateSummaryEntity(appliedClassificationAssignment.role(), builder)
-                    + validateSummaryItems(appliedClassificationAssignment.items(), builder);
-        }
-        if (entity instanceof StepOrganizationAssignment) {
+            + validateSummaryEntity(appliedClassificationAssignment.role(), builder)
+            + validateSummaryItems(appliedClassificationAssignment.items(), builder);
+        }),
+        managementAssignmentRule(StepOrganizationAssignment.class, (entity, builder) -> {
             StepOrganizationAssignment organizationAssignment = (StepOrganizationAssignment) entity;
             return validateSummaryEntity(organizationAssignment.assignedOrganization(), builder)
-                    + validateSummaryEntity(organizationAssignment.role(), builder);
-        }
-        if (entity instanceof StepAppliedOrganizationAssignment) {
+            + validateSummaryEntity(organizationAssignment.role(), builder);
+        }),
+        managementAssignmentRule(StepAppliedOrganizationAssignment.class, (entity, builder) -> {
             StepAppliedOrganizationAssignment appliedOrganizationAssignment = (StepAppliedOrganizationAssignment) entity;
             return validateSummaryEntity(appliedOrganizationAssignment.assignedOrganization(), builder)
-                    + validateSummaryEntity(appliedOrganizationAssignment.role(), builder)
-                    + validateSummaryItems(appliedOrganizationAssignment.items(), builder);
-        }
-        if (entity instanceof StepAppliedNameAssignment) {
+            + validateSummaryEntity(appliedOrganizationAssignment.role(), builder)
+            + validateSummaryItems(appliedOrganizationAssignment.items(), builder);
+        }),
+        managementAssignmentRule(StepAppliedNameAssignment.class, (entity, builder) -> {
             StepAppliedNameAssignment appliedNameAssignment = (StepAppliedNameAssignment) entity;
             return validateSummaryItems(appliedNameAssignment.items(), builder);
-        }
-        if (entity instanceof StepApproval) {
+        }),
+        managementAssignmentRule(StepApproval.class, (entity, builder) -> {
             StepApproval approval = (StepApproval) entity;
             return 1 + validateSummaryEntity(approval.status(), builder);
-        }
-        if (entity instanceof StepApprovalAssignment) {
+        }),
+        managementAssignmentRule(StepApprovalAssignment.class, (entity, builder) -> {
             StepApprovalAssignment approvalAssignment = (StepApprovalAssignment) entity;
             return validateSummaryEntity(approvalAssignment.assignedApproval(), builder);
-        }
-        if (entity instanceof StepAppliedApprovalAssignment) {
+        }),
+        managementAssignmentRule(StepAppliedApprovalAssignment.class, (entity, builder) -> {
             StepAppliedApprovalAssignment appliedApprovalAssignment = (StepAppliedApprovalAssignment) entity;
             return validateSummaryEntity(appliedApprovalAssignment.assignedApproval(), builder)
-                    + validateSummaryItems(appliedApprovalAssignment.items(), builder);
-        }
-        if (entity instanceof StepContract) {
+            + validateSummaryItems(appliedApprovalAssignment.items(), builder);
+        }),
+        managementAssignmentRule(StepContract.class, (entity, builder) -> {
             StepContract contract = (StepContract) entity;
             return 1 + validateSummaryEntity(contract.kind(), builder);
-        }
-        if (entity instanceof StepContractAssignment) {
+        }),
+        managementAssignmentRule(StepContractAssignment.class, (entity, builder) -> {
             StepContractAssignment contractAssignment = (StepContractAssignment) entity;
             return validateSummaryEntity(contractAssignment.assignedContract(), builder);
-        }
-        if (entity instanceof StepAppliedContractAssignment) {
+        }),
+        managementAssignmentRule(StepAppliedContractAssignment.class, (entity, builder) -> {
             StepAppliedContractAssignment appliedContractAssignment = (StepAppliedContractAssignment) entity;
             return validateSummaryEntity(appliedContractAssignment.assignedContract(), builder)
-                    + validateSummaryItems(appliedContractAssignment.items(), builder);
-        }
-        if (entity instanceof StepCertification) {
+            + validateSummaryItems(appliedContractAssignment.items(), builder);
+        }),
+        managementAssignmentRule(StepCertification.class, (entity, builder) -> {
             StepCertification certification = (StepCertification) entity;
             return 1 + validateSummaryEntity(certification.kind(), builder);
-        }
-        if (entity instanceof StepCertificationAssignment) {
+        }),
+        managementAssignmentRule(StepCertificationAssignment.class, (entity, builder) -> {
             StepCertificationAssignment certificationAssignment = (StepCertificationAssignment) entity;
             return validateSummaryEntity(certificationAssignment.assignedCertification(), builder);
-        }
-        if (entity instanceof StepAppliedCertificationAssignment) {
+        }),
+        managementAssignmentRule(StepAppliedCertificationAssignment.class, (entity, builder) -> {
             StepAppliedCertificationAssignment appliedCertificationAssignment = (StepAppliedCertificationAssignment) entity;
             return validateSummaryEntity(appliedCertificationAssignment.assignedCertification(), builder)
-                    + validateSummaryItems(appliedCertificationAssignment.items(), builder);
-        }
-        if (entity instanceof StepSecurityClassification) {
+            + validateSummaryItems(appliedCertificationAssignment.items(), builder);
+        }),
+        managementAssignmentRule(StepSecurityClassification.class, (entity, builder) -> {
             StepSecurityClassification securityClassification = (StepSecurityClassification) entity;
             return 1 + validateSummaryEntity(securityClassification.securityLevel(), builder);
-        }
-        if (entity instanceof StepSecurityClassificationAssignment) {
+        }),
+        managementAssignmentRule(StepSecurityClassificationAssignment.class, (entity, builder) -> {
             StepSecurityClassificationAssignment securityClassificationAssignment = (StepSecurityClassificationAssignment) entity;
             return validateSummaryEntity(securityClassificationAssignment.assignedSecurityClassification(), builder);
-        }
-        if (entity instanceof StepAppliedSecurityClassificationAssignment) {
+        }),
+        managementAssignmentRule(StepAppliedSecurityClassificationAssignment.class, (entity, builder) -> {
             StepAppliedSecurityClassificationAssignment appliedSecurityClassificationAssignment = (StepAppliedSecurityClassificationAssignment) entity;
             return validateSummaryEntity(appliedSecurityClassificationAssignment.assignedSecurityClassification(), builder)
-                    + validateSummaryItems(appliedSecurityClassificationAssignment.items(), builder);
-        }
-        if (entity instanceof StepExternalSourceRelationship) {
+            + validateSummaryItems(appliedSecurityClassificationAssignment.items(), builder);
+        }),
+        managementAssignmentRule(StepExternalSourceRelationship.class, (entity, builder) -> {
             StepExternalSourceRelationship externalSourceRelationship = (StepExternalSourceRelationship) entity;
             return validateSummaryEntity(externalSourceRelationship.relatingSource(), builder)
-                    + validateSummaryEntity(externalSourceRelationship.relatedSource(), builder);
-        }
-        if (entity instanceof StepGeneralPropertyRelationship) {
+            + validateSummaryEntity(externalSourceRelationship.relatedSource(), builder);
+        }),
+        managementAssignmentRule(StepGeneralPropertyRelationship.class, (entity, builder) -> {
             StepGeneralPropertyRelationship generalPropertyRelationship = (StepGeneralPropertyRelationship) entity;
             return validateSummaryEntity(generalPropertyRelationship.relatingGeneralProperty(), builder)
-                    + validateSummaryEntity(generalPropertyRelationship.relatedGeneralProperty(), builder);
-        }
-        if (entity instanceof StepProductCategoryRelationship) {
+            + validateSummaryEntity(generalPropertyRelationship.relatedGeneralProperty(), builder);
+        }),
+        managementAssignmentRule(StepProductCategoryRelationship.class, (entity, builder) -> {
             StepProductCategoryRelationship productCategoryRelationship = (StepProductCategoryRelationship) entity;
             return validateSummaryEntity(productCategoryRelationship.category(), builder)
-                    + validateSummaryEntity(productCategoryRelationship.subCategory(), builder);
-        }
-        if (entity instanceof StepProductRelatedProductCategory) {
+            + validateSummaryEntity(productCategoryRelationship.subCategory(), builder);
+        }),
+        managementAssignmentRule(StepProductRelatedProductCategory.class, (entity, builder) -> {
             StepProductRelatedProductCategory productRelatedCategory = (StepProductRelatedProductCategory) entity;
             return validateSummaryItems(List.copyOf(productRelatedCategory.products()), builder);
-        }
-        if (entity instanceof StepDocument) {
+        }),
+        managementAssignmentRule(StepDocument.class, (entity, builder) -> {
             StepDocument document = (StepDocument) entity;
             return 1 + validateSummaryEntity(document.kind(), builder);
-        }
-        if (entity instanceof StepDocumentUsageConstraint) {
+        }),
+        managementAssignmentRule(StepDocumentUsageConstraint.class, (entity, builder) -> {
             StepDocumentUsageConstraint documentUsageConstraint = (StepDocumentUsageConstraint) entity;
             return validateSummaryEntity(documentUsageConstraint.source(), builder);
-        }
-        if (entity instanceof StepEffectivityRelationship) {
+        }),
+        managementAssignmentRule(StepEffectivityRelationship.class, (entity, builder) -> {
             StepEffectivityRelationship effectivityRelationship = (StepEffectivityRelationship) entity;
             return validateSummaryEntity(effectivityRelationship.relatingEffectivity(), builder)
-                    + validateSummaryEntity(effectivityRelationship.relatedEffectivity(), builder);
-        }
-        if (entity instanceof StepLanguageAssignment) {
+            + validateSummaryEntity(effectivityRelationship.relatedEffectivity(), builder);
+        }),
+        managementAssignmentRule(StepLanguageAssignment.class, (entity, builder) -> {
             StepLanguageAssignment languageAssignment = (StepLanguageAssignment) entity;
             return validateSummaryEntity(languageAssignment.assignedLanguage(), builder);
-        }
-        if (entity instanceof StepAppliedLanguageAssignment) {
+        }),
+        managementAssignmentRule(StepAppliedLanguageAssignment.class, (entity, builder) -> {
             StepAppliedLanguageAssignment appliedLanguageAssignment = (StepAppliedLanguageAssignment) entity;
             int count = validateSummaryEntity(appliedLanguageAssignment.assignedLanguage(), builder);
             for (StepEntity item : appliedLanguageAssignment.items()) {
-                count += validateSummaryEntity(item, builder);
+            count += validateSummaryEntity(item, builder);
             }
             return count;
-        }
-        if (entity instanceof StepExternalIdentificationAssignment) {
+        }),
+        managementAssignmentRule(StepExternalIdentificationAssignment.class, (entity, builder) -> {
             StepExternalIdentificationAssignment externalIdentificationAssignment = (StepExternalIdentificationAssignment) entity;
             return validateSummaryEntity(externalIdentificationAssignment.role(), builder)
-                    + validateSummaryEntity(externalIdentificationAssignment.source(), builder);
-        }
-        if (entity instanceof StepAppliedExternalIdentificationAssignment) {
+            + validateSummaryEntity(externalIdentificationAssignment.source(), builder);
+        }),
+        managementAssignmentRule(StepAppliedExternalIdentificationAssignment.class, (entity, builder) -> {
             StepAppliedExternalIdentificationAssignment appliedExternalIdentificationAssignment = (StepAppliedExternalIdentificationAssignment) entity;
             int count = validateSummaryEntity(appliedExternalIdentificationAssignment.role(), builder)
-                    + validateSummaryEntity(appliedExternalIdentificationAssignment.source(), builder);
+            + validateSummaryEntity(appliedExternalIdentificationAssignment.source(), builder);
             for (StepEntity item : appliedExternalIdentificationAssignment.items()) {
-                count += validateSummaryEntity(item, builder);
+            count += validateSummaryEntity(item, builder);
             }
             return count;
+        })
+    );
+
+    private static Integer validateManagementAssignmentEntity(StepEntity entity, StepCadBuilder builder) {
+        for (ManagementAssignmentRule rule : MANAGEMENT_ASSIGNMENT_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
