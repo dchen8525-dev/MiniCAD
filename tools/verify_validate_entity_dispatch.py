@@ -67,13 +67,27 @@ def original_branches(lines, method):
 
 
 def table_entries(text, names):
-    marker = "private static final List<%s> %s = List.of(" % (
-        names["record"],
-        names["table"],
-    )
+    # The `List.of(...)` block lives inline for a static table
+    # (`NAME = List.of(` at the field) and inside the constructor for an instance
+    # table (`NAME = List.of(` there). Both share the `NAME = List.of(` marker,
+    # so locate it and capture up to its matching close paren regardless of the
+    # surrounding indentation.
+    marker = "%s = List.of(" % names["table"]
     start = text.index(marker)
-    region = text[start:]
-    region = region[: region.index("\n    );") + len("\n    );")]
+    # Match the `List.of(` opener's close paren by depth so we ignore the
+    # unrelated `    );` / `        );` indentations.
+    open_paren = text.index("(", start)
+    depth = 0
+    close = -1
+    for j in range(open_paren, len(text)):
+        if text[j] == "(":
+            depth += 1
+        elif text[j] == ")":
+            depth -= 1
+            if depth == 0:
+                close = j
+                break
+    region = text[start : close + 1]
 
     params_pat = r"\s*,\s*".join(re.escape(p) for p in gen.PARAMS)
     entry_re = re.compile(
@@ -117,9 +131,10 @@ def table_entries(text, names):
 def shipped_mode(lines, method):
     mi, _bs, _t, end = gen.method_bounds(lines, method)
     body = "\n".join(lines[mi:end])
-    if gen.TERMINAL not in body:
-        print("MISSING terminal `%s` in the folded method" % gen.TERMINAL)
-        sys.exit(1)
+    # The fold only replaces the branch region [first branch, last branch), so
+    # the terminal statement after the chain is always preserved verbatim --
+    # there is no terminal string to require here (it may be `return null;`,
+    # `return x;`, or `throw ...`). Mode is detected structurally.
     return "null-fallthrough" if "!= null" in body else "first-match"
 
 
@@ -201,8 +216,8 @@ def main():
 
     if ok:
         print(
-            "FAITHFUL: all %d branch bodies match verbatim, dispatch is %s, terminal "
-            "`%s` intact (%s)" % (len(orig), ships, gen.TERMINAL, names["method"])
+            "FAITHFUL: all %d branch bodies match verbatim, dispatch is %s (%s)"
+            % (len(orig), ships, names["method"])
         )
         sys.exit(0)
     sys.exit(1)

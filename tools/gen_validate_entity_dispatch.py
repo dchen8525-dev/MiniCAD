@@ -79,6 +79,11 @@ SUBJECT = "entity"
 HANDLER_METHOD = "validate"
 TERMINAL = "return null;"
 NEEDED_IMPORT = "import java.util.List;"
+# IS_STATIC / PARAM_TYPES are the dispatch shape, derived per method from its
+# declaration (see derive_shape): an instance method's lambdas capture `this`,
+# so the table field is non-static and the handler takes only the subject.
+IS_STATIC = True
+PARAM_TYPES = ("StepEntity", "StepCadBuilder")
 
 HEADER_RE = re.compile(r"if \((.*)\)\s*\{$")
 # Kept as the entity-default for the historical reindent/audit importers; live
@@ -166,6 +171,79 @@ def method_bounds(lines, sig):
     return mi, mi + 1, end - 1, end
 
 
+def parse_params(decl_line):
+    """Return [(type, name), ...] from a method declaration line.
+
+    `Solid buildBooleanOperandSolid(StepEntity operand) {` -> [("StepEntity",
+    "operand")]. Generics in params are not present in our chains; a comma can
+    only separate parameters here.
+    """
+    m = re.search(r"\(([^)]*)\)", decl_line)
+    if not m or not m.group(1).strip():
+        return []
+    out = []
+    for part in m.group(1).split(","):
+        part = part.strip()
+        if not part:
+            continue
+        toks = part.split()
+        out.append((" ".join(toks[:-1]), toks[-1]))
+    return out
+
+
+def derive_shape(decl, method, overrides):
+    """Set the dispatch-shape globals from a declaration plus CLI overrides.
+
+    Auto-detection (no override):
+      * `static` in the declaration  -> STATIC, handler takes every parameter.
+      * instance method              -> the lambdas capture `this`, so the
+                                        handler takes only the instanceof
+                                        subject and the table field is non-static.
+      * return type / param types    -> read straight off the declaration.
+      * handler method name          -> `validate` for validateXxxEntity, else
+                                        `build` (override with --handler-method).
+
+    This lets one generator fold any chain without per-method scripting.
+    """
+    global RESULT_TYPE, PARAMS, SUBJECT, HANDLER_METHOD, TERMINAL, IS_STATIC, PARAM_TYPES
+    parsed = parse_params(decl)
+    is_static = bool(re.search(r"\bstatic\b", decl))
+
+    idx = decl.index(method + "(")
+    before = decl[:idx].split()
+    result_type = overrides.get("result_type") or (before[-1] if before else "void")
+
+    if overrides.get("params"):
+        pnames = [p.strip() for p in overrides["params"].split(",")]
+    elif is_static:
+        pnames = [n for _, n in parsed]
+    else:
+        pnames = [parsed[0][1]] if parsed else []
+
+    subject = overrides.get("subject") or (pnames[0] if pnames else "entity")
+    handler_method = overrides.get("handler_method")
+    if not handler_method:
+        handler_method = "validate" if method.startswith("validate") else "build"
+    terminal = overrides.get("terminal") or "return null;"
+
+    RESULT_TYPE = result_type
+    PARAMS = tuple(pnames)
+    SUBJECT = subject
+    HANDLER_METHOD = handler_method
+    TERMINAL = terminal
+    IS_STATIC = is_static
+    PARAM_TYPES = tuple(t for t, _ in parsed)
+    return {
+        "is_static": is_static,
+        "result_type": result_type,
+        "params": PARAMS,
+        "subject": subject,
+        "handler_method": handler_method,
+        "terminal": terminal,
+        "param_types": PARAM_TYPES,
+    }
+
+
 def javadoc_start(lines, mi):
     """Index of the method's javadoc opener, or mi when it has none.
 
@@ -184,6 +262,43 @@ def javadoc_start(lines, mi):
 
 STRING_RE = re.compile(r'"(?:\\.|[^"\\])*"')
 CHAR_RE = re.compile(r"'(?:\\.|[^'\\])*'")
+
+
+def find_constructors(lines, host_class):
+    """Indices of every constructor declaration of `host_class`.
+
+    A constructor is the only `<ClassName>(` that is not preceded by a return
+    type, so `StepCadBuilder fromResolved(...)` (a factory) does not match while
+    `StepCadBuilder(Map...) {` does.
+    """
+    pat = re.compile(r"\b" + re.escape(host_class) + r"\s*\(")
+    cts = []
+    for i, ln in enumerate(lines):
+        if pat.search(ln) and ln.rstrip().endswith("{"):
+            cts.append(i)
+    if not cts:
+        for i, ln in enumerate(lines):
+            if pat.search(ln):
+                j = i + 1
+                while j < len(lines) and not lines[j].strip():
+                    j += 1
+                if j < len(lines) and lines[j].strip().endswith("{"):
+                    cts.append(i)
+    return cts
+
+
+def constructor_end(lines, ci):
+    """Index of the constructor's closing brace (matching the decl's `{`)."""
+    depth = 0
+    for k in range(ci, len(lines)):
+        for ch in lines[k]:
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+        if depth == 0 and k > ci:
+            return k
+    return len(lines) - 1
 
 
 def strip_literals(line):
@@ -380,19 +495,24 @@ def render_dispatch(names, mode):
     ]
 
 
-def render_table_header(names, mode):
+def render_table_header(names, mode, static=True, param_types=None, param_names=None):
     semantics = (
         "first-match-return" if mode == FIRST_MATCH else "null means keep looking"
     )
-    return [
+    if param_types is None:
+        param_types = PARAM_TYPES
+    if param_names is None:
+        param_names = PARAMS
+    iface_params = ", ".join("%s %s" % (t, n) for t, n in zip(param_types, param_names))
+    field_mod = "private static final" if static else "private final"
+    header = [
         "    // %s dispatch table (%s," % (names["method"], semantics),
         "    // mirrors the original sequential ifs).",
         "    private record %s(" % names["record"],
         "            Class<? extends StepEntity> type, %s handler) {}" % names["handler"],
         "",
         "    private interface %s {" % names["handler"],
-        "        %s %s(StepEntity %s, StepCadBuilder %s);"
-        % (RESULT_TYPE, HANDLER_METHOD, PARAMS[0], PARAMS[1]),
+        "        %s %s(%s);" % (RESULT_TYPE, HANDLER_METHOD, iface_params),
         "    }",
         "",
         "    private static %s %s(" % (names["record"], names["factory"]),
@@ -400,9 +520,32 @@ def render_table_header(names, mode):
         "        return new %s(type, handler);" % names["record"],
         "    }",
         "",
-        "    private static final List<%s> %s = List.of("
-        % (names["record"], names["table"]),
     ]
+    if static:
+        # Static table: the field is initialised inline with the rule list.
+        header.append(
+            "    %s List<%s> %s = List.of("
+            % (field_mod, names["record"], names["table"])
+        )
+    else:
+        # Instance table: the field is declared here but assigned inside the
+        # constructor(s), because its lambdas capture `this` and read final
+        # fields (builder / entitiesById / curveBuilder) that are only assigned
+        # in the constructor -- a field initializer would hit Java's
+        # definite-assignment rule ("might not have been initialized").
+        header.append(
+            "    %s List<%s> %s;" % (field_mod, names["record"], names["table"])
+        )
+    return header
+
+
+def render_ctor_assignment(names, branches, mode):
+    """The `RULES = List.of(...)` block injected into each constructor.
+
+    Eight-space base (constructor body), entries at twelve spaces.
+    """
+    entries = render_entries(names, branches, mode, indent="            ")
+    return ["        %s = List.of(" % names["table"]] + entries + ["        );", ""]
 
 
 def reindent(body, indent="            "):
@@ -436,17 +579,27 @@ def expand(branches):
     return [(t, br) for br in branches for t in br["types"]]
 
 
-def render_entries(names, branches, mode):
+def render_entries(names, branches, mode, indent="        "):
+    """Render the table entries.
+
+    `indent` is the 4-space multiple at which each `factory(...)` call sits. The
+    static table lives at class level (indent 8); the constructor assignment for
+    an instance table lives one level deeper (indent 12), so the body is re-based
+    four spaces further in.
+    """
+    body_indent = indent + "    "
     rendered_by_type = {}
     for type_name, br in expand(branches):
-        body = reindent(br["body"])
+        body = reindent(br["body"], body_indent)
         if mode == NULL_FALLTHROUGH and not br["exits"]:
             # The original branch fell out of the if and kept testing the
             # following types; `return null` makes the loop do the same.
-            body.append("            return null;")
+            body.append(body_indent + "return null;")
         rendered_by_type[type_name] = (
-            "        %s(%s.class, (%s) -> {\n%s\n        })"
-            % (names["factory"], type_name, ", ".join(PARAMS), "\n".join(body))
+            indent + "%s(%s.class, (%s) -> {\n%s\n" % (
+                names["factory"], type_name, ", ".join(PARAMS), "\n".join(body)
+            )
+            + indent + "})"
         )
     entries = [rendered_by_type[t] for t, _ in expand(branches)]
     return [e + "," if j < len(entries) - 1 else e for j, e in enumerate(entries)]
@@ -554,6 +707,142 @@ class {test_class} {{
 }}
 '''
 
+# Guard test for an INSTANCE-field table: the lambdas capture `this`, so the
+# field is non-static and the guard test cannot reflect it off the class.
+# Instead it reads the host source file (deterministically available at
+# project root) and extracts the table's (.class) entries in declaration order,
+# which still pins both the order and the per-type handler wiring.
+TEST_TEMPLATE_INSTANCE = '''package {host_pkg};
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+/**
+ * Guards the table-driven dispatch introduced for {host_class}.{method}.
+ *
+{intro}
+ *
+{item1}
+{item2}
+ *
+ * src/test/resources/{slug}-dispatch-order.txt freezes the type order captured
+ * from the original chain (see tools/gen_validate_entity_dispatch.py). The table
+ * is an instance field whose lambdas capture `this`, so this test reads the host
+ * source and extracts the table's (.class) entries in declaration order, pinning
+ * both the order and the handler wiring-by-type.
+ */
+class {test_class} {{
+
+    private static final Path FROZEN_ORDER =
+            Paths.get("src/test/resources/{slug}-dispatch-order.txt");
+    private static final String TABLE_FIELD = "{table}";
+    private static final String HOST_SOURCE = "src/main/java/{host_path}.java";
+
+    @Test
+    @DisplayName("{method} dispatch table keeps the original branch order")
+    void dispatchTableShouldMatchFrozenOrder() throws Exception {{
+        List<String> expected = frozenTypes();
+        List<String> actual = liveHandlerTypes();
+
+        assertEquals(expected.size(), actual.size(),
+                "Dispatch table branch count changed. Expected " + expected.size()
+                        + " branches from the original chain, found " + actual.size() + ".");
+        assertEquals(expected, actual,
+                "Dispatch table order/types changed. The table is ordered data, not "
+                        + "control flow: instanceof matches subtypes and the first match wins, "
+                        + "so reordering silently changes which entity is validated.");
+    }}
+
+    @Test
+    @DisplayName("{method} dispatch table has no duplicate types")
+    void dispatchTableShouldHaveNoDuplicateTypes() throws Exception {{
+        List<String> actual = liveHandlerTypes();
+        Set<String> seen = new HashSet<>();
+        List<String> duplicates = new ArrayList<>();
+        for (String type : actual) {{
+            if (!seen.add(type)) {{
+                duplicates.add(type);
+            }}
+        }}
+        assertEquals(List.of(), duplicates,
+                "Duplicate types in the dispatch table: later entries are unreachable, "
+                        + "because the first match returns.");
+    }}
+
+    private static List<String> frozenTypes() throws IOException {{
+        if (!Files.exists(FROZEN_ORDER)) {{
+            fail("Missing frozen dispatch order at " + FROZEN_ORDER.toAbsolutePath()
+                    + " - regenerate with tools/gen_validate_entity_dispatch.py");
+        }}
+        List<String> types = new ArrayList<>();
+        for (String line : Files.readAllLines(FROZEN_ORDER, StandardCharsets.UTF_8)) {{
+            String trimmed = line.trim();
+            if (!trimmed.isEmpty() && !trimmed.startsWith("#")) {{
+                types.add(trimmed);
+            }}
+        }}
+        return types;
+    }}
+
+    private static List<String> liveHandlerTypes() throws Exception {{
+        if (!Files.exists(Paths.get(HOST_SOURCE))) {{
+            fail("Cannot read " + HOST_SOURCE + " to verify the dispatch table order.");
+        }}
+        String text = Files.readString(Paths.get(HOST_SOURCE), StandardCharsets.UTF_8);
+        int field = text.indexOf(TABLE_FIELD + " = List.of(");
+        if (field < 0) {{
+            fail("Cannot find " + TABLE_FIELD + " in " + HOST_SOURCE);
+        }}
+        // The table is assigned inside the constructor as
+        // `NAME = List.of(entry, entry, ...)`. Count the `List.of(` opener's own
+        // paren as depth 1 so the matching `)` is the List.of closer -- not the
+        // first entry's closing paren (which would stop after one rule).
+        int listOf = text.indexOf("List.of(", field);
+        int paren = listOf + "List.of".length();
+        int depth = 1;
+        int close = -1;
+        for (int i = paren + 1; i < text.length(); i++) {{
+            char c = text.charAt(i);
+            if (c == '(') {{
+                depth++;
+            }} else if (c == ')') {{
+                depth--;
+                if (depth == 0) {{
+                    close = i;
+                    break;
+                }}
+            }}
+        }}
+        if (close < 0) {{
+            fail("Unterminated " + TABLE_FIELD + " table in " + HOST_SOURCE);
+        }}
+        String body = text.substring(paren + 1, close);
+        List<String> types = new ArrayList<>();
+        Matcher m = Pattern.compile("([\\\\w.]+)\\\\.class\\\\s*,").matcher(body);
+        while (m.find()) {{
+            String fqn = m.group(1);
+            types.add(fqn.substring(fqn.lastIndexOf('.') + 1));
+        }}
+        return types;
+    }}
+}}
+'''
+
 
 def wrap_javadoc(paragraph, first=" * ", cont=" * ", width=78):
     """Wrap a paragraph into javadoc lines, keeping `code` tokens unbroken."""
@@ -571,7 +860,10 @@ def wrap_javadoc(paragraph, first=" * ", cont=" * ", width=78):
     return "\n".join(out)
 
 
-def render_test(names, count, mode, summary, order_doc, host_class, host_pkg):
+def render_test(
+    names, count, mode, summary, order_doc, host_class, host_pkg,
+    static=True, host_path=None,
+):
     semantics_doc = (
         "Every branch returns, so it is first-match-return dispatch with a "
         "terminal `return null;` for unsupported entities."
@@ -599,7 +891,10 @@ def render_test(names, count, mode, summary, order_doc, host_class, host_pkg):
         first=" *   2. ",
         cont=" *      ",
     )
-    return TEST_TEMPLATE.format(
+    if host_path is None:
+        host_path = host_pkg.replace(".", "/") + "/" + host_class
+    template = TEST_TEMPLATE if static else TEST_TEMPLATE_INSTANCE
+    return template.format(
         method=names["method"],
         intro=intro,
         item1=item1,
@@ -609,12 +904,13 @@ def render_test(names, count, mode, summary, order_doc, host_class, host_pkg):
         test_class=names["test_class"],
         host_class=host_class,
         host_pkg=host_pkg,
+        host_path=host_path,
     )
 
 
 # --------------------------------------------------------------------------
 def main():
-    global RESULT_TYPE, PARAMS, SUBJECT, HANDLER_METHOD, TERMINAL, SRC
+    global RESULT_TYPE, PARAMS, SUBJECT, HANDLER_METHOD, TERMINAL, SRC, IS_STATIC
     ap = argparse.ArgumentParser()
     ap.add_argument("--method", required=True, help="e.g. validateAssignmentEntity")
     ap.add_argument(
@@ -655,12 +951,6 @@ def main():
     )
     args = ap.parse_args()
 
-    # Make the dispatch shape CLI-driven so one generator folds any chain.
-    RESULT_TYPE = args.result_type
-    PARAMS = tuple(p.strip() for p in args.params.split(","))
-    SUBJECT = PARAMS[0]
-    HANDLER_METHOD = args.handler_method
-    TERMINAL = args.terminal
     SRC = Path(args.source).resolve()
 
     names = derive(args.method)
@@ -677,11 +967,20 @@ def main():
     lines = read_lines(SRC)
 
     mi, body_start, terminal, end = method_bounds(lines, args.method)
+    # Derive the dispatch shape (static vs instance, return type, params, handler
+    # name, terminal) from the declaration so one generator folds any chain. CLI
+    # flags override only when explicitly different from the validate defaults.
+    overrides = {}
+    if args.result_type != "Integer":
+        overrides["result_type"] = args.result_type
+    if args.params != "entity,builder":
+        overrides["params"] = args.params
+    if args.handler_method != "validate":
+        overrides["handler_method"] = args.handler_method
+    if args.terminal != "return null;":
+        overrides["terminal"] = args.terminal
+    derive_shape(lines[mi], args.method, overrides)
     terminal_text = lines[terminal].strip()
-    if terminal_text != TERMINAL:
-        raise SystemExit(
-            "ABORT: expected a terminal `%s`, found: %s" % (TERMINAL, terminal_text)
-        )
 
     bi = next(
         i
@@ -689,7 +988,15 @@ def main():
         if lines[i].strip().startswith("if (%s instanceof " % SUBJECT)
     )
     if bi != body_start:
-        prefix = [lines[i] for i in range(body_start, bi) if lines[i].strip()]
+        # Comments and blank lines before the chain are harmless (they stay put,
+        # the fold only replaces the branch region). A real statement/declaration
+        # preceding the chain would be a local the lambdas cannot capture, so it
+        # still aborts.
+        prefix = [
+            lines[i]
+            for i in range(body_start, bi)
+            if lines[i].strip() and not lines[i].strip().startswith("//")
+        ]
         if prefix:
             raise SystemExit(
                 "ABORT: statements precede the chain and may declare locals the "
@@ -736,7 +1043,13 @@ def main():
             % (len(interleaved), "\n  ".join(interleaved))
         )
 
-    tail = [lines[i] for i in range(region_end, terminal) if lines[i].strip()]
+    # Comments/blank lines between the last branch and the terminal are harmless
+    # (they stay put); a real statement would be unreachable code after the fold.
+    tail = [
+        lines[i]
+        for i in range(region_end, terminal)
+        if lines[i].strip() and not lines[i].strip().startswith("//")
+    ]
     if tail:
         raise SystemExit(
             "ABORT: statements sit between the chain and the terminal return:\n  "
@@ -746,14 +1059,22 @@ def main():
     fallthrough = [b["type"] for b in branches if not b["exits"]]
     mode = FIRST_MATCH if not fallthrough else NULL_FALLTHROUGH
     if mode == NULL_FALLTHROUGH:
+        # The loop falls through to the terminal, so it must be a neutral
+        # `return null;` -- a `throw` as the fallback would change behaviour.
+        if terminal_text != "return null;":
+            raise SystemExit(
+                "ABORT: NULL_FALLTHROUGH needs a `return null;` terminal, found: "
+                + terminal_text
+            )
         for b in branches:
             last = [x.strip() for x in b["body"] if x.strip()][-1]
-            if last == TERMINAL:
+            if last == "return null;":
                 raise SystemExit(
-                    "ABORT: %s returns the terminal explicitly, which the "
-                    "null-means-keep-looking loop would misread as fall-through"
-                    % b["type"]
+                    "ABORT: %s returns null explicitly, which the null-means-keep-"
+                    "looking loop would misread as fall-through" % b["type"]
                 )
+    # For FIRST_MATCH any terminal (return null; / return x; / throw) is the
+    # unreachable fallback we keep verbatim -- no constraint.
 
     all_types = [s for b in branches for s in b["simple"]]
     parents = supertypes(all_types)
@@ -768,6 +1089,7 @@ def main():
         if m:
             host_pkg = m.group(1)
             break
+    host_path = host_pkg.replace(".", "/") + "/" + host_class
     test_dir = ROOT / "src/test/java" / host_pkg.replace(".", "/")
 
     print("method      :", names["method"], "(%s line %d)" % (host_class, mi + 1))
@@ -784,27 +1106,62 @@ def main():
         print("\nDRY RUN: no files written")
         return
 
-    if related:
+    # Table types may be related by inheritance (e.g. StepSolidModel is the base
+    # of several branches). The original sequential-if chain is already ordered
+    # correctly (children before parents) so the first match is the most specific
+    # subtype; the frozen order file pins that. If a parent precedes a child we
+    # would silently break reachability, so refuse and reorder the chain first.
+    expanded_order = [s for b in branches for s in b["simple"]]
+    name_to_idx = {n: i for i, n in enumerate(expanded_order)}
+    bad_order = [
+        "%s before its child %s" % (p, c)
+        for c, p in related.items()
+        if name_to_idx.get(p, -1) >= 0 and name_to_idx[p] < name_to_idx[c]
+    ]
+    if bad_order:
         raise SystemExit(
-            "ABORT: table types are related by inheritance %s; verify the parent is "
-            "listed after its children before folding" % related
+            "ABORT: table types are ordered parent-before-child %s; reorder the "
+            "chain so each child is tested before its parent" % bad_order
         )
 
-    order_doc = (
-        "The %d types are unrelated today (each implements StepEntity directly), "
-        "so the order happens not to matter, but the frozen file turns any future "
-        "reordering into a test failure rather than a silent behaviour change;"
-        % len(expanded)
-    )
+    if related:
+        order_doc = (
+            "Some of the %d types are related by inheritance, so the order is "
+            "load-bearing: a child must be tested before its parent or the parent's "
+            "rule would shadow it. The frozen file pins the original child-first "
+            "ordering so any future reordering becomes a test failure rather than a "
+            "silent behaviour change;"
+            % len(expanded)
+        )
+    else:
+        order_doc = (
+            "The %d types are unrelated today (each implements StepEntity directly), "
+            "so the order happens not to matter, but the frozen file turns any future "
+            "reordering into a test failure rather than a silent behaviour change;"
+            % len(expanded)
+        )
 
-    # 1) replace only the branch region; the terminal statement stays put.
+    # 1) replace the branch region with the dispatch loop; the terminal
+    #    statement (return null; / return x; / throw) stays put.
     dispatch = render_dispatch(names, mode)
-    entries = render_entries(names, branches, mode)
     lines[bi:region_end] = dispatch + [""]
 
-    # 2) insert the class-level table before the method (or its javadoc).
+    # 2) insert the table. Static: the field is initialised inline at class
+    #    level (before the method). Instance: the field is declared at class
+    #    level but assigned inside the constructor(s), because its lambdas
+    #    capture `this` and read final fields only set in the constructor.
     ii = javadoc_start(lines, mi)
-    lines[ii:ii] = render_table_header(names, mode) + entries + ["    );", ""]
+    if IS_STATIC:
+        entries = render_entries(names, branches, mode, indent="        ")
+        lines[ii:ii] = (
+            render_table_header(names, mode, static=True) + entries + ["    );", ""]
+        )
+    else:
+        lines[ii:ii] = render_table_header(names, mode, static=False) + [""]
+        ctor_assign = render_ctor_assignment(names, branches, mode)
+        for ci in sorted(find_constructors(lines, host_class), reverse=True):
+            ce = constructor_end(lines, ci)
+            lines[ce:ce] = ctor_assign
 
     # 3) make sure List is visible. A wildcard `import java.util.*;` already
     # provides it -- StepDumpApp has one -- so injecting the single-type import
@@ -830,7 +1187,8 @@ def main():
     test_java.parent.mkdir(parents=True, exist_ok=True)
     test_java.write_text(
         render_test(
-            names, len(expanded), mode, args.summary, order_doc, host_class, host_pkg
+            names, len(expanded), mode, args.summary, order_doc,
+            host_class, host_pkg, static=IS_STATIC, host_path=host_path,
         ),
         encoding="utf-8",
     )

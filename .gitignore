@@ -5,3 +5,5 @@ target/
 .claude/
 .workbuddy/
 tools/cp.txt
+__pycache__/
+*.pyc
