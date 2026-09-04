@@ -1988,147 +1988,187 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validateTopologyEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepEdgeCurve) {
+    // validateTopologyEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record TopologyRule(
+            Class<? extends StepEntity> type, TopologyHandler handler) {}
+
+    private interface TopologyHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static TopologyRule topologyRule(
+            Class<? extends StepEntity> type, TopologyHandler handler) {
+        return new TopologyRule(type, handler);
+    }
+
+    private static final List<TopologyRule> TOPOLOGY_RULES = List.of(
+        topologyRule(StepEdgeCurve.class, (entity, builder) -> {
             StepEdgeCurve edgeCurve = (StepEdgeCurve) entity;
             builder.buildEdge(edgeCurve.id());
             return 1;
-        }
-        if (entity instanceof StepSubedge) {
+        }),
+        topologyRule(StepSubedge.class, (entity, builder) -> {
             StepSubedge subedge = (StepSubedge) entity;
             builder.buildEdge(subedge.id());
             return 1;
-        }
-        if (entity instanceof StepOrientedEdge) {
+        }),
+        topologyRule(StepOrientedEdge.class, (entity, builder) -> {
             StepOrientedEdge orientedEdge = (StepOrientedEdge) entity;
             builder.buildOrientedEdge(orientedEdge.id());
             return 1;
-        }
-        if (entity instanceof StepEdgeLoop) {
+        }),
+        topologyRule(StepEdgeLoop.class, (entity, builder) -> {
             StepEdgeLoop edgeLoop = (StepEdgeLoop) entity;
             builder.buildEdgeLoop(edgeLoop.id());
             return 1;
-        }
-        if (entity instanceof StepVertexLoop) {
+        }),
+        topologyRule(StepVertexLoop.class, (entity, builder) -> {
             StepVertexLoop vertexLoop = (StepVertexLoop) entity;
             builder.buildVertexLoop(vertexLoop.id());
             return 1;
-        }
-        if (entity instanceof StepPolyLoop) {
+        }),
+        topologyRule(StepPolyLoop.class, (entity, builder) -> {
             StepPolyLoop polyLoop = (StepPolyLoop) entity;
             validatePolyLoop(polyLoop, builder);
             return 1;
-        }
-        if (entity instanceof StepPath) {
+        }),
+        topologyRule(StepPath.class, (entity, builder) -> {
             StepPath path = (StepPath) entity;
             validatePathEdges(path.edges(), builder);
             return 1;
-        }
-        if (entity instanceof StepOpenPath) {
+        }),
+        topologyRule(StepOpenPath.class, (entity, builder) -> {
             StepOpenPath openPath = (StepOpenPath) entity;
             validatePathEdges(openPath.edges(), builder);
             return 1;
-        }
-        if (entity instanceof StepSubpath) {
+        }),
+        topologyRule(StepSubpath.class, (entity, builder) -> {
             StepSubpath subpath = (StepSubpath) entity;
             validatePathEdges(subpath.edges(), builder);
             return 1;
-        }
-        if (entity instanceof StepOrientedPath) {
+        }),
+        topologyRule(StepOrientedPath.class, (entity, builder) -> {
             StepOrientedPath orientedPath = (StepOrientedPath) entity;
             validatePathEdges(orientedPath.edges(), builder);
             return 1;
-        }
-        if (entity instanceof StepConnectedEdgeSet) {
+        }),
+        topologyRule(StepConnectedEdgeSet.class, (entity, builder) -> {
             StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) entity;
             return validateConnectedEdgeSet(edgeSet, builder);
-        }
-        if (entity instanceof StepWireShell) {
+        }),
+        topologyRule(StepWireShell.class, (entity, builder) -> {
             StepWireShell wireShell = (StepWireShell) entity;
             return validateWireShell(wireShell, builder);
-        }
-        if (entity instanceof StepVertexShell) {
+        }),
+        topologyRule(StepVertexShell.class, (entity, builder) -> {
             StepVertexShell vertexShell = (StepVertexShell) entity;
             builder.buildVertexLoop(vertexShell.extent().id());
             return 1;
-        }
-        if (entity instanceof StepEdgeBasedWireframeModel) {
+        }),
+        topologyRule(StepEdgeBasedWireframeModel.class, (entity, builder) -> {
             StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) entity;
             int count = 0;
             for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
                 count += validateConnectedEdgeSet(boundary, builder);
             }
             return count;
-        }
-        if (entity instanceof StepShellBasedWireframeModel) {
+        }),
+        topologyRule(StepShellBasedWireframeModel.class, (entity, builder) -> {
             StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) entity;
             return validateShellBasedWireframeModel(wireframeModel, builder);
-        }
-        if (entity instanceof StepFaceEntity) {
+        }),
+        topologyRule(StepFaceEntity.class, (entity, builder) -> {
             StepFaceEntity face = (StepFaceEntity) entity;
             builder.buildFace(face.id());
             return 1;
-        }
-        if (entity instanceof StepFaceBasedSurfaceModel) {
+        }),
+        topologyRule(StepFaceBasedSurfaceModel.class, (entity, builder) -> {
             StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) entity;
             return validateFaceBasedSurfaceModel(surfaceModel, builder).supportedFaces();
-        }
-        if (entity instanceof StepShellBasedSurfaceModel) {
+        }),
+        topologyRule(StepShellBasedSurfaceModel.class, (entity, builder) -> {
             StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) entity;
             return validateShellBasedSurfaceModel(surfaceModel, builder).supportedFaces();
-        }
-        if (entity instanceof StepConnectedFaceSet) {
+        }),
+        topologyRule(StepConnectedFaceSet.class, (entity, builder) -> {
             StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) entity;
             return summarizeShell(connectedFaceSet.faces(), builder).supportedFaces();
-        }
-        if (entity instanceof StepConnectedFaceSubSet) {
+        }),
+        topologyRule(StepConnectedFaceSubSet.class, (entity, builder) -> {
             StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
             return summarizeShell(connectedFaceSubSet.faces(), builder).supportedFaces();
-        }
-        if (entity instanceof StepOpenShell
-                || entity instanceof StepSurfacedOpenShell
-                || entity instanceof StepOrientedOpenShell
-                || entity instanceof StepClosedShell
-                || entity instanceof StepOrientedClosedShell) {
+        }),
+        topologyRule(StepOpenShell.class, (entity, builder) -> {
             return builder.buildShell(entity.id()).faces().size();
-        }
-        if (entity instanceof StepManifoldSolidBrep
-                || entity instanceof StepBrepWithVoids
-                || entity instanceof StepSweptAreaSolid
-                || entity instanceof StepExtrudedFaceSolid
-                || entity instanceof StepRevolvedFaceSolid
-                || entity instanceof StepSolidReplica
-                || entity instanceof StepCsgSolid
-                || entity instanceof StepCsgPrimitive
-                || entity instanceof StepBooleanResult
-                || entity instanceof StepBooleanClippingResult) {
+        }),
+        topologyRule(StepSurfacedOpenShell.class, (entity, builder) -> {
+            return builder.buildShell(entity.id()).faces().size();
+        }),
+        topologyRule(StepOrientedOpenShell.class, (entity, builder) -> {
+            return builder.buildShell(entity.id()).faces().size();
+        }),
+        topologyRule(StepClosedShell.class, (entity, builder) -> {
+            return builder.buildShell(entity.id()).faces().size();
+        }),
+        topologyRule(StepOrientedClosedShell.class, (entity, builder) -> {
+            return builder.buildShell(entity.id()).faces().size();
+        }),
+        topologyRule(StepManifoldSolidBrep.class, (entity, builder) -> {
             return builder.buildSolid(entity.id()).outerShell().faces().size();
-        }
-        if (entity instanceof StepPointSet) {
+        }),
+        topologyRule(StepBrepWithVoids.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepSweptAreaSolid.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepExtrudedFaceSolid.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepRevolvedFaceSolid.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepSolidReplica.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepCsgSolid.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepCsgPrimitive.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepBooleanResult.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepBooleanClippingResult.class, (entity, builder) -> {
+            return builder.buildSolid(entity.id()).outerShell().faces().size();
+        }),
+        topologyRule(StepPointSet.class, (entity, builder) -> {
             StepPointSet pointSet = (StepPointSet) entity;
             return validatePointSet(pointSet, builder);
-        }
-        if (entity instanceof StepGeometricCurveSet) {
+        }),
+        topologyRule(StepGeometricCurveSet.class, (entity, builder) -> {
             StepGeometricCurveSet curveSet = (StepGeometricCurveSet) entity;
             return validateGeometricCurveSet(curveSet, builder);
-        }
-        if (entity instanceof StepGeometricSet) {
+        }),
+        topologyRule(StepGeometricSet.class, (entity, builder) -> {
             StepGeometricSet geometricSet = (StepGeometricSet) entity;
             return validateGeometricSet(geometricSet, builder);
-        }
-        if (entity instanceof StepBoxDomain) {
+        }),
+        topologyRule(StepBoxDomain.class, (entity, builder) -> {
             StepBoxDomain boxDomain = (StepBoxDomain) entity;
             return validateSummaryEntity(boxDomain.corner(), builder);
-        }
-        if (entity instanceof StepHalfSpaceSolid) {
+        }),
+        topologyRule(StepHalfSpaceSolid.class, (entity, builder) -> {
             StepHalfSpaceSolid halfSpaceSolid = (StepHalfSpaceSolid) entity;
             int count = validateSummaryEntity(halfSpaceSolid.baseSurface(), builder);
             if (halfSpaceSolid.enclosure() != null) {
                 count += validateSummaryEntity(halfSpaceSolid.enclosure(), builder);
             }
             return count;
-        }
-        if (entity instanceof StepProfileDef) {
+        }),
+        topologyRule(StepProfileDef.class, (entity, builder) -> {
             StepProfileDef profileDef = (StepProfileDef) entity;
             int count = 0;
             if (profileDef.position() != null) {
@@ -2136,39 +2176,48 @@ public final class StepDumpApp {
             }
             count += validateSummaryItems(profileDef.curves(), builder);
             return Math.max(1, count);
-        }
-        if (entity instanceof StepRepresentation) {
+        }),
+        topologyRule(StepRepresentation.class, (entity, builder) -> {
             StepRepresentation representation = (StepRepresentation) entity;
             return validateRepresentation(representation, builder);
-        }
-        if (entity instanceof StepRepresentationMap) {
+        }),
+        topologyRule(StepRepresentationMap.class, (entity, builder) -> {
             StepRepresentationMap representationMap = (StepRepresentationMap) entity;
             return validateRepresentationMap(representationMap, builder);
-        }
-        if (entity instanceof StepMappedItem) {
+        }),
+        topologyRule(StepMappedItem.class, (entity, builder) -> {
             StepMappedItem mappedItem = (StepMappedItem) entity;
             return validateMappedItem(mappedItem, builder);
-        }
-        if (entity instanceof StepStyledItem) {
+        }),
+        topologyRule(StepStyledItem.class, (entity, builder) -> {
             StepStyledItem styledItem = (StepStyledItem) entity;
             return validateStyledItem(styledItem, builder);
-        }
-        if (entity instanceof StepOverRidingStyledItem) {
+        }),
+        topologyRule(StepOverRidingStyledItem.class, (entity, builder) -> {
             StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) entity;
             return validateOverridingStyledItem(styledItem, builder);
-        }
-        if (entity instanceof StepRepresentationRelationship) {
+        }),
+        topologyRule(StepRepresentationRelationship.class, (entity, builder) -> {
             StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
             return validateRepresentationRelationship(relationship, builder);
-        }
-        if (entity instanceof StepRepresentationRelationshipWithTransformation) {
+        }),
+        topologyRule(StepRepresentationRelationshipWithTransformation.class, (entity, builder) -> {
             StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
             return validateRepresentationRelationshipWithTransformation(relationship, builder);
-        }
-        if (entity instanceof StepShapeRepresentationRelationship) {
+        }),
+        topologyRule(StepShapeRepresentationRelationship.class, (entity, builder) -> {
             StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
             return validateShapeRepresentationRelationship(relationship, builder);
+        })
+    );
+
+    private static Integer validateTopologyEntity(StepEntity entity, StepCadBuilder builder) {
+        for (TopologyRule rule : TOPOLOGY_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
