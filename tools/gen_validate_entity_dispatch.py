@@ -219,40 +219,82 @@ def extract_branches(lines, start, stop):
     i = start
     while i < stop:
         stripped = lines[i].strip()
-        if stripped.startswith(BRANCH_START) and stripped.endswith("{"):
-            condition = HEADER_RE.search(lines[i]).group(1)
-            depth = 1
-            body = []
-            k = i + 1
-            while k < stop:
-                for ch in lines[k]:
-                    if ch == "{":
-                        depth += 1
-                    elif ch == "}":
-                        depth -= 1
-                if depth == 0:
-                    break
-                body.append(lines[k])
-                k += 1
-            while body and body[0].strip() == "":
-                body.pop(0)
-            while body and body[-1].strip() == "":
-                body.pop()
-            branches.append(
-                {
-                    "type": re.search(r"instanceof (\w+)", condition).group(1),
-                    "condition": condition,
-                    "body": body,
-                    "guarded": "&&" in condition or "||" in condition,
-                    "exits": last_statement_exits(body),
-                    "start": i,
-                    "end": k + 1,
-                }
-            )
-            region_end = k + 1
-            i = k + 1
+        if not stripped.startswith(BRANCH_START):
+            i += 1
             continue
-        i += 1
+
+        # A branch header can wrap onto following lines when it is an OR group:
+        #
+        #     if (entity instanceof StepManifoldSolidBrep
+        #             || entity instanceof StepBrepWithVoids
+        #             || entity instanceof StepCsgSolid) {
+        #
+        # so the header runs until the line that opens the body.
+        header = i
+        while not lines[header].strip().endswith("{") and header + 1 < stop:
+            header += 1
+        raw_header = " ".join(x.strip() for x in lines[i : header + 1])
+        match = HEADER_RE.search(raw_header)
+        if not match:
+            # Not a header this extractor understands (e.g. a one-line body).
+            # Leave it alone rather than crash; the contiguity check downstream
+            # will refuse the fold if it sits inside the chain.
+            i += 1
+            continue
+        condition = match.group(1)
+
+        depth = 1
+        body = []
+        k = header + 1
+        while k < stop:
+            for ch in lines[k]:
+                if ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+            if depth == 0:
+                break
+            body.append(lines[k])
+            k += 1
+        while body and body[0].strip() == "":
+            body.pop(0)
+        while body and body[-1].strip() == "":
+            body.pop()
+
+        types = re.findall(r"instanceof (\w+)", condition)
+        if len(types) > 1:
+            # Several types sharing one body is only table-driven if the condition
+            # is a pure OR of instanceof tests. Anything else (a && guard, a test
+            # that is not instanceof) is a real predicate and needs a different
+            # rule shape -- refuse instead of silently dropping the guard.
+            operands = [x.strip() for x in condition.split("||")]
+            pure_or = (
+                "&&" not in condition
+                and all(re.fullmatch(r"entity instanceof \w+", o) for o in operands)
+            )
+            if not pure_or:
+                raise SystemExit(
+                    "ABORT: multi-type condition is not a pure OR of instanceof "
+                    "tests, so it cannot become one rule per type:\n  " + condition
+                )
+
+        branches.append(
+            {
+                "type": types[0],
+                "types": types,
+                "condition": condition,
+                "body": body,
+                # A `&&` guard is a real predicate the plain type table cannot
+                # express. A `||` OR of pure instanceof tests is NOT guarded: it
+                # expands into one rule per type (handled by expand()/render).
+                "guarded": "&&" in condition,
+                "exits": last_statement_exits(body),
+                "start": i,
+                "end": k + 1,
+            }
+        )
+        region_end = k + 1
+        i = k + 1
     return branches, region_end
 
 
@@ -345,19 +387,32 @@ def reindent(body, indent="            "):
     return [indent + ln[base:].rstrip() if ln.strip() else "" for ln in body]
 
 
+def expand(branches):
+    """Flatten the chain into one (type, branch) pair per dispatched type.
+
+    An OR group (`entity instanceof A || entity instanceof B`) serves one body
+    for several types. The table stays "one rule per type" and repeats the body,
+    because that keeps the frozen order file a flat list and keeps the guard
+    test's `type()` accessor working unchanged; the cost is a repeated lambda for
+    group members, which is acceptable since a group's body cannot cast to any
+    one of its types anyway.
+    """
+    return [(t, br) for br in branches for t in br["types"]]
+
+
 def render_entries(names, branches, mode):
-    entries = []
-    for br in branches:
+    rendered_by_type = {}
+    for type_name, br in expand(branches):
         body = reindent(br["body"])
         if mode == NULL_FALLTHROUGH and not br["exits"]:
             # The original branch fell out of the if and kept testing the
             # following types; `return null` makes the loop do the same.
             body.append("            return null;")
-        rendered_body = "\n".join(body)
-        entries.append(
+        rendered_by_type[type_name] = (
             "        %s(%s.class, (%s) -> {\n%s\n        })"
-            % (names["factory"], br["type"], ", ".join(PARAMS), rendered_body)
+            % (names["factory"], type_name, ", ".join(PARAMS), "\n".join(body))
         )
+    entries = [rendered_by_type[t] for t, _ in expand(branches)]
     return [e + "," if j < len(entries) - 1 else e for j, e in enumerate(entries)]
 
 
@@ -571,18 +626,26 @@ def main():
     if len(branches) < 2:
         raise SystemExit("ABORT: %d branch(es) extracted; nothing to fold" % len(branches))
 
+    # An OR group (A || B || C) becomes one rule per type, so the table count
+    # is the expanded list, not the branch count.
+    expanded = expand(branches)
+
     guarded = [b["type"] for b in branches if b["guarded"]]
     if guarded:
         raise SystemExit(
-            "ABORT: guarded/or-ed branch(es) present, the plain type table cannot "
-            "express them: " + ", ".join(guarded)
+            "ABORT: predicate-guarded branch(es) present (a real `&&` guard the "
+            "plain type table cannot express): " + ", ".join(guarded)
         )
 
+    # An OR group contributes one rule per type, so duplicates are checked over
+    # the expanded list -- a type repeated inside or across groups would make the
+    # later rule unreachable.
     seen = set()
     for b in branches:
-        if b["type"] in seen:
-            raise SystemExit("ABORT: duplicate type in chain: " + b["type"])
-        seen.add(b["type"])
+        for t in b["types"]:
+            if t in seen:
+                raise SystemExit("ABORT: duplicate type in chain: " + t)
+            seen.add(t)
 
     # The fold replaces [first branch, last branch) in one slice, so anything
     # sitting *between* two branches would be deleted. Refuse rather than eat it.
@@ -617,13 +680,14 @@ def main():
                     "looking loop would misread as fall-through" % b["type"]
                 )
 
-    parents = supertypes([b["type"] for b in branches])
-    in_table = {b["type"] for b in branches}
+    all_types = [t for b in branches for t in b["types"]]
+    parents = supertypes(all_types)
+    in_table = set(all_types)
     related = {t: p for t, p in parents.items() if p and p in in_table}
     missing = [t for t, p in parents.items() if p == "<missing source>"]
 
     print("method      :", names["method"], "(line %d)" % (mi + 1))
-    print("branches    :", len(branches))
+    print("branches    :", len(branches), "(expands to %d table rules)" % len(expanded))
     print("mode        :", mode, ("(fall-through: %s)" % ", ".join(fallthrough)) if fallthrough else "")
     print("table field :", names["table"])
     print("order file  : src/test/resources/%s-dispatch-order.txt" % names["slug"])
@@ -646,7 +710,7 @@ def main():
         "The %d types are unrelated today (each implements StepEntity directly), "
         "so the order happens not to matter, but the frozen file turns any future "
         "reordering into a test failure rather than a silent behaviour change;"
-        % len(branches)
+        % len(expanded)
     )
 
     # 1) replace only the branch region; the terminal `return null;` stays put.
@@ -667,22 +731,25 @@ def main():
         lines[last_import + 1:last_import + 1] = [NEEDED_IMPORT]
         print("note        : injected", NEEDED_IMPORT)
 
-    SRC.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # read_lines() yields a trailing "" element (the file's final newline), so
+    # "\n".join(lines) already ends in one newline. Normalise then add exactly
+    # one: this avoids a double trailing newline that spotless rejects.
+    SRC.write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8")
 
     order_txt = RES_DIR / (names["slug"] + "-dispatch-order.txt")
     order_txt.parent.mkdir(parents=True, exist_ok=True)
     order_txt.write_text(
-        "\n".join(b["type"] for b in branches) + "\n", encoding="utf-8"
+        "\n".join(t for b in branches for t in b["types"]) + "\n", encoding="utf-8"
     )
 
     test_java = TEST_DIR / (names["test_class"] + ".java")
     test_java.parent.mkdir(parents=True, exist_ok=True)
     test_java.write_text(
-        render_test(names, len(branches), mode, args.summary, order_doc),
+        render_test(names, len(expanded), mode, args.summary, order_doc),
         encoding="utf-8",
     )
 
-    print("\nOK: folded %d rules into %s" % (len(branches), names["table"]))
+    print("\nOK: folded %d rules into %s" % (len(expanded), names["table"]))
     print("    ", SRC)
     print("    ", order_txt)
     print("    ", test_java)

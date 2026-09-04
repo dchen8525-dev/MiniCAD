@@ -28,11 +28,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gen_validate_entity_dispatch import (  # noqa: E402
     BRANCH_START,
-    HEADER_RE,
     ROOT,
     SRC,
     derive,
-    last_statement_exits,
+    expand,
+    extract_branches,
     method_bounds,
 )
 
@@ -44,45 +44,30 @@ def norm(s):
 
 
 def original_branches(lines, sig):
+    """(type, body, guarded, exits) dicts from the pre-fold chain.
+
+    Shares the generator's extractor so both agree on what counts as a branch --
+    in particular on multi-line OR-group headers, where one body serves several
+    types. OR groups are expanded to one dict per type, matching how the table
+    is rendered, so the downstream `ob["type"]` / `ob["exits"]` indexing keeps
+    working and the fall-through classification stays accurate.
+    """
     mi, body_start, terminal, _end = method_bounds(lines, sig)
     bi = next(
         i for i in range(body_start, terminal) if lines[i].strip().startswith(BRANCH_START)
     )
-    branches = []
-    i = bi
-    while i < terminal:
-        s = lines[i].strip()
-        if s.startswith(BRANCH_START) and s.endswith("{"):
-            cond = HEADER_RE.search(lines[i]).group(1)
-            depth = 1
-            body = []
-            k = i + 1
-            while k < terminal:
-                for ch in lines[k]:
-                    if ch == "{":
-                        depth += 1
-                    elif ch == "}":
-                        depth -= 1
-                if depth == 0:
-                    break
-                body.append(lines[k])
-                k += 1
-            while body and not body[0].strip():
-                body.pop(0)
-            while body and not body[-1].strip():
-                body.pop()
-            branches.append(
-                {
-                    "type": re.search(r"instanceof (\w+)", cond).group(1),
-                    "body": norm(" ".join(b.strip() for b in body)),
-                    "guarded": "&&" in cond or "||" in cond,
-                    "exits": last_statement_exits(body),
-                }
-            )
-            i = k + 1
-            continue
-        i += 1
-    return branches
+    branches, _ = extract_branches(lines, bi, terminal)
+    out = []
+    for t, br in expand(branches):
+        out.append(
+            {
+                "type": t,
+                "body": norm(" ".join(b.strip() for b in br["body"])),
+                "guarded": "&&" in br["condition"],
+                "exits": br["exits"],
+            }
+        )
+    return out
 
 
 def table_entries(text, names):
