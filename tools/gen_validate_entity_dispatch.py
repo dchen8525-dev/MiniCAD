@@ -69,12 +69,20 @@ MODEL_DIR = ROOT / "src/main/java/com/minicad/step/model"
 TEST_DIR = ROOT / "src/test/java/com/minicad/app"
 RES_DIR = ROOT / "src/test/resources"
 
+# These four are the dispatch shape; the CLI overrides them per method so the
+# same generator folds any static `instanceof` chain (the validateXxxEntity
+# family is just the default). `SUBJECT` is the instanceof operand -- also the
+# first lambda parameter. `TERMINAL` is the fallback statement after the chain.
 RESULT_TYPE = "Integer"
 PARAMS = ("entity", "builder")
+SUBJECT = "entity"
 HANDLER_METHOD = "validate"
+TERMINAL = "return null;"
 NEEDED_IMPORT = "import java.util.List;"
 
 HEADER_RE = re.compile(r"if \((.*)\)\s*\{$")
+# Kept as the entity-default for the historical reindent/audit importers; live
+# branch detection derives the subject from `--params` instead.
 BRANCH_START = "if (entity instanceof "
 
 FIRST_MATCH = "FIRST_MATCH"
@@ -85,11 +93,17 @@ NULL_FALLTHROUGH = "NULL_FALLTHROUGH"
 # name derivation
 # --------------------------------------------------------------------------
 def derive(method):
-    if not (method.startswith("validate") and method.endswith("Entity")):
-        raise SystemExit(
-            "ABORT: --method must look like validateXxxEntity, got: " + method
-        )
-    base = method[len("validate"):-len("Entity")]
+    # The validateXxxEntity family was folded first and already ships tables
+    # named ASSIGNMENT_RULES / MANAGEMENT_ASSIGNMENT_RULES / ... -- keep those
+    # identifiers stable so the idempotency guard and guard tests keep working.
+    if method.startswith("validate") and method.endswith("Entity"):
+        base = method[len("validate"):-len("Entity")]
+    else:
+        # Strip a leading verb (build / get / make / ...) to get the noun the
+        # table is "about": buildCurve3 -> Curve3, buildBooleanOperandSolid ->
+        # BooleanOperandSolid. This is the generic path for every other chain.
+        verb = re.match(r"^[a-z]+", method)
+        base = method[verb.end():] if verb else method
     if not base or not base[0].isupper():
         raise SystemExit("ABORT: cannot derive a base name from: " + method)
     words = re.findall(r"[A-Z][a-z0-9]*", base)
@@ -121,15 +135,31 @@ def read_lines(path):
 def method_bounds(lines, sig):
     """Return (method_idx, body_start, terminal_idx, end_idx).
 
-    The terminal statement is located structurally -- the line before the
-    method's closing brace -- because a marker substring collides with the same
-    text in the ten sibling methods.
+    `sig` may be a bare method name or a declaration prefix; the method name is
+    extracted so a `static` method declared without `private` still matches the
+    validateXxxEntity family that is always `private static`.
     """
-    hits = [i for i, ln in enumerate(lines) if ln.startswith(sig)]
+    if "(" in sig:
+        m = re.search(r"(\w+)\s*\(", sig)
+        name = m.group(1) if m else sig
+    else:
+        name = sig
+    pat = re.compile(r"\b" + re.escape(name) + r"\s*\(")
+    # A declaration opens its body on the same line (`) {`); a call site ends
+    # with `);`. Prefer that to avoid matching `count = name(...)` call sites.
+    hits = [
+        i for i, ln in enumerate(lines)
+        if pat.search(ln) and ln.rstrip().endswith("{")
+    ]
+    if len(hits) != 1:
+        # Fall back to "preceded by modifiers / a return type" for methods
+        # whose body brace is on the next line.
+        pat2 = re.compile(r"\b(?:[a-z]+\s+)*\b" + re.escape(name) + r"\s*\(")
+        hits = [i for i, ln in enumerate(lines) if pat2.search(ln)]
     if len(hits) != 1:
         raise SystemExit(
             "ABORT: expected exactly one declaration matching %r, found %d"
-            % (sig, len(hits))
+            % (name, len(hits))
         )
     mi = hits[0]
     end = next(i for i in range(mi + 1, len(lines)) if lines[i] == "    }")
@@ -207,19 +237,22 @@ def last_statement_exits(body):
     return s.startswith("return") or s.startswith("throw")
 
 
-def extract_branches(lines, start, stop):
+def extract_branches(lines, start, stop, subject="entity"):
     """Return (branches, region_end).
 
     branches: list of dicts with type/condition/body/guarded/exits.
     region_end: index just past the last branch's closing brace, so a caller can
     replace only the chain and leave whatever follows it untouched.
+    `subject` is the instanceof operand (the first lambda parameter); it selects
+    which `if (<subject> instanceof ...)` lines are branches.
     """
+    branch_start = "if (%s instanceof " % subject
     branches = []
     region_end = start
     i = start
     while i < stop:
         stripped = lines[i].strip()
-        if not stripped.startswith(BRANCH_START):
+        if not stripped.startswith(branch_start):
             i += 1
             continue
 
@@ -261,7 +294,7 @@ def extract_branches(lines, start, stop):
         while body and body[-1].strip() == "":
             body.pop()
 
-        types = re.findall(r"instanceof (\w+)", condition)
+        types = re.findall(r"instanceof ([\w.]+)", condition)
         if len(types) > 1:
             # Several types sharing one body is only table-driven if the condition
             # is a pure OR of instanceof tests. Anything else (a && guard, a test
@@ -270,7 +303,9 @@ def extract_branches(lines, start, stop):
             operands = [x.strip() for x in condition.split("||")]
             pure_or = (
                 "&&" not in condition
-                and all(re.fullmatch(r"entity instanceof \w+", o) for o in operands)
+                and all(
+                    re.fullmatch(r"%s instanceof [\w.]+" % subject, o) for o in operands
+                )
             )
             if not pure_or:
                 raise SystemExit(
@@ -282,6 +317,7 @@ def extract_branches(lines, start, stop):
             {
                 "type": types[0],
                 "types": types,
+                "simple": [t.split(".")[-1] for t in types],
                 "condition": condition,
                 "body": body,
                 # A `&&` guard is a real predicate the plain type table cannot
@@ -327,14 +363,14 @@ def render_dispatch(names, mode):
     if mode == FIRST_MATCH:
         return [
             head,
-            "            if (rule.type().isInstance(entity)) {",
+            "            if (rule.type().isInstance(%s)) {" % SUBJECT,
             "                return " + call + ";",
             "            }",
             "        }",
         ]
     return [
         head,
-        "            if (rule.type().isInstance(entity)) {",
+        "            if (rule.type().isInstance(%s)) {" % SUBJECT,
         "                %s result = %s;" % (RESULT_TYPE, call),
         "                if (result != null) {",
         "                    return result;",
@@ -355,8 +391,8 @@ def render_table_header(names, mode):
         "            Class<? extends StepEntity> type, %s handler) {}" % names["handler"],
         "",
         "    private interface %s {" % names["handler"],
-        "        %s %s(StepEntity entity, StepCadBuilder builder);"
-        % (RESULT_TYPE, HANDLER_METHOD),
+        "        %s %s(StepEntity %s, StepCadBuilder %s);"
+        % (RESULT_TYPE, HANDLER_METHOD, PARAMS[0], PARAMS[1]),
         "    }",
         "",
         "    private static %s %s(" % (names["record"], names["factory"]),
@@ -416,7 +452,7 @@ def render_entries(names, branches, mode):
     return [e + "," if j < len(entries) - 1 else e for j, e in enumerate(entries)]
 
 
-TEST_TEMPLATE = '''package com.minicad.app;
+TEST_TEMPLATE = '''package {host_pkg};
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -437,7 +473,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Guards the table-driven dispatch introduced for StepDumpApp.{method}.
+ * Guards the table-driven dispatch introduced for {host_class}.{method}.
  *
 {intro}
  *
@@ -503,7 +539,7 @@ class {test_class} {{
 
     @SuppressWarnings("unchecked")
     private static List<String> liveHandlerTypes() throws Exception {{
-        Field field = StepDumpApp.class.getDeclaredField(TABLE_FIELD);
+        Field field = {host_class}.class.getDeclaredField(TABLE_FIELD);
         field.setAccessible(true);
         List<?> rules = (List<?>) field.get(null);
 
@@ -535,7 +571,7 @@ def wrap_javadoc(paragraph, first=" * ", cont=" * ", width=78):
     return "\n".join(out)
 
 
-def render_test(names, count, mode, summary, order_doc):
+def render_test(names, count, mode, summary, order_doc, host_class, host_pkg):
     semantics_doc = (
         "Every branch returns, so it is first-match-return dispatch with a "
         "terminal `return null;` for unsupported entities."
@@ -571,11 +607,14 @@ def render_test(names, count, mode, summary, order_doc):
         slug=names["slug"],
         table=names["table"],
         test_class=names["test_class"],
+        host_class=host_class,
+        host_pkg=host_pkg,
     )
 
 
 # --------------------------------------------------------------------------
 def main():
+    global RESULT_TYPE, PARAMS, SUBJECT, HANDLER_METHOD, TERMINAL, SRC
     ap = argparse.ArgumentParser()
     ap.add_argument("--method", required=True, help="e.g. validateAssignmentEntity")
     ap.add_argument(
@@ -584,14 +623,47 @@ def main():
         help="javadoc fragment describing what the handlers return",
     )
     ap.add_argument(
+        "--source",
+        default=str(SRC),
+        help="java source file containing the method (default: StepDumpApp.java)",
+    )
+    ap.add_argument(
+        "--result-type",
+        default=RESULT_TYPE,
+        help="method return type (default: Integer)",
+    )
+    ap.add_argument(
+        "--params",
+        default=",".join(PARAMS),
+        help="comma-separated lambda parameters; first is the instanceof operand "
+        "(default: entity,builder)",
+    )
+    ap.add_argument(
+        "--terminal",
+        default=TERMINAL,
+        help="expected fallback statement after the chain (default: return null;)",
+    )
+    ap.add_argument(
+        "--handler-method",
+        default=HANDLER_METHOD,
+        help="name of the handler interface method (default: validate)",
+    )
+    ap.add_argument(
         "--dry-run",
         action="store_true",
         help="analyse the chain and print the plan without touching any file",
     )
     args = ap.parse_args()
 
+    # Make the dispatch shape CLI-driven so one generator folds any chain.
+    RESULT_TYPE = args.result_type
+    PARAMS = tuple(p.strip() for p in args.params.split(","))
+    SUBJECT = PARAMS[0]
+    HANDLER_METHOD = args.handler_method
+    TERMINAL = args.terminal
+    SRC = Path(args.source).resolve()
+
     names = derive(args.method)
-    sig = "    private static %s %s(" % (RESULT_TYPE, names["method"])
 
     text = SRC.read_text(encoding="utf-8")
     for ident in (names["table"], names["record"], names["handler"], names["factory"]):
@@ -604,15 +676,17 @@ def main():
             )
     lines = read_lines(SRC)
 
-    mi, body_start, terminal, end = method_bounds(lines, sig)
+    mi, body_start, terminal, end = method_bounds(lines, args.method)
     terminal_text = lines[terminal].strip()
-    if terminal_text != "return null;":
+    if terminal_text != TERMINAL:
         raise SystemExit(
-            "ABORT: expected a terminal `return null;`, found: " + terminal_text
+            "ABORT: expected a terminal `%s`, found: %s" % (TERMINAL, terminal_text)
         )
 
     bi = next(
-        i for i in range(body_start, terminal) if lines[i].strip().startswith(BRANCH_START)
+        i
+        for i in range(body_start, terminal)
+        if lines[i].strip().startswith("if (%s instanceof " % SUBJECT)
     )
     if bi != body_start:
         prefix = [lines[i] for i in range(body_start, bi) if lines[i].strip()]
@@ -622,7 +696,7 @@ def main():
                 "lambdas would need to capture:\n  " + "\n  ".join(prefix)
             )
 
-    branches, region_end = extract_branches(lines, bi, terminal)
+    branches, region_end = extract_branches(lines, bi, terminal, SUBJECT)
     if len(branches) < 2:
         raise SystemExit("ABORT: %d branch(es) extracted; nothing to fold" % len(branches))
 
@@ -674,23 +748,33 @@ def main():
     if mode == NULL_FALLTHROUGH:
         for b in branches:
             last = [x.strip() for x in b["body"] if x.strip()][-1]
-            if last == "return null;":
+            if last == TERMINAL:
                 raise SystemExit(
-                    "ABORT: %s returns null explicitly, which the null-means-keep-"
-                    "looking loop would misread as fall-through" % b["type"]
+                    "ABORT: %s returns the terminal explicitly, which the "
+                    "null-means-keep-looking loop would misread as fall-through"
+                    % b["type"]
                 )
 
-    all_types = [t for b in branches for t in b["types"]]
+    all_types = [s for b in branches for s in b["simple"]]
     parents = supertypes(all_types)
     in_table = set(all_types)
     related = {t: p for t, p in parents.items() if p and p in in_table}
     missing = [t for t, p in parents.items() if p == "<missing source>"]
 
-    print("method      :", names["method"], "(line %d)" % (mi + 1))
+    host_class = SRC.stem
+    host_pkg = ""
+    for ln in lines:
+        m = re.match(r"\s*package\s+([\w.]+)\s*;", ln)
+        if m:
+            host_pkg = m.group(1)
+            break
+    test_dir = ROOT / "src/test/java" / host_pkg.replace(".", "/")
+
+    print("method      :", names["method"], "(%s line %d)" % (host_class, mi + 1))
+    print("source      :", SRC)
     print("branches    :", len(branches), "(expands to %d table rules)" % len(expanded))
     print("mode        :", mode, ("(fall-through: %s)" % ", ".join(fallthrough)) if fallthrough else "")
     print("table field :", names["table"])
-    print("order file  : src/test/resources/%s-dispatch-order.txt" % names["slug"])
     print("guard test  : %s.java" % names["test_class"])
     print("inheritance :", related if related else "none of the table types extends another")
     if missing:
@@ -713,13 +797,13 @@ def main():
         % len(expanded)
     )
 
-    # 1) replace only the branch region; the terminal `return null;` stays put.
+    # 1) replace only the branch region; the terminal statement stays put.
     dispatch = render_dispatch(names, mode)
     entries = render_entries(names, branches, mode)
     lines[bi:region_end] = dispatch + [""]
 
     # 2) insert the class-level table before the method (or its javadoc).
-    ii = javadoc_start(lines, next(i for i, ln in enumerate(lines) if ln.startswith(sig)))
+    ii = javadoc_start(lines, mi)
     lines[ii:ii] = render_table_header(names, mode) + entries + ["    );", ""]
 
     # 3) make sure List is visible. A wildcard `import java.util.*;` already
@@ -739,13 +823,15 @@ def main():
     order_txt = RES_DIR / (names["slug"] + "-dispatch-order.txt")
     order_txt.parent.mkdir(parents=True, exist_ok=True)
     order_txt.write_text(
-        "\n".join(t for b in branches for t in b["types"]) + "\n", encoding="utf-8"
+        "\n".join(s for b in branches for s in b["simple"]) + "\n", encoding="utf-8"
     )
 
-    test_java = TEST_DIR / (names["test_class"] + ".java")
+    test_java = test_dir / (names["test_class"] + ".java")
     test_java.parent.mkdir(parents=True, exist_ok=True)
     test_java.write_text(
-        render_test(names, len(expanded), mode, args.summary, order_doc),
+        render_test(
+            names, len(expanded), mode, args.summary, order_doc, host_class, host_pkg
+        ),
         encoding="utf-8",
     )
 

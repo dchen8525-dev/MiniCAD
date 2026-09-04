@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""1:1 body-fidelity check for a StepDumpApp `validateXxxEntity` fold.
+"""1:1 body-fidelity check for a table-driven `instanceof` fold.
 
-Parametric counterpart to gen_validate_entity_dispatch.py, replacing the
-per-method verify_*.py copies. It pulls the ORIGINAL sequential-if chain from git
-HEAD and the GENERATED table from the working tree, then asserts:
+Parametric counterpart to gen_validate_entity_dispatch.py. It pulls the
+ORIGINAL sequential-if chain from git HEAD and the GENERATED table from the
+working tree, then asserts:
 
   1. same number of branches, same types, same order;
   2. every branch body is byte-identical up to whitespace;
   3. the fall-through semantics the chain required match the loop that shipped
      (a chain whose branches all return needs first-match; a chain with a
      falling-through branch needs the null-means-keep-looking loop);
-  4. the terminal `return null;` survived;
+  4. the terminal statement survived;
   5. no duplicate types.
 
 This is the behavioural-equivalence proof that runs BEFORE the build, because
@@ -18,6 +18,9 @@ the build cannot see the difference: the bodies are identical either way, only
 the surrounding control flow differs.
 
     python tools/verify_validate_entity_dispatch.py --method validateAssignmentEntity
+    python tools/verify_validate_entity_dispatch.py --method buildSemanticSurfaceGeometry \
+        --source src/main/java/com/minicad/export/mesh/StepMeshExporter.java \
+        --result-type SurfaceGeometry --params geometry,builder
 """
 import argparse
 import re
@@ -25,25 +28,16 @@ import subprocess
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from gen_validate_entity_dispatch import (  # noqa: E402
-    BRANCH_START,
-    ROOT,
-    SRC,
-    derive,
-    expand,
-    extract_branches,
-    method_bounds,
-)
+import gen_validate_entity_dispatch as gen
 
-RESULT_TYPE = "Integer"
+RESULT_TYPE = gen.RESULT_TYPE
 
 
 def norm(s):
     return " ".join(s.split())
 
 
-def original_branches(lines, sig):
+def original_branches(lines, method):
     """(type, body, guarded, exits) dicts from the pre-fold chain.
 
     Shares the generator's extractor so both agree on what counts as a branch --
@@ -52,13 +46,15 @@ def original_branches(lines, sig):
     is rendered, so the downstream `ob["type"]` / `ob["exits"]` indexing keeps
     working and the fall-through classification stays accurate.
     """
-    mi, body_start, terminal, _end = method_bounds(lines, sig)
+    mi, body_start, terminal, _end = gen.method_bounds(lines, method)
     bi = next(
-        i for i in range(body_start, terminal) if lines[i].strip().startswith(BRANCH_START)
+        i
+        for i in range(body_start, terminal)
+        if lines[i].strip().startswith("if (%s instanceof " % gen.SUBJECT)
     )
-    branches, _ = extract_branches(lines, bi, terminal)
+    branches, _ = gen.extract_branches(lines, bi, terminal, gen.SUBJECT)
     out = []
-    for t, br in expand(branches):
+    for t, br in gen.expand(branches):
         out.append(
             {
                 "type": t,
@@ -79,9 +75,12 @@ def table_entries(text, names):
     region = text[start:]
     region = region[: region.index("\n    );") + len("\n    );")]
 
+    params_pat = r"\s*,\s*".join(re.escape(p) for p in gen.PARAMS)
     entry_re = re.compile(
         re.escape(names["factory"])
-        + r"\((\w+)\.class,\s*\(entity,\s*builder\)\s*->\s*\{(.*)\}\s*\)\s*,?$",
+        + r"\(([\w.]+)\.class,\s*\("
+        + params_pat
+        + r"\)\s*->\s*\{(.*)\}\s*\)\s*,?$",
         re.S,
     )
     entries = []
@@ -115,11 +114,11 @@ def table_entries(text, names):
     return entries
 
 
-def shipped_mode(lines, sig):
-    mi, _bs, _t, end = method_bounds(lines, sig)
+def shipped_mode(lines, method):
+    mi, _bs, _t, end = gen.method_bounds(lines, method)
     body = "\n".join(lines[mi:end])
-    if "return null;" not in body:
-        print("MISSING terminal `return null;` in the folded method")
+    if gen.TERMINAL not in body:
+        print("MISSING terminal `%s` in the folded method" % gen.TERMINAL)
         sys.exit(1)
     return "null-fallthrough" if "!= null" in body else "first-match"
 
@@ -127,35 +126,53 @@ def shipped_mode(lines, sig):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--method", required=True)
+    ap.add_argument(
+        "--source",
+        default=str(gen.SRC),
+        help="java source file containing the method (default: StepDumpApp.java)",
+    )
+    ap.add_argument("--result-type", default=gen.RESULT_TYPE)
+    ap.add_argument(
+        "--params",
+        default=",".join(gen.PARAMS),
+        help="comma-separated lambda parameters; first is the instanceof operand",
+    )
+    ap.add_argument("--terminal", default=gen.TERMINAL)
     args = ap.parse_args()
 
-    names = derive(args.method)
-    sig = "    private static %s %s(" % (RESULT_TYPE, names["method"])
+    # Drive the generator's globals so its extractor/matchers use this shape.
+    gen.RESULT_TYPE = args.result_type
+    gen.PARAMS = tuple(p.strip() for p in args.params.split(","))
+    gen.SUBJECT = gen.PARAMS[0]
+    gen.TERMINAL = args.terminal
+    gen.SRC = Path(args.source).resolve()
+
+    names = gen.derive(args.method)
 
     head = subprocess.run(
-        ["git", "show", "HEAD:" + SRC.relative_to(ROOT).as_posix()],
-        cwd=ROOT, capture_output=True, text=True,
+        ["git", "show", "HEAD:" + gen.SRC.relative_to(gen.ROOT).as_posix()],
+        cwd=gen.ROOT, capture_output=True, text=True,
     ).stdout.replace("\r\n", "\n").replace("\r", "\n")
-    cur = SRC.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    cur = gen.SRC.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
 
-    orig = original_branches(head.split("\n"), sig)
-    gen = table_entries(cur, names)
+    orig = original_branches(head.split("\n"), args.method)
+    gen_tbl = table_entries(cur, names)
     cur_lines = cur.split("\n")
 
     ok = True
 
-    if len(orig) != len(gen):
-        print("MISMATCH count: original %d vs generated %d" % (len(orig), len(gen)))
+    if len(orig) != len(gen_tbl):
+        print("MISMATCH count: original %d vs generated %d" % (len(orig), len(gen_tbl)))
         sys.exit(1)
 
     needs = "null-fallthrough" if any(not b["exits"] for b in orig) else "first-match"
-    ships = shipped_mode(cur_lines, sig)
+    ships = shipped_mode(cur_lines, args.method)
     if needs != ships:
         print("MISMATCH semantics: chain needs %s, folded method ships %s" % (needs, ships))
         ok = False
 
     seen, dup = set(), []
-    for t, _ in gen:
+    for t, _ in gen_tbl:
         if t in seen:
             dup.append(t)
         seen.add(t)
@@ -163,7 +180,7 @@ def main():
         print("DUPLICATE types in generated table:", sorted(set(dup)))
         ok = False
 
-    for idx, (ob, (g_type, g_body)) in enumerate(zip(orig, gen), 1):
+    for idx, (ob, (g_type, g_body)) in enumerate(zip(orig, gen_tbl), 1):
         if ob["type"] != g_type:
             print("MISMATCH type at %d: original %s vs generated %s" % (idx, ob["type"], g_type))
             ok = False
@@ -174,7 +191,7 @@ def main():
             continue
         expected = ob["body"]
         if needs == "null-fallthrough" and not ob["exits"]:
-            expected = norm(expected + " return null;")
+            expected = norm(expected + " " + gen.TERMINAL)
         if g_body != expected:
             print(
                 "MISMATCH body at %d (%s):\n  original =%s\n  generated=%s"
@@ -185,7 +202,7 @@ def main():
     if ok:
         print(
             "FAITHFUL: all %d branch bodies match verbatim, dispatch is %s, terminal "
-            "`return null;` intact (%s)" % (len(orig), ships, names["method"])
+            "`%s` intact (%s)" % (len(orig), ships, gen.TERMINAL, names["method"])
         )
         sys.exit(0)
     sys.exit(1)
