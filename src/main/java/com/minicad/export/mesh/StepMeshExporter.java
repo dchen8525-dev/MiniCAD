@@ -86,94 +86,121 @@ public final class StepMeshExporter {
         throw new IllegalArgumentException("unsupported face subtype");
     }
 
-    static SurfaceGeometry buildSemanticSurfaceGeometry(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof com.minicad.step.model.StepPlane) {
+    // buildSemanticSurfaceGeometry dispatch table (null means keep looking,
+    // mirrors the original sequential ifs).
+    private record SemanticSurfaceGeometryRule(
+            Class<? extends StepEntity> type, SemanticSurfaceGeometryHandler handler) {}
+
+    private interface SemanticSurfaceGeometryHandler {
+        SurfaceGeometry build(StepEntity geometry, StepCadBuilder builder);
+    }
+
+    private static SemanticSurfaceGeometryRule semanticSurfaceGeometryRule(
+            Class<? extends StepEntity> type, SemanticSurfaceGeometryHandler handler) {
+        return new SemanticSurfaceGeometryRule(type, handler);
+    }
+
+    private static final List<SemanticSurfaceGeometryRule> SEMANTIC_SURFACE_GEOMETRY_RULES = List.of(
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepPlane.class, (geometry, builder) -> {
             com.minicad.step.model.StepPlane plane = (com.minicad.step.model.StepPlane) geometry;
             return builder.buildPlane(plane.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepCylindricalSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepCylindricalSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepCylindricalSurface cylindricalSurface = (com.minicad.step.model.StepCylindricalSurface) geometry;
             return builder.buildCylindricalSurface(cylindricalSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepConicalSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepConicalSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepConicalSurface conicalSurface = (com.minicad.step.model.StepConicalSurface) geometry;
             return builder.buildConicalSurface(conicalSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepSphericalSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepSphericalSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepSphericalSurface sphericalSurface = (com.minicad.step.model.StepSphericalSurface) geometry;
             return builder.buildSphericalSurface(sphericalSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepToroidalSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepToroidalSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepToroidalSurface toroidalSurface = (com.minicad.step.model.StepToroidalSurface) geometry;
             return builder.buildToroidalSurface(toroidalSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepDegenerateToroidalSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepDegenerateToroidalSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepDegenerateToroidalSurface degenerateToroidalSurface = (com.minicad.step.model.StepDegenerateToroidalSurface) geometry;
             return builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepSurfaceOfLinearExtrusion) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepSurfaceOfLinearExtrusion.class, (geometry, builder) -> {
             com.minicad.step.model.StepSurfaceOfLinearExtrusion extrusionSurface = (com.minicad.step.model.StepSurfaceOfLinearExtrusion) geometry;
             return builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepSurfaceOfRevolution) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepSurfaceOfRevolution.class, (geometry, builder) -> {
             com.minicad.step.model.StepSurfaceOfRevolution revolutionSurface = (com.minicad.step.model.StepSurfaceOfRevolution) geometry;
             return builder.buildSurfaceOfRevolution(revolutionSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepRationalBSplineSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepRationalBSplineSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepRationalBSplineSurface rationalSplineSurface = (com.minicad.step.model.StepRationalBSplineSurface) geometry;
             return builder.buildRationalBSplineSurface(rationalSplineSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepBSplineSurfaceWithKnots) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepBSplineSurfaceWithKnots.class, (geometry, builder) -> {
             com.minicad.step.model.StepBSplineSurfaceWithKnots splineSurface = (com.minicad.step.model.StepBSplineSurfaceWithKnots) geometry;
             return builder.buildBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepBSplineSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepBSplineSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepBSplineSurface splineSurface = (com.minicad.step.model.StepBSplineSurface) geometry;
             return builder.buildGenericBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepBezierSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepBezierSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepBezierSurface splineSurface = (com.minicad.step.model.StepBezierSurface) geometry;
             return builder.buildBezierSurface(splineSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepUniformSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepUniformSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepUniformSurface splineSurface = (com.minicad.step.model.StepUniformSurface) geometry;
             return builder.buildUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepQuasiUniformSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepQuasiUniformSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepQuasiUniformSurface splineSurface = (com.minicad.step.model.StepQuasiUniformSurface) geometry;
             return builder.buildQuasiUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepPiecewiseBezierSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepPiecewiseBezierSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepPiecewiseBezierSurface splineSurface = (com.minicad.step.model.StepPiecewiseBezierSurface) geometry;
             return builder.buildPiecewiseBezierSurface(splineSurface.id());
-        }
-        if (geometry instanceof com.minicad.step.model.StepRectangularTrimmedSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepRectangularTrimmedSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepRectangularTrimmedSurface trimmedSurface = (com.minicad.step.model.StepRectangularTrimmedSurface) geometry;
             return buildSemanticSurfaceGeometry(trimmedSurface.basisSurface(), builder);
-        }
-        if (geometry instanceof com.minicad.step.model.StepCurveBoundedSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepCurveBoundedSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepCurveBoundedSurface boundedSurface = (com.minicad.step.model.StepCurveBoundedSurface) geometry;
             return buildSemanticSurfaceGeometry(boundedSurface.basisSurface(), builder);
-        }
-        if (geometry instanceof com.minicad.step.model.StepOrientedSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepOrientedSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepOrientedSurface orientedSurface = (com.minicad.step.model.StepOrientedSurface) geometry;
             builder.buildOrientedSurface(orientedSurface.id());
             return buildSemanticSurfaceGeometry(orientedSurface.surfaceElement(), builder);
-        }
-        if (geometry instanceof com.minicad.step.model.StepOffsetSurface) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepOffsetSurface.class, (geometry, builder) -> {
             com.minicad.step.model.StepOffsetSurface offsetSurface = (com.minicad.step.model.StepOffsetSurface) geometry;
             builder.buildOffsetSurface(offsetSurface.id());
             SurfaceGeometry base = buildSemanticSurfaceGeometry(offsetSurface.basisSurface(), builder);
             return offsetSemanticSurfaceGeometry(base, offsetSurface.distance());
-        }
-        if (geometry instanceof com.minicad.step.model.StepGeometricReplica) {
+        }),
+        semanticSurfaceGeometryRule(com.minicad.step.model.StepGeometricReplica.class, (geometry, builder) -> {
             com.minicad.step.model.StepGeometricReplica replica = (com.minicad.step.model.StepGeometricReplica) geometry;
             if ("SURFACE_REPLICA".equals(replica.entityName())) {
                 builder.buildSurfaceReplica(replica.id());
                 SurfaceGeometry base = buildSemanticSurfaceGeometry(replica.parent(), builder);
                 return transformSemanticSurfaceGeometry(base, replica.transformation(), builder);
             }
+            return null;
+        })
+    );
+
+    static SurfaceGeometry buildSemanticSurfaceGeometry(StepEntity geometry, StepCadBuilder builder) {
+        for (SemanticSurfaceGeometryRule rule : SEMANTIC_SURFACE_GEOMETRY_RULES) {
+            if (rule.type().isInstance(geometry)) {
+                SurfaceGeometry result = rule.handler().build(geometry, builder);
+                if (result != null) {
+                    return result;
+                }
+            }
         }
+
         return null;
     }
 
