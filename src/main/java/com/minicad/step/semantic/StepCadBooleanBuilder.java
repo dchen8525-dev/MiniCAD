@@ -57,6 +57,111 @@ final class StepCadBooleanBuilder {
     StepCadBooleanBuilder(StepCadBuilder builder, Map<Integer, StepEntity> entitiesById) {
         this.builder = builder;
         this.entitiesById = entitiesById;
+        BOOLEAN_OPERAND_SOLID_RULES = List.of(
+            booleanOperandSolidRule(StepManifoldSolidBrep.class, (operand) -> {
+                StepManifoldSolidBrep solidBrep = (StepManifoldSolidBrep) operand;
+                return builder.buildSolid(solidBrep.id());
+            }),
+            booleanOperandSolidRule(StepFacettedBrep.class, (operand) -> {
+                StepFacettedBrep facettedBrep = (StepFacettedBrep) operand;
+                return builder.buildSolid(facettedBrep.id());
+            }),
+            booleanOperandSolidRule(StepBrepWithVoids.class, (operand) -> {
+                StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) operand;
+                return builder.buildSolid(brepWithVoids.id());
+            }),
+            booleanOperandSolidRule(StepFacetedBrepAndBrepWithVoids.class, (operand) -> {
+                StepFacetedBrepAndBrepWithVoids facetedBrepWithVoids = (StepFacetedBrepAndBrepWithVoids) operand;
+                return builder.buildSolid(facetedBrepWithVoids.id());
+            }),
+            booleanOperandSolidRule(StepBlockVolume.class, (operand) -> {
+                return builder.buildSolid(operand.id());
+            }),
+            booleanOperandSolidRule(StepNonManifoldSolidBrep.class, (operand) -> {
+                StepNonManifoldSolidBrep nonManifold = (StepNonManifoldSolidBrep) operand;
+                return builder.buildSolid(nonManifold.id());
+            }),
+            booleanOperandSolidRule(StepAdvancedBrep.class, (operand) -> {
+                StepAdvancedBrep advancedBrep = (StepAdvancedBrep) operand;
+                return builder.buildSolid(advancedBrep.id());
+            }),
+            booleanOperandSolidRule(StepCsgPrimitive.class, (operand) -> {
+                StepCsgPrimitive csgPrimitive = (StepCsgPrimitive) operand;
+                return buildCsgPrimitive(csgPrimitive);
+            }),
+            booleanOperandSolidRule(StepCsgPrimitive3D.class, (operand) -> {
+                StepCsgPrimitive3D csg3D = (StepCsgPrimitive3D) operand;
+                // CSG_PRIMITIVE_3D is a reference wrapper; build solid from the position entity
+                StepEntity actual = entitiesById.get(csg3D.getPosition().id());
+                if (actual != null && actual instanceof StepCsgPrimitive) {
+                    StepCsgPrimitive primitive = (StepCsgPrimitive) actual;
+                    return buildCsgPrimitive(primitive);
+                }
+                throw new UnsupportedGeometryException("CSG_PRIMITIVE_3D #" + csg3D.id() + " position must reference a CSG primitive");
+            }),
+            booleanOperandSolidRule(StepCsgVolume.class, (operand) -> {
+                StepCsgVolume csgVolume = (StepCsgVolume) operand;
+                return buildCsgVolumeSolid(csgVolume);
+            }),
+            booleanOperandSolidRule(StepCsgSolid.class, (operand) -> {
+                StepCsgSolid csgSolid = (StepCsgSolid) operand;
+                return buildBooleanOperandSolid(csgSolid.treeRootExpression());
+            }),
+            booleanOperandSolidRule(StepSolidReplica.class, (operand) -> {
+                StepSolidReplica solidReplica = (StepSolidReplica) operand;
+                return builder.buildSolid(solidReplica.id());
+            }),
+            booleanOperandSolidRule(StepSweptAreaSolid.class, (operand) -> {
+                StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) operand;
+                return builder.buildSweptAreaSolid(sweptAreaSolid);
+            }),
+            booleanOperandSolidRule(StepSweptDiskSolid.class, (operand) -> {
+                StepSweptDiskSolid sweptDiskSolid = (StepSweptDiskSolid) operand;
+                return builder.buildSweptDiskSolid(sweptDiskSolid);
+            }),
+            booleanOperandSolidRule(StepExtrudedAreaSolidTapered.class, (operand) -> {
+                StepExtrudedAreaSolidTapered taperedExtrusion = (StepExtrudedAreaSolidTapered) operand;
+                return builder.buildExtrudedAreaSolidTapered(taperedExtrusion);
+            }),
+            booleanOperandSolidRule(StepRevolvedAreaSolidTapered.class, (operand) -> {
+                StepRevolvedAreaSolidTapered taperedRevolution = (StepRevolvedAreaSolidTapered) operand;
+                return builder.buildRevolvedAreaSolidTapered(taperedRevolution);
+            }),
+            booleanOperandSolidRule(StepSurfaceCurveSweptAreaSolid.class, (operand) -> {
+                StepSurfaceCurveSweptAreaSolid surfaceCurveSweep = (StepSurfaceCurveSweptAreaSolid) operand;
+                return builder.buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
+            }),
+            booleanOperandSolidRule(StepBooleanClippingResult.class, (operand) -> {
+                StepBooleanClippingResult clippingResult = (StepBooleanClippingResult) operand;
+                return buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
+            }),
+            booleanOperandSolidRule(StepBooleanResult.class, (operand) -> {
+                StepBooleanResult booleanResult = (StepBooleanResult) operand;
+                return buildBooleanResult(booleanResult.operator(), booleanResult.firstOperand(), booleanResult.secondOperand());
+            }),
+            booleanOperandSolidRule(StepHalfSpaceSolid.class, (operand) -> {
+                StepHalfSpaceSolid halfSpace = (StepHalfSpaceSolid) operand;
+                return builder.buildHalfSpaceSolid(halfSpace);
+            }),
+            booleanOperandSolidRule(StepPolygonalBoundedHalfSpace.class, (operand) -> {
+                StepPolygonalBoundedHalfSpace polyHalfSpace = (StepPolygonalBoundedHalfSpace) operand;
+                return builder.buildPolygonalBoundedHalfSpace(polyHalfSpace);
+            }),
+            booleanOperandSolidRule(StepSolidModel.class, (operand) -> {
+                StepSolidModel solidModel = (StepSolidModel) operand;
+                // SolidModel is the abstract base type; check for concrete subtype at same ID.
+                StepEntity actual = entitiesById.get(solidModel.id());
+                if (actual != null && actual != solidModel && builder.canBuildAsSolid(actual)) {
+                    return builder.buildSolid(solidModel.id());
+                }
+                throw new com.minicad.common.StepResolutionException("entity #" + solidModel.id() + " is an abstract SOLID_MODEL with no concrete subtype");
+            }),
+            booleanOperandSolidRule(StepMappedItem.class, (operand) -> {
+                StepMappedItem mappedItem = (StepMappedItem) operand;
+                return buildBooleanOperandSolid(mappedItem.mappingTarget());
+            })
+        );
+
     }
 
     /**
@@ -413,6 +518,22 @@ final class StepCadBooleanBuilder {
         return null;
     }
 
+    // buildBooleanOperandSolid dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record BooleanOperandSolidRule(
+            Class<? extends StepEntity> type, BooleanOperandSolidHandler handler) {}
+
+    private interface BooleanOperandSolidHandler {
+        Solid build(StepEntity operand);
+    }
+
+    private static BooleanOperandSolidRule booleanOperandSolidRule(
+            Class<? extends StepEntity> type, BooleanOperandSolidHandler handler) {
+        return new BooleanOperandSolidRule(type, handler);
+    }
+
+    private final List<BooleanOperandSolidRule> BOOLEAN_OPERAND_SOLID_RULES;
+
     /**
      * Builds a solid from a Boolean operand entity.
      *
@@ -420,108 +541,12 @@ final class StepCadBooleanBuilder {
      * @return built solid
      */
     Solid buildBooleanOperandSolid(StepEntity operand) {
-        if (operand instanceof StepManifoldSolidBrep) {
-            StepManifoldSolidBrep solidBrep = (StepManifoldSolidBrep) operand;
-            return builder.buildSolid(solidBrep.id());
-        }
-        if (operand instanceof StepFacettedBrep) {
-            StepFacettedBrep facettedBrep = (StepFacettedBrep) operand;
-            return builder.buildSolid(facettedBrep.id());
-        }
-        if (operand instanceof StepBrepWithVoids) {
-            StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) operand;
-            return builder.buildSolid(brepWithVoids.id());
-        }
-        if (operand instanceof StepFacetedBrepAndBrepWithVoids) {
-            StepFacetedBrepAndBrepWithVoids facetedBrepWithVoids = (StepFacetedBrepAndBrepWithVoids) operand;
-            return builder.buildSolid(facetedBrepWithVoids.id());
-        }
-        if (operand instanceof StepBlockVolume) {
-            return builder.buildSolid(operand.id());
-        }
-        if (operand instanceof StepNonManifoldSolidBrep) {
-            StepNonManifoldSolidBrep nonManifold = (StepNonManifoldSolidBrep) operand;
-            return builder.buildSolid(nonManifold.id());
-        }
-        if (operand instanceof StepAdvancedBrep) {
-            StepAdvancedBrep advancedBrep = (StepAdvancedBrep) operand;
-            return builder.buildSolid(advancedBrep.id());
-        }
-        if (operand instanceof StepCsgPrimitive) {
-            StepCsgPrimitive csgPrimitive = (StepCsgPrimitive) operand;
-            return buildCsgPrimitive(csgPrimitive);
-        }
-        if (operand instanceof StepCsgPrimitive3D) {
-            StepCsgPrimitive3D csg3D = (StepCsgPrimitive3D) operand;
-            // CSG_PRIMITIVE_3D is a reference wrapper; build solid from the position entity
-            StepEntity actual = entitiesById.get(csg3D.getPosition().id());
-            if (actual != null && actual instanceof StepCsgPrimitive) {
-                StepCsgPrimitive primitive = (StepCsgPrimitive) actual;
-                return buildCsgPrimitive(primitive);
+        for (BooleanOperandSolidRule rule : BOOLEAN_OPERAND_SOLID_RULES) {
+            if (rule.type().isInstance(operand)) {
+                return rule.handler().build(operand);
             }
-            throw new UnsupportedGeometryException("CSG_PRIMITIVE_3D #" + csg3D.id() + " position must reference a CSG primitive");
         }
-        if (operand instanceof StepCsgVolume) {
-            StepCsgVolume csgVolume = (StepCsgVolume) operand;
-            return buildCsgVolumeSolid(csgVolume);
-        }
-        if (operand instanceof StepCsgSolid) {
-            StepCsgSolid csgSolid = (StepCsgSolid) operand;
-            return buildBooleanOperandSolid(csgSolid.treeRootExpression());
-        }
-        if (operand instanceof StepSolidReplica) {
-            StepSolidReplica solidReplica = (StepSolidReplica) operand;
-            return builder.buildSolid(solidReplica.id());
-        }
-        if (operand instanceof StepSweptAreaSolid) {
-            StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) operand;
-            return builder.buildSweptAreaSolid(sweptAreaSolid);
-        }
-        if (operand instanceof StepSweptDiskSolid) {
-            StepSweptDiskSolid sweptDiskSolid = (StepSweptDiskSolid) operand;
-            return builder.buildSweptDiskSolid(sweptDiskSolid);
-        }
-        if (operand instanceof StepExtrudedAreaSolidTapered) {
-            StepExtrudedAreaSolidTapered taperedExtrusion = (StepExtrudedAreaSolidTapered) operand;
-            return builder.buildExtrudedAreaSolidTapered(taperedExtrusion);
-        }
-        if (operand instanceof StepRevolvedAreaSolidTapered) {
-            StepRevolvedAreaSolidTapered taperedRevolution = (StepRevolvedAreaSolidTapered) operand;
-            return builder.buildRevolvedAreaSolidTapered(taperedRevolution);
-        }
-        if (operand instanceof StepSurfaceCurveSweptAreaSolid) {
-            StepSurfaceCurveSweptAreaSolid surfaceCurveSweep = (StepSurfaceCurveSweptAreaSolid) operand;
-            return builder.buildSurfaceCurveSweptAreaSolid(surfaceCurveSweep);
-        }
-        if (operand instanceof StepBooleanClippingResult) {
-            StepBooleanClippingResult clippingResult = (StepBooleanClippingResult) operand;
-            return buildBooleanResult(clippingResult.operator(), clippingResult.firstOperand(), clippingResult.secondOperand());
-        }
-        if (operand instanceof StepBooleanResult) {
-            StepBooleanResult booleanResult = (StepBooleanResult) operand;
-            return buildBooleanResult(booleanResult.operator(), booleanResult.firstOperand(), booleanResult.secondOperand());
-        }
-        if (operand instanceof StepHalfSpaceSolid) {
-            StepHalfSpaceSolid halfSpace = (StepHalfSpaceSolid) operand;
-            return builder.buildHalfSpaceSolid(halfSpace);
-        }
-        if (operand instanceof StepPolygonalBoundedHalfSpace) {
-            StepPolygonalBoundedHalfSpace polyHalfSpace = (StepPolygonalBoundedHalfSpace) operand;
-            return builder.buildPolygonalBoundedHalfSpace(polyHalfSpace);
-        }
-        if (operand instanceof StepSolidModel) {
-            StepSolidModel solidModel = (StepSolidModel) operand;
-            // SolidModel is the abstract base type; check for concrete subtype at same ID.
-            StepEntity actual = entitiesById.get(solidModel.id());
-            if (actual != null && actual != solidModel && builder.canBuildAsSolid(actual)) {
-                return builder.buildSolid(solidModel.id());
-            }
-            throw new com.minicad.common.StepResolutionException("entity #" + solidModel.id() + " is an abstract SOLID_MODEL with no concrete subtype");
-        }
-        if (operand instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) operand;
-            return buildBooleanOperandSolid(mappedItem.mappingTarget());
-        }
+
         throw new UnsupportedGeometryException("boolean operand " + StepCadBuilder.stepEntityTypeName(operand) + " is unsupported");
     }
 
