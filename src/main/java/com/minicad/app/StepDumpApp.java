@@ -1702,117 +1702,131 @@ public final class StepDumpApp {
         throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " dump validation is unsupported");
     }
 
-    private static Integer validateGeometricPrimitiveEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepCartesianPoint) {
+    // validateGeometricPrimitiveEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record GeometricPrimitiveRule(
+            Class<? extends StepEntity> type, GeometricPrimitiveHandler handler) {}
+
+    private interface GeometricPrimitiveHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static GeometricPrimitiveRule geometricPrimitiveRule(
+            Class<? extends StepEntity> type, GeometricPrimitiveHandler handler) {
+        return new GeometricPrimitiveRule(type, handler);
+    }
+
+    private static final List<GeometricPrimitiveRule> GEOMETRIC_PRIMITIVE_RULES = List.of(
+        geometricPrimitiveRule(StepCartesianPoint.class, (entity, builder) -> {
             StepCartesianPoint point = (StepCartesianPoint) entity;
             validatePoint(point, builder);
             return 1;
-        }
-        if (entity instanceof StepDirection) {
+        }),
+        geometricPrimitiveRule(StepDirection.class, (entity, builder) -> {
             StepDirection direction = (StepDirection) entity;
             validateDirection(direction, builder);
             return 1;
-        }
-        if (entity instanceof StepVector) {
+        }),
+        geometricPrimitiveRule(StepVector.class, (entity, builder) -> {
             StepVector vector = (StepVector) entity;
             builder.buildVector(vector.id());
             return 1;
-        }
-        if (entity instanceof StepVertexPoint) {
+        }),
+        geometricPrimitiveRule(StepVertexPoint.class, (entity, builder) -> {
             StepVertexPoint vertexPoint = (StepVertexPoint) entity;
             builder.buildVertex(vertexPoint.id());
             return 1;
-        }
-        if (entity instanceof StepConicCurve) {
+        }),
+        geometricPrimitiveRule(StepConicCurve.class, (entity, builder) -> {
             StepConicCurve conicCurve = (StepConicCurve) entity;
             return validateSummaryEntity(conicCurve.position(), builder);
-        }
-        if (entity instanceof StepLine) {
+        }),
+        geometricPrimitiveRule(StepLine.class, (entity, builder) -> {
             StepLine line = (StepLine) entity;
             validateLine(line, builder);
             return 1;
-        }
-        if (entity instanceof StepCircle) {
+        }),
+        geometricPrimitiveRule(StepCircle.class, (entity, builder) -> {
             StepCircle circle = (StepCircle) entity;
             validateCircle(circle, builder);
             return 1;
-        }
-        if (entity instanceof StepEllipse) {
+        }),
+        geometricPrimitiveRule(StepEllipse.class, (entity, builder) -> {
             StepEllipse ellipse = (StepEllipse) entity;
             validateEllipse(ellipse, builder);
             return 1;
-        }
-        if (entity instanceof StepPolyline) {
+        }),
+        geometricPrimitiveRule(StepPolyline.class, (entity, builder) -> {
             StepPolyline polyline = (StepPolyline) entity;
             validatePolyline(polyline, builder);
             return 1;
-        }
-        if (entity instanceof StepBSplineCurveWithKnots) {
+        }),
+        geometricPrimitiveRule(StepBSplineCurveWithKnots.class, (entity, builder) -> {
             StepBSplineCurveWithKnots splineCurve = (StepBSplineCurveWithKnots) entity;
             builder.buildBSplineCurve(splineCurve.id());
             return 1;
-        }
-        if (entity instanceof StepRationalBSplineCurve) {
+        }),
+        geometricPrimitiveRule(StepRationalBSplineCurve.class, (entity, builder) -> {
             StepRationalBSplineCurve splineCurve = (StepRationalBSplineCurve) entity;
             builder.buildRationalBSplineCurve(splineCurve.id());
             return 1;
-        }
-        if (entity instanceof StepTrimmedCurve) {
+        }),
+        geometricPrimitiveRule(StepTrimmedCurve.class, (entity, builder) -> {
             StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) entity;
             builder.buildTrimmedCurve(trimmedCurve.id());
             return 1;
-        }
-        if (entity instanceof StepSurfaceCurve) {
+        }),
+        geometricPrimitiveRule(StepSurfaceCurve.class, (entity, builder) -> {
             StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) entity;
             builder.buildSurfaceCurve(surfaceCurve.id());
             return 1;
-        }
-        if (entity instanceof StepSeamCurve) {
+        }),
+        geometricPrimitiveRule(StepSeamCurve.class, (entity, builder) -> {
             StepSeamCurve seamCurve = (StepSeamCurve) entity;
             builder.buildSeamCurve(seamCurve.id());
             return 1;
-        }
-        if (entity instanceof StepCompositeCurve) {
+        }),
+        geometricPrimitiveRule(StepCompositeCurve.class, (entity, builder) -> {
             StepCompositeCurve compositeCurve = (StepCompositeCurve) entity;
             builder.buildCompositeCurve(compositeCurve.id());
             return 1;
-        }
-        if (entity instanceof StepCompositeCurveOnSurface) {
+        }),
+        geometricPrimitiveRule(StepCompositeCurveOnSurface.class, (entity, builder) -> {
             StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) entity;
             builder.buildCompositeCurve(compositeCurveOnSurface.id());
             return 1;
-        }
-        if (entity instanceof StepCompositeCurveSegment) {
+        }),
+        geometricPrimitiveRule(StepCompositeCurveSegment.class, (entity, builder) -> {
             StepCompositeCurveSegment segment = (StepCompositeCurveSegment) entity;
             return validateSummaryEntity(segment.parentCurve(), builder);
-        }
-        if (entity instanceof StepOffsetCurve2D) {
+        }),
+        geometricPrimitiveRule(StepOffsetCurve2D.class, (entity, builder) -> {
             StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) entity;
             builder.buildOffsetCurve2(offsetCurve2D.id());
             return 1;
-        }
-        if (entity instanceof StepOffsetCurve3D) {
+        }),
+        geometricPrimitiveRule(StepOffsetCurve3D.class, (entity, builder) -> {
             StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) entity;
             builder.buildOffsetCurve3(offsetCurve3D.id());
             return 1;
-        }
-        if (entity instanceof StepOrientedCurve) {
+        }),
+        geometricPrimitiveRule(StepOrientedCurve.class, (entity, builder) -> {
             StepOrientedCurve orientedCurve = (StepOrientedCurve) entity;
             builder.buildCurveReference3(orientedCurve.id());
             return validateSummaryEntity(orientedCurve.curveElement(), builder);
-        }
-        if (entity instanceof StepPcurve) {
+        }),
+        geometricPrimitiveRule(StepPcurve.class, (entity, builder) -> {
             StepPcurve pcurve = (StepPcurve) entity;
             builder.buildPcurve2(pcurve.id());
             return 1;
-        }
-        if (entity instanceof StepDegeneratePcurve) {
+        }),
+        geometricPrimitiveRule(StepDegeneratePcurve.class, (entity, builder) -> {
             StepDegeneratePcurve degeneratePcurve = (StepDegeneratePcurve) entity;
             builder.buildPcurve2(degeneratePcurve.id());
             return validateSummaryEntity(degeneratePcurve.basisSurface(), builder)
                     + validateSummaryEntity(degeneratePcurve.referenceToCurve(), builder);
-        }
-        if (entity instanceof StepGeometricReplica) {
+        }),
+        geometricPrimitiveRule(StepGeometricReplica.class, (entity, builder) -> {
             StepGeometricReplica replica = (StepGeometricReplica) entity;
             if ("POINT_REPLICA".equals(replica.entityName())) {
                 builder.buildPointReference(replica.id());
@@ -1825,7 +1839,16 @@ public final class StepDumpApp {
             }
             return validateSummaryEntity(replica.parent(), builder)
                     + validateSummaryEntity(replica.transformation(), builder);
+        })
+    );
+
+    private static Integer validateGeometricPrimitiveEntity(StepEntity entity, StepCadBuilder builder) {
+        for (GeometricPrimitiveRule rule : GEOMETRIC_PRIMITIVE_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
