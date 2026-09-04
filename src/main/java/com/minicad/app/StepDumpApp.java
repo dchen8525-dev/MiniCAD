@@ -2685,7 +2685,7 @@ public final class StepDumpApp {
         productStructureRule(StepProductDefinition.class, (entity, builder) -> {
             StepProductDefinition definition = (StepProductDefinition) entity;
             return validateSummaryEntity(definition.formation(), builder)
-            + validateSummaryEntity(definition.frameOfReference(), builder);
+                    + validateSummaryEntity(definition.frameOfReference(), builder);
         }),
         productStructureRule(StepProductDefinitionShape.class, (entity, builder) -> {
             StepProductDefinitionShape productDefinitionShape = (StepProductDefinitionShape) entity;
@@ -2698,22 +2698,22 @@ public final class StepDumpApp {
         productStructureRule(StepProductRelationship.class, (entity, builder) -> {
             StepProductRelationship productRelationship = (StepProductRelationship) entity;
             return validateSummaryEntity(productRelationship.relatingProduct(), builder)
-            + validateSummaryEntity(productRelationship.relatedProduct(), builder);
+                    + validateSummaryEntity(productRelationship.relatedProduct(), builder);
         }),
         productStructureRule(StepProductDefinitionRelationship.class, (entity, builder) -> {
             StepProductDefinitionRelationship productDefinitionRelationship = (StepProductDefinitionRelationship) entity;
             return validateSummaryEntity(productDefinitionRelationship.relatingProductDefinition(), builder)
-            + validateSummaryEntity(productDefinitionRelationship.relatedProductDefinition(), builder);
+                    + validateSummaryEntity(productDefinitionRelationship.relatedProductDefinition(), builder);
         }),
         productStructureRule(StepProductDefinitionFormationRelationship.class, (entity, builder) -> {
             StepProductDefinitionFormationRelationship productDefinitionFormationRelationship = (StepProductDefinitionFormationRelationship) entity;
             return validateSummaryEntity(productDefinitionFormationRelationship.relatingFormation(), builder)
-            + validateSummaryEntity(productDefinitionFormationRelationship.relatedFormation(), builder);
+                    + validateSummaryEntity(productDefinitionFormationRelationship.relatedFormation(), builder);
         }),
         productStructureRule(StepProductDefinitionRelationshipRelationship.class, (entity, builder) -> {
             StepProductDefinitionRelationshipRelationship relationshipRelationship = (StepProductDefinitionRelationshipRelationship) entity;
             return validateSummaryEntity(relationshipRelationship.relating(), builder)
-            + validateSummaryEntity(relationshipRelationship.related(), builder);
+                    + validateSummaryEntity(relationshipRelationship.related(), builder);
         }),
         productStructureRule(StepPropertyDefinition.class, (entity, builder) -> {
             StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) entity;
@@ -2722,57 +2722,57 @@ public final class StepDumpApp {
         productStructureRule(StepPropertyDefinitionRepresentation.class, (entity, builder) -> {
             StepPropertyDefinitionRepresentation propertyDefinitionRepresentation = (StepPropertyDefinitionRepresentation) entity;
             return validateSummaryEntity(propertyDefinitionRepresentation.definition(), builder)
-            + validateSummaryEntity(propertyDefinitionRepresentation.usedRepresentation(), builder);
+                    + validateSummaryEntity(propertyDefinitionRepresentation.usedRepresentation(), builder);
         }),
         productStructureRule(StepActionPropertyRepresentation.class, (entity, builder) -> {
             StepActionPropertyRepresentation actionPropertyRepresentation = (StepActionPropertyRepresentation) entity;
             return validateSummaryEntity(actionPropertyRepresentation.definition(), builder)
-            + validateSummaryEntity(actionPropertyRepresentation.usedRepresentation(), builder);
+                    + validateSummaryEntity(actionPropertyRepresentation.usedRepresentation(), builder);
         }),
         productStructureRule(StepContactRatioRepresentation.class, (entity, builder) -> {
             StepContactRatioRepresentation contactRatioRepresentation = (StepContactRatioRepresentation) entity;
             return validateSummaryEntity(contactRatioRepresentation.definition(), builder)
-            + validateSummaryEntity(contactRatioRepresentation.usedRepresentation(), builder);
+                    + validateSummaryEntity(contactRatioRepresentation.usedRepresentation(), builder);
         }),
         productStructureRule(StepKinematicPropertyDefinitionRepresentation.class, (entity, builder) -> {
             StepKinematicPropertyDefinitionRepresentation kinematicPropertyDefinitionRepresentation = (StepKinematicPropertyDefinitionRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyDefinitionRepresentation.definition(), builder)
-            + validateSummaryEntity(kinematicPropertyDefinitionRepresentation.usedRepresentation(), builder);
+                    + validateSummaryEntity(kinematicPropertyDefinitionRepresentation.usedRepresentation(), builder);
         }),
         productStructureRule(StepKinematicPropertyMechanismRepresentation.class, (entity, builder) -> {
             StepKinematicPropertyMechanismRepresentation kinematicPropertyMechanismRepresentation = (StepKinematicPropertyMechanismRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyMechanismRepresentation.definition(), builder)
-            + validateSummaryEntity(kinematicPropertyMechanismRepresentation.usedRepresentation(), builder);
+                    + validateSummaryEntity(kinematicPropertyMechanismRepresentation.usedRepresentation(), builder);
         }),
         productStructureRule(StepKinematicPropertyRepresentationRelation.class, (entity, builder) -> {
             StepKinematicPropertyRepresentationRelation kinematicPropertyRepresentationRelation = (StepKinematicPropertyRepresentationRelation) entity;
             return validateSummaryEntity(kinematicPropertyRepresentationRelation.definition(), builder)
-            + validateSummaryEntity(kinematicPropertyRepresentationRelation.usedRepresentation(), builder);
+                    + validateSummaryEntity(kinematicPropertyRepresentationRelation.usedRepresentation(), builder);
         }),
         productStructureRule(StepKinematicPropertyTopologyRepresentation.class, (entity, builder) -> {
             StepKinematicPropertyTopologyRepresentation kinematicPropertyTopologyRepresentation = (StepKinematicPropertyTopologyRepresentation) entity;
             return validateSummaryEntity(kinematicPropertyTopologyRepresentation.definition(), builder)
-            + validateSummaryEntity(kinematicPropertyTopologyRepresentation.usedRepresentation(), builder);
+                    + validateSummaryEntity(kinematicPropertyTopologyRepresentation.usedRepresentation(), builder);
         }),
         productStructureRule(StepResourcePropertyRepresentation.class, (entity, builder) -> {
             StepResourcePropertyRepresentation resourcePropertyRepresentation = (StepResourcePropertyRepresentation) entity;
             return validateSummaryEntity(resourcePropertyRepresentation.definition(), builder)
-            + validateSummaryEntity(resourcePropertyRepresentation.usedRepresentation(), builder);
+                    + validateSummaryEntity(resourcePropertyRepresentation.usedRepresentation(), builder);
         }),
         productStructureRule(StepShapeDefinitionRepresentation.class, (entity, builder) -> {
             StepShapeDefinitionRepresentation shapeDefinitionRepresentation = (StepShapeDefinitionRepresentation) entity;
             return validateSummaryEntity(shapeDefinitionRepresentation.definition(), builder)
-            + validateSummaryEntity(shapeDefinitionRepresentation.usedRepresentation(), builder);
+                    + validateSummaryEntity(shapeDefinitionRepresentation.usedRepresentation(), builder);
         }),
         productStructureRule(StepContextDependentShapeRepresentation.class, (entity, builder) -> {
             StepContextDependentShapeRepresentation contextDependentShapeRepresentation = (StepContextDependentShapeRepresentation) entity;
             return validateSummaryEntity(contextDependentShapeRepresentation.representationRelationship(), builder)
-            + validateSummaryEntity(contextDependentShapeRepresentation.representedProductRelation(), builder);
+                    + validateSummaryEntity(contextDependentShapeRepresentation.representedProductRelation(), builder);
         }),
         productStructureRule(StepNextAssemblyUsageOccurrence.class, (entity, builder) -> {
             StepNextAssemblyUsageOccurrence nextAssemblyUsageOccurrence = (StepNextAssemblyUsageOccurrence) entity;
             return validateSummaryEntity(nextAssemblyUsageOccurrence.relatingProductDefinition(), builder)
-            + validateSummaryEntity(nextAssemblyUsageOccurrence.relatedProductDefinition(), builder);
+                    + validateSummaryEntity(nextAssemblyUsageOccurrence.relatedProductDefinition(), builder);
         }),
         productStructureRule(StepPlacedDatumTargetFeature.class, (entity, builder) -> {
             StepPlacedDatumTargetFeature placedDatumTargetFeature = (StepPlacedDatumTargetFeature) entity;
@@ -2785,12 +2785,12 @@ public final class StepDumpApp {
         productStructureRule(StepShapeAspectOccurrence.class, (entity, builder) -> {
             StepShapeAspectOccurrence shapeAspectOccurrence = (StepShapeAspectOccurrence) entity;
             return validateSummaryEntity(shapeAspectOccurrence.ofShape(), builder)
-            + validateSummaryEntity(shapeAspectOccurrence.definition(), builder);
+                    + validateSummaryEntity(shapeAspectOccurrence.definition(), builder);
         }),
         productStructureRule(StepShapeAspectRelationship.class, (entity, builder) -> {
             StepShapeAspectRelationship shapeAspectRelationship = (StepShapeAspectRelationship) entity;
             return validateSummaryEntity(shapeAspectRelationship.relatingShapeAspect(), builder)
-            + validateSummaryEntity(shapeAspectRelationship.relatedShapeAspect(), builder);
+                    + validateSummaryEntity(shapeAspectRelationship.relatedShapeAspect(), builder);
         })
     );
 
@@ -2897,29 +2897,29 @@ public final class StepDumpApp {
         managementAssignmentRule(StepAppliedGroupAssignment.class, (entity, builder) -> {
             StepAppliedGroupAssignment appliedGroupAssignment = (StepAppliedGroupAssignment) entity;
             return validateSummaryEntity(appliedGroupAssignment.assignedGroup(), builder)
-            + validateSummaryItems(appliedGroupAssignment.items(), builder);
+                    + validateSummaryItems(appliedGroupAssignment.items(), builder);
         }),
         managementAssignmentRule(StepClassificationAssignment.class, (entity, builder) -> {
             StepClassificationAssignment classificationAssignment = (StepClassificationAssignment) entity;
             return validateSummaryEntity(classificationAssignment.assignedClass(), builder)
-            + validateSummaryEntity(classificationAssignment.role(), builder);
+                    + validateSummaryEntity(classificationAssignment.role(), builder);
         }),
         managementAssignmentRule(StepAppliedClassificationAssignment.class, (entity, builder) -> {
             StepAppliedClassificationAssignment appliedClassificationAssignment = (StepAppliedClassificationAssignment) entity;
             return validateSummaryEntity(appliedClassificationAssignment.assignedClass(), builder)
-            + validateSummaryEntity(appliedClassificationAssignment.role(), builder)
-            + validateSummaryItems(appliedClassificationAssignment.items(), builder);
+                    + validateSummaryEntity(appliedClassificationAssignment.role(), builder)
+                    + validateSummaryItems(appliedClassificationAssignment.items(), builder);
         }),
         managementAssignmentRule(StepOrganizationAssignment.class, (entity, builder) -> {
             StepOrganizationAssignment organizationAssignment = (StepOrganizationAssignment) entity;
             return validateSummaryEntity(organizationAssignment.assignedOrganization(), builder)
-            + validateSummaryEntity(organizationAssignment.role(), builder);
+                    + validateSummaryEntity(organizationAssignment.role(), builder);
         }),
         managementAssignmentRule(StepAppliedOrganizationAssignment.class, (entity, builder) -> {
             StepAppliedOrganizationAssignment appliedOrganizationAssignment = (StepAppliedOrganizationAssignment) entity;
             return validateSummaryEntity(appliedOrganizationAssignment.assignedOrganization(), builder)
-            + validateSummaryEntity(appliedOrganizationAssignment.role(), builder)
-            + validateSummaryItems(appliedOrganizationAssignment.items(), builder);
+                    + validateSummaryEntity(appliedOrganizationAssignment.role(), builder)
+                    + validateSummaryItems(appliedOrganizationAssignment.items(), builder);
         }),
         managementAssignmentRule(StepAppliedNameAssignment.class, (entity, builder) -> {
             StepAppliedNameAssignment appliedNameAssignment = (StepAppliedNameAssignment) entity;
@@ -2936,7 +2936,7 @@ public final class StepDumpApp {
         managementAssignmentRule(StepAppliedApprovalAssignment.class, (entity, builder) -> {
             StepAppliedApprovalAssignment appliedApprovalAssignment = (StepAppliedApprovalAssignment) entity;
             return validateSummaryEntity(appliedApprovalAssignment.assignedApproval(), builder)
-            + validateSummaryItems(appliedApprovalAssignment.items(), builder);
+                    + validateSummaryItems(appliedApprovalAssignment.items(), builder);
         }),
         managementAssignmentRule(StepContract.class, (entity, builder) -> {
             StepContract contract = (StepContract) entity;
@@ -2949,7 +2949,7 @@ public final class StepDumpApp {
         managementAssignmentRule(StepAppliedContractAssignment.class, (entity, builder) -> {
             StepAppliedContractAssignment appliedContractAssignment = (StepAppliedContractAssignment) entity;
             return validateSummaryEntity(appliedContractAssignment.assignedContract(), builder)
-            + validateSummaryItems(appliedContractAssignment.items(), builder);
+                    + validateSummaryItems(appliedContractAssignment.items(), builder);
         }),
         managementAssignmentRule(StepCertification.class, (entity, builder) -> {
             StepCertification certification = (StepCertification) entity;
@@ -2962,7 +2962,7 @@ public final class StepDumpApp {
         managementAssignmentRule(StepAppliedCertificationAssignment.class, (entity, builder) -> {
             StepAppliedCertificationAssignment appliedCertificationAssignment = (StepAppliedCertificationAssignment) entity;
             return validateSummaryEntity(appliedCertificationAssignment.assignedCertification(), builder)
-            + validateSummaryItems(appliedCertificationAssignment.items(), builder);
+                    + validateSummaryItems(appliedCertificationAssignment.items(), builder);
         }),
         managementAssignmentRule(StepSecurityClassification.class, (entity, builder) -> {
             StepSecurityClassification securityClassification = (StepSecurityClassification) entity;
@@ -2975,22 +2975,22 @@ public final class StepDumpApp {
         managementAssignmentRule(StepAppliedSecurityClassificationAssignment.class, (entity, builder) -> {
             StepAppliedSecurityClassificationAssignment appliedSecurityClassificationAssignment = (StepAppliedSecurityClassificationAssignment) entity;
             return validateSummaryEntity(appliedSecurityClassificationAssignment.assignedSecurityClassification(), builder)
-            + validateSummaryItems(appliedSecurityClassificationAssignment.items(), builder);
+                    + validateSummaryItems(appliedSecurityClassificationAssignment.items(), builder);
         }),
         managementAssignmentRule(StepExternalSourceRelationship.class, (entity, builder) -> {
             StepExternalSourceRelationship externalSourceRelationship = (StepExternalSourceRelationship) entity;
             return validateSummaryEntity(externalSourceRelationship.relatingSource(), builder)
-            + validateSummaryEntity(externalSourceRelationship.relatedSource(), builder);
+                    + validateSummaryEntity(externalSourceRelationship.relatedSource(), builder);
         }),
         managementAssignmentRule(StepGeneralPropertyRelationship.class, (entity, builder) -> {
             StepGeneralPropertyRelationship generalPropertyRelationship = (StepGeneralPropertyRelationship) entity;
             return validateSummaryEntity(generalPropertyRelationship.relatingGeneralProperty(), builder)
-            + validateSummaryEntity(generalPropertyRelationship.relatedGeneralProperty(), builder);
+                    + validateSummaryEntity(generalPropertyRelationship.relatedGeneralProperty(), builder);
         }),
         managementAssignmentRule(StepProductCategoryRelationship.class, (entity, builder) -> {
             StepProductCategoryRelationship productCategoryRelationship = (StepProductCategoryRelationship) entity;
             return validateSummaryEntity(productCategoryRelationship.category(), builder)
-            + validateSummaryEntity(productCategoryRelationship.subCategory(), builder);
+                    + validateSummaryEntity(productCategoryRelationship.subCategory(), builder);
         }),
         managementAssignmentRule(StepProductRelatedProductCategory.class, (entity, builder) -> {
             StepProductRelatedProductCategory productRelatedCategory = (StepProductRelatedProductCategory) entity;
@@ -3007,7 +3007,7 @@ public final class StepDumpApp {
         managementAssignmentRule(StepEffectivityRelationship.class, (entity, builder) -> {
             StepEffectivityRelationship effectivityRelationship = (StepEffectivityRelationship) entity;
             return validateSummaryEntity(effectivityRelationship.relatingEffectivity(), builder)
-            + validateSummaryEntity(effectivityRelationship.relatedEffectivity(), builder);
+                    + validateSummaryEntity(effectivityRelationship.relatedEffectivity(), builder);
         }),
         managementAssignmentRule(StepLanguageAssignment.class, (entity, builder) -> {
             StepLanguageAssignment languageAssignment = (StepLanguageAssignment) entity;
@@ -3017,21 +3017,21 @@ public final class StepDumpApp {
             StepAppliedLanguageAssignment appliedLanguageAssignment = (StepAppliedLanguageAssignment) entity;
             int count = validateSummaryEntity(appliedLanguageAssignment.assignedLanguage(), builder);
             for (StepEntity item : appliedLanguageAssignment.items()) {
-            count += validateSummaryEntity(item, builder);
+                count += validateSummaryEntity(item, builder);
             }
             return count;
         }),
         managementAssignmentRule(StepExternalIdentificationAssignment.class, (entity, builder) -> {
             StepExternalIdentificationAssignment externalIdentificationAssignment = (StepExternalIdentificationAssignment) entity;
             return validateSummaryEntity(externalIdentificationAssignment.role(), builder)
-            + validateSummaryEntity(externalIdentificationAssignment.source(), builder);
+                    + validateSummaryEntity(externalIdentificationAssignment.source(), builder);
         }),
         managementAssignmentRule(StepAppliedExternalIdentificationAssignment.class, (entity, builder) -> {
             StepAppliedExternalIdentificationAssignment appliedExternalIdentificationAssignment = (StepAppliedExternalIdentificationAssignment) entity;
             int count = validateSummaryEntity(appliedExternalIdentificationAssignment.role(), builder)
-            + validateSummaryEntity(appliedExternalIdentificationAssignment.source(), builder);
+                    + validateSummaryEntity(appliedExternalIdentificationAssignment.source(), builder);
             for (StepEntity item : appliedExternalIdentificationAssignment.items()) {
-            count += validateSummaryEntity(item, builder);
+                count += validateSummaryEntity(item, builder);
             }
             return count;
         })
