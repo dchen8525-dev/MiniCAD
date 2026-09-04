@@ -2341,134 +2341,161 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validatePresentationStyleEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepPresentationLayerAssignment) {
+    // validatePresentationStyleEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record PresentationStyleRule(
+            Class<? extends StepEntity> type, PresentationStyleHandler handler) {}
+
+    private interface PresentationStyleHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static PresentationStyleRule presentationStyleRule(
+            Class<? extends StepEntity> type, PresentationStyleHandler handler) {
+        return new PresentationStyleRule(type, handler);
+    }
+
+    private static final List<PresentationStyleRule> PRESENTATION_STYLE_RULES = List.of(
+        presentationStyleRule(StepPresentationLayerAssignment.class, (entity, builder) -> {
             StepPresentationLayerAssignment layerAssignment = (StepPresentationLayerAssignment) entity;
             return validateSummaryItems(layerAssignment.assignedItems(), builder);
-        }
-        if (entity instanceof StepPresentationStyleAssignment) {
+        }),
+        presentationStyleRule(StepPresentationStyleAssignment.class, (entity, builder) -> {
             StepPresentationStyleAssignment assignment = (StepPresentationStyleAssignment) entity;
             return validatePresentationStyleAssignment(assignment, builder);
-        }
-        if (entity instanceof StepCurveStyle) {
+        }),
+        presentationStyleRule(StepCurveStyle.class, (entity, builder) -> {
             StepCurveStyle curveStyle = (StepCurveStyle) entity;
             return validateCurveStyle(curveStyle, builder);
-        }
-        if (entity instanceof StepPointStyle) {
+        }),
+        presentationStyleRule(StepPointStyle.class, (entity, builder) -> {
             StepPointStyle pointStyle = (StepPointStyle) entity;
             return validateSummaryEntity(pointStyle.marker(), builder)
                     + validateSummaryEntity(pointStyle.colour(), builder);
-        }
-        if (entity instanceof StepSymbolStyle) {
+        }),
+        presentationStyleRule(StepSymbolStyle.class, (entity, builder) -> {
             StepSymbolStyle symbolStyle = (StepSymbolStyle) entity;
             return validateSummaryEntity(symbolStyle.styleOfSymbol(), builder);
-        }
-        if (entity instanceof StepFillAreaStyleColour) {
+        }),
+        presentationStyleRule(StepFillAreaStyleColour.class, (entity, builder) -> {
             StepFillAreaStyleColour fillAreaStyleColour = (StepFillAreaStyleColour) entity;
             return validateSummaryEntity(fillAreaStyleColour.colour(), builder);
-        }
-        if (entity instanceof StepFillAreaStyle) {
+        }),
+        presentationStyleRule(StepFillAreaStyle.class, (entity, builder) -> {
             StepFillAreaStyle fillAreaStyle = (StepFillAreaStyle) entity;
             return validateFillAreaStyle(fillAreaStyle, builder);
-        }
-        if (entity instanceof StepSurfaceStyleFillArea) {
+        }),
+        presentationStyleRule(StepSurfaceStyleFillArea.class, (entity, builder) -> {
             StepSurfaceStyleFillArea surfaceStyleFillArea = (StepSurfaceStyleFillArea) entity;
             return validateSummaryEntity(surfaceStyleFillArea.fillStyle(), builder);
-        }
-        if (entity instanceof StepSurfaceStyleBoundary) {
+        }),
+        presentationStyleRule(StepSurfaceStyleBoundary.class, (entity, builder) -> {
             StepSurfaceStyleBoundary surfaceStyleBoundary = (StepSurfaceStyleBoundary) entity;
             return validateCurveStyle(surfaceStyleBoundary.style(), builder);
-        }
-        if (entity instanceof StepSurfaceStyleParameterLine) {
+        }),
+        presentationStyleRule(StepSurfaceStyleParameterLine.class, (entity, builder) -> {
             StepSurfaceStyleParameterLine surfaceStyleParameterLine = (StepSurfaceStyleParameterLine) entity;
             return validateCurveStyle(surfaceStyleParameterLine.style(), builder);
-        }
-        if (entity instanceof StepSurfaceStyleControlGrid) {
+        }),
+        presentationStyleRule(StepSurfaceStyleControlGrid.class, (entity, builder) -> {
             StepSurfaceStyleControlGrid surfaceStyleControlGrid = (StepSurfaceStyleControlGrid) entity;
             return validateCurveStyle(surfaceStyleControlGrid.style(), builder);
-        }
-        if (entity instanceof StepSurfaceStyleSegmentationCurve) {
+        }),
+        presentationStyleRule(StepSurfaceStyleSegmentationCurve.class, (entity, builder) -> {
             StepSurfaceStyleSegmentationCurve surfaceStyleSegmentationCurve = (StepSurfaceStyleSegmentationCurve) entity;
             return validateCurveStyle(surfaceStyleSegmentationCurve.style(), builder);
-        }
-        if (entity instanceof StepSurfaceStyleSilhouette) {
+        }),
+        presentationStyleRule(StepSurfaceStyleSilhouette.class, (entity, builder) -> {
             StepSurfaceStyleSilhouette surfaceStyleSilhouette = (StepSurfaceStyleSilhouette) entity;
             return validateCurveStyle(surfaceStyleSilhouette.style(), builder);
-        }
-        if (entity instanceof StepSurfaceStyleTransparent
-                || entity instanceof StepSurfaceStyleReflectanceAmbient
-                || entity instanceof StepSurfaceStyleReflectanceAmbientDiffuse) {
+        }),
+        presentationStyleRule(StepSurfaceStyleTransparent.class, (entity, builder) -> {
             return 1;
-        }
-        if (entity instanceof StepSurfaceStyleReflectanceAmbientDiffuseSpecular) {
+        }),
+        presentationStyleRule(StepSurfaceStyleReflectanceAmbient.class, (entity, builder) -> {
+            return 1;
+        }),
+        presentationStyleRule(StepSurfaceStyleReflectanceAmbientDiffuse.class, (entity, builder) -> {
+            return 1;
+        }),
+        presentationStyleRule(StepSurfaceStyleReflectanceAmbientDiffuseSpecular.class, (entity, builder) -> {
             StepSurfaceStyleReflectanceAmbientDiffuseSpecular specular = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) entity;
             return 1 + validateSummaryEntity(specular.specularColour(), builder);
-        }
-        if (entity instanceof StepSurfaceSideStyle) {
+        }),
+        presentationStyleRule(StepSurfaceSideStyle.class, (entity, builder) -> {
             StepSurfaceSideStyle surfaceSideStyle = (StepSurfaceSideStyle) entity;
             return validateSurfaceSideStyle(surfaceSideStyle, builder);
-        }
-        if (entity instanceof StepSurfaceStyleUsage) {
+        }),
+        presentationStyleRule(StepSurfaceStyleUsage.class, (entity, builder) -> {
             StepSurfaceStyleUsage surfaceStyleUsage = (StepSurfaceStyleUsage) entity;
             return validateSurfaceSideStyle(surfaceStyleUsage.style(), builder);
-        }
-        if (entity instanceof StepTextStyleForDefinedFont) {
+        }),
+        presentationStyleRule(StepTextStyleForDefinedFont.class, (entity, builder) -> {
             StepTextStyleForDefinedFont textStyleForDefinedFont = (StepTextStyleForDefinedFont) entity;
             return validateSummaryEntity(textStyleForDefinedFont.textColour(), builder);
-        }
-        if (entity instanceof StepTextStyle) {
+        }),
+        presentationStyleRule(StepTextStyle.class, (entity, builder) -> {
             StepTextStyle textStyle = (StepTextStyle) entity;
             return validateSummaryEntity(textStyle.characterAppearance(), builder);
-        }
-        if (entity instanceof StepTextStyleWithSpacing) {
+        }),
+        presentationStyleRule(StepTextStyleWithSpacing.class, (entity, builder) -> {
             StepTextStyleWithSpacing textStyleWithSpacing = (StepTextStyleWithSpacing) entity;
             return validateSummaryEntity(textStyleWithSpacing.characterAppearance(), builder);
-        }
-        if (entity instanceof StepTextStyleWithJustification) {
+        }),
+        presentationStyleRule(StepTextStyleWithJustification.class, (entity, builder) -> {
             StepTextStyleWithJustification textStyleWithJustification = (StepTextStyleWithJustification) entity;
             return validateSummaryEntity(textStyleWithJustification.characterAppearance(), builder);
-        }
-        if (entity instanceof StepTextStyleWithMirror) {
+        }),
+        presentationStyleRule(StepTextStyleWithMirror.class, (entity, builder) -> {
             StepTextStyleWithMirror textStyleWithMirror = (StepTextStyleWithMirror) entity;
             return validateSummaryEntity(textStyleWithMirror.characterAppearance(), builder)
                     + validateSummaryEntity(textStyleWithMirror.mirrorPlacement(), builder);
-        }
-        if (entity instanceof StepTextStyleWithBoxCharacteristics) {
+        }),
+        presentationStyleRule(StepTextStyleWithBoxCharacteristics.class, (entity, builder) -> {
             StepTextStyleWithBoxCharacteristics textStyleWithBoxCharacteristics = (StepTextStyleWithBoxCharacteristics) entity;
             return validateSummaryEntity(textStyleWithBoxCharacteristics.characterAppearance(), builder);
-        }
-        if (entity instanceof StepSymbolColour) {
+        }),
+        presentationStyleRule(StepSymbolColour.class, (entity, builder) -> {
             StepSymbolColour symbolColour = (StepSymbolColour) entity;
             return validateSummaryEntity(symbolColour.colour(), builder);
-        }
-        if (entity instanceof StepCharacterGlyphStyleStroke) {
+        }),
+        presentationStyleRule(StepCharacterGlyphStyleStroke.class, (entity, builder) -> {
             StepCharacterGlyphStyleStroke glyphStyleStroke = (StepCharacterGlyphStyleStroke) entity;
             return validateCurveStyle(glyphStyleStroke.strokeStyle(), builder);
-        }
-        if (entity instanceof StepCharacterGlyphStyleOutline) {
+        }),
+        presentationStyleRule(StepCharacterGlyphStyleOutline.class, (entity, builder) -> {
             StepCharacterGlyphStyleOutline glyphStyleOutline = (StepCharacterGlyphStyleOutline) entity;
             return validateCurveStyle(glyphStyleOutline.outlineStyle(), builder);
-        }
-        if (entity instanceof StepCharacterGlyphStyleOutlineWithCharacteristics) {
+        }),
+        presentationStyleRule(StepCharacterGlyphStyleOutlineWithCharacteristics.class, (entity, builder) -> {
             StepCharacterGlyphStyleOutlineWithCharacteristics glyphStyleOutline = (StepCharacterGlyphStyleOutlineWithCharacteristics) entity;
             return validateCurveStyle(glyphStyleOutline.outlineStyle(), builder)
                     + validateFillAreaStyle(glyphStyleOutline.characteristics(), builder);
-        }
-        if (entity instanceof StepUserDefinedCurveFont) {
+        }),
+        presentationStyleRule(StepUserDefinedCurveFont.class, (entity, builder) -> {
             StepUserDefinedCurveFont userDefinedCurveFont = (StepUserDefinedCurveFont) entity;
             return validateRepresentationMap(userDefinedCurveFont.mappingSource(), builder)
                     + validateSummaryEntity(userDefinedCurveFont.mappingTarget(), builder);
-        }
-        if (entity instanceof StepUserDefinedMarker) {
+        }),
+        presentationStyleRule(StepUserDefinedMarker.class, (entity, builder) -> {
             StepUserDefinedMarker userDefinedMarker = (StepUserDefinedMarker) entity;
             return validateRepresentationMap(userDefinedMarker.mappingSource(), builder)
                     + validateSummaryEntity(userDefinedMarker.mappingTarget(), builder);
-        }
-        if (entity instanceof StepUserDefinedTerminatorSymbol) {
+        }),
+        presentationStyleRule(StepUserDefinedTerminatorSymbol.class, (entity, builder) -> {
             StepUserDefinedTerminatorSymbol userDefinedTerminatorSymbol = (StepUserDefinedTerminatorSymbol) entity;
             return validateRepresentationMap(userDefinedTerminatorSymbol.mappingSource(), builder)
                     + validateSummaryEntity(userDefinedTerminatorSymbol.mappingTarget(), builder);
+        })
+    );
+
+    private static Integer validatePresentationStyleEntity(StepEntity entity, StepCadBuilder builder) {
+        for (PresentationStyleRule rule : PRESENTATION_STYLE_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
