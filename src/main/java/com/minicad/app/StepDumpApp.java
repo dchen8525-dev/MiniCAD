@@ -2873,63 +2873,77 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validateRepresentationUsageEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepItemIdentifiedRepresentationUsage) {
+    // validateRepresentationUsageEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record RepresentationUsageRule(
+            Class<? extends StepEntity> type, RepresentationUsageHandler handler) {}
+
+    private interface RepresentationUsageHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static RepresentationUsageRule representationUsageRule(
+            Class<? extends StepEntity> type, RepresentationUsageHandler handler) {
+        return new RepresentationUsageRule(type, handler);
+    }
+
+    private static final List<RepresentationUsageRule> REPRESENTATION_USAGE_RULES = List.of(
+        representationUsageRule(StepItemIdentifiedRepresentationUsage.class, (entity, builder) -> {
             StepItemIdentifiedRepresentationUsage itemIdentifiedRepresentationUsage = (StepItemIdentifiedRepresentationUsage) entity;
             return validateRepresentationUsage(itemIdentifiedRepresentationUsage.definition(),
                     itemIdentifiedRepresentationUsage.usedRepresentation(),
                     itemIdentifiedRepresentationUsage.identifiedItem(),
                     builder);
-        }
-        if (entity instanceof StepChainBasedItemIdentifiedRepresentationUsage) {
+        }),
+        representationUsageRule(StepChainBasedItemIdentifiedRepresentationUsage.class, (entity, builder) -> {
             StepChainBasedItemIdentifiedRepresentationUsage chainBasedItemIdentifiedRepresentationUsage = (StepChainBasedItemIdentifiedRepresentationUsage) entity;
             return validateChainBasedRepresentationUsage(chainBasedItemIdentifiedRepresentationUsage.definition(),
                     chainBasedItemIdentifiedRepresentationUsage.nodes(),
                     chainBasedItemIdentifiedRepresentationUsage.undirectedLinks(),
                     chainBasedItemIdentifiedRepresentationUsage.identifiedItem(),
                     builder);
-        }
-        if (entity instanceof StepPlacedTarget) {
+        }),
+        representationUsageRule(StepPlacedTarget.class, (entity, builder) -> {
             StepPlacedTarget placedTarget = (StepPlacedTarget) entity;
             return validateRepresentationUsage(placedTarget.definition(),
                     placedTarget.usedRepresentation(),
                     placedTarget.identifiedItem(),
                     builder);
-        }
-        if (entity instanceof StepDraughtingModelItemAssociation) {
+        }),
+        representationUsageRule(StepDraughtingModelItemAssociation.class, (entity, builder) -> {
             StepDraughtingModelItemAssociation draughtingModelItemAssociation = (StepDraughtingModelItemAssociation) entity;
             return validateRepresentationUsage(draughtingModelItemAssociation.definition(),
                     draughtingModelItemAssociation.usedRepresentation(),
                     draughtingModelItemAssociation.identifiedItem(),
                     builder);
-        }
-        if (entity instanceof StepDraughtingModelItemAssociationWithPlaceholder) {
+        }),
+        representationUsageRule(StepDraughtingModelItemAssociationWithPlaceholder.class, (entity, builder) -> {
             StepDraughtingModelItemAssociationWithPlaceholder associationWithPlaceholder = (StepDraughtingModelItemAssociationWithPlaceholder) entity;
             return validateRepresentationUsage(associationWithPlaceholder.definition(),
                     associationWithPlaceholder.usedRepresentation(),
                     associationWithPlaceholder.identifiedItem(),
                     builder) + validateSummaryEntity(associationWithPlaceholder.annotationPlaceholder(), builder);
-        }
-        if (entity instanceof StepPmiRequirementItemAssociation) {
+        }),
+        representationUsageRule(StepPmiRequirementItemAssociation.class, (entity, builder) -> {
             StepPmiRequirementItemAssociation pmiRequirementItemAssociation = (StepPmiRequirementItemAssociation) entity;
             return validateRepresentationUsage(pmiRequirementItemAssociation.definition(),
                     pmiRequirementItemAssociation.usedRepresentation(),
                     pmiRequirementItemAssociation.identifiedItem(),
                     builder) + validateSummaryEntity(pmiRequirementItemAssociation.requirement(), builder);
-        }
-        if (entity instanceof StepMechanicalDesignRequirementItemAssociation) {
+        }),
+        representationUsageRule(StepMechanicalDesignRequirementItemAssociation.class, (entity, builder) -> {
             StepMechanicalDesignRequirementItemAssociation requirementItemAssociation = (StepMechanicalDesignRequirementItemAssociation) entity;
             return validateRepresentationUsage(requirementItemAssociation.definition(),
                     requirementItemAssociation.usedRepresentation(),
                     requirementItemAssociation.identifiedItem(),
                     builder) + validateSummaryEntity(requirementItemAssociation.requirement(), builder);
-        }
-        if (entity instanceof StepGeometricItemSpecificUsage) {
+        }),
+        representationUsageRule(StepGeometricItemSpecificUsage.class, (entity, builder) -> {
             StepGeometricItemSpecificUsage geometricItemSpecificUsage = (StepGeometricItemSpecificUsage) entity;
             return validateSummaryEntity(geometricItemSpecificUsage.usage(), builder)
                     + validateSummaryEntity(geometricItemSpecificUsage.identifiedItem(), builder);
-        }
-        if (entity instanceof StepChainBasedGeometricItemSpecificUsage) {
+        }),
+        representationUsageRule(StepChainBasedGeometricItemSpecificUsage.class, (entity, builder) -> {
             StepChainBasedGeometricItemSpecificUsage chainBasedGeometricItemSpecificUsage = (StepChainBasedGeometricItemSpecificUsage) entity;
             int count = validateSummaryEntity(chainBasedGeometricItemSpecificUsage.usage(), builder)
                     + validateSummaryEntity(chainBasedGeometricItemSpecificUsage.identifiedItem(), builder);
@@ -2940,7 +2954,16 @@ public final class StepDumpApp {
                 count += validateSummaryEntity(link, builder);
             }
             return count;
+        })
+    );
+
+    private static Integer validateRepresentationUsageEntity(StepEntity entity, StepCadBuilder builder) {
+        for (RepresentationUsageRule rule : REPRESENTATION_USAGE_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
