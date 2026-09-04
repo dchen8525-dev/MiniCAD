@@ -2499,8 +2499,22 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validateContextUnitEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepGeometricRepresentationContext) {
+    // validateContextUnitEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record ContextUnitRule(
+            Class<? extends StepEntity> type, ContextUnitHandler handler) {}
+
+    private interface ContextUnitHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static ContextUnitRule contextUnitRule(
+            Class<? extends StepEntity> type, ContextUnitHandler handler) {
+        return new ContextUnitRule(type, handler);
+    }
+
+    private static final List<ContextUnitRule> CONTEXT_UNIT_RULES = List.of(
+        contextUnitRule(StepGeometricRepresentationContext.class, (entity, builder) -> {
             StepGeometricRepresentationContext geometricRepresentationContext = (StepGeometricRepresentationContext) entity;
             int count = 1;
             if (geometricRepresentationContext.globalUnitAssignedContext() != null) {
@@ -2510,131 +2524,294 @@ public final class StepDumpApp {
                 count += validateSummaryEntity(geometricRepresentationContext.globalUncertaintyAssignedContext(), builder);
             }
             return count;
-        }
-        if (entity instanceof StepGlobalUnitAssignedContext) {
+        }),
+        contextUnitRule(StepGlobalUnitAssignedContext.class, (entity, builder) -> {
             StepGlobalUnitAssignedContext globalUnitAssignedContext = (StepGlobalUnitAssignedContext) entity;
             return validateSummaryItems(globalUnitAssignedContext.units(), builder);
-        }
-        if (entity instanceof StepGlobalUncertaintyAssignedContext) {
+        }),
+        contextUnitRule(StepGlobalUncertaintyAssignedContext.class, (entity, builder) -> {
             StepGlobalUncertaintyAssignedContext globalUncertaintyAssignedContext = (StepGlobalUncertaintyAssignedContext) entity;
             int count = 0;
             for (StepUncertaintyMeasureWithUnit uncertainty : globalUncertaintyAssignedContext.uncertainties()) {
                 count += validateSummaryEntity(uncertainty, builder);
             }
             return count;
-        }
-        if (entity instanceof StepMeasureWithUnit) {
+        }),
+        contextUnitRule(StepMeasureWithUnit.class, (entity, builder) -> {
             StepMeasureWithUnit measureWithUnit = (StepMeasureWithUnit) entity;
             return validateSummaryEntity(measureWithUnit.unitComponent(), builder);
-        }
-        if (entity instanceof StepTypedMeasureWithUnit) {
+        }),
+        contextUnitRule(StepTypedMeasureWithUnit.class, (entity, builder) -> {
             StepTypedMeasureWithUnit typedMeasureWithUnit = (StepTypedMeasureWithUnit) entity;
             return validateSummaryEntity(typedMeasureWithUnit.unitComponent(), builder);
-        }
-        if (entity instanceof StepUncertaintyMeasureWithUnit) {
+        }),
+        contextUnitRule(StepUncertaintyMeasureWithUnit.class, (entity, builder) -> {
             StepUncertaintyMeasureWithUnit uncertaintyMeasureWithUnit = (StepUncertaintyMeasureWithUnit) entity;
             return validateSummaryEntity(uncertaintyMeasureWithUnit.unitComponent(), builder);
-        }
-        if (entity instanceof StepConversionBasedUnit) {
+        }),
+        contextUnitRule(StepConversionBasedUnit.class, (entity, builder) -> {
             StepConversionBasedUnit conversionBasedUnit = (StepConversionBasedUnit) entity;
             return validateSummaryEntity(conversionBasedUnit.conversionFactor(), builder);
-        }
-        if (entity instanceof StepConversionBasedUnitWithOffset) {
+        }),
+        contextUnitRule(StepConversionBasedUnitWithOffset.class, (entity, builder) -> {
             StepConversionBasedUnitWithOffset conversionBasedUnitWithOffset = (StepConversionBasedUnitWithOffset) entity;
             return validateSummaryEntity(conversionBasedUnitWithOffset.conversionFactor(), builder);
-        }
-        if (entity instanceof StepDerivedUnit) {
+        }),
+        contextUnitRule(StepDerivedUnit.class, (entity, builder) -> {
             StepDerivedUnit derivedUnit = (StepDerivedUnit) entity;
             int count = 0;
             for (StepDerivedUnitElement element : derivedUnit.elements()) {
                 count += validateSummaryEntity(element, builder);
             }
             return count;
-        }
-        if (entity instanceof StepDerivedUnitElement) {
+        }),
+        contextUnitRule(StepDerivedUnitElement.class, (entity, builder) -> {
             StepDerivedUnitElement derivedUnitElement = (StepDerivedUnitElement) entity;
             return validateSummaryEntity(derivedUnitElement.unit(), builder);
-        }
-        if (entity instanceof StepPreDefinedColour
-                || entity instanceof StepColourSpecification
-                || entity instanceof StepDraughtingPreDefinedColour
-                || entity instanceof StepColour
-                || entity instanceof StepColourRgb
-                || entity instanceof StepPreDefinedCurveFont
-                || entity instanceof StepDraughtingPreDefinedCurveFont
-                || entity instanceof StepPreDefinedMarker
-                || entity instanceof StepPreDefinedTextFont
-                || entity instanceof StepPreDefinedItem
-                || entity instanceof StepPreDefinedSymbol
-                || entity instanceof StepPreDefinedPointMarkerSymbol
-                || entity instanceof StepPreDefinedDimensionSymbol
-                || entity instanceof StepPreDefinedGeometricalToleranceSymbol
-                || entity instanceof StepPreDefinedTerminatorSymbol
-                || entity instanceof StepPreDefinedSurfaceSideStyle
-                || entity instanceof StepDraughtingPreDefinedTextFont
-                || entity instanceof StepExternalSource
-                || entity instanceof StepExternallyDefinedItem
-                || entity instanceof StepAddress
-                || entity instanceof StepGeneralProperty
-                || entity instanceof StepCharacterizedObject
-                || entity instanceof StepProductCategory
-                || entity instanceof StepProductRelatedProductCategory
-                || entity instanceof StepEffectivity
-                || entity instanceof StepLanguage
-                || entity instanceof StepIdentificationRole
-                || entity instanceof StepDescriptionAttribute
-                || entity instanceof StepNameAttribute
-                || entity instanceof StepIdAttribute
-                || entity instanceof StepDescriptiveRepresentationItem
-                || entity instanceof StepValueRepresentationItem
-                || entity instanceof StepMeasureRepresentationItem
-                || entity instanceof StepRepresentationItem
-                || entity instanceof StepGeometricRepresentationItem
-                || entity instanceof StepTopologicalRepresentationItem
-                || entity instanceof StepPoint
-                || entity instanceof StepCurve
-                || entity instanceof StepSurface
-                || entity instanceof StepSurfaceModel
-                || entity instanceof StepSolidModel
-                || entity instanceof StepBoundedCurve
-                || entity instanceof StepBSplineCurve
-                || entity instanceof StepPiecewiseBezierCurve
-                || entity instanceof StepBezierCurve
-                || entity instanceof StepUniformCurve
-                || entity instanceof StepQuasiUniformCurve
-                || entity instanceof StepBoundedSurface
-                || entity instanceof StepBSplineSurface
-                || entity instanceof StepPiecewiseBezierSurface
-                || entity instanceof StepBezierSurface
-                || entity instanceof StepUniformSurface
-                || entity instanceof StepQuasiUniformSurface
-                || entity instanceof StepVertex
-                || entity instanceof StepEdge
-                || entity instanceof StepFace
-                || entity instanceof StepDocumentType
-                || entity instanceof StepRepresentationContext
-                || entity instanceof StepNamedUnit
-                || entity instanceof StepSiUnit
-                || entity instanceof StepContextDependentUnit
-                || entity instanceof StepDimensionalExponents
-                || entity instanceof StepGroup
-                || entity instanceof StepClassificationRole
-                || entity instanceof StepOrganization
-                || entity instanceof StepOrganizationRole
-                || entity instanceof StepNameAssignment
-                || entity instanceof StepApprovalStatus
-                || entity instanceof StepApprovalRole
-                || entity instanceof StepContractType
-                || entity instanceof StepCertificationType
-                || entity instanceof StepSecurityClassificationLevel
-                || entity instanceof StepPerson
-                || entity instanceof StepPersonAndOrganizationRole
-                || entity instanceof StepCalendarDate
-                || entity instanceof StepCoordinatedUniversalTimeOffset
-                || entity instanceof StepDateRole
-                || entity instanceof StepDateTimeRole) {
+        }),
+        contextUnitRule(StepPreDefinedColour.class, (entity, builder) -> {
             return 1;
+        }),
+        contextUnitRule(StepColourSpecification.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDraughtingPreDefinedColour.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepColour.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepColourRgb.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedCurveFont.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDraughtingPreDefinedCurveFont.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedMarker.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedTextFont.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedItem.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedSymbol.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedPointMarkerSymbol.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedDimensionSymbol.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedGeometricalToleranceSymbol.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedTerminatorSymbol.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPreDefinedSurfaceSideStyle.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDraughtingPreDefinedTextFont.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepExternalSource.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepExternallyDefinedItem.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepAddress.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepGeneralProperty.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepCharacterizedObject.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepProductCategory.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepProductRelatedProductCategory.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepEffectivity.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepLanguage.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepIdentificationRole.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDescriptionAttribute.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepNameAttribute.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepIdAttribute.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDescriptiveRepresentationItem.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepValueRepresentationItem.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepMeasureRepresentationItem.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepRepresentationItem.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepGeometricRepresentationItem.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepTopologicalRepresentationItem.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPoint.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepCurve.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepSurface.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepSurfaceModel.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepSolidModel.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepBoundedCurve.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepBSplineCurve.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPiecewiseBezierCurve.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepBezierCurve.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepUniformCurve.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepQuasiUniformCurve.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepBoundedSurface.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepBSplineSurface.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPiecewiseBezierSurface.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepBezierSurface.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepUniformSurface.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepQuasiUniformSurface.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepVertex.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepEdge.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepFace.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDocumentType.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepRepresentationContext.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepNamedUnit.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepSiUnit.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepContextDependentUnit.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDimensionalExponents.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepGroup.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepClassificationRole.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepOrganization.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepOrganizationRole.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepNameAssignment.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepApprovalStatus.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepApprovalRole.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepContractType.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepCertificationType.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepSecurityClassificationLevel.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPerson.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepPersonAndOrganizationRole.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepCalendarDate.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepCoordinatedUniversalTimeOffset.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDateRole.class, (entity, builder) -> {
+            return 1;
+        }),
+        contextUnitRule(StepDateTimeRole.class, (entity, builder) -> {
+            return 1;
+        })
+    );
+
+    private static Integer validateContextUnitEntity(StepEntity entity, StepCadBuilder builder) {
+        for (ContextUnitRule rule : CONTEXT_UNIT_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
