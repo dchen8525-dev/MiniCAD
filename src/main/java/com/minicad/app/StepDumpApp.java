@@ -2149,100 +2149,123 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validateAnnotationEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepAnnotationCurveOccurrence) {
+    // validateAnnotationEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record AnnotationRule(
+            Class<? extends StepEntity> type, AnnotationHandler handler) {}
+
+    private interface AnnotationHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static AnnotationRule annotationRule(
+            Class<? extends StepEntity> type, AnnotationHandler handler) {
+        return new AnnotationRule(type, handler);
+    }
+
+    private static final List<AnnotationRule> ANNOTATION_RULES = List.of(
+        annotationRule(StepAnnotationCurveOccurrence.class, (entity, builder) -> {
             StepAnnotationCurveOccurrence annotationCurveOccurrence = (StepAnnotationCurveOccurrence) entity;
             return validateAnnotationCurveOccurrence(annotationCurveOccurrence.item(), builder);
-        }
-        if (entity instanceof StepDraughtingAnnotationOccurrence) {
+        }),
+        annotationRule(StepDraughtingAnnotationOccurrence.class, (entity, builder) -> {
             StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) entity;
             return validateSummaryEntity(annotationOccurrence.item(), builder);
-        }
-        if (entity instanceof StepLeaderCurve) {
+        }),
+        annotationRule(StepLeaderCurve.class, (entity, builder) -> {
             StepLeaderCurve leaderCurve = (StepLeaderCurve) entity;
             return validateAnnotationCurveOccurrence(leaderCurve.item(), builder);
-        }
-        if (entity instanceof StepDimensionCurve) {
+        }),
+        annotationRule(StepDimensionCurve.class, (entity, builder) -> {
             StepDimensionCurve dimensionCurve = (StepDimensionCurve) entity;
             return validateAnnotationCurveOccurrence(dimensionCurve.item(), builder);
-        }
-        if (entity instanceof StepProjectionCurve) {
+        }),
+        annotationRule(StepProjectionCurve.class, (entity, builder) -> {
             StepProjectionCurve projectionCurve = (StepProjectionCurve) entity;
             return validateAnnotationCurveOccurrence(projectionCurve.item(), builder);
-        }
-        if (entity instanceof StepAnnotationFillArea) {
+        }),
+        annotationRule(StepAnnotationFillArea.class, (entity, builder) -> {
             StepAnnotationFillArea fillArea = (StepAnnotationFillArea) entity;
             return validateAnnotationFillArea(fillArea, builder);
-        }
-        if (entity instanceof StepAnnotationFillAreaOccurrence) {
+        }),
+        annotationRule(StepAnnotationFillAreaOccurrence.class, (entity, builder) -> {
             StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) entity;
             return validateAnnotationFillArea(fillAreaOccurrence.item(), builder)
                     + validateSummaryEntity(fillAreaOccurrence.fillStyleTarget(), builder);
-        }
-        if (entity instanceof StepAnnotationPlaceholderOccurrence) {
+        }),
+        annotationRule(StepAnnotationPlaceholderOccurrence.class, (entity, builder) -> {
             StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) entity;
             return validateSummaryEntity(placeholderOccurrence.item(), builder);
-        }
-        if (entity instanceof StepAnnotationPointOccurrence) {
+        }),
+        annotationRule(StepAnnotationPointOccurrence.class, (entity, builder) -> {
             StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) entity;
             return validateSummaryEntity(pointOccurrence.item(), builder);
-        }
-        if (entity instanceof StepAnnotationTextOccurrence) {
+        }),
+        annotationRule(StepAnnotationTextOccurrence.class, (entity, builder) -> {
             StepAnnotationTextOccurrence textOccurrence = (StepAnnotationTextOccurrence) entity;
             validateSummaryEntity(textOccurrence.position(), builder);
             return 1;
-        }
-        if (entity instanceof StepAnnotationSymbolOccurrence) {
+        }),
+        annotationRule(StepAnnotationSymbolOccurrence.class, (entity, builder) -> {
             StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) entity;
             return validateSummaryEntity(symbolOccurrence.item(), builder);
-        }
-        if (entity instanceof StepAnnotationSubfigureOccurrence) {
+        }),
+        annotationRule(StepAnnotationSubfigureOccurrence.class, (entity, builder) -> {
             StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) entity;
             return validateSummaryEntity(subfigureOccurrence.item(), builder);
-        }
-        if (entity instanceof StepTerminatorSymbol) {
+        }),
+        annotationRule(StepTerminatorSymbol.class, (entity, builder) -> {
             StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) entity;
             return validateSummaryEntity(terminatorSymbol.item(), builder)
                     + validateSummaryEntity(terminatorSymbol.annotatedCurve(), builder);
-        }
-        if (entity instanceof StepAnnotationPlane) {
+        }),
+        annotationRule(StepAnnotationPlane.class, (entity, builder) -> {
             StepAnnotationPlane annotationPlane = (StepAnnotationPlane) entity;
             return validateAnnotationPlane(annotationPlane, builder);
-        }
-        if (entity instanceof StepDraughtingCallout) {
+        }),
+        annotationRule(StepDraughtingCallout.class, (entity, builder) -> {
             StepDraughtingCallout callout = (StepDraughtingCallout) entity;
             return validateDraughtingCallout(callout, builder);
-        }
-        if (entity instanceof StepDraughtingCalloutRelationship) {
+        }),
+        annotationRule(StepDraughtingCalloutRelationship.class, (entity, builder) -> {
             StepDraughtingCalloutRelationship relationship = (StepDraughtingCalloutRelationship) entity;
             return validateDraughtingCallout(relationship.relatingCallout(), builder)
                     + validateDraughtingCallout(relationship.relatedCallout(), builder);
-        }
-        if (entity instanceof StepAnnotationOccurrenceRelationship) {
+        }),
+        annotationRule(StepAnnotationOccurrenceRelationship.class, (entity, builder) -> {
             StepAnnotationOccurrenceRelationship relationship = (StepAnnotationOccurrenceRelationship) entity;
             return validateSummaryEntity(relationship.relatingAnnotationOccurrence(), builder)
                     + validateSummaryEntity(relationship.relatedAnnotationOccurrence(), builder);
-        }
-        if (entity instanceof StepSymbolRepresentationMap) {
+        }),
+        annotationRule(StepSymbolRepresentationMap.class, (entity, builder) -> {
             StepSymbolRepresentationMap representationMap = (StepSymbolRepresentationMap) entity;
             validateSummaryEntity(representationMap.mappedOrigin(), builder);
             return validateRepresentation(representationMap.mappedRepresentation(), builder);
-        }
-        if (entity instanceof StepAnnotationSymbol) {
+        }),
+        annotationRule(StepAnnotationSymbol.class, (entity, builder) -> {
             StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) entity;
             int count = validateSummaryEntity(annotationSymbol.mappingSource(), builder);
             return count + validateSummaryEntity(annotationSymbol.mappingTarget(), builder);
-        }
-        if (entity instanceof StepAnnotationText) {
+        }),
+        annotationRule(StepAnnotationText.class, (entity, builder) -> {
             StepAnnotationText annotationText = (StepAnnotationText) entity;
             int count = validateSummaryEntity(annotationText.mappingSource(), builder);
             return count + validateSummaryEntity(annotationText.mappingTarget(), builder);
-        }
-        if (entity instanceof StepAnnotationTextCharacter) {
+        }),
+        annotationRule(StepAnnotationTextCharacter.class, (entity, builder) -> {
             StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) entity;
             int count = validateSummaryEntity(annotationTextCharacter.mappingSource(), builder);
             return count + validateSummaryEntity(annotationTextCharacter.mappingTarget(), builder);
+        })
+    );
+
+    private static Integer validateAnnotationEntity(StepEntity entity, StepCadBuilder builder) {
+        for (AnnotationRule rule : ANNOTATION_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
