@@ -1852,97 +1852,111 @@ public final class StepDumpApp {
         return null;
     }
 
-    private static Integer validateSurfaceEntity(StepEntity entity, StepCadBuilder builder) {
-        if (entity instanceof StepPlane) {
+    // validateSurfaceEntity dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record SurfaceRule(
+            Class<? extends StepEntity> type, SurfaceHandler handler) {}
+
+    private interface SurfaceHandler {
+        Integer validate(StepEntity entity, StepCadBuilder builder);
+    }
+
+    private static SurfaceRule surfaceRule(
+            Class<? extends StepEntity> type, SurfaceHandler handler) {
+        return new SurfaceRule(type, handler);
+    }
+
+    private static final List<SurfaceRule> SURFACE_RULES = List.of(
+        surfaceRule(StepPlane.class, (entity, builder) -> {
             StepPlane plane = (StepPlane) entity;
             builder.buildPlane(plane.id());
             return 1;
-        }
-        if (entity instanceof StepCylindricalSurface) {
+        }),
+        surfaceRule(StepCylindricalSurface.class, (entity, builder) -> {
             StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) entity;
             builder.buildCylindricalSurface(cylindricalSurface.id());
             return 1;
-        }
-        if (entity instanceof StepConicalSurface) {
+        }),
+        surfaceRule(StepConicalSurface.class, (entity, builder) -> {
             StepConicalSurface conicalSurface = (StepConicalSurface) entity;
             builder.buildConicalSurface(conicalSurface.id());
             return 1;
-        }
-        if (entity instanceof StepToroidalSurface) {
+        }),
+        surfaceRule(StepToroidalSurface.class, (entity, builder) -> {
             StepToroidalSurface toroidalSurface = (StepToroidalSurface) entity;
             builder.buildToroidalSurface(toroidalSurface.id());
             return 1;
-        }
-        if (entity instanceof StepSphericalSurface) {
+        }),
+        surfaceRule(StepSphericalSurface.class, (entity, builder) -> {
             StepSphericalSurface sphericalSurface = (StepSphericalSurface) entity;
             builder.buildSphericalSurface(sphericalSurface.id());
             return 1;
-        }
-        if (entity instanceof StepDegenerateToroidalSurface) {
+        }),
+        surfaceRule(StepDegenerateToroidalSurface.class, (entity, builder) -> {
             StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) entity;
             builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
             return 1;
-        }
-        if (entity instanceof StepBSplineSurfaceWithKnots) {
+        }),
+        surfaceRule(StepBSplineSurfaceWithKnots.class, (entity, builder) -> {
             StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) entity;
             builder.buildBSplineSurface(splineSurface.id());
             return 1;
-        }
-        if (entity instanceof StepRationalBSplineSurface) {
+        }),
+        surfaceRule(StepRationalBSplineSurface.class, (entity, builder) -> {
             StepRationalBSplineSurface rationalSplineSurface = (StepRationalBSplineSurface) entity;
             builder.buildRationalBSplineSurface(rationalSplineSurface.id());
             return 1;
-        }
-        if (entity instanceof StepSurfaceOfLinearExtrusion) {
+        }),
+        surfaceRule(StepSurfaceOfLinearExtrusion.class, (entity, builder) -> {
             StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) entity;
             builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
             return validateSummaryEntity(extrusionSurface.sweptCurve(), builder)
                     + validateSummaryEntity(extrusionSurface.extrusionAxis(), builder);
-        }
-        if (entity instanceof StepSurfaceOfRevolution) {
+        }),
+        surfaceRule(StepSurfaceOfRevolution.class, (entity, builder) -> {
             StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) entity;
             builder.buildSurfaceOfRevolution(revolutionSurface.id());
             return validateSummaryEntity(revolutionSurface.sweptCurve(), builder)
                     + validateSummaryEntity(revolutionSurface.axisPosition(), builder);
-        }
-        if (entity instanceof StepRectangularTrimmedSurface) {
+        }),
+        surfaceRule(StepRectangularTrimmedSurface.class, (entity, builder) -> {
             StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) entity;
             builder.buildRectangularTrimmedSurface(trimmedSurface.id());
             return validateSummaryEntity(trimmedSurface.basisSurface(), builder);
-        }
-        if (entity instanceof StepCurveBoundedSurface) {
+        }),
+        surfaceRule(StepCurveBoundedSurface.class, (entity, builder) -> {
             StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) entity;
             builder.buildCurveBoundedSurface(boundedSurface.id());
             return validateSummaryEntity(boundedSurface.basisSurface(), builder)
                     + validateSummaryItems(boundedSurface.boundaries(), builder);
-        }
-        if (entity instanceof StepOrientedSurface) {
+        }),
+        surfaceRule(StepOrientedSurface.class, (entity, builder) -> {
             StepOrientedSurface orientedSurface = (StepOrientedSurface) entity;
             builder.buildOrientedSurface(orientedSurface.id());
             return validateSummaryEntity(orientedSurface.surfaceElement(), builder);
-        }
-        if (entity instanceof StepOffsetSurface) {
+        }),
+        surfaceRule(StepOffsetSurface.class, (entity, builder) -> {
             StepOffsetSurface offsetSurface = (StepOffsetSurface) entity;
             builder.buildOffsetSurface(offsetSurface.id());
             return validateSummaryEntity(offsetSurface.basisSurface(), builder);
-        }
-        if (entity instanceof StepAxis2Placement3D) {
+        }),
+        surfaceRule(StepAxis2Placement3D.class, (entity, builder) -> {
             StepAxis2Placement3D placement3D = (StepAxis2Placement3D) entity;
             builder.buildPlacement(placement3D.id());
             return 1;
-        }
-        if (entity instanceof StepAxis1Placement) {
+        }),
+        surfaceRule(StepAxis1Placement.class, (entity, builder) -> {
             StepAxis1Placement axis1Placement = (StepAxis1Placement) entity;
             builder.buildAxis1Placement(axis1Placement.id());
             return 1;
-        }
-        if (entity instanceof StepAxis2Placement2D) {
+        }),
+        surfaceRule(StepAxis2Placement2D.class, (entity, builder) -> {
             StepAxis2Placement2D placement2D = (StepAxis2Placement2D) entity;
             validatePoint(placement2D.location(), builder);
             validateDirection(placement2D.refDirection(), builder);
             return 1;
-        }
-        if (entity instanceof StepCartesianTransformationOperator) {
+        }),
+        surfaceRule(StepCartesianTransformationOperator.class, (entity, builder) -> {
             StepCartesianTransformationOperator transformation = (StepCartesianTransformationOperator) entity;
             if (transformation.axis1() != null) {
                 validateDirection(transformation.axis1(), builder);
@@ -1955,13 +1969,22 @@ public final class StepDumpApp {
             }
             validatePoint(transformation.localOrigin(), builder);
             return 1;
-        }
-        if (entity instanceof StepItemDefinedTransformation) {
+        }),
+        surfaceRule(StepItemDefinedTransformation.class, (entity, builder) -> {
             StepItemDefinedTransformation transformation = (StepItemDefinedTransformation) entity;
             builder.buildPlacement(transformation.transformItem1().id());
             builder.buildPlacement(transformation.transformItem2().id());
             return 1;
+        })
+    );
+
+    private static Integer validateSurfaceEntity(StepEntity entity, StepCadBuilder builder) {
+        for (SurfaceRule rule : SURFACE_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().validate(entity, builder);
+            }
         }
+
         return null;
     }
 
