@@ -30,6 +30,7 @@ import com.minicad.topology.Shell;
 import com.minicad.topology.Solid;
 import com.minicad.topology.VertexLoop;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.minicad.step.syntax.StepValue;
@@ -425,340 +426,175 @@ public final class StepPmiPayloadBuilder {
     // PMI Leader Methods
     // ========================================================================
 
+    @FunctionalInterface
+    private interface PmiLeaderHandler {
+        void handle(StepEntity content, List<PointPayload> leader, StepCadBuilder builder);
+    }
+
+    private record PmiLeaderRule(Class<?> type, Predicate<StepEntity> guard, PmiLeaderHandler handler) {
+        boolean matches(StepEntity content) {
+            return type.isInstance(content) && (guard == null || guard.test(content));
+        }
+    }
+
+    private static PmiLeaderRule leaderRule(Class<?> type, PmiLeaderHandler handler) {
+        return new PmiLeaderRule(type, null, handler);
+    }
+
+    /** Delegate to the leader of a single referenced entity. */
+    private static PmiLeaderRule delegateRule(Class<?> type, Function<StepEntity, StepEntity> next) {
+        return leaderRule(type, (content, leader, builder) -> appendPmiLeader(next.apply(content), leader, builder));
+    }
+
+    /** Recurse over each member of a contained entity list. */
+    private static PmiLeaderRule membersRule(Class<?> type, Function<StepEntity, List<? extends StepEntity>> members) {
+        return leaderRule(type, (content, leader, builder) -> {
+            for (StepEntity member : members.apply(content)) {
+                appendPmiLeader(member, leader, builder);
+            }
+        });
+    }
+
+    /** Path/loop families whose leader is built from oriented-edge lists. */
+    private static PmiLeaderRule pathLeaderRule(Class<?> type, Function<StepEntity, List<StepOrientedEdge>> edges) {
+        return leaderRule(type, (content, leader, builder) -> appendPmiPathLeader(edges.apply(content), leader, builder));
+    }
+
+    /** Content types whose leader points come from loose-edge sampling. */
+    private static PmiLeaderRule sampledPointsRule(Class<?> type) {
+        return leaderRule(type, (content, leader, builder) -> addSampledPoints(content, leader, builder));
+    }
+
+    /** Leader consisting of one extracted point. */
+    private static PmiLeaderRule pointRule(Class<?> type, Function<StepEntity, CartesianPoint> point) {
+        return leaderRule(type, (content, leader, builder) ->
+                leader.add(PayloadConversionHelper.toPointPayload(point.apply(content))));
+    }
+
+    private static void addSampledPoints(StepEntity content, List<PointPayload> leader, StepCadBuilder builder) {
+        List<CartesianPoint> sampled = sampleLooseEdgePoints(content, builder);
+        addSampledPoints(sampled, leader);
+    }
+
+    private static void addSampledPoints(List<CartesianPoint> sampled, List<PointPayload> leader) {
+        if (sampled != null) {
+            for (CartesianPoint point : sampled) {
+                leader.add(PayloadConversionHelper.toPointPayload(point));
+            }
+        }
+    }
+
+    /** Solid types summarized through builder.buildSolid; unsupported solids contribute no leader points. */
+    private static final List<Class<?>> SOLID_LEADER_TYPES = List.of(
+            StepSweptAreaSolid.class,
+            StepSolidReplica.class,
+            StepCsgSolid.class,
+            StepCsgPrimitive.class,
+            StepBooleanResult.class,
+            StepBooleanClippingResult.class,
+            StepSweptDiskSolid.class,
+            StepExtrudedAreaSolidTapered.class,
+            StepRevolvedAreaSolidTapered.class,
+            StepSurfaceCurveSweptAreaSolid.class,
+            StepPolygonalBoundedHalfSpace.class,
+            StepComplexClippingResult.class
+    );
+
+    /**
+     * PMI leader rules keyed by concrete type, replacing the former 50-branch
+     * if/else-if chain. Order mirrors the original chain (first match wins);
+     * any content that matches no rule falls back to loose-edge sampling, as
+     * the trailing branch of the old chain did.
+     */
+    private static final List<PmiLeaderRule> PMI_LEADER_RULES = List.of(
+            membersRule(StepGeometricSet.class, content -> ((StepGeometricSet) content).elements()),
+            membersRule(StepGeometricCurveSet.class, content -> ((StepGeometricCurveSet) content).elements()),
+            membersRule(StepPointSet.class, content -> ((StepPointSet) content).points()),
+            delegateRule(StepAnnotationPlaceholderOccurrence.class, content -> ((StepAnnotationPlaceholderOccurrence) content).item()),
+            membersRule(StepAnnotationPlane.class, content -> ((StepAnnotationPlane) content).elements()),
+            membersRule(StepFaceBasedSurfaceModel.class, content -> ((StepFaceBasedSurfaceModel) content).faceSets()),
+            membersRule(StepShellBasedSurfaceModel.class, content -> ((StepShellBasedSurfaceModel) content).shells()),
+            delegateRule(StepManifoldSolidBrep.class, content -> ((StepManifoldSolidBrep) content).outer()),
+            leaderRule(StepBrepWithVoids.class, (content, leader, builder) -> {
+                StepBrepWithVoids solid = (StepBrepWithVoids) content;
+                appendPmiLeader(solid.outer(), leader, builder);
+                for (StepEntity voidShell : solid.voids()) {
+                    appendPmiLeader(voidShell, leader, builder);
+                }
+            }),
+            new PmiLeaderRule(StepEntity.class,
+                    content -> SOLID_LEADER_TYPES.stream().anyMatch(type -> type.isInstance(content)),
+                    (content, leader, builder) -> appendPmiLeaderForSolid(content, leader, builder)),
+            membersRule(StepAdvancedFace.class, content -> ((StepAdvancedFace) content).bounds()),
+            membersRule(StepFaceSurface.class, content -> ((StepFaceSurface) content).bounds()),
+            delegateRule(StepOrientedFace.class, content -> ((StepOrientedFace) content).faceElement()),
+            delegateRule(StepFaceBound.class, content -> ((StepFaceBound) content).loop()),
+            membersRule(StepOpenShell.class, content -> ((StepOpenShell) content).faces()),
+            membersRule(StepSurfacedOpenShell.class, content -> ((StepSurfacedOpenShell) content).faces()),
+            delegateRule(StepOrientedOpenShell.class, content -> ((StepOrientedOpenShell) content).openShellElement()),
+            membersRule(StepClosedShell.class, content -> ((StepClosedShell) content).faces()),
+            delegateRule(StepOrientedClosedShell.class, content -> ((StepOrientedClosedShell) content).closedShellElement()),
+            membersRule(StepConnectedFaceSet.class, content -> ((StepConnectedFaceSet) content).faces()),
+            membersRule(StepConnectedFaceSubSet.class, content -> ((StepConnectedFaceSubSet) content).faces()),
+            delegateRule(StepAnnotationPointOccurrence.class, content -> ((StepAnnotationPointOccurrence) content).item()),
+            delegateRule(StepAnnotationCurveOccurrence.class, content -> ((StepAnnotationCurveOccurrence) content).item()),
+            leaderRule(StepAnnotationFillArea.class, (content, leader, builder) ->
+                    addSampledPoints(sampleAnnotationFillAreaPoints((StepAnnotationFillArea) content, builder), leader)),
+            delegateRule(StepAnnotationFillAreaOccurrence.class, content -> ((StepAnnotationFillAreaOccurrence) content).item()),
+            sampledPointsRule(StepAnnotationSymbol.class),
+            delegateRule(StepAnnotationSymbolOccurrence.class, content -> ((StepAnnotationSymbolOccurrence) content).item()),
+            delegateRule(StepAnnotationSubfigureOccurrence.class, content -> ((StepAnnotationSubfigureOccurrence) content).item()),
+            sampledPointsRule(StepAnnotationText.class),
+            sampledPointsRule(StepAnnotationTextCharacter.class),
+            delegateRule(StepDimensionCurve.class, content -> ((StepDimensionCurve) content).item()),
+            delegateRule(StepLeaderCurve.class, content -> ((StepLeaderCurve) content).item()),
+            delegateRule(StepProjectionCurve.class, content -> ((StepProjectionCurve) content).item()),
+            delegateRule(StepDraughtingAnnotationOccurrence.class, content -> ((StepDraughtingAnnotationOccurrence) content).item()),
+            delegateRule(StepTerminatorSymbol.class, content -> ((StepTerminatorSymbol) content).annotatedCurve()),
+            pathLeaderRule(StepPath.class, content -> ((StepPath) content).edges()),
+            pathLeaderRule(StepOpenPath.class, content -> ((StepOpenPath) content).edges()),
+            pathLeaderRule(StepSubpath.class, content -> ((StepSubpath) content).edges()),
+            pathLeaderRule(StepOrientedPath.class, content -> ((StepOrientedPath) content).edges()),
+            membersRule(StepConnectedEdgeSet.class, content -> ((StepConnectedEdgeSet) content).edges()),
+            membersRule(StepEdgeBasedWireframeModel.class, content -> ((StepEdgeBasedWireframeModel) content).boundaries()),
+            membersRule(StepShellBasedWireframeModel.class, content -> ((StepShellBasedWireframeModel) content).boundaries()),
+            membersRule(StepWireShell.class, content -> ((StepWireShell) content).loops()),
+            pathLeaderRule(StepEdgeLoop.class, content -> ((StepEdgeLoop) content).edges()),
+            pointRule(StepVertexLoop.class, content ->
+                    StepPointExtractor.pointFromStep(((StepVertexLoop) content).loopVertex().point())),
+            leaderRule(StepPolyLoop.class, (content, leader, builder) -> {
+                for (StepCartesianPoint point : ((StepPolyLoop) content).polygon()) {
+                    leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
+                }
+            }),
+            pointRule(StepVertexShell.class, content ->
+                    StepPointExtractor.pointFromStep(((StepVertexShell) content).extent().loopVertex().point())),
+            new PmiLeaderRule(StepGeometricReplica.class,
+                    content -> "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName()),
+                    (content, leader, builder) -> {
+                        CartesianPoint point = pointFromReplica((StepGeometricReplica) content, builder);
+                        if (point != null) {
+                            leader.add(PayloadConversionHelper.toPointPayload(point));
+                        }
+                    }),
+            pointRule(StepCartesianPoint.class, content ->
+                    StepPointExtractor.pointFromStep((StepCartesianPoint) content)),
+            pointRule(StepVertexPoint.class, content ->
+                    StepPointExtractor.pointFromStep(((StepVertexPoint) content).point()))
+    );
+
     private static void appendPmiLeader(
             StepEntity content,
             List<PointPayload> leader,
             StepCadBuilder builder
     ) {
-        if (content instanceof StepGeometricSet) {
-            StepGeometricSet geometricSet = (StepGeometricSet) content;
-            for (StepEntity element : geometricSet.elements()) {
-                appendPmiLeader(element, leader, builder);
+        for (PmiLeaderRule rule : PMI_LEADER_RULES) {
+            if (rule.matches(content)) {
+                rule.handler().handle(content, leader, builder);
+                return;
             }
-            return;
         }
-        if (content instanceof StepGeometricCurveSet) {
-            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) content;
-            for (StepEntity element : curveSet.elements()) {
-                appendPmiLeader(element, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepPointSet) {
-            StepPointSet pointSet = (StepPointSet) content;
-            for (StepEntity point : pointSet.points()) {
-                appendPmiLeader(point, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepAnnotationPlaceholderOccurrence) {
-            StepAnnotationPlaceholderOccurrence placeholderOccurrence = (StepAnnotationPlaceholderOccurrence) content;
-            appendPmiLeader(placeholderOccurrence.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepAnnotationPlane) {
-            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) content;
-            for (StepEntity element : annotationPlane.elements()) {
-                appendPmiLeader(element, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepFaceBasedSurfaceModel) {
-            StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) content;
-            for (StepEntity faceSet : surfaceModel.faceSets()) {
-                appendPmiLeader(faceSet, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepShellBasedSurfaceModel) {
-            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) content;
-            for (StepEntity shell : surfaceModel.shells()) {
-                appendPmiLeader(shell, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepManifoldSolidBrep) {
-            StepManifoldSolidBrep solid = (StepManifoldSolidBrep) content;
-            appendPmiLeader(solid.outer(), leader, builder);
-            return;
-        }
-        if (content instanceof StepBrepWithVoids) {
-            StepBrepWithVoids solid = (StepBrepWithVoids) content;
-            appendPmiLeader(solid.outer(), leader, builder);
-            for (StepEntity voidShell : solid.voids()) {
-                appendPmiLeader(voidShell, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepSweptAreaSolid
-                || content instanceof StepSolidReplica
-                || content instanceof StepCsgSolid
-                || content instanceof StepCsgPrimitive
-                || content instanceof StepBooleanResult
-                || content instanceof StepBooleanClippingResult
-                || content instanceof StepSweptDiskSolid
-                || content instanceof StepExtrudedAreaSolidTapered
-                || content instanceof StepRevolvedAreaSolidTapered
-                || content instanceof StepSurfaceCurveSweptAreaSolid
-                || content instanceof StepPolygonalBoundedHalfSpace
-                || content instanceof StepComplexClippingResult) {
-            appendPmiLeaderForSolid(content, leader, builder);
-            return;
-        }
-        if (content instanceof StepAdvancedFace) {
-            StepAdvancedFace face = (StepAdvancedFace) content;
-            for (StepFaceBound bound : face.bounds()) {
-                appendPmiLeader(bound, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepFaceSurface) {
-            StepFaceSurface face = (StepFaceSurface) content;
-            for (StepFaceBound bound : face.bounds()) {
-                appendPmiLeader(bound, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepOrientedFace) {
-            StepOrientedFace face = (StepOrientedFace) content;
-            appendPmiLeader(face.faceElement(), leader, builder);
-            return;
-        }
-        if (content instanceof StepFaceBound) {
-            StepFaceBound faceBound = (StepFaceBound) content;
-            appendPmiLeader(faceBound.loop(), leader, builder);
-            return;
-        }
-        if (content instanceof StepOpenShell) {
-            StepOpenShell shell = (StepOpenShell) content;
-            for (StepFaceEntity face : shell.faces()) {
-                appendPmiLeader(face, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepSurfacedOpenShell) {
-            StepSurfacedOpenShell shell = (StepSurfacedOpenShell) content;
-            for (StepFaceEntity face : shell.faces()) {
-                appendPmiLeader(face, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepOrientedOpenShell) {
-            StepOrientedOpenShell shell = (StepOrientedOpenShell) content;
-            appendPmiLeader(shell.openShellElement(), leader, builder);
-            return;
-        }
-        if (content instanceof StepClosedShell) {
-            StepClosedShell shell = (StepClosedShell) content;
-            for (StepFaceEntity face : shell.faces()) {
-                appendPmiLeader(face, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepOrientedClosedShell) {
-            StepOrientedClosedShell shell = (StepOrientedClosedShell) content;
-            appendPmiLeader(shell.closedShellElement(), leader, builder);
-            return;
-        }
-        if (content instanceof StepConnectedFaceSet) {
-            StepConnectedFaceSet faceSet = (StepConnectedFaceSet) content;
-            for (StepFaceEntity face : faceSet.faces()) {
-                appendPmiLeader(face, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepConnectedFaceSubSet) {
-            StepConnectedFaceSubSet faceSet = (StepConnectedFaceSubSet) content;
-            for (StepFaceEntity face : faceSet.faces()) {
-                appendPmiLeader(face, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepAnnotationPointOccurrence) {
-            StepAnnotationPointOccurrence pointOccurrence = (StepAnnotationPointOccurrence) content;
-            appendPmiLeader(pointOccurrence.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepAnnotationCurveOccurrence) {
-            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) content;
-            appendPmiLeader(occurrence.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepAnnotationFillArea) {
-            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) content;
-            List<CartesianPoint> sampled = sampleAnnotationFillAreaPoints(fillArea, builder);
-            if (sampled != null) {
-                for (CartesianPoint point : sampled) {
-                    leader.add(PayloadConversionHelper.toPointPayload(point));
-                }
-            }
-            return;
-        }
-        if (content instanceof StepAnnotationFillAreaOccurrence) {
-            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) content;
-            appendPmiLeader(fillAreaOccurrence.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepAnnotationSymbol) {
-            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) content;
-            List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationSymbol, builder);
-            if (sampled != null) {
-                for (CartesianPoint point : sampled) {
-                    leader.add(PayloadConversionHelper.toPointPayload(point));
-                }
-            }
-            return;
-        }
-        if (content instanceof StepAnnotationSymbolOccurrence) {
-            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) content;
-            appendPmiLeader(symbolOccurrence.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepAnnotationSubfigureOccurrence) {
-            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) content;
-            appendPmiLeader(subfigureOccurrence.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepAnnotationText) {
-            StepAnnotationText annotationText = (StepAnnotationText) content;
-            List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationText, builder);
-            if (sampled != null) {
-                for (CartesianPoint point : sampled) {
-                    leader.add(PayloadConversionHelper.toPointPayload(point));
-                }
-            }
-            return;
-        }
-        if (content instanceof StepAnnotationTextCharacter) {
-            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) content;
-            List<CartesianPoint> sampled = sampleLooseEdgePoints(annotationTextCharacter, builder);
-            if (sampled != null) {
-                for (CartesianPoint point : sampled) {
-                    leader.add(PayloadConversionHelper.toPointPayload(point));
-                }
-            }
-            return;
-        }
-        if (content instanceof StepDimensionCurve) {
-            StepDimensionCurve dimensionCurve = (StepDimensionCurve) content;
-            appendPmiLeader(dimensionCurve.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepLeaderCurve) {
-            StepLeaderCurve leaderCurve = (StepLeaderCurve) content;
-            appendPmiLeader(leaderCurve.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepProjectionCurve) {
-            StepProjectionCurve projectionCurve = (StepProjectionCurve) content;
-            appendPmiLeader(projectionCurve.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepDraughtingAnnotationOccurrence) {
-            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) content;
-            appendPmiLeader(annotationOccurrence.item(), leader, builder);
-            return;
-        }
-        if (content instanceof StepTerminatorSymbol) {
-            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) content;
-            appendPmiLeader(terminatorSymbol.annotatedCurve(), leader, builder);
-            return;
-        }
-        if (content instanceof StepPath) {
-            StepPath path = (StepPath) content;
-            appendPmiPathLeader(path.edges(), leader, builder);
-            return;
-        }
-        if (content instanceof StepOpenPath) {
-            StepOpenPath path = (StepOpenPath) content;
-            appendPmiPathLeader(path.edges(), leader, builder);
-            return;
-        }
-        if (content instanceof StepSubpath) {
-            StepSubpath subpath = (StepSubpath) content;
-            appendPmiPathLeader(subpath.edges(), leader, builder);
-            return;
-        }
-        if (content instanceof StepOrientedPath) {
-            StepOrientedPath orientedPath = (StepOrientedPath) content;
-            appendPmiPathLeader(orientedPath.edges(), leader, builder);
-            return;
-        }
-        if (content instanceof StepConnectedEdgeSet) {
-            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) content;
-            for (StepEntity edge : connectedEdgeSet.edges()) {
-                appendPmiLeader(edge, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepEdgeBasedWireframeModel) {
-            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) content;
-            for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
-                appendPmiLeader(boundary, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepShellBasedWireframeModel) {
-            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) content;
-            for (StepEntity boundary : wireframeModel.boundaries()) {
-                appendPmiLeader(boundary, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepWireShell) {
-            StepWireShell wireShell = (StepWireShell) content;
-            for (StepEntity loop : wireShell.loops()) {
-                appendPmiLeader(loop, leader, builder);
-            }
-            return;
-        }
-        if (content instanceof StepEdgeLoop) {
-            StepEdgeLoop edgeLoop = (StepEdgeLoop) content;
-            appendPmiPathLeader(edgeLoop.edges(), leader, builder);
-            return;
-        }
-        if (content instanceof StepVertexLoop) {
-            StepVertexLoop vertexLoop = (StepVertexLoop) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexLoop.loopVertex().point())));
-            return;
-        }
-        if (content instanceof StepPolyLoop) {
-            StepPolyLoop polyLoop = (StepPolyLoop) content;
-            for (StepCartesianPoint point : polyLoop.polygon()) {
-                leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
-            }
-            return;
-        }
-        if (content instanceof StepVertexShell) {
-            StepVertexShell vertexShell = (StepVertexShell) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point())));
-            return;
-        }
-        if (content instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) content).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) content;
-            CartesianPoint point = StepPmiPayloadBuilder.pointFromReplica(replica, builder);
-            if (point != null) {
-                leader.add(PayloadConversionHelper.toPointPayload(point));
-            }
-            return;
-        }
-        if (content instanceof StepCartesianPoint) {
-            StepCartesianPoint point = (StepCartesianPoint) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(point)));
-            return;
-        }
-        if (content instanceof StepVertexPoint) {
-            StepVertexPoint vertexPoint = (StepVertexPoint) content;
-            leader.add(PayloadConversionHelper.toPointPayload(StepPointExtractor.pointFromStep(vertexPoint.point())));
-            return;
-        }
-        List<CartesianPoint> sampled = sampleLooseEdgePoints(content, builder);
-        if (sampled == null) {
-            return;
-        }
-        for (CartesianPoint point : sampled) {
-            leader.add(PayloadConversionHelper.toPointPayload(point));
-        }
+        addSampledPoints(content, leader, builder);
     }
 
     private static void appendPmiLeaderForSolid(
