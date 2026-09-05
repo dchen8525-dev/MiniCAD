@@ -2,6 +2,7 @@ package com.minicad.export.json;
 
 import com.minicad.preview.builder.PmiTargetHelper;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import com.minicad.helper.StepMetadataExtractor;
 import com.minicad.step.model.*;
@@ -9131,67 +9132,7 @@ public final class StepPmiTargetBuilder {
 
 
     static StepRepresentation propertyRepresentationLinkRepresentation(StepEntity candidate, int propertyDefinitionId) {
-        if (candidate instanceof StepPropertyDefinitionRepresentation
-                && ((StepPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinitionId) {
-            StepPropertyDefinitionRepresentation representationLink = (StepPropertyDefinitionRepresentation) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepAttributeAssertion
-                && ((StepAttributeAssertion) candidate).definition().id() == propertyDefinitionId) {
-            StepAttributeAssertion representationLink = (StepAttributeAssertion) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepActionPropertyRepresentation
-                && ((StepActionPropertyRepresentation) candidate).definition().id() == propertyDefinitionId) {
-            StepActionPropertyRepresentation representationLink = (StepActionPropertyRepresentation) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepContactRatioRepresentation
-                && ((StepContactRatioRepresentation) candidate).definition().id() == propertyDefinitionId) {
-            StepContactRatioRepresentation representationLink = (StepContactRatioRepresentation) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepKinematicPropertyDefinitionRepresentation
-                && ((StepKinematicPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinitionId) {
-            StepKinematicPropertyDefinitionRepresentation representationLink = (StepKinematicPropertyDefinitionRepresentation) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepKinematicPropertyMechanismRepresentation
-                && ((StepKinematicPropertyMechanismRepresentation) candidate).definition().id() == propertyDefinitionId) {
-            StepKinematicPropertyMechanismRepresentation representationLink = (StepKinematicPropertyMechanismRepresentation) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepKinematicPropertyRepresentationRelation
-                && ((StepKinematicPropertyRepresentationRelation) candidate).definition().id() == propertyDefinitionId) {
-            StepKinematicPropertyRepresentationRelation representationLink = (StepKinematicPropertyRepresentationRelation) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepKinematicPropertyTopologyRepresentation
-                && ((StepKinematicPropertyTopologyRepresentation) candidate).definition().id() == propertyDefinitionId) {
-            StepKinematicPropertyTopologyRepresentation representationLink = (StepKinematicPropertyTopologyRepresentation) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepResourcePropertyRepresentation
-                && ((StepResourcePropertyRepresentation) candidate).definition().id() == propertyDefinitionId) {
-            StepResourcePropertyRepresentation representationLink = (StepResourcePropertyRepresentation) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepForwardChainingRulePremise
-                && ((StepForwardChainingRulePremise) candidate).definition().id() == propertyDefinitionId) {
-            StepForwardChainingRulePremise representationLink = (StepForwardChainingRulePremise) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepBackChainingRuleBody
-                && ((StepBackChainingRuleBody) candidate).definition().id() == propertyDefinitionId) {
-            StepBackChainingRuleBody representationLink = (StepBackChainingRuleBody) candidate;
-            return representationLink.usedRepresentation();
-        }
-        if (candidate instanceof StepPlacedDatumTargetFeature
-                && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinitionId) {
-            StepPlacedDatumTargetFeature representationLink = (StepPlacedDatumTargetFeature) candidate;
-            return representationLink.usedRepresentation();
-        }
-        return null;
+        return usedRepresentationIfLinkMatches(candidate, propertyDefinitionId);
     }
 
 
@@ -10407,51 +10348,7 @@ public final class StepPmiTargetBuilder {
             StepPropertyDefinition propertyDefinition = (StepPropertyDefinition) entity;
             targets.addAll(collectSemanticTargets(propertyDefinition.definition(), resolved, visiting, index));
             for (StepEntity candidate : index.propertyDefinitionLinks()) {
-            if (candidate instanceof StepPropertyDefinitionRepresentation
-            && ((StepPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-            StepPropertyDefinitionRepresentation representationLink = (StepPropertyDefinitionRepresentation) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepActionPropertyRepresentation
-            && ((StepActionPropertyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-            StepActionPropertyRepresentation representationLink = (StepActionPropertyRepresentation) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepContactRatioRepresentation
-            && ((StepContactRatioRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-            StepContactRatioRepresentation representationLink = (StepContactRatioRepresentation) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepKinematicPropertyDefinitionRepresentation
-            && ((StepKinematicPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-            StepKinematicPropertyDefinitionRepresentation representationLink = (StepKinematicPropertyDefinitionRepresentation) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepKinematicPropertyMechanismRepresentation
-            && ((StepKinematicPropertyMechanismRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-            StepKinematicPropertyMechanismRepresentation representationLink = (StepKinematicPropertyMechanismRepresentation) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepKinematicPropertyRepresentationRelation
-            && ((StepKinematicPropertyRepresentationRelation) candidate).definition().id() == propertyDefinition.id()) {
-            StepKinematicPropertyRepresentationRelation representationLink = (StepKinematicPropertyRepresentationRelation) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepKinematicPropertyTopologyRepresentation
-            && ((StepKinematicPropertyTopologyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-            StepKinematicPropertyTopologyRepresentation representationLink = (StepKinematicPropertyTopologyRepresentation) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepResourcePropertyRepresentation
-            && ((StepResourcePropertyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-            StepResourcePropertyRepresentation representationLink = (StepResourcePropertyRepresentation) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepForwardChainingRulePremise
-            && ((StepForwardChainingRulePremise) candidate).definition().id() == propertyDefinition.id()) {
-            StepForwardChainingRulePremise representationLink = (StepForwardChainingRulePremise) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepBackChainingRuleBody
-            && ((StepBackChainingRuleBody) candidate).definition().id() == propertyDefinition.id()) {
-            StepBackChainingRuleBody representationLink = (StepBackChainingRuleBody) candidate;
-            targets.add(representationLink.usedRepresentation());
-            } else if (candidate instanceof StepPlacedDatumTargetFeature
-            && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinition.id()) {
-            StepPlacedDatumTargetFeature datumTargetFeature = (StepPlacedDatumTargetFeature) candidate;
-            targets.add(datumTargetFeature.usedRepresentation());
-            } else if (candidate instanceof StepPropertyDefinitionRelationship) {
+            if (candidate instanceof StepPropertyDefinitionRelationship) {
             StepPropertyDefinitionRelationship relationship = (StepPropertyDefinitionRelationship) candidate;
             if (relationship.relatingPropertyDefinition().id() == propertyDefinition.id()) {
             targets.addAll(collectSemanticTargets(relationship.relatedPropertyDefinition(), resolved, visiting, index));
@@ -10459,6 +10356,11 @@ public final class StepPmiTargetBuilder {
             if (relationship.relatedPropertyDefinition().id() == propertyDefinition.id()) {
             targets.addAll(collectSemanticTargets(relationship.relatingPropertyDefinition(), resolved, visiting, index));
             }
+            continue;
+            }
+            StepRepresentation usedRepresentation = usedRepresentationIfLinkMatches(candidate, propertyDefinition.id());
+            if (usedRepresentation != null) {
+            targets.add(usedRepresentation);
             }
             }
             }),
@@ -12646,6 +12548,80 @@ public final class StepPmiTargetBuilder {
     }
 
 
+    /**
+     * The property-definition link types whose {@code definition().id()} match routes the
+     * used representation in as a PMI target. All twelve carry the same
+     * (definition, usedRepresentation) shape, so one table covers them all.
+     */
+    private record PropertyRepresentationLinkRule(
+            Class<?> type,
+            Function<StepEntity, StepPropertyDefinition> definition,
+            Function<StepEntity, StepRepresentation> usedRepresentation
+    ) {
+        boolean matches(StepEntity candidate) {
+            return type.isInstance(candidate);
+        }
+    }
+
+    private static <T extends StepEntity> PropertyRepresentationLinkRule propertyLinkRule(
+            Class<T> type,
+            Function<T, StepPropertyDefinition> definition,
+            Function<T, StepRepresentation> usedRepresentation
+    ) {
+        return new PropertyRepresentationLinkRule(
+                type,
+                candidate -> definition.apply(type.cast(candidate)),
+                candidate -> usedRepresentation.apply(type.cast(candidate))
+        );
+    }
+
+    private static final List<PropertyRepresentationLinkRule> PROPERTY_REPRESENTATION_LINK_RULES = List.of(
+            propertyLinkRule(StepPropertyDefinitionRepresentation.class,
+                    StepPropertyDefinitionRepresentation::definition, StepPropertyDefinitionRepresentation::usedRepresentation),
+            propertyLinkRule(StepAttributeAssertion.class,
+                    StepAttributeAssertion::definition, StepAttributeAssertion::usedRepresentation),
+            propertyLinkRule(StepActionPropertyRepresentation.class,
+                    StepActionPropertyRepresentation::definition, StepActionPropertyRepresentation::usedRepresentation),
+            propertyLinkRule(StepContactRatioRepresentation.class,
+                    StepContactRatioRepresentation::definition, StepContactRatioRepresentation::usedRepresentation),
+            propertyLinkRule(StepKinematicPropertyDefinitionRepresentation.class,
+                    StepKinematicPropertyDefinitionRepresentation::definition, StepKinematicPropertyDefinitionRepresentation::usedRepresentation),
+            propertyLinkRule(StepKinematicPropertyMechanismRepresentation.class,
+                    StepKinematicPropertyMechanismRepresentation::definition, StepKinematicPropertyMechanismRepresentation::usedRepresentation),
+            propertyLinkRule(StepKinematicPropertyRepresentationRelation.class,
+                    StepKinematicPropertyRepresentationRelation::definition, StepKinematicPropertyRepresentationRelation::usedRepresentation),
+            propertyLinkRule(StepKinematicPropertyTopologyRepresentation.class,
+                    StepKinematicPropertyTopologyRepresentation::definition, StepKinematicPropertyTopologyRepresentation::usedRepresentation),
+            propertyLinkRule(StepResourcePropertyRepresentation.class,
+                    StepResourcePropertyRepresentation::definition, StepResourcePropertyRepresentation::usedRepresentation),
+            propertyLinkRule(StepForwardChainingRulePremise.class,
+                    StepForwardChainingRulePremise::definition, StepForwardChainingRulePremise::usedRepresentation),
+            propertyLinkRule(StepBackChainingRuleBody.class,
+                    StepBackChainingRuleBody::definition, StepBackChainingRuleBody::usedRepresentation),
+            propertyLinkRule(StepPlacedDatumTargetFeature.class,
+                    StepPlacedDatumTargetFeature::definition, StepPlacedDatumTargetFeature::usedRepresentation)
+    );
+
+    /**
+     * Returns the used representation of {@code candidate} when it is one of the
+     * property-definition link types and its {@code definition().id()} matches
+     * {@code definitionId}; otherwise null. Semantics of the former else-if
+     * chains: first matching link type wins, and a definition mismatch yields
+     * no target.
+     */
+    private static StepRepresentation usedRepresentationIfLinkMatches(StepEntity candidate, int definitionId) {
+        for (PropertyRepresentationLinkRule rule : PROPERTY_REPRESENTATION_LINK_RULES) {
+            if (!rule.matches(candidate)) {
+                continue;
+            }
+            if (rule.definition().apply(candidate).id() != definitionId) {
+                return null;
+            }
+            return rule.usedRepresentation().apply(candidate);
+        }
+        return null;
+    }
+
     static void appendPropertyRepresentationLinkTargets(
             Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
             int usageId,
@@ -12654,185 +12630,24 @@ public final class StepPmiTargetBuilder {
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
         for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepPropertyDefinitionRepresentation
-                    && ((StepPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-                StepPropertyDefinitionRepresentation representationLink = (StepPropertyDefinitionRepresentation) candidate;
+            for (PropertyRepresentationLinkRule rule : PROPERTY_REPRESENTATION_LINK_RULES) {
+                if (!rule.matches(candidate)) {
+                    continue;
+                }
+                if (rule.definition().apply(candidate).id() != propertyDefinition.id()) {
+                    continue;
+                }
                 appendPmiTarget(
                         targetsByUsageId,
                         usageId,
-                        representationLink.usedRepresentation(),
+                        rule.usedRepresentation().apply(candidate),
                         instanceIdsByTargetId,
                         null,
                         null,
                         null,
                         null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepAttributeAssertion
-                    && ((StepAttributeAssertion) candidate).definition().id() == propertyDefinition.id()) {
-                StepAttributeAssertion representationLink = (StepAttributeAssertion) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepActionPropertyRepresentation
-                    && ((StepActionPropertyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-                StepActionPropertyRepresentation representationLink = (StepActionPropertyRepresentation) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepContactRatioRepresentation
-                    && ((StepContactRatioRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-                StepContactRatioRepresentation representationLink = (StepContactRatioRepresentation) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepKinematicPropertyDefinitionRepresentation
-                    && ((StepKinematicPropertyDefinitionRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-                StepKinematicPropertyDefinitionRepresentation representationLink = (StepKinematicPropertyDefinitionRepresentation) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepKinematicPropertyMechanismRepresentation
-                    && ((StepKinematicPropertyMechanismRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-                StepKinematicPropertyMechanismRepresentation representationLink = (StepKinematicPropertyMechanismRepresentation) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepKinematicPropertyRepresentationRelation
-                    && ((StepKinematicPropertyRepresentationRelation) candidate).definition().id() == propertyDefinition.id()) {
-                StepKinematicPropertyRepresentationRelation representationLink = (StepKinematicPropertyRepresentationRelation) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepKinematicPropertyTopologyRepresentation
-                    && ((StepKinematicPropertyTopologyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-                StepKinematicPropertyTopologyRepresentation representationLink = (StepKinematicPropertyTopologyRepresentation) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepResourcePropertyRepresentation
-                    && ((StepResourcePropertyRepresentation) candidate).definition().id() == propertyDefinition.id()) {
-                StepResourcePropertyRepresentation representationLink = (StepResourcePropertyRepresentation) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepForwardChainingRulePremise
-                    && ((StepForwardChainingRulePremise) candidate).definition().id() == propertyDefinition.id()) {
-                StepForwardChainingRulePremise representationLink = (StepForwardChainingRulePremise) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepBackChainingRuleBody
-                    && ((StepBackChainingRuleBody) candidate).definition().id() == propertyDefinition.id()) {
-                StepBackChainingRuleBody representationLink = (StepBackChainingRuleBody) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
-                );
-            } else if (candidate instanceof StepPlacedDatumTargetFeature
-                    && ((StepPlacedDatumTargetFeature) candidate).definition().id() == propertyDefinition.id()) {
-                StepPlacedDatumTargetFeature representationLink = (StepPlacedDatumTargetFeature) candidate;
-                appendPmiTarget(
-                        targetsByUsageId,
-                        usageId,
-                        representationLink.usedRepresentation(),
-                        instanceIdsByTargetId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        definitionTypeName(representationLink),
-                        representationLink.id()
+                        definitionTypeName(candidate),
+                        candidate.id()
                 );
             }
         }
