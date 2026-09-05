@@ -1084,56 +1084,36 @@ public final class StepDumpApp {
                 "GEOMETRIC_SET requires supported point, curve, surface, path, topology, shell/model/solid container or nested set members", builder);
     }
 
+    /** Surface reference types validated through a single builder call. */
+    private static final List<SummaryElementRule> SUPPORTED_SURFACE_REFERENCE_RULES = List.of(
+            buildRule(StepPlane.class, StepCadBuilder::buildPlane),
+            buildRule(StepCylindricalSurface.class, StepCadBuilder::buildCylindricalSurface),
+            buildRule(StepConicalSurface.class, StepCadBuilder::buildConicalSurface),
+            buildRule(StepSphericalSurface.class, StepCadBuilder::buildSphericalSurface),
+            buildRule(StepToroidalSurface.class, StepCadBuilder::buildToroidalSurface),
+            buildRule(StepDegenerateToroidalSurface.class, StepCadBuilder::buildDegenerateToroidalSurface),
+            buildRule(StepSurfaceOfLinearExtrusion.class, StepCadBuilder::buildSurfaceOfLinearExtrusion),
+            buildRule(StepSurfaceOfRevolution.class, StepCadBuilder::buildSurfaceOfRevolution),
+            buildRule(StepBSplineSurfaceWithKnots.class, StepCadBuilder::buildBSplineSurface),
+            buildRule(StepRationalBSplineSurface.class, StepCadBuilder::buildRationalBSplineSurface),
+            buildRule(StepRectangularTrimmedSurface.class, StepCadBuilder::buildRectangularTrimmedSurface),
+            buildRule(StepCurveBoundedSurface.class, StepCadBuilder::buildCurveBoundedSurface),
+            buildRule(StepOrientedSurface.class, StepCadBuilder::buildOrientedSurface),
+            buildRule(StepOffsetSurface.class, StepCadBuilder::buildOffsetSurface),
+            new SummaryElementRule(StepGeometricReplica.class,
+                    element -> "SURFACE_REPLICA".equals(((StepGeometricReplica) element).entityName()),
+                    (element, builder) -> builder.buildSurfaceReplica(element.id()))
+    );
+
     private static void validateSupportedSurfaceReference(StepEntity surface, StepCadBuilder builder) {
-        if (surface instanceof StepPlane) {
-            StepPlane plane = (StepPlane) surface;
-            builder.buildPlane(plane.id());
-        } else if (surface instanceof StepCylindricalSurface) {
-            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) surface;
-            builder.buildCylindricalSurface(cylindricalSurface.id());
-        } else if (surface instanceof StepConicalSurface) {
-            StepConicalSurface conicalSurface = (StepConicalSurface) surface;
-            builder.buildConicalSurface(conicalSurface.id());
-        } else if (surface instanceof StepSphericalSurface) {
-            StepSphericalSurface sphericalSurface = (StepSphericalSurface) surface;
-            builder.buildSphericalSurface(sphericalSurface.id());
-        } else if (surface instanceof StepToroidalSurface) {
-            StepToroidalSurface toroidalSurface = (StepToroidalSurface) surface;
-            builder.buildToroidalSurface(toroidalSurface.id());
-        } else if (surface instanceof StepDegenerateToroidalSurface) {
-            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) surface;
-            builder.buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
-        } else if (surface instanceof StepSurfaceOfLinearExtrusion) {
-            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) surface;
-            builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
-        } else if (surface instanceof StepSurfaceOfRevolution) {
-            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) surface;
-            builder.buildSurfaceOfRevolution(revolutionSurface.id());
-        } else if (surface instanceof StepBSplineSurfaceWithKnots) {
-            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) surface;
-            builder.buildBSplineSurface(splineSurface.id());
-        } else if (surface instanceof StepRationalBSplineSurface) {
-            StepRationalBSplineSurface rationalSplineSurface = (StepRationalBSplineSurface) surface;
-            builder.buildRationalBSplineSurface(rationalSplineSurface.id());
-        } else if (surface instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) surface;
-            builder.buildRectangularTrimmedSurface(trimmedSurface.id());
-        } else if (surface instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) surface;
-            builder.buildCurveBoundedSurface(boundedSurface.id());
-        } else if (surface instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) surface;
-            builder.buildOrientedSurface(orientedSurface.id());
-        } else if (surface instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) surface;
-            builder.buildOffsetSurface(offsetSurface.id());
-        } else if (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) surface;
-            builder.buildSurfaceReplica(replica.id());
-        } else {
-            throw new UnsupportedGeometryException(
-                    "GEOMETRIC_SET requires supported point, curve, surface, path, topology, shell/model/solid container or nested set members");
+        for (SummaryElementRule rule : SUPPORTED_SURFACE_REFERENCE_RULES) {
+            if (rule.matches(surface)) {
+                rule.validator().validate(surface, builder);
+                return;
+            }
         }
+        throw new UnsupportedGeometryException(
+                "GEOMETRIC_SET requires supported point, curve, surface, path, topology, shell/model/solid container or nested set members");
     }
 
     private static boolean isSupportedGeometricSetSurface(StepEntity surface) {
