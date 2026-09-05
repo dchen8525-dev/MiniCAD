@@ -1610,7 +1610,7 @@ public final class StepEdgePayloadBuilder {
                     item -> ((StepGeometricReplica) item).parent())
     );
 
-    private static StepEntity previewCurveSemanticItem(StepEntity item) {
+    static StepEntity previewCurveSemanticItem(StepEntity item) {
         StepEntity current = item;
         while (true) {
             StepEntity next = null;
