@@ -3887,101 +3887,77 @@ public final class StepCadBuilder {
         buildCurve3(boundary);
     }
 
-    String describeUnsupportedFaceGeometry(StepEntity geometry) {
-        if (geometry instanceof StepCylindricalSurface) {
-            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) geometry;
-            buildCylindricalSurface(cylindricalSurface.id());
-            return "CYLINDRICAL_SURFACE";
+    @FunctionalInterface
+    private interface FaceDescribeHandler {
+        String describe(StepEntity geometry);
+    }
+
+    private record FaceDescribeRule(Class<?> type, Predicate<StepEntity> guard, FaceDescribeHandler handler) {
+        boolean matches(StepEntity geometry) {
+            return type.isInstance(geometry) && (guard == null || guard.test(geometry));
         }
-        if (geometry instanceof StepConicalSurface) {
-            StepConicalSurface conicalSurface = (StepConicalSurface) geometry;
-            buildConicalSurface(conicalSurface.id());
-            return "CONICAL_SURFACE";
-        }
-        if (geometry instanceof StepSphericalSurface) {
-            StepSphericalSurface sphericalSurface = (StepSphericalSurface) geometry;
-            buildSphericalSurface(sphericalSurface.id());
-            return "SPHERICAL_SURFACE";
-        }
-        if (geometry instanceof StepSurfaceOfLinearExtrusion) {
-            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) geometry;
-            buildSurfaceOfLinearExtrusion(extrusionSurface.id());
-            return "SURFACE_OF_LINEAR_EXTRUSION";
-        }
-        if (geometry instanceof StepSurfaceOfRevolution) {
-            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) geometry;
-            buildSurfaceOfRevolution(revolutionSurface.id());
-            return "SURFACE_OF_REVOLUTION";
-        }
-        if (geometry instanceof StepBezierSurface) {
-            StepBezierSurface splineSurface = (StepBezierSurface) geometry;
-            buildBezierSurface(splineSurface.id());
-            return "BEZIER_SURFACE";
-        }
-        if (geometry instanceof StepUniformSurface) {
-            StepUniformSurface splineSurface = (StepUniformSurface) geometry;
-            buildUniformSurface(splineSurface.id());
-            return "UNIFORM_SURFACE";
-        }
-        if (geometry instanceof StepQuasiUniformSurface) {
-            StepQuasiUniformSurface splineSurface = (StepQuasiUniformSurface) geometry;
-            buildQuasiUniformSurface(splineSurface.id());
-            return "QUASI_UNIFORM_SURFACE";
-        }
-        if (geometry instanceof StepPiecewiseBezierSurface) {
-            StepPiecewiseBezierSurface splineSurface = (StepPiecewiseBezierSurface) geometry;
-            buildPiecewiseBezierSurface(splineSurface.id());
-            return "PIECEWISE_BEZIER_SURFACE";
-        }
-        if (geometry instanceof StepBSplineSurfaceWithKnots) {
-            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
-            buildBSplineSurface(splineSurface.id());
-            return "B_SPLINE_SURFACE_WITH_KNOTS";
-        }
-        if (geometry instanceof StepRationalBSplineSurface) {
-            StepRationalBSplineSurface rationalSplineSurface = (StepRationalBSplineSurface) geometry;
-            buildRationalBSplineSurface(rationalSplineSurface.id());
-            return "RATIONAL_B_SPLINE_SURFACE";
-        }
-        if (geometry instanceof StepToroidalSurface) {
-            StepToroidalSurface toroidalSurface = (StepToroidalSurface) geometry;
-            buildToroidalSurface(toroidalSurface.id());
-            return "TOROIDAL_SURFACE";
-        }
-        if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
-            StepToroidalSurfaceWithSpecifiedBends toroidalSpecBends = (StepToroidalSurfaceWithSpecifiedBends) geometry;
-            buildToroidalSurfaceFromSpecifiedBends(toroidalSpecBends);
+    }
+
+    /** Analytical and spline surfaces described after a build attempt populates their geometry. */
+    private FaceDescribeRule describeIdRule(Class<?> type, IntConsumer builder, String name) {
+        return new FaceDescribeRule(type, null, geometry -> {
+            builder.accept(geometry.id());
+            return name;
+        });
+    }
+
+    /** Wrapper surfaces described through the surface they reference. */
+    private FaceDescribeRule describeRecurseRule(Class<?> type, Function<StepEntity, StepEntity> next) {
+        return new FaceDescribeRule(type, null, geometry -> describeUnsupportedFaceGeometry(next.apply(geometry)));
+    }
+
+    /**
+     * Face-geometry describe rules keyed by concrete type, replacing the
+     * former 19-branch if/else-if chain. Order mirrors the original chain
+     * (first match wins); each entry first builds the surface so the
+     * resulting error report reflects its geometry, then names it. Unmatched
+     * geometry yields null.
+     */
+    private final List<FaceDescribeRule> faceDescribeRules = createFaceDescribeRules();
+
+    private List<FaceDescribeRule> createFaceDescribeRules() {
+        List<FaceDescribeRule> rules = new ArrayList<>();
+        rules.add(describeIdRule(StepCylindricalSurface.class, this::buildCylindricalSurface, "CYLINDRICAL_SURFACE"));
+        rules.add(describeIdRule(StepConicalSurface.class, this::buildConicalSurface, "CONICAL_SURFACE"));
+        rules.add(describeIdRule(StepSphericalSurface.class, this::buildSphericalSurface, "SPHERICAL_SURFACE"));
+        rules.add(describeIdRule(StepSurfaceOfLinearExtrusion.class, this::buildSurfaceOfLinearExtrusion, "SURFACE_OF_LINEAR_EXTRUSION"));
+        rules.add(describeIdRule(StepSurfaceOfRevolution.class, this::buildSurfaceOfRevolution, "SURFACE_OF_REVOLUTION"));
+        rules.add(describeIdRule(StepBezierSurface.class, this::buildBezierSurface, "BEZIER_SURFACE"));
+        rules.add(describeIdRule(StepUniformSurface.class, this::buildUniformSurface, "UNIFORM_SURFACE"));
+        rules.add(describeIdRule(StepQuasiUniformSurface.class, this::buildQuasiUniformSurface, "QUASI_UNIFORM_SURFACE"));
+        rules.add(describeIdRule(StepPiecewiseBezierSurface.class, this::buildPiecewiseBezierSurface, "PIECEWISE_BEZIER_SURFACE"));
+        rules.add(describeIdRule(StepBSplineSurfaceWithKnots.class, this::buildBSplineSurface, "B_SPLINE_SURFACE_WITH_KNOTS"));
+        rules.add(describeIdRule(StepRationalBSplineSurface.class, this::buildRationalBSplineSurface, "RATIONAL_B_SPLINE_SURFACE"));
+        rules.add(describeIdRule(StepToroidalSurface.class, this::buildToroidalSurface, "TOROIDAL_SURFACE"));
+        rules.add(new FaceDescribeRule(StepToroidalSurfaceWithSpecifiedBends.class, null, geometry -> {
+            buildToroidalSurfaceFromSpecifiedBends((StepToroidalSurfaceWithSpecifiedBends) geometry);
             return "TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS";
-        }
-        if (geometry instanceof StepDegenerateToroidalSurface) {
-            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) geometry;
-            buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
-            return "DEGENERATE_TOROIDAL_SURFACE";
-        }
-        if (geometry instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
-            buildRectangularTrimmedSurface(trimmedSurface.id());
-            return describeUnsupportedFaceGeometry(trimmedSurface.getBasisSurface());
-        }
-        if (geometry instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
-            buildCurveBoundedSurface(boundedSurface.id());
-            return describeUnsupportedFaceGeometry(boundedSurface.getBasisSurface());
-        }
-        if (geometry instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
-            buildOrientedSurface(orientedSurface.id());
-            return describeUnsupportedFaceGeometry(orientedSurface.surfaceElement());
-        }
-        if (geometry instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
-            buildOffsetSurface(offsetSurface.id());
-            return describeUnsupportedFaceGeometry(offsetSurface.getBasisSurface());
-        }
-        if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) geometry;
-            buildSurfaceReplica(replica.id());
-            return describeUnsupportedFaceGeometry(replica.parent());
+        }));
+        rules.add(describeIdRule(StepDegenerateToroidalSurface.class, this::buildDegenerateToroidalSurface, "DEGENERATE_TOROIDAL_SURFACE"));
+        rules.add(describeRecurseRule(StepRectangularTrimmedSurface.class, geometry -> ((StepRectangularTrimmedSurface) geometry).getBasisSurface()));
+        rules.add(describeRecurseRule(StepCurveBoundedSurface.class, geometry -> ((StepCurveBoundedSurface) geometry).getBasisSurface()));
+        rules.add(describeRecurseRule(StepOrientedSurface.class, geometry -> ((StepOrientedSurface) geometry).surfaceElement()));
+        rules.add(describeRecurseRule(StepOffsetSurface.class, geometry -> ((StepOffsetSurface) geometry).getBasisSurface()));
+        rules.add(new FaceDescribeRule(StepGeometricReplica.class,
+                geometry -> "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName()),
+                geometry -> {
+                    // Build attempt first: rejects zero / non-uniform scale replicas with a dedicated error.
+                    buildSurfaceReplica(geometry.id());
+                    return describeUnsupportedFaceGeometry(((StepGeometricReplica) geometry).parent());
+                }));
+        return List.copyOf(rules);
+    }
+
+    String describeUnsupportedFaceGeometry(StepEntity geometry) {
+        for (FaceDescribeRule rule : faceDescribeRules) {
+            if (rule.matches(geometry)) {
+                return rule.handler().describe(geometry);
+            }
         }
         return null;
     }
