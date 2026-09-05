@@ -10,7 +10,9 @@ import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepProfileDef;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.function.Function;
 
@@ -60,60 +62,70 @@ final class StepProfileBuilder {
 
     private final StepCadGeometryOps geometryOps;
     private final Function<StepEntity, Curve2> buildCurve2;
+    private final Map<String, Function<StepProfileDef, ProfileLoops>> areaProfileBuilders;
 
     StepProfileBuilder(StepCadGeometryOps geometryOps, Function<StepEntity, Curve2> buildCurve2) {
         this.geometryOps = geometryOps;
         this.buildCurve2 = buildCurve2;
+        this.areaProfileBuilders = buildAreaProfileBuilders();
+    }
+
+    /**
+     * AREA profile entity names mapped to their loop builders, replacing the
+     * former 19-branch if/else-if chain in buildAreaProfileLoops. Aliased
+     * STEP names (I_PROFILE_DEF vs I_SHAPE_PROFILE_DEF, etc.) share one
+     * builder. Insertion order is preserved for readability only; dispatch is
+     * on exact name equality so lookup order cannot change behavior.
+     */
+    private Map<String, Function<StepProfileDef, ProfileLoops>> buildAreaProfileBuilders() {
+        Map<String, Function<StepProfileDef, ProfileLoops>> builders = new LinkedHashMap<>();
+        builders.put("RECTANGLE_PROFILE_DEF", profile -> outerLoopProfile(rectangleProfile(profile)));
+        builders.put("CENTERED_RECTANGLE_PROFILE_DEF", profile -> outerLoopProfile(rectangleProfile(profile)));
+        builders.put("CIRCLE_PROFILE_DEF", profile -> outerLoopProfile(circleProfile(profile)));
+        builders.put("ELLIPSE_PROFILE_DEF", profile -> outerLoopProfile(ellipseProfile(profile)));
+        builders.put("ROUNDED_RECTANGLE_PROFILE_DEF", profile -> outerLoopProfile(roundedRectangleProfile(profile)));
+        builders.put("CIRCULAR_HOLLOW_PROFILE_DEF", this::circularHollowProfile);
+        builders.put("RECTANGLE_HOLLOW_PROFILE_DEF", this::rectangleHollowProfile);
+        builders.put("CENTERED_CIRCLE_PROFILE_DEF", profile -> outerLoopProfile(centeredCircleProfile(profile)));
+        builders.put("CENTRE_LINE_ARC_PROFILE_DEF", profile -> outerLoopProfile(centreLineArcProfile(profile)));
+        builders.put("ARBITRARY_CLOSED_PROFILE_DEF", profile -> outerLoopProfile(arbitraryClosedProfile(profile)));
+        builders.put("ARBITRARY_PROFILE_DEF", profile -> outerLoopProfile(arbitraryClosedProfile(profile)));
+        builders.put("ARBITRARY_PROFILE_DEF_WITH_VOIDS", this::arbitraryProfileWithVoids);
+        builders.put("I_SHAPE_PROFILE_DEF", profile -> outerLoopProfile(iShapeProfile(profile)));
+        builders.put("I_PROFILE_DEF", profile -> outerLoopProfile(iShapeProfile(profile)));
+        builders.put("T_SHAPE_PROFILE_DEF", profile -> outerLoopProfile(tShapeProfile(profile)));
+        builders.put("T_PROFILE_DEF", profile -> outerLoopProfile(tShapeProfile(profile)));
+        builders.put("TEE_PROFILE_DEF", profile -> outerLoopProfile(tShapeProfile(profile)));
+        builders.put("L_SHAPE_PROFILE_DEF", profile -> outerLoopProfile(lShapeProfile(profile)));
+        builders.put("L_PROFILE_DEF", profile -> outerLoopProfile(lShapeProfile(profile)));
+        builders.put("ANGLE_PROFILE_DEF", profile -> outerLoopProfile(lShapeProfile(profile)));
+        builders.put("U_SHAPE_PROFILE_DEF", profile -> outerLoopProfile(uShapeProfile(profile)));
+        builders.put("U_PROFILE_DEF", profile -> outerLoopProfile(uShapeProfile(profile)));
+        builders.put("CHANNEL_PROFILE_DEF", profile -> outerLoopProfile(uShapeProfile(profile)));
+        builders.put("C_SHAPE_PROFILE_DEF", profile -> outerLoopProfile(uShapeProfile(profile)));
+        builders.put("Z_SHAPE_PROFILE_DEF", profile -> outerLoopProfile(zShapeProfile(profile)));
+        builders.put("Z_PROFILE_DEF", profile -> outerLoopProfile(zShapeProfile(profile)));
+        builders.put("HAT_SHAPE_PROFILE_DEF", profile -> outerLoopProfile(hatShapeProfile(profile)));
+        builders.put("FLAT_BAR_PROFILE_DEF", profile -> outerLoopProfile(flatBarProfile(profile)));
+        builders.put("DOVE_TAIL_PROFILE_DEF", profile -> outerLoopProfile(doveTailProfile(profile)));
+        builders.put("ARBITRARY_OPEN_PROFILE_DEF", this::buildArbitraryOpenProfile);
+        builders.put("PARAMETERIZED_PROFILE_DEF", this::buildParameterizedProfile);
+        return builders;
+    }
+
+    private ProfileLoops outerLoopProfile(List<Point2> outerLoop) {
+        return new ProfileLoops(normalizeOuterLoop(outerLoop), List.of());
     }
 
     ProfileLoops buildAreaProfileLoops(StepProfileDef profile) {
         if (!"AREA".equals(profile.profileType())) {
             throw new UnsupportedGeometryException(profile.entityName() + " must be an AREA profile");
         }
-        String entityName = profile.entityName();
-        if ("RECTANGLE_PROFILE_DEF".equals(entityName) || "CENTERED_RECTANGLE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(rectangleProfile(profile)), List.of());
-        } else if ("CIRCLE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(circleProfile(profile)), List.of());
-        } else if ("ELLIPSE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(ellipseProfile(profile)), List.of());
-        } else if ("ROUNDED_RECTANGLE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(roundedRectangleProfile(profile)), List.of());
-        } else if ("CIRCULAR_HOLLOW_PROFILE_DEF".equals(entityName)) {
-            return circularHollowProfile(profile);
-        } else if ("RECTANGLE_HOLLOW_PROFILE_DEF".equals(entityName)) {
-            return rectangleHollowProfile(profile);
-        } else if ("CENTERED_CIRCLE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(centeredCircleProfile(profile)), List.of());
-        } else if ("CENTRE_LINE_ARC_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(centreLineArcProfile(profile)), List.of());
-        } else if ("ARBITRARY_CLOSED_PROFILE_DEF".equals(entityName) || "ARBITRARY_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(arbitraryClosedProfile(profile)), List.of());
-        } else if ("ARBITRARY_PROFILE_DEF_WITH_VOIDS".equals(entityName)) {
-            return arbitraryProfileWithVoids(profile);
-        } else if ("I_SHAPE_PROFILE_DEF".equals(entityName) || "I_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(iShapeProfile(profile)), List.of());
-        } else if ("T_SHAPE_PROFILE_DEF".equals(entityName) || "T_PROFILE_DEF".equals(entityName) || "TEE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(tShapeProfile(profile)), List.of());
-        } else if ("L_SHAPE_PROFILE_DEF".equals(entityName) || "L_PROFILE_DEF".equals(entityName) || "ANGLE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(lShapeProfile(profile)), List.of());
-        } else if ("U_SHAPE_PROFILE_DEF".equals(entityName) || "U_PROFILE_DEF".equals(entityName) || "CHANNEL_PROFILE_DEF".equals(entityName) || "C_SHAPE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(uShapeProfile(profile)), List.of());
-        } else if ("Z_SHAPE_PROFILE_DEF".equals(entityName) || "Z_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(zShapeProfile(profile)), List.of());
-        } else if ("HAT_SHAPE_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(hatShapeProfile(profile)), List.of());
-        } else if ("FLAT_BAR_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(flatBarProfile(profile)), List.of());
-        } else if ("DOVE_TAIL_PROFILE_DEF".equals(entityName)) {
-            return new ProfileLoops(normalizeOuterLoop(doveTailProfile(profile)), List.of());
-        } else if ("ARBITRARY_OPEN_PROFILE_DEF".equals(entityName)) {
-            return buildArbitraryOpenProfile(profile);
-        } else if ("PARAMETERIZED_PROFILE_DEF".equals(entityName)) {
-            return buildParameterizedProfile(profile);
-        } else {
+        Function<StepProfileDef, ProfileLoops> builder = areaProfileBuilders.get(profile.entityName());
+        if (builder == null) {
             throw new UnsupportedGeometryException(profile.entityName() + " extrusion is unsupported");
         }
+        return builder.apply(profile);
     }
 
     private List<Point2> rectangleProfile(StepProfileDef profile) {
