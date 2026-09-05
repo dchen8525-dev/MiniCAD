@@ -1587,52 +1587,79 @@ public final class StepEdgePayloadBuilder {
         return null;
     }
 
+    private record SemanticCurveUnwrapRule(Class<?> type, Predicate<StepEntity> guard, Function<StepEntity, StepEntity> next) {
+        boolean matches(StepEntity item) {
+            return type.isInstance(item) && (guard == null || guard.test(item));
+        }
+    }
+
+    /**
+     * Wrapper curves unwrapped to the curve they reference, replacing the
+     * former 8-branch if/else-if chain in previewCurveSemanticItem.
+     */
+    private static final List<SemanticCurveUnwrapRule> SEMANTIC_CURVE_UNWRAP_RULES = List.of(
+            new SemanticCurveUnwrapRule(StepOrientedCurve.class, null, item -> ((StepOrientedCurve) item).curveElement()),
+            new SemanticCurveUnwrapRule(StepAnnotationCurveOccurrence.class, null, item -> ((StepAnnotationCurveOccurrence) item).item()),
+            new SemanticCurveUnwrapRule(StepDimensionCurve.class, null, item -> ((StepDimensionCurve) item).item()),
+            new SemanticCurveUnwrapRule(StepLeaderCurve.class, null, item -> ((StepLeaderCurve) item).item()),
+            new SemanticCurveUnwrapRule(StepProjectionCurve.class, null, item -> ((StepProjectionCurve) item).item()),
+            new SemanticCurveUnwrapRule(StepDraughtingAnnotationOccurrence.class, null, item -> ((StepDraughtingAnnotationOccurrence) item).item()),
+            new SemanticCurveUnwrapRule(StepTerminatorSymbol.class, null, item -> ((StepTerminatorSymbol) item).annotatedCurve()),
+            new SemanticCurveUnwrapRule(StepGeometricReplica.class,
+                    item -> "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()),
+                    item -> ((StepGeometricReplica) item).parent())
+    );
+
     private static StepEntity previewCurveSemanticItem(StepEntity item) {
         StepEntity current = item;
         while (true) {
-            if (current instanceof StepOrientedCurve) {
-            StepOrientedCurve orientedCurve = (StepOrientedCurve) current;
-                current = orientedCurve.curveElement();
-                continue;
+            StepEntity next = null;
+            for (SemanticCurveUnwrapRule rule : SEMANTIC_CURVE_UNWRAP_RULES) {
+                if (rule.matches(current)) {
+                    next = rule.next().apply(current);
+                    break;
+                }
             }
-            if (current instanceof StepAnnotationCurveOccurrence) {
-            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) current;
-                current = occurrence.item();
-                continue;
+            if (next == null) {
+                return current;
             }
-            if (current instanceof StepDimensionCurve) {
-            StepDimensionCurve dimensionCurve = (StepDimensionCurve) current;
-                current = dimensionCurve.item();
-                continue;
-            }
-            if (current instanceof StepLeaderCurve) {
-            StepLeaderCurve leaderCurve = (StepLeaderCurve) current;
-                current = leaderCurve.item();
-                continue;
-            }
-            if (current instanceof StepProjectionCurve) {
-            StepProjectionCurve projectionCurve = (StepProjectionCurve) current;
-                current = projectionCurve.item();
-                continue;
-            }
-            if (current instanceof StepDraughtingAnnotationOccurrence) {
-            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) current;
-                current = annotationOccurrence.item();
-                continue;
-            }
-            if (current instanceof StepTerminatorSymbol) {
-            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current;
-                current = terminatorSymbol.annotatedCurve();
-                continue;
-            }
-            if (current instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) current;
-                current = replica.parent();
-                continue;
-            }
-            return current;
+            current = next;
         }
     }
+
+    private record MappedAnnotationCarrier(
+            Class<?> type,
+            Function<StepEntity, StepRepresentation> mappedRepresentation,
+            Function<StepEntity, StepEntity> mappedOrigin,
+            Function<StepEntity, StepEntity> mappingTarget
+    ) {
+        boolean matches(StepEntity item) {
+            return type.isInstance(item);
+        }
+    }
+
+    /** Annotation carriers whose mapped representation supplies the collected edges. */
+    private static final List<MappedAnnotationCarrier> MAPPED_ANNOTATION_CARRIERS = List.of(
+            new MappedAnnotationCarrier(StepAnnotationSymbol.class,
+                    item -> ((StepAnnotationSymbol) item).mappingSource().mappedRepresentation(),
+                    item -> ((StepAnnotationSymbol) item).mappingSource().mappedOrigin(),
+                    item -> ((StepAnnotationSymbol) item).mappingTarget()),
+            new MappedAnnotationCarrier(StepAnnotationText.class,
+                    item -> ((StepAnnotationText) item).mappingSource().mappedRepresentation(),
+                    item -> ((StepAnnotationText) item).mappingSource().mappedOrigin(),
+                    item -> ((StepAnnotationText) item).mappingTarget()),
+            new MappedAnnotationCarrier(StepAnnotationTextCharacter.class,
+                    item -> ((StepAnnotationTextCharacter) item).mappingSource().mappedRepresentation(),
+                    item -> ((StepAnnotationTextCharacter) item).mappingSource().mappedOrigin(),
+                    item -> ((StepAnnotationTextCharacter) item).mappingTarget())
+    );
+
+    /** Occurrence types recursed through to their underlying annotation carrier. */
+    private static final List<SemanticCurveUnwrapRule> MAPPED_CARRIER_OCCURRENCE_RULES = List.of(
+            new SemanticCurveUnwrapRule(StepAnnotationSymbolOccurrence.class, null, item -> ((StepAnnotationSymbolOccurrence) item).item()),
+            new SemanticCurveUnwrapRule(StepAnnotationSubfigureOccurrence.class, null, item -> ((StepAnnotationSubfigureOccurrence) item).item())
+    );
+
     static boolean collectMappedAnnotationCarrierEdges(
             int mappedOwnerId,
             String sourceType,
@@ -1642,74 +1669,34 @@ public final class StepEdgePayloadBuilder {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
-        if (item instanceof StepAnnotationSymbol) {
-            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
-            collectMappedAnnotationEdges(
-                    mappedOwnerId,
-                    annotationSymbol.mappingSource().mappedRepresentation(),
-                    annotationSymbol.mappingSource().mappedOrigin(),
-                    annotationSymbol.mappingTarget(),
-                    sourceType,
-                    sourceStepId,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return true;
+        for (MappedAnnotationCarrier carrier : MAPPED_ANNOTATION_CARRIERS) {
+            if (carrier.matches(item)) {
+                collectMappedAnnotationEdges(
+                        mappedOwnerId,
+                        carrier.mappedRepresentation().apply(item),
+                        carrier.mappedOrigin().apply(item),
+                        carrier.mappingTarget().apply(item),
+                        sourceType,
+                        sourceStepId,
+                        edges,
+                        resolved,
+                        builder
+                );
+                return true;
+            }
         }
-        if (item instanceof StepAnnotationText) {
-            StepAnnotationText annotationText = (StepAnnotationText) item;
-            collectMappedAnnotationEdges(
-                    mappedOwnerId,
-                    annotationText.mappingSource().mappedRepresentation(),
-                    annotationText.mappingSource().mappedOrigin(),
-                    annotationText.mappingTarget(),
-                    sourceType,
-                    sourceStepId,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return true;
-        }
-        if (item instanceof StepAnnotationTextCharacter) {
-            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
-            collectMappedAnnotationEdges(
-                    mappedOwnerId,
-                    annotationTextCharacter.mappingSource().mappedRepresentation(),
-                    annotationTextCharacter.mappingSource().mappedOrigin(),
-                    annotationTextCharacter.mappingTarget(),
-                    sourceType,
-                    sourceStepId,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return true;
-        }
-        if (item instanceof StepAnnotationSymbolOccurrence) {
-            StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
-            return collectMappedAnnotationCarrierEdges(
-                    mappedOwnerId,
-                    sourceType,
-                    sourceStepId,
-                    symbolOccurrence.item(),
-                    edges,
-                    resolved,
-                    builder
-            );
-        }
-        if (item instanceof StepAnnotationSubfigureOccurrence) {
-            StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
-            return collectMappedAnnotationCarrierEdges(
-                    mappedOwnerId,
-                    sourceType,
-                    sourceStepId,
-                    subfigureOccurrence.item(),
-                    edges,
-                    resolved,
-                    builder
-            );
+        for (SemanticCurveUnwrapRule rule : MAPPED_CARRIER_OCCURRENCE_RULES) {
+            if (rule.matches(item)) {
+                return collectMappedAnnotationCarrierEdges(
+                        mappedOwnerId,
+                        sourceType,
+                        sourceStepId,
+                        rule.next().apply(item),
+                        edges,
+                        resolved,
+                        builder
+                );
+            }
         }
         return false;
     }
