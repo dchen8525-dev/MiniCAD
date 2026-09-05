@@ -146,33 +146,63 @@ def main():
         default=str(gen.SRC),
         help="java source file containing the method (default: StepDumpApp.java)",
     )
-    ap.add_argument("--result-type", default=gen.RESULT_TYPE)
+    ap.add_argument(
+        "--result-type",
+        default=None,
+        help="override the auto-detected return type",
+    )
     ap.add_argument(
         "--params",
-        default=",".join(gen.PARAMS),
-        help="comma-separated lambda parameters; first is the instanceof operand",
+        default=None,
+        help="override the auto-detected comma-separated lambda parameters; "
+        "first is the instanceof operand",
     )
-    ap.add_argument("--terminal", default=gen.TERMINAL)
+    ap.add_argument(
+        "--terminal",
+        default=None,
+        help="override the auto-detected terminal statement",
+    )
     args = ap.parse_args()
 
-    # Drive the generator's globals so its extractor/matchers use this shape.
-    gen.RESULT_TYPE = args.result_type
-    gen.PARAMS = tuple(p.strip() for p in args.params.split(","))
-    gen.SUBJECT = gen.PARAMS[0]
-    gen.TERMINAL = args.terminal
     gen.SRC = Path(args.source).resolve()
-
-    names = gen.derive(args.method)
 
     head = subprocess.run(
         ["git", "show", "HEAD:" + gen.SRC.relative_to(gen.ROOT).as_posix()],
         cwd=gen.ROOT, capture_output=True, text=True,
     ).stdout.replace("\r\n", "\n").replace("\r", "\n")
     cur = gen.SRC.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
-
-    orig = original_branches(head.split("\n"), args.method)
-    gen_tbl = table_entries(cur, names)
     cur_lines = cur.split("\n")
+    head_lines = head.split("\n")
+
+    # Derive the shape from the real declaration (joining a wrapped signature)
+    # instead of trusting module defaults: SUBJECT would otherwise stay
+    # "entity" for every non-validateXxxEntity chain, so the branch search
+    # found nothing and died with StopIteration rather than naming the cause.
+    mi, _bs, _t, _end = gen.method_bounds(cur_lines, args.method)
+    overrides = {
+        k: v
+        for k, v in (
+            ("result_type", args.result_type),
+            ("params", args.params),
+        )
+        if v
+    }
+    gen.derive_shape(gen.declaration_text(cur_lines, mi), args.method, overrides)
+
+    # Read the real terminal off the pre-fold chain rather than assuming
+    # "return null;".
+    if args.terminal:
+        gen.TERMINAL = args.terminal
+    else:
+        _hmi, _hbs, h_term, _hend = gen.method_bounds(head_lines, args.method)
+        gen.TERMINAL = (
+            head_lines[h_term].strip() if 0 <= h_term < len(head_lines) else "return null;"
+        )
+
+    names = gen.derive(args.method)
+
+    orig = original_branches(head_lines, args.method)
+    gen_tbl = table_entries(cur, names)
 
     ok = True
 

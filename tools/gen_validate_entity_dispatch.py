@@ -191,6 +191,36 @@ def parse_params(decl_line):
     return out
 
 
+def declaration_text(lines, mi):
+    """Full declaration, joining a signature that wraps across lines.
+
+    A single declaration line cannot carry a wrapped parameter list:
+    `public static FacePayload facePayloadFromTopologyFace(` has no closing
+    paren, so parse_params() sees nothing and SUBJECT silently falls back to
+    "entity" -- the branch search then dies with StopIteration instead of
+    reporting the real problem.
+    """
+    out = []
+    depth = 0
+    for i in range(mi, min(mi + 40, len(lines))):
+        out.append(lines[i])
+        depth += lines[i].count("(") - lines[i].count(")")
+        if depth <= 0 and "{" in lines[i]:
+            break
+    return " ".join(s.strip() for s in out)
+
+
+def subject_type():
+    """Declared type of the instanceof operand.
+
+    The rule record is bounded by THIS, not by a hardcoded StepEntity: a chain
+    dispatching on SurfaceGeometry must not emit `Class<? extends StepEntity>`,
+    a symbol that may not even be imported in the host file. Fold 21 hit
+    exactly that (COMPILATION ERROR: cannot find symbol StepEntity).
+    """
+    return PARAM_TYPES[0] if PARAM_TYPES else "StepEntity"
+
+
 def derive_shape(decl, method, overrides):
     """Set the dispatch-shape globals from a declaration plus CLI overrides.
 
@@ -509,14 +539,14 @@ def render_table_header(names, mode, static=True, param_types=None, param_names=
         "    // %s dispatch table (%s," % (names["method"], semantics),
         "    // mirrors the original sequential ifs).",
         "    private record %s(" % names["record"],
-        "            Class<? extends StepEntity> type, %s handler) {}" % names["handler"],
+        "            Class<? extends %s> type, %s handler) {}" % (subject_type(), names["handler"]),
         "",
         "    private interface %s {" % names["handler"],
         "        %s %s(%s);" % (RESULT_TYPE, HANDLER_METHOD, iface_params),
         "    }",
         "",
         "    private static %s %s(" % (names["record"], names["factory"]),
-        "            Class<? extends StepEntity> type, %s handler) {" % names["handler"],
+        "            Class<? extends %s> type, %s handler) {" % (subject_type(), names["handler"]),
         "        return new %s(type, handler);" % names["record"],
         "    }",
         "",
@@ -979,7 +1009,7 @@ def main():
         overrides["handler_method"] = args.handler_method
     if args.terminal != "return null;":
         overrides["terminal"] = args.terminal
-    derive_shape(lines[mi], args.method, overrides)
+    derive_shape(declaration_text(lines, mi), args.method, overrides)
     terminal_text = lines[terminal].strip()
 
     bi = next(
@@ -1135,10 +1165,10 @@ def main():
         )
     else:
         order_doc = (
-            "The %d types are unrelated today (each implements StepEntity directly), "
+            "The %d types are unrelated today (each is a direct %s subtype), "
             "so the order happens not to matter, but the frozen file turns any future "
             "reordering into a test failure rather than a silent behaviour change;"
-            % len(expanded)
+            % (len(expanded), subject_type())
         )
 
     # 1) replace the branch region with the dispatch loop; the terminal

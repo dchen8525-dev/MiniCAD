@@ -594,55 +594,78 @@ final class StepCadGeometryOps {
         return StepEntityNamingUtils.curveTypeName(curve);
     }
 
-    static String surfaceTypeName(SurfaceGeometry surface) {
-        if (surface instanceof Plane) {
+    // surfaceTypeName dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record TypeNameRule(
+            Class<? extends SurfaceGeometry> type, TypeNameHandler handler) {}
+
+    private interface TypeNameHandler {
+        String build(SurfaceGeometry surface);
+    }
+
+    private static TypeNameRule typeNameRule(
+            Class<? extends SurfaceGeometry> type, TypeNameHandler handler) {
+        return new TypeNameRule(type, handler);
+    }
+
+    private static final List<TypeNameRule> TYPE_NAME_RULES = List.of(
+        typeNameRule(Plane.class, (surface) -> {
             return "PLANE";
-        }
-        if (surface instanceof CylindricalSurface) {
+        }),
+        typeNameRule(CylindricalSurface.class, (surface) -> {
             return "CYLINDRICAL_SURFACE";
-        }
-        if (surface instanceof ConicalSurface) {
+        }),
+        typeNameRule(ConicalSurface.class, (surface) -> {
             return "CONICAL_SURFACE";
-        }
-        if (surface instanceof SphericalSurface) {
+        }),
+        typeNameRule(SphericalSurface.class, (surface) -> {
             return "SPHERICAL_SURFACE";
-        }
-        if (surface instanceof ToroidalSurface) {
+        }),
+        typeNameRule(ToroidalSurface.class, (surface) -> {
             return "TOROIDAL_SURFACE";
-        }
-        if (surface instanceof BSplineSurface3) {
+        }),
+        typeNameRule(BSplineSurface3.class, (surface) -> {
             return "B_SPLINE_SURFACE";
-        }
-        if (surface instanceof RationalBSplineSurface3) {
+        }),
+        typeNameRule(RationalBSplineSurface3.class, (surface) -> {
             return "RATIONAL_B_SPLINE_SURFACE";
-        }
-        if (surface instanceof SurfaceOfLinearExtrusion3) {
+        }),
+        typeNameRule(SurfaceOfLinearExtrusion3.class, (surface) -> {
             return "SURFACE_OF_LINEAR_EXTRUSION";
-        }
-        if (surface instanceof SurfaceOfRevolution3) {
+        }),
+        typeNameRule(SurfaceOfRevolution3.class, (surface) -> {
             return "SURFACE_OF_REVOLUTION";
-        }
-        if (surface instanceof RuledSurface3) {
+        }),
+        typeNameRule(RuledSurface3.class, (surface) -> {
             return "RULED_SURFACE";
-        }
-        if (surface instanceof OffsetSurface3) {
+        }),
+        typeNameRule(OffsetSurface3.class, (surface) -> {
             return "OFFSET_SURFACE";
-        }
-        if (surface instanceof SurfaceOfConstantRadius3) {
+        }),
+        typeNameRule(SurfaceOfConstantRadius3.class, (surface) -> {
             return "SURFACE_OF_CONSTANT_RADIUS";
-        }
-        if (surface instanceof ParaboloidSurface) {
+        }),
+        typeNameRule(ParaboloidSurface.class, (surface) -> {
             return "PARABOLOID_SURFACE";
-        }
-        if (surface instanceof HyperboloidSurface) {
+        }),
+        typeNameRule(HyperboloidSurface.class, (surface) -> {
             return "HYPERBOLOID_SURFACE";
-        }
-        if (surface instanceof SurfaceOfTranslation3) {
+        }),
+        typeNameRule(SurfaceOfTranslation3.class, (surface) -> {
             return "SURFACE_OF_TRANSLATION";
-        }
-        if (surface instanceof SurfaceOfProjection3) {
+        }),
+        typeNameRule(SurfaceOfProjection3.class, (surface) -> {
             return "SURFACE_OF_PROJECTION";
+        })
+    );
+
+    static String surfaceTypeName(SurfaceGeometry surface) {
+        for (TypeNameRule rule : TYPE_NAME_RULES) {
+            if (rule.type().isInstance(surface)) {
+                return rule.handler().build(surface);
+            }
         }
+
         return surface.getClass().getSimpleName();
     }
 
