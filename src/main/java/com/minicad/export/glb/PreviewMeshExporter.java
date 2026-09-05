@@ -48,6 +48,126 @@ public final class PreviewMeshExporter {
     /**
      * Creates a FacePayload from a topology Face object.
      */
+    /**
+     * Per-surface-type parameters for the grid-based face payload builder;
+     * nulls mean "not applicable" exactly as in the former inline calls.
+     */
+    private record GridSurfaceParams(
+            Axis2Placement3D position,
+            Integer uDegree,
+            Integer vDegree,
+            double scalarA,
+            double scalarB,
+            double scalarC
+    ) {
+        static GridSurfaceParams none() {
+            return new GridSurfaceParams(null, null, null, 0.0, 0.0, 0.0);
+        }
+    }
+
+    @FunctionalInterface
+    private interface GridSurfaceParamsExtractor {
+        GridSurfaceParams extract(SurfaceGeometry surface);
+    }
+
+    private record TopologyFaceRule(Class<?> type, FacePayloadBuilder builder) {
+        boolean matches(SurfaceGeometry surface) {
+            return type.isInstance(surface);
+        }
+    }
+
+    @FunctionalInterface
+    private interface FacePayloadBuilder {
+        FacePayload build(SurfaceGeometry surface, int stepId, String name,
+                StepMetadataExtractor.DisplayMetadata metadata, boolean sameSense, Face face);
+    }
+
+    private static TopologyFaceRule dedicatedRule(Class<?> type, FacePayloadBuilder builder) {
+        return new TopologyFaceRule(type, builder);
+    }
+
+    private static TopologyFaceRule gridRule(
+            Class<?> type,
+            String displayName,
+            String surfaceType,
+            GridSurfaceParamsExtractor params
+    ) {
+        return new TopologyFaceRule(type, (surface, stepId, name, metadata, sameSense, face) -> {
+            GridSurfaceParams p = params.extract(surface);
+            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
+                    displayName, surfaceType, p.position(), p.uDegree(), p.vDegree(),
+                    p.scalarA(), p.scalarB(), p.scalarC(), face.bounds());
+        });
+    }
+
+    /**
+     * Topology face payload builders keyed by concrete surface type, replacing
+     * the former 15-branch if/else-if chain. Order mirrors the original chain
+     * (first match wins); unmatched surfaces fall back to the generic grid
+     * builder, as the old trailing branch did.
+     */
+    private static final List<TopologyFaceRule> TOPOLOGY_FACE_RULES = List.of(
+            dedicatedRule(Plane.class, (surface, stepId, name, metadata, sameSense, face) ->
+                    buildPlaneFacePayload(stepId, name, metadata, surface, sameSense, face)),
+            dedicatedRule(ParaboloidSurface.class, (surface, stepId, name, metadata, sameSense, face) ->
+                    buildParaboloidFacePayload(stepId, name, metadata, surface, sameSense, face)),
+            dedicatedRule(HyperboloidSurface.class, (surface, stepId, name, metadata, sameSense, face) ->
+                    buildHyperboloidFacePayload(stepId, name, metadata, surface, sameSense, face)),
+            dedicatedRule(SurfaceOfTranslation3.class, (surface, stepId, name, metadata, sameSense, face) ->
+                    buildTranslationFacePayload(stepId, name, metadata, surface, sameSense, face)),
+            dedicatedRule(SurfaceOfProjection3.class, (surface, stepId, name, metadata, sameSense, face) ->
+                    buildProjectionFacePayload(stepId, name, metadata, surface, sameSense, face)),
+            gridRule(CylindricalSurface.class, "CYLINDRICAL_SURFACE", "cylindrical_surface",
+                    surface -> {
+                        CylindricalSurface cyl = (CylindricalSurface) surface;
+                        return new GridSurfaceParams(cyl.position(), null, null, cyl.radius(), 0.0, 0.0);
+                    }),
+            gridRule(ConicalSurface.class, "CONICAL_SURFACE", "conical_surface",
+                    surface -> {
+                        ConicalSurface cone = (ConicalSurface) surface;
+                        return new GridSurfaceParams(cone.position(), null, null, cone.radius(), cone.semiAngle(), 0.0);
+                    }),
+            gridRule(SphericalSurface.class, "SPHERICAL_SURFACE", "spherical_surface",
+                    surface -> {
+                        SphericalSurface sphere = (SphericalSurface) surface;
+                        return new GridSurfaceParams(sphere.position(), null, null, sphere.radius(), 0.0, 0.0);
+                    }),
+            gridRule(ToroidalSurface.class, "TOROIDAL_SURFACE", "toroidal_surface",
+                    surface -> {
+                        ToroidalSurface torus = (ToroidalSurface) surface;
+                        return new GridSurfaceParams(torus.position(), null, null, torus.majorRadius(), torus.minorRadius(), 0.0);
+                    }),
+            gridRule(BSplineSurface3.class, "BSPLINE_SURFACE", "bspline_surface",
+                    surface -> {
+                        BSplineSurface3 bspline = (BSplineSurface3) surface;
+                        return new GridSurfaceParams(null, bspline.uDegree(), bspline.vDegree(), 0.0, 0.0, 0.0);
+                    }),
+            gridRule(RationalBSplineSurface3.class, "RATIONAL_BSPLINE_SURFACE", "rational_bspline_surface",
+                    surface -> {
+                        RationalBSplineSurface3 rational = (RationalBSplineSurface3) surface;
+                        return new GridSurfaceParams(null, rational.uDegree(), rational.vDegree(), 0.0, 0.0, 0.0);
+                    }),
+            gridRule(SurfaceOfLinearExtrusion3.class, "SURFACE_OF_LINEAR_EXTRUSION", "linear_extrusion",
+                    surface -> GridSurfaceParams.none()),
+            gridRule(SurfaceOfRevolution3.class, "SURFACE_OF_REVOLUTION", "surface_of_revolution",
+                    surface -> GridSurfaceParams.none()),
+            gridRule(RuledSurface3.class, "RULED_SURFACE", "ruled_surface",
+                    surface -> GridSurfaceParams.none()),
+            gridRule(SurfaceOfConstantRadius3.class, "SURFACE_OF_CONSTANT_RADIUS", "constant_radius_surface",
+                    surface -> {
+                        SurfaceOfConstantRadius3 constRadius = (SurfaceOfConstantRadius3) surface;
+                        return new GridSurfaceParams(null, null, null, constRadius.radius(), 0.0, 0.0);
+                    }),
+            gridRule(OffsetSurface3.class, "OFFSET_SURFACE", "offset_surface",
+                    surface -> {
+                        OffsetSurface3 offset = (OffsetSurface3) surface;
+                        return new GridSurfaceParams(null, null, null, 0.0, offset.distance(), 0.0);
+                    })
+    );
+
+    /**
+     * Creates a FacePayload from a topology Face object.
+     */
     public static FacePayload facePayloadFromTopologyFace(
             int stepId,
             Face face,
@@ -57,83 +177,10 @@ public final class PreviewMeshExporter {
         SurfaceGeometry surface = face.surface();
         boolean sameSense = face.sameSense();
 
-        if (surface instanceof Plane) {
-            return buildPlaneFacePayload(stepId, name, metadata, surface, sameSense, face);
-        }
-        if (surface instanceof ParaboloidSurface) {
-            return buildParaboloidFacePayload(stepId, name, metadata, surface, sameSense, face);
-        }
-        if (surface instanceof HyperboloidSurface) {
-            return buildHyperboloidFacePayload(stepId, name, metadata, surface, sameSense, face);
-        }
-        if (surface instanceof SurfaceOfTranslation3) {
-            return buildTranslationFacePayload(stepId, name, metadata, surface, sameSense, face);
-        }
-        if (surface instanceof SurfaceOfProjection3) {
-            return buildProjectionFacePayload(stepId, name, metadata, surface, sameSense, face);
-        }
-        if (surface instanceof CylindricalSurface) {
-            CylindricalSurface cyl = (CylindricalSurface) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "CYLINDRICAL_SURFACE", "cylindrical_surface",
-                    cyl.position(), null, null, cyl.radius(), 0.0, 0.0, face.bounds());
-        }
-        if (surface instanceof ConicalSurface) {
-            ConicalSurface cone = (ConicalSurface) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "CONICAL_SURFACE", "conical_surface",
-                    cone.position(), null, null, cone.radius(), cone.semiAngle(), 0.0, face.bounds());
-        }
-        if (surface instanceof SphericalSurface) {
-            SphericalSurface sphere = (SphericalSurface) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "SPHERICAL_SURFACE", "spherical_surface",
-                    sphere.position(), null, null, sphere.radius(), 0.0, 0.0, face.bounds());
-        }
-        if (surface instanceof ToroidalSurface) {
-            ToroidalSurface torus = (ToroidalSurface) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "TOROIDAL_SURFACE", "toroidal_surface",
-                    torus.position(), null, null, torus.majorRadius(), torus.minorRadius(), 0.0, face.bounds());
-        }
-        if (surface instanceof BSplineSurface3) {
-            BSplineSurface3 bspline = (BSplineSurface3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "BSPLINE_SURFACE", "bspline_surface",
-                    null, bspline.uDegree(), bspline.vDegree(), 0.0, 0.0, 0.0, face.bounds());
-        }
-        if (surface instanceof RationalBSplineSurface3) {
-            RationalBSplineSurface3 rational = (RationalBSplineSurface3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "RATIONAL_BSPLINE_SURFACE", "rational_bspline_surface",
-                    null, rational.uDegree(), rational.vDegree(), 0.0, 0.0, 0.0, face.bounds());
-        }
-        if (surface instanceof SurfaceOfLinearExtrusion3) {
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "SURFACE_OF_LINEAR_EXTRUSION", "linear_extrusion",
-                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
-        }
-        if (surface instanceof SurfaceOfRevolution3) {
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "SURFACE_OF_REVOLUTION", "surface_of_revolution",
-                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
-        }
-        if (surface instanceof RuledSurface3) {
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "RULED_SURFACE", "ruled_surface",
-                    null, null, null, 0.0, 0.0, 0.0, face.bounds());
-        }
-        if (surface instanceof SurfaceOfConstantRadius3) {
-            SurfaceOfConstantRadius3 constRadius = (SurfaceOfConstantRadius3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "SURFACE_OF_CONSTANT_RADIUS", "constant_radius_surface",
-                    null, null, null, constRadius.radius(), 0.0, 0.0, face.bounds());
-        }
-        if (surface instanceof OffsetSurface3) {
-            OffsetSurface3 offset = (OffsetSurface3) surface;
-            return newFacePayloadFromGrid(surface, stepId, name, sameSense, metadata,
-                    "OFFSET_SURFACE", "offset_surface",
-                    null, null, null, 0.0, offset.distance(), 0.0, face.bounds());
+        for (TopologyFaceRule rule : TOPOLOGY_FACE_RULES) {
+            if (rule.matches(surface)) {
+                return rule.builder().build(surface, stepId, name, metadata, sameSense, face);
+            }
         }
 
         // Generic grid-based triangulation for other surfaces
