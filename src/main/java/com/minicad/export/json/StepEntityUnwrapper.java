@@ -1,5 +1,6 @@
 package com.minicad.export.json;
 
+import com.minicad.preview.builder.PreviewFaceBuilder;
 import com.minicad.step.model.*;
 
 /**
@@ -41,73 +42,15 @@ public final class StepEntityUnwrapper {
 
     /**
      * Unwraps parametric surfaces to extract the base surface.
-     * Handles various surface wrapper types including trimmed,
-     * bounded, oriented, offset, and mapped surfaces.
+     * Delegates to the shared SURFACE_UNWRAP_RULES table in
+     * PreviewFaceBuilder, which handles the same wrapper types
+     * (trimmed, bounded, oriented, offset, patched, mapped, replica).
      *
      * @param geometry the potentially wrapped surface
      * @return the unwrapped base surface
      */
     public static StepEntity unwrapParametricPreviewSurface(StepEntity geometry) {
-        StepEntity current = geometry;
-        for (int depth = 0; depth < 16 && current != null; depth++) {
-            if (current instanceof StepRectangularTrimmedSurface) {
-                StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
-                current = trimmedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepCurveBoundedSurface) {
-                StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
-                current = boundedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOrientedSurface) {
-                StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
-                current = orientedSurface.surfaceElement();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface) {
-                StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
-                current = offsetSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface2) {
-                StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) current;
-                current = offsetSurface2.basisSurface();
-                continue;
-            }
-            if (current instanceof StepSurfacePatch) {
-                StepSurfacePatch surfacePatch = (StepSurfacePatch) current;
-                current = surfacePatch.basisSurface();
-                continue;
-            }
-            if (current instanceof StepRectangularCompositeSurface) {
-                StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) current;
-                current = compositeSurface.parentSurface();
-                continue;
-            }
-            if (current instanceof StepMachinedSurface) {
-                StepMachinedSurface machinedSurface = (StepMachinedSurface) current;
-                current = machinedSurface.face();
-                continue;
-            }
-            if (current instanceof StepBlendedSurface) {
-                StepBlendedSurface blended = (StepBlendedSurface) current;
-                current = blended.primarySurface();
-                continue;
-            }
-            if (current instanceof StepMappedItem) {
-                StepMappedItem mappedItem = (StepMappedItem) current;
-                current = mappedItem.mappingTarget();
-                continue;
-            }
-            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) current;
-                current = replica.parent();
-                continue;
-            }
-            return current;
-        }
-        return current;
+        return PreviewFaceBuilder.unwrapParametricPreviewSurface(geometry);
     }
 
     /**
