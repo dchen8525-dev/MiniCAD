@@ -165,53 +165,47 @@ public final class StepTypeNameResolver {
         })
     );
 
+    private record ResolverTypeEntry(List<Class<?>> types, String name) {
+        boolean matches(StepEntity entity) {
+            return types.stream().anyMatch(type -> type.isInstance(entity));
+        }
+    }
+
+    private static ResolverTypeEntry typeEntry(String name, Class<?>... types) {
+        return new ResolverTypeEntry(List.of(types), name);
+    }
+
+    /**
+     * Coarse geometry class names, replacing the two former OR-blocks in
+     * geometryTypeName (3 shell types, 33 solid-like types). Order mirrors
+     * the original chain (first match wins).
+     */
+    private static final List<ResolverTypeEntry> GEOMETRY_CLASS_NAME_ENTRIES = List.of(
+            // Open shell types -> SHELL (surface, not a closed volume)
+            typeEntry("SHELL", StepOpenShell.class, StepSurfacedOpenShell.class, StepOrientedOpenShell.class),
+            // Closed shell types and solid-like entities -> SOLID
+            typeEntry("SOLID", StepClosedShell.class, StepOrientedClosedShell.class, StepManifoldSolidBrep.class,
+                    StepFacettedBrep.class, StepNonManifoldSolidBrep.class, StepAdvancedBrep.class,
+                    StepBrepWithVoids.class, StepSweptAreaSolid.class, StepSolidReplica.class, StepCsgSolid.class,
+                    StepCsgPrimitive.class, StepBooleanClippingResult.class, StepBooleanResult.class,
+                    StepSweptDiskSolid.class, StepExtrudedAreaSolidTapered.class, StepRevolvedAreaSolidTapered.class,
+                    StepSurfaceCurveSweptAreaSolid.class, StepPolygonalBoundedHalfSpace.class,
+                    StepComplexClippingResult.class, StepHalfSpaceSolid.class, StepCsgVolume.class,
+                    StepBlockVolume.class, StepFiniteElementMesh.class, StepFlatPattern.class, StepMappedItem.class,
+                    StepSolidModel.class, StepSurfacePatch.class, StepExtrudedFaceSolid.class,
+                    StepRevolvedFaceSolid.class, StepSweptFaceSolid.class, StepCylinderVolume.class,
+                    StepSphereVolume.class, StepTorusVolume.class, StepPrismVolume.class,
+                    StepRightCircularConeVolume.class)
+    );
+
     public static String geometryTypeName(StepEntity entity) {
         if (entity == null) {
             return "SOLID"; // Default for unknown entities in solid context
         }
-        // Open shell types -> SHELL (surface, not a closed volume)
-        if (entity instanceof StepOpenShell
-                || entity instanceof StepSurfacedOpenShell
-                || entity instanceof StepOrientedOpenShell) {
-            return "SHELL";
-        }
-        // Closed shell types and solid-like entities -> SOLID
-        if (entity instanceof StepClosedShell
-                || entity instanceof StepOrientedClosedShell
-                || entity instanceof StepManifoldSolidBrep
-                || entity instanceof StepFacettedBrep
-                || entity instanceof StepNonManifoldSolidBrep
-                || entity instanceof StepAdvancedBrep
-                || entity instanceof StepBrepWithVoids
-                || entity instanceof StepSweptAreaSolid
-                || entity instanceof StepSolidReplica
-                || entity instanceof StepCsgSolid
-                || entity instanceof StepCsgPrimitive
-                || entity instanceof StepBooleanClippingResult
-                || entity instanceof StepBooleanResult
-                || entity instanceof StepSweptDiskSolid
-                || entity instanceof StepExtrudedAreaSolidTapered
-                || entity instanceof StepRevolvedAreaSolidTapered
-                || entity instanceof StepSurfaceCurveSweptAreaSolid
-                || entity instanceof StepPolygonalBoundedHalfSpace
-                || entity instanceof StepComplexClippingResult
-                || entity instanceof StepHalfSpaceSolid
-                || entity instanceof StepCsgVolume
-                || entity instanceof StepBlockVolume
-                || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern
-                || entity instanceof StepMappedItem
-                || entity instanceof StepSolidModel
-                || entity instanceof StepSurfacePatch
-                || entity instanceof StepExtrudedFaceSolid
-                || entity instanceof StepRevolvedFaceSolid
-                || entity instanceof StepSweptFaceSolid
-                || entity instanceof StepCylinderVolume
-                || entity instanceof StepSphereVolume
-                || entity instanceof StepTorusVolume
-                || entity instanceof StepPrismVolume
-                || entity instanceof StepRightCircularConeVolume) {
-            return "SOLID";
+        for (ResolverTypeEntry entry : GEOMETRY_CLASS_NAME_ENTRIES) {
+            if (entry.matches(entity)) {
+                return entry.name();
+            }
         }
         // For other entities, use the detailed type name from surfaceTypeName
         return surfaceTypeName(entity);
@@ -224,24 +218,40 @@ public final class StepTypeNameResolver {
      * @param surface the surface geometry
      * @return the surface type name
      */
+    private record SurfaceGeometryTypeNameEntry(Class<? extends SurfaceGeometry> type, String name) {
+    }
+
+    /**
+     * Geometry surface type names, replacing the former 16-branch if/else-if
+     * chain. Order mirrors the original chain (first match wins), preserving
+     * the old resolution if subtype overlaps ever appear.
+     */
+    private static final List<SurfaceGeometryTypeNameEntry> SURFACE_GEOMETRY_TYPE_NAMES = List.of(
+            new SurfaceGeometryTypeNameEntry(Plane.class, "PLANE"),
+            new SurfaceGeometryTypeNameEntry(CylindricalSurface.class, "CYLINDRICAL_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(ConicalSurface.class, "CONICAL_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(SphericalSurface.class, "SPHERICAL_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(ToroidalSurface.class, "TOROIDAL_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(BSplineSurface3.class, "BSPLINE_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(RationalBSplineSurface3.class, "RATIONAL_BSPLINE_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(RuledSurface3.class, "RULED_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(SurfaceOfRevolution3.class, "SURFACE_OF_REVOLUTION"),
+            new SurfaceGeometryTypeNameEntry(OffsetSurface3.class, "OFFSET_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(SurfaceOfLinearExtrusion3.class, "SURFACE_OF_LINEAR_EXTRUSION"),
+            new SurfaceGeometryTypeNameEntry(SurfaceOfConstantRadius3.class, "SURFACE_OF_CONSTANT_RADIUS"),
+            new SurfaceGeometryTypeNameEntry(ParaboloidSurface.class, "PARABOLOID_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(HyperboloidSurface.class, "HYPERBOLOID_SURFACE"),
+            new SurfaceGeometryTypeNameEntry(SurfaceOfTranslation3.class, "SURFACE_OF_TRANSLATION"),
+            new SurfaceGeometryTypeNameEntry(SurfaceOfProjection3.class, "SURFACE_OF_PROJECTION")
+    );
+
     public static String surfaceTypeNameForGeometry(SurfaceGeometry surface) {
-        if (surface instanceof Plane) return "PLANE";
-        else if (surface instanceof CylindricalSurface) return "CYLINDRICAL_SURFACE";
-        else if (surface instanceof ConicalSurface) return "CONICAL_SURFACE";
-        else if (surface instanceof SphericalSurface) return "SPHERICAL_SURFACE";
-        else if (surface instanceof ToroidalSurface) return "TOROIDAL_SURFACE";
-        else if (surface instanceof BSplineSurface3) return "BSPLINE_SURFACE";
-        else if (surface instanceof RationalBSplineSurface3) return "RATIONAL_BSPLINE_SURFACE";
-        else if (surface instanceof RuledSurface3) return "RULED_SURFACE";
-        else if (surface instanceof SurfaceOfRevolution3) return "SURFACE_OF_REVOLUTION";
-        else if (surface instanceof OffsetSurface3) return "OFFSET_SURFACE";
-        else if (surface instanceof SurfaceOfLinearExtrusion3) return "SURFACE_OF_LINEAR_EXTRUSION";
-        else if (surface instanceof SurfaceOfConstantRadius3) return "SURFACE_OF_CONSTANT_RADIUS";
-        else if (surface instanceof ParaboloidSurface) return "PARABOLOID_SURFACE";
-        else if (surface instanceof HyperboloidSurface) return "HYPERBOLOID_SURFACE";
-        else if (surface instanceof SurfaceOfTranslation3) return "SURFACE_OF_TRANSLATION";
-        else if (surface instanceof SurfaceOfProjection3) return "SURFACE_OF_PROJECTION";
-        else throw new IllegalArgumentException("Unknown surface type: " + surface.getClass().getSimpleName());
+        for (SurfaceGeometryTypeNameEntry entry : SURFACE_GEOMETRY_TYPE_NAMES) {
+            if (entry.type().isInstance(surface)) {
+                return entry.name();
+            }
+        }
+        throw new IllegalArgumentException("Unknown surface type: " + surface.getClass().getSimpleName());
     }
 
     /**
