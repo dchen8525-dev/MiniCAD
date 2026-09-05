@@ -37,6 +37,8 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -896,232 +898,190 @@ public final class StepDumpApp {
         return counts;
     }
 
-    private static int validateGeometricCurveSet(StepGeometricCurveSet curveSet, StepCadBuilder builder) {
+    @FunctionalInterface
+    private interface SummaryElementValidator {
+        void validate(StepEntity element, StepCadBuilder builder);
+    }
+
+    private record SummaryElementRule(Class<?> type, Predicate<StepEntity> guard, SummaryElementValidator validator) {
+        boolean matches(StepEntity element) {
+            return type.isInstance(element) && (guard == null || guard.test(element));
+        }
+    }
+
+    private static SummaryElementRule elementRule(Class<?> type, SummaryElementValidator validator) {
+        return new SummaryElementRule(type, null, validator);
+    }
+
+    /** Collection members validated through a single builder call. */
+    private static SummaryElementRule buildRule(Class<?> type, BiConsumer<StepCadBuilder, Integer> build) {
+        return elementRule(type, (element, builder) -> build.accept(builder, element.id()));
+    }
+
+    /** Path/loop members validated edge by edge. */
+    private static SummaryElementRule pathEdgesRule(Class<?> type, Function<StepEntity, List<StepOrientedEdge>> edges) {
+        return elementRule(type, (element, builder) -> validatePathEdges(edges.apply(element), builder));
+    }
+
+    /** Several member types funneling into the same validator. */
+    private static SummaryElementRule anyOfRule(List<Class<?>> types, SummaryElementValidator validator) {
+        return new SummaryElementRule(StepEntity.class,
+                element -> types.stream().anyMatch(type -> type.isInstance(element)),
+                validator);
+    }
+
+    private static final Predicate<StepEntity> POINT_REPLICA_GUARD =
+            element -> "POINT_REPLICA".equals(((StepGeometricReplica) element).entityName());
+
+    private static final List<SummaryElementRule> GEOMETRIC_CURVE_SET_MEMBER_RULES = List.of(
+            buildRule(StepCartesianPoint.class, StepCadBuilder::buildPoint),
+            buildRule(StepVertexPoint.class, StepCadBuilder::buildVertex),
+            new SummaryElementRule(StepGeometricReplica.class, POINT_REPLICA_GUARD,
+                    (element, builder) -> builder.buildPointReference(element.id())),
+            buildRule(StepLine.class, StepCadBuilder::buildLine),
+            buildRule(StepCircle.class, StepCadBuilder::buildCircle),
+            buildRule(StepEllipse.class, StepCadBuilder::buildEllipse),
+            buildRule(StepPolyline.class, StepCadBuilder::buildPolyline),
+            buildRule(StepEdgeCurve.class, StepCadBuilder::buildEdge),
+            buildRule(StepSubedge.class, StepCadBuilder::buildEdge),
+            buildRule(StepOrientedEdge.class, StepCadBuilder::buildOrientedEdge),
+            elementRule(StepConnectedEdgeSet.class,
+                    (element, builder) -> validateConnectedEdgeSet((StepConnectedEdgeSet) element, builder)),
+            pathEdgesRule(StepEdgeLoop.class, element -> ((StepEdgeLoop) element).edges()),
+            buildRule(StepVertexLoop.class, StepCadBuilder::buildVertexLoop),
+            pathEdgesRule(StepPath.class, element -> ((StepPath) element).edges()),
+            pathEdgesRule(StepOpenPath.class, element -> ((StepOpenPath) element).edges()),
+            pathEdgesRule(StepSubpath.class, element -> ((StepSubpath) element).edges()),
+            pathEdgesRule(StepOrientedPath.class, element -> ((StepOrientedPath) element).edges()),
+            elementRule(StepPolyLoop.class, (element, builder) -> validatePolyLoop((StepPolyLoop) element, builder)),
+            elementRule(StepWireShell.class, (element, builder) -> validateWireShell((StepWireShell) element, builder)),
+            anyOfRule(List.of(StepVertexShell.class, StepEdgeBasedWireframeModel.class, StepShellBasedWireframeModel.class),
+                    (element, builder) -> validateSummaryEntity(element, builder)),
+            elementRule(StepPointSet.class, (element, builder) -> validatePointSet((StepPointSet) element, builder)),
+            elementRule(StepGeometricSet.class, (element, builder) -> validateGeometricSet((StepGeometricSet) element, builder)),
+            elementRule(StepGeometricCurveSet.class, (element, builder) ->
+                    validateGeometricCurveSet((StepGeometricCurveSet) element, builder))
+    );
+
+    private static final List<SummaryElementRule> POINT_SET_MEMBER_RULES = List.of(
+            buildRule(StepCartesianPoint.class, StepCadBuilder::buildPoint),
+            new SummaryElementRule(StepGeometricReplica.class, POINT_REPLICA_GUARD,
+                    (element, builder) -> builder.buildPointReference(element.id())),
+            buildRule(StepVertexPoint.class, StepCadBuilder::buildVertex),
+            anyOfRule(List.of(
+                    StepVertexShell.class,
+                    StepAnnotationSymbol.class,
+                    StepAnnotationText.class,
+                    StepAnnotationTextCharacter.class,
+                    StepAnnotationFillArea.class,
+                    StepAnnotationPointOccurrence.class,
+                    StepAnnotationFillAreaOccurrence.class,
+                    StepAnnotationTextOccurrence.class,
+                    StepAnnotationPlaceholderOccurrence.class,
+                    StepAnnotationSymbolOccurrence.class,
+                    StepAnnotationSubfigureOccurrence.class,
+                    StepDraughtingAnnotationOccurrence.class,
+                    StepAnnotationPlane.class),
+                    (element, builder) -> validateSummaryEntity(element, builder)),
+            elementRule(StepPointSet.class, (element, builder) -> validatePointSet((StepPointSet) element, builder)),
+            elementRule(StepGeometricSet.class, (element, builder) -> validateGeometricSet((StepGeometricSet) element, builder)),
+            elementRule(StepGeometricCurveSet.class, (element, builder) ->
+                    validateGeometricCurveSet((StepGeometricCurveSet) element, builder))
+    );
+
+    /** Geometry-container members summarized wholesale by validateSummaryEntity. */
+    private static final List<Class<?>> GEOMETRIC_SET_CONTAINER_TYPES = List.of(
+            StepOpenShell.class,
+            StepSurfacedOpenShell.class,
+            StepOrientedOpenShell.class,
+            StepClosedShell.class,
+            StepOrientedClosedShell.class,
+            StepConnectedFaceSet.class,
+            StepConnectedFaceSubSet.class,
+            StepFaceBasedSurfaceModel.class,
+            StepShellBasedSurfaceModel.class,
+            StepEdgeBasedWireframeModel.class,
+            StepShellBasedWireframeModel.class,
+            StepManifoldSolidBrep.class,
+            StepBrepWithVoids.class,
+            StepSweptAreaSolid.class,
+            StepExtrudedFaceSolid.class,
+            StepRevolvedFaceSolid.class,
+            StepSolidReplica.class,
+            StepCsgSolid.class,
+            StepCsgPrimitive.class,
+            StepBooleanResult.class,
+            StepBooleanClippingResult.class
+    );
+
+    private static final List<SummaryElementRule> GEOMETRIC_SET_MEMBER_RULES = List.of(
+            buildRule(StepCartesianPoint.class, StepCadBuilder::buildPoint),
+            new SummaryElementRule(StepGeometricReplica.class, POINT_REPLICA_GUARD,
+                    (element, builder) -> builder.buildPointReference(element.id())),
+            buildRule(StepVertexPoint.class, StepCadBuilder::buildVertex),
+            buildRule(StepLine.class, StepCadBuilder::buildLine),
+            buildRule(StepCircle.class, StepCadBuilder::buildCircle),
+            buildRule(StepEllipse.class, StepCadBuilder::buildEllipse),
+            buildRule(StepPolyline.class, StepCadBuilder::buildPolyline),
+            buildRule(StepEdgeCurve.class, StepCadBuilder::buildEdge),
+            buildRule(StepSubedge.class, StepCadBuilder::buildEdge),
+            buildRule(StepOrientedEdge.class, StepCadBuilder::buildOrientedEdge),
+            elementRule(StepConnectedEdgeSet.class,
+                    (element, builder) -> validateConnectedEdgeSet((StepConnectedEdgeSet) element, builder)),
+            pathEdgesRule(StepEdgeLoop.class, element -> ((StepEdgeLoop) element).edges()),
+            buildRule(StepVertexLoop.class, StepCadBuilder::buildVertexLoop),
+            elementRule(StepWireShell.class, (element, builder) -> validateWireShell((StepWireShell) element, builder)),
+            anyOfRule(GEOMETRIC_SET_CONTAINER_TYPES, (element, builder) -> validateSummaryEntity(element, builder)),
+            pathEdgesRule(StepPath.class, element -> ((StepPath) element).edges()),
+            pathEdgesRule(StepOpenPath.class, element -> ((StepOpenPath) element).edges()),
+            pathEdgesRule(StepSubpath.class, element -> ((StepSubpath) element).edges()),
+            pathEdgesRule(StepOrientedPath.class, element -> ((StepOrientedPath) element).edges()),
+            elementRule(StepPolyLoop.class, (element, builder) -> validatePolyLoop((StepPolyLoop) element, builder)),
+            new SummaryElementRule(StepEntity.class, StepDumpApp::isSupportedGeometricSetSurface,
+                    (element, builder) -> validateSupportedSurfaceReference(element, builder)),
+            elementRule(StepPointSet.class, (element, builder) -> validatePointSet((StepPointSet) element, builder)),
+            elementRule(StepGeometricSet.class, (element, builder) -> validateGeometricSet((StepGeometricSet) element, builder)),
+            elementRule(StepGeometricCurveSet.class, (element, builder) ->
+                    validateGeometricCurveSet((StepGeometricCurveSet) element, builder))
+    );
+
+    private static int validateMembers(
+            List<? extends StepEntity> members,
+            List<SummaryElementRule> rules,
+            String unsupportedMessage,
+            StepCadBuilder builder
+    ) {
         int count = 0;
-        for (StepEntity element : curveSet.elements()) {
-            if (element instanceof StepCartesianPoint) {
-                StepCartesianPoint point = (StepCartesianPoint) element;
-                builder.buildPoint(point.id());
-            } else if (element instanceof StepVertexPoint) {
-                StepVertexPoint vertexPoint = (StepVertexPoint) element;
-                builder.buildVertex(vertexPoint.id());
-            } else if (element instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) element).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) element;
-                builder.buildPointReference(replica.id());
-            } else if (element instanceof StepLine) {
-                StepLine line = (StepLine) element;
-                builder.buildLine(line.id());
-            } else if (element instanceof StepCircle) {
-                StepCircle circle = (StepCircle) element;
-                builder.buildCircle(circle.id());
-            } else if (element instanceof StepEllipse) {
-                StepEllipse ellipse = (StepEllipse) element;
-                builder.buildEllipse(ellipse.id());
-            } else if (element instanceof StepPolyline) {
-                StepPolyline polyline = (StepPolyline) element;
-                builder.buildPolyline(polyline.id());
-            } else if (element instanceof StepEdgeCurve) {
-                StepEdgeCurve edgeCurve = (StepEdgeCurve) element;
-                builder.buildEdge(edgeCurve.id());
-            } else if (element instanceof StepSubedge) {
-                StepSubedge subedge = (StepSubedge) element;
-                builder.buildEdge(subedge.id());
-            } else if (element instanceof StepOrientedEdge) {
-                StepOrientedEdge orientedEdge = (StepOrientedEdge) element;
-                builder.buildOrientedEdge(orientedEdge.id());
-            } else if (element instanceof StepConnectedEdgeSet) {
-                StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) element;
-                validateConnectedEdgeSet(edgeSet, builder);
-            } else if (element instanceof StepEdgeLoop) {
-                StepEdgeLoop edgeLoop = (StepEdgeLoop) element;
-                validatePathEdges(edgeLoop.edges(), builder);
-            } else if (element instanceof StepVertexLoop) {
-                StepVertexLoop vertexLoop = (StepVertexLoop) element;
-                builder.buildVertexLoop(vertexLoop.id());
-            } else if (element instanceof StepPath) {
-                StepPath path = (StepPath) element;
-                validatePathEdges(path.edges(), builder);
-            } else if (element instanceof StepOpenPath) {
-                StepOpenPath openPath = (StepOpenPath) element;
-                validatePathEdges(openPath.edges(), builder);
-            } else if (element instanceof StepSubpath) {
-                StepSubpath subpath = (StepSubpath) element;
-                validatePathEdges(subpath.edges(), builder);
-            } else if (element instanceof StepOrientedPath) {
-                StepOrientedPath orientedPath = (StepOrientedPath) element;
-                validatePathEdges(orientedPath.edges(), builder);
-            } else if (element instanceof StepPolyLoop) {
-                StepPolyLoop polyLoop = (StepPolyLoop) element;
-                validatePolyLoop(polyLoop, builder);
-            } else if (element instanceof StepWireShell) {
-                StepWireShell wireShell = (StepWireShell) element;
-                validateWireShell(wireShell, builder);
-            } else if (element instanceof StepVertexShell
-                    || element instanceof StepEdgeBasedWireframeModel
-                    || element instanceof StepShellBasedWireframeModel) {
-                validateSummaryEntity(element, builder);
-            } else if (element instanceof StepPointSet) {
-                StepPointSet pointSet = (StepPointSet) element;
-                validatePointSet(pointSet, builder);
-            } else if (element instanceof StepGeometricSet) {
-                StepGeometricSet geometricSet = (StepGeometricSet) element;
-                validateGeometricSet(geometricSet, builder);
-            } else if (element instanceof StepGeometricCurveSet) {
-                StepGeometricCurveSet nestedCurveSet = (StepGeometricCurveSet) element;
-                validateGeometricCurveSet(nestedCurveSet, builder);
-            } else {
-                throw new UnsupportedGeometryException(
-                        "GEOMETRIC_CURVE_SET requires supported curve, point, path, wire, topology or nested set members");
+        for (StepEntity element : members) {
+            SummaryElementRule matched = null;
+            for (SummaryElementRule rule : rules) {
+                if (rule.matches(element)) {
+                    matched = rule;
+                    break;
+                }
             }
+            if (matched == null) {
+                throw new UnsupportedGeometryException(unsupportedMessage);
+            }
+            matched.validator().validate(element, builder);
             count++;
         }
         return count;
+    }
+
+    private static int validateGeometricCurveSet(StepGeometricCurveSet curveSet, StepCadBuilder builder) {
+        return validateMembers(curveSet.elements(), GEOMETRIC_CURVE_SET_MEMBER_RULES,
+                "GEOMETRIC_CURVE_SET requires supported curve, point, path, wire, topology or nested set members", builder);
     }
 
     private static int validatePointSet(StepPointSet pointSet, StepCadBuilder builder) {
-        int count = 0;
-        for (StepEntity point : pointSet.points()) {
-            if (point instanceof StepCartesianPoint) {
-                StepCartesianPoint cartesianPoint = (StepCartesianPoint) point;
-                builder.buildPoint(cartesianPoint.id());
-            } else if (point instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) point).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) point;
-                builder.buildPointReference(replica.id());
-            } else if (point instanceof StepVertexPoint) {
-                StepVertexPoint vertexPoint = (StepVertexPoint) point;
-                builder.buildVertex(vertexPoint.id());
-            } else if (point instanceof StepVertexShell
-                    || point instanceof StepAnnotationSymbol
-                    || point instanceof StepAnnotationText
-                    || point instanceof StepAnnotationTextCharacter
-                    || point instanceof StepAnnotationFillArea
-                    || point instanceof StepAnnotationPointOccurrence
-                    || point instanceof StepAnnotationFillAreaOccurrence
-                    || point instanceof StepAnnotationTextOccurrence
-                    || point instanceof StepAnnotationPlaceholderOccurrence
-                    || point instanceof StepAnnotationSymbolOccurrence
-                    || point instanceof StepAnnotationSubfigureOccurrence
-                    || point instanceof StepDraughtingAnnotationOccurrence
-                    || point instanceof StepAnnotationPlane) {
-                validateSummaryEntity(point, builder);
-            } else if (point instanceof StepPointSet) {
-                StepPointSet nestedPointSet = (StepPointSet) point;
-                validatePointSet(nestedPointSet, builder);
-            } else if (point instanceof StepGeometricSet) {
-                StepGeometricSet geometricSet = (StepGeometricSet) point;
-                validateGeometricSet(geometricSet, builder);
-            } else if (point instanceof StepGeometricCurveSet) {
-                StepGeometricCurveSet curveSet = (StepGeometricCurveSet) point;
-                validateGeometricCurveSet(curveSet, builder);
-            } else {
-                throw new UnsupportedGeometryException(
-                        "POINT_SET requires supported point carriers, point-like annotation content/occurrences or nested point containers");
-            }
-            count++;
-        }
-        return count;
+        return validateMembers(pointSet.points(), POINT_SET_MEMBER_RULES,
+                "POINT_SET requires supported point carriers, point-like annotation content/occurrences or nested point containers", builder);
     }
 
     private static int validateGeometricSet(StepGeometricSet geometricSet, StepCadBuilder builder) {
-        int count = 0;
-        for (StepEntity element : geometricSet.elements()) {
-            if (element instanceof StepCartesianPoint) {
-                StepCartesianPoint cartesianPoint = (StepCartesianPoint) element;
-                builder.buildPoint(cartesianPoint.id());
-            } else if (element instanceof StepGeometricReplica && "POINT_REPLICA".equals(((StepGeometricReplica) element).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) element;
-                builder.buildPointReference(replica.id());
-            } else if (element instanceof StepVertexPoint) {
-                StepVertexPoint vertexPoint = (StepVertexPoint) element;
-                builder.buildVertex(vertexPoint.id());
-            } else if (element instanceof StepLine) {
-                StepLine line = (StepLine) element;
-                builder.buildLine(line.id());
-            } else if (element instanceof StepCircle) {
-                StepCircle circle = (StepCircle) element;
-                builder.buildCircle(circle.id());
-            } else if (element instanceof StepEllipse) {
-                StepEllipse ellipse = (StepEllipse) element;
-                builder.buildEllipse(ellipse.id());
-            } else if (element instanceof StepPolyline) {
-                StepPolyline polyline = (StepPolyline) element;
-                builder.buildPolyline(polyline.id());
-            } else if (element instanceof StepEdgeCurve) {
-                StepEdgeCurve edgeCurve = (StepEdgeCurve) element;
-                builder.buildEdge(edgeCurve.id());
-            } else if (element instanceof StepSubedge) {
-                StepSubedge subedge = (StepSubedge) element;
-                builder.buildEdge(subedge.id());
-            } else if (element instanceof StepOrientedEdge) {
-                StepOrientedEdge orientedEdge = (StepOrientedEdge) element;
-                builder.buildOrientedEdge(orientedEdge.id());
-            } else if (element instanceof StepConnectedEdgeSet) {
-                StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) element;
-                validateConnectedEdgeSet(edgeSet, builder);
-            } else if (element instanceof StepEdgeLoop) {
-                StepEdgeLoop edgeLoop = (StepEdgeLoop) element;
-                validatePathEdges(edgeLoop.edges(), builder);
-            } else if (element instanceof StepVertexLoop) {
-                StepVertexLoop vertexLoop = (StepVertexLoop) element;
-                builder.buildVertexLoop(vertexLoop.id());
-            } else if (element instanceof StepWireShell) {
-                StepWireShell wireShell = (StepWireShell) element;
-                validateWireShell(wireShell, builder);
-            } else if (element instanceof StepOpenShell
-                    || element instanceof StepSurfacedOpenShell
-                    || element instanceof StepOrientedOpenShell
-                    || element instanceof StepClosedShell
-                    || element instanceof StepOrientedClosedShell
-                    || element instanceof StepConnectedFaceSet
-                    || element instanceof StepConnectedFaceSubSet
-                    || element instanceof StepFaceBasedSurfaceModel
-                    || element instanceof StepShellBasedSurfaceModel
-                    || element instanceof StepEdgeBasedWireframeModel
-                    || element instanceof StepShellBasedWireframeModel
-                    || element instanceof StepManifoldSolidBrep
-                    || element instanceof StepBrepWithVoids
-                    || element instanceof StepSweptAreaSolid
-                    || element instanceof StepExtrudedFaceSolid
-                    || element instanceof StepRevolvedFaceSolid
-                    || element instanceof StepSolidReplica
-                    || element instanceof StepCsgSolid
-                    || element instanceof StepCsgPrimitive
-                    || element instanceof StepBooleanResult
-                    || element instanceof StepBooleanClippingResult) {
-                validateSummaryEntity(element, builder);
-            } else if (element instanceof StepPath) {
-                StepPath path = (StepPath) element;
-                validatePathEdges(path.edges(), builder);
-            } else if (element instanceof StepOpenPath) {
-                StepOpenPath openPath = (StepOpenPath) element;
-                validatePathEdges(openPath.edges(), builder);
-            } else if (element instanceof StepSubpath) {
-                StepSubpath subpath = (StepSubpath) element;
-                validatePathEdges(subpath.edges(), builder);
-            } else if (element instanceof StepOrientedPath) {
-                StepOrientedPath orientedPath = (StepOrientedPath) element;
-                validatePathEdges(orientedPath.edges(), builder);
-            } else if (element instanceof StepPolyLoop) {
-                StepPolyLoop polyLoop = (StepPolyLoop) element;
-                validatePolyLoop(polyLoop, builder);
-            } else if (isSupportedGeometricSetSurface(element)) {
-                validateSupportedSurfaceReference(element, builder);
-            } else if (element instanceof StepPointSet) {
-                StepPointSet pointSet = (StepPointSet) element;
-                validatePointSet(pointSet, builder);
-            } else if (element instanceof StepGeometricSet) {
-                StepGeometricSet nestedGeometricSet = (StepGeometricSet) element;
-                validateGeometricSet(nestedGeometricSet, builder);
-            } else if (element instanceof StepGeometricCurveSet) {
-                StepGeometricCurveSet curveSet = (StepGeometricCurveSet) element;
-                validateGeometricCurveSet(curveSet, builder);
-            } else {
-                throw new UnsupportedGeometryException(
-                        "GEOMETRIC_SET requires supported point, curve, surface, path, topology, shell/model/solid container or nested set members");
-            }
-            count++;
-        }
-        return count;
+        return validateMembers(geometricSet.elements(), GEOMETRIC_SET_MEMBER_RULES,
+                "GEOMETRIC_SET requires supported point, curve, surface, path, topology, shell/model/solid container or nested set members", builder);
     }
 
     private static void validateSupportedSurfaceReference(StepEntity surface, StepCadBuilder builder) {
