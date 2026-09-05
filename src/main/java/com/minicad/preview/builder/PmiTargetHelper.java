@@ -60,90 +60,54 @@ public final class PmiTargetHelper {
         // Utility class
     }
 
+    private record PmiTargetTypeEntry(List<Class<?>> types, String name) {
+        boolean matches(StepEntity target) {
+            return types.stream().anyMatch(type -> type.isInstance(target));
+        }
+    }
+
+    private static PmiTargetTypeEntry typeEntry(String name, Class<?>... types) {
+        return new PmiTargetTypeEntry(List.of(types), name);
+    }
+
+    /**
+     * PMI target type names keyed by concrete type groups, replacing the
+     * former 19-branch if/else-if chain. Order mirrors the original chain
+     * (first match wins); unmatched targets fall back to "entity".
+     */
+    private static final List<PmiTargetTypeEntry> PMI_TARGET_TYPE_ENTRIES = List.of(
+            typeEntry("face", StepFaceEntity.class),
+            typeEntry("edge", StepEdgeCurve.class, StepSubedge.class, StepOrientedEdge.class),
+            typeEntry("path", StepPath.class, StepOpenPath.class, StepSubpath.class, StepOrientedPath.class),
+            typeEntry("edge_set", StepConnectedEdgeSet.class),
+            typeEntry("point_set", StepPointSet.class),
+            typeEntry("annotation_symbol", StepAnnotationSymbol.class),
+            typeEntry("annotation_text", StepAnnotationText.class),
+            typeEntry("annotation_text_character", StepAnnotationTextCharacter.class),
+            typeEntry("annotation_fill_area", StepAnnotationFillArea.class),
+            typeEntry("geometric_set", StepGeometricSet.class),
+            typeEntry("curve_set", StepGeometricCurveSet.class),
+            typeEntry("shell", StepOpenShell.class, StepSurfacedOpenShell.class, StepOrientedOpenShell.class,
+                    StepClosedShell.class, StepOrientedClosedShell.class),
+            typeEntry("wire_shell", StepWireShell.class),
+            typeEntry("vertex_shell", StepVertexShell.class),
+            typeEntry("loop", StepEdgeLoop.class, StepVertexLoop.class, StepPolyLoop.class),
+            typeEntry("face_set", StepConnectedFaceSet.class, StepConnectedFaceSubSet.class),
+            typeEntry("surface_model", StepFaceBasedSurfaceModel.class, StepShellBasedSurfaceModel.class),
+            typeEntry("wireframe_model", StepEdgeBasedWireframeModel.class, StepShellBasedWireframeModel.class),
+            typeEntry("solid", StepManifoldSolidBrep.class, StepBrepWithVoids.class, StepSweptAreaSolid.class,
+                    StepSolidReplica.class, StepCsgSolid.class, StepCsgPrimitive.class, StepBooleanResult.class,
+                    StepBooleanClippingResult.class, StepSweptDiskSolid.class, StepExtrudedAreaSolidTapered.class,
+                    StepRevolvedAreaSolidTapered.class, StepSurfaceCurveSweptAreaSolid.class,
+                    StepPolygonalBoundedHalfSpace.class, StepComplexClippingResult.class),
+            typeEntry("representation", StepRepresentation.class)
+    );
+
     public static String pmiTargetType(StepEntity target) {
-        if (target instanceof StepFaceEntity) {
-            return "face";
-        }
-        if (target instanceof StepEdgeCurve
-                || target instanceof StepSubedge
-                || target instanceof StepOrientedEdge) {
-            return "edge";
-        }
-        if (target instanceof StepPath
-                || target instanceof StepOpenPath
-                || target instanceof StepSubpath
-                || target instanceof StepOrientedPath) {
-            return "path";
-        }
-        if (target instanceof StepConnectedEdgeSet) {
-            return "edge_set";
-        }
-        if (target instanceof StepPointSet) {
-            return "point_set";
-        }
-        if (target instanceof StepAnnotationSymbol) {
-            return "annotation_symbol";
-        }
-        if (target instanceof StepAnnotationText) {
-            return "annotation_text";
-        }
-        if (target instanceof StepAnnotationTextCharacter) {
-            return "annotation_text_character";
-        }
-        if (target instanceof StepAnnotationFillArea) {
-            return "annotation_fill_area";
-        }
-        if (target instanceof StepGeometricSet) {
-            return "geometric_set";
-        }
-        if (target instanceof StepGeometricCurveSet) {
-            return "curve_set";
-        }
-        if (target instanceof StepOpenShell
-                || target instanceof StepSurfacedOpenShell
-                || target instanceof StepOrientedOpenShell
-                || target instanceof StepClosedShell
-                || target instanceof StepOrientedClosedShell) {
-            return "shell";
-        }
-        if (target instanceof StepWireShell) {
-            return "wire_shell";
-        }
-        if (target instanceof StepVertexShell) {
-            return "vertex_shell";
-        }
-        if (target instanceof StepEdgeLoop
-                || target instanceof StepVertexLoop
-                || target instanceof StepPolyLoop) {
-            return "loop";
-        }
-        if (target instanceof StepConnectedFaceSet || target instanceof StepConnectedFaceSubSet) {
-            return "face_set";
-        }
-        if (target instanceof StepFaceBasedSurfaceModel || target instanceof StepShellBasedSurfaceModel) {
-            return "surface_model";
-        }
-        if (target instanceof StepEdgeBasedWireframeModel || target instanceof StepShellBasedWireframeModel) {
-            return "wireframe_model";
-        }
-        if (target instanceof StepManifoldSolidBrep
-                || target instanceof StepBrepWithVoids
-                || target instanceof StepSweptAreaSolid
-                || target instanceof StepSolidReplica
-                || target instanceof StepCsgSolid
-                || target instanceof StepCsgPrimitive
-                || target instanceof StepBooleanResult
-                || target instanceof StepBooleanClippingResult
-                || target instanceof StepSweptDiskSolid
-                || target instanceof StepExtrudedAreaSolidTapered
-                || target instanceof StepRevolvedAreaSolidTapered
-                || target instanceof StepSurfaceCurveSweptAreaSolid
-                || target instanceof StepPolygonalBoundedHalfSpace
-                || target instanceof StepComplexClippingResult) {
-            return "solid";
-        }
-        if (target instanceof StepRepresentation) {
-            return "representation";
+        for (PmiTargetTypeEntry entry : PMI_TARGET_TYPE_ENTRIES) {
+            if (entry.matches(target)) {
+                return entry.name();
+            }
         }
         return "entity";
     }
