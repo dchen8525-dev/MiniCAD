@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.minicad.export.json.StepTypeNameResolver;
 
@@ -996,69 +997,97 @@ public final class PreviewCurveEvaluator {
 
     // ─── Preview curve type/name helpers ─────────────────────────────────
 
+    private record TypeNameRule(
+            Class<?> type,
+            Predicate<StepEntity> guard,
+            Function<StepEntity, String> name
+    ) {
+        boolean matches(StepEntity item) {
+            return type.isInstance(item) && (guard == null || guard.test(item));
+        }
+    }
+
+    private static TypeNameRule typeNameRule(Class<?> type, String name) {
+        return new TypeNameRule(type, null, item -> name);
+    }
+
+    /**
+     * Preview curve names keyed by concrete type, replacing the former
+     * 62-branch if/else-if chain. Two dead duplicate branches
+     * (RATIONAL_B_SPLINE_CURVE, COMPOSITE_CURVE_ON_SURFACE) that could never
+     * be reached behind identical earlier rules are dropped.
+     */
+    private static final List<TypeNameRule> PREVIEW_CURVE_TYPE_NAME_RULES = List.of(
+            typeNameRule(StepLine.class, "LINE"),
+            typeNameRule(StepCircle.class, "CIRCLE"),
+            typeNameRule(StepEllipse.class, "ELLIPSE"),
+            new TypeNameRule(StepConicCurve.class, null, item -> ((StepConicCurve) item).entityName()),
+            typeNameRule(StepBezierCurve.class, "BEZIER_CURVE"),
+            typeNameRule(StepUniformCurve.class, "UNIFORM_CURVE"),
+            typeNameRule(StepQuasiUniformCurve.class, "QUASI_UNIFORM_CURVE"),
+            typeNameRule(StepPiecewiseBezierCurve.class, "PIECEWISE_BEZIER_CURVE"),
+            typeNameRule(StepBSplineCurveWithKnots.class, "B_SPLINE_CURVE_WITH_KNOTS"),
+            typeNameRule(StepRationalBSplineCurve.class, "RATIONAL_B_SPLINE_CURVE"),
+            new TypeNameRule(StepSurfaceCurve.class, null, item -> ((StepSurfaceCurve) item).entityName()),
+            typeNameRule(StepSeamCurve.class, "SEAM_CURVE"),
+            typeNameRule(StepTrimmedCurve.class, "TRIMMED_CURVE"),
+            typeNameRule(StepPolyline.class, "POLYLINE"),
+            typeNameRule(StepCompositeCurve.class, "COMPOSITE_CURVE"),
+            typeNameRule(StepCompositeCurveOnSurface.class, "COMPOSITE_CURVE_ON_SURFACE"),
+            typeNameRule(StepOffsetCurve2D.class, "OFFSET_CURVE_2D"),
+            typeNameRule(StepOffsetCurve3D.class, "OFFSET_CURVE_3D"),
+            typeNameRule(StepPcurve.class, "PCURVE"),
+            typeNameRule(StepDegeneratePcurve.class, "DEGENERATE_PCURVE"),
+            typeNameRule(StepOrientedCurve.class, "ORIENTED_CURVE"),
+            typeNameRule(StepAnnotationCurveOccurrence.class, "ANNOTATION_CURVE_OCCURRENCE"),
+            typeNameRule(StepDimensionCurve.class, "DIMENSION_CURVE"),
+            typeNameRule(StepLeaderCurve.class, "LEADER_CURVE"),
+            typeNameRule(StepProjectionCurve.class, "PROJECTION_CURVE"),
+            typeNameRule(StepDraughtingAnnotationOccurrence.class, "DRAUGHTING_ANNOTATION_OCCURRENCE"),
+            typeNameRule(StepTerminatorSymbol.class, "TERMINATOR_SYMBOL"),
+            new TypeNameRule(StepGeometricReplica.class,
+                    item -> "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()),
+                    item -> "CURVE_REPLICA"),
+            typeNameRule(StepBSplineCurve.class, "B_SPLINE_CURVE"),
+            typeNameRule(StepCompositeCurveOnSurface3D.class, "COMPOSITE_CURVE_ON_SURFACE_3D"),
+            typeNameRule(StepClothoid.class, "CLOTHOID"),
+            typeNameRule(StepIndexedPolyCurve.class, "INDEXED_POLY_CURVE"),
+            typeNameRule(StepDegenerateCurve.class, "DEGENERATE_CURVE"),
+            typeNameRule(StepBSplineCurveWithKnotsAndBreakpoints.class, "B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS"),
+            typeNameRule(StepLineSegment.class, "LINE_SEGMENT"),
+            typeNameRule(StepEdgeCurve.class, "EDGE_CURVE"),
+            typeNameRule(StepSurfacedEdgeCurve.class, "SURFACED_EDGE_CURVE"),
+            typeNameRule(StepPath.class, "PATH"),
+            typeNameRule(StepOpenPath.class, "OPEN_PATH"),
+            typeNameRule(StepSubpath.class, "SUBPATH"),
+            typeNameRule(StepOrientedPath.class, "ORIENTED_PATH"),
+            typeNameRule(StepCurve.class, "CURVE"),
+            typeNameRule(StepBoundedCurve.class, "BOUNDED_CURVE"),
+            typeNameRule(StepCircle2D.class, "CIRCLE_2D"),
+            typeNameRule(StepEllipse2D.class, "ELLIPSE_2D"),
+            typeNameRule(StepPolyline2D.class, "POLYLINE_2D"),
+            typeNameRule(StepTrimmedCurve2D.class, "TRIMMED_CURVE_2D"),
+            typeNameRule(StepCompositeCurve2D.class, "COMPOSITE_CURVE_2D"),
+            typeNameRule(StepBezierCurve2D.class, "BEZIER_CURVE_2D"),
+            typeNameRule(StepQuasiUniformCurve2D.class, "QUASI_UNIFORM_CURVE_2D"),
+            typeNameRule(StepUniformCurve2D.class, "UNIFORM_CURVE_2D"),
+            typeNameRule(StepPiecewiseBezierCurve2D.class, "PIECEWISE_BEZIER_CURVE_2D"),
+            typeNameRule(StepIndexedPolyCurve2D.class, "INDEXED_POLY_CURVE_2D"),
+            typeNameRule(StepDegenerateCurve2D.class, "DEGENERATE_CURVE_2D"),
+            typeNameRule(StepBSplineCurve2D.class, "B_SPLINE_CURVE_2D"),
+            typeNameRule(StepRationalBSplineCurve2D.class, "RATIONAL_B_SPLINE_CURVE_2D"),
+            typeNameRule(StepLine2D.class, "LINE_2D"),
+            typeNameRule(StepCurve2D.class, "CURVE_2D"),
+            typeNameRule(StepHyperbola2D.class, "HYPERBOLA_2D"),
+            typeNameRule(StepParabola2D.class, "PARABOLA_2D")
+    );
+
     public static String previewCurveTypeName(StepEntity item) {
-        if (item instanceof StepLine) return "LINE";
-        if (item instanceof StepCircle) return "CIRCLE";
-        if (item instanceof StepEllipse) return "ELLIPSE";
-        if (item instanceof StepConicCurve) return ((StepConicCurve) item).entityName();
-        if (item instanceof StepBezierCurve) return "BEZIER_CURVE";
-        if (item instanceof StepUniformCurve) return "UNIFORM_CURVE";
-        if (item instanceof StepQuasiUniformCurve) return "QUASI_UNIFORM_CURVE";
-        if (item instanceof StepPiecewiseBezierCurve) return "PIECEWISE_BEZIER_CURVE";
-        if (item instanceof StepBSplineCurveWithKnots) return "B_SPLINE_CURVE_WITH_KNOTS";
-        if (item instanceof StepRationalBSplineCurve) return "RATIONAL_B_SPLINE_CURVE";
-        if (item instanceof StepSurfaceCurve) return ((StepSurfaceCurve) item).entityName();
-        if (item instanceof StepSeamCurve) return "SEAM_CURVE";
-        if (item instanceof StepTrimmedCurve) return "TRIMMED_CURVE";
-        if (item instanceof StepPolyline) return "POLYLINE";
-        if (item instanceof StepCompositeCurve) return "COMPOSITE_CURVE";
-        if (item instanceof StepCompositeCurveOnSurface) return "COMPOSITE_CURVE_ON_SURFACE";
-        if (item instanceof StepOffsetCurve2D) return "OFFSET_CURVE_2D";
-        if (item instanceof StepOffsetCurve3D) return "OFFSET_CURVE_3D";
-        if (item instanceof StepPcurve) return "PCURVE";
-        if (item instanceof StepDegeneratePcurve) return "DEGENERATE_PCURVE";
-        if (item instanceof StepOrientedCurve) return "ORIENTED_CURVE";
-        if (item instanceof StepAnnotationCurveOccurrence) return "ANNOTATION_CURVE_OCCURRENCE";
-        if (item instanceof StepDimensionCurve) return "DIMENSION_CURVE";
-        if (item instanceof StepLeaderCurve) return "LEADER_CURVE";
-        if (item instanceof StepProjectionCurve) return "PROJECTION_CURVE";
-        if (item instanceof StepDraughtingAnnotationOccurrence) return "DRAUGHTING_ANNOTATION_OCCURRENCE";
-        if (item instanceof StepTerminatorSymbol) return "TERMINATOR_SYMBOL";
-        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) return "CURVE_REPLICA";
-        if (item instanceof StepBSplineCurve) return "B_SPLINE_CURVE";
-        if (item instanceof StepRationalBSplineCurve) return "RATIONAL_B_SPLINE_CURVE";
-        if (item instanceof StepCompositeCurveOnSurface3D) return "COMPOSITE_CURVE_ON_SURFACE_3D";
-        if (item instanceof StepClothoid) return "CLOTHOID";
-        if (item instanceof StepIndexedPolyCurve) return "INDEXED_POLY_CURVE";
-        if (item instanceof StepDegenerateCurve) return "DEGENERATE_CURVE";
-        if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints) return "B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS";
-        if (item instanceof StepLineSegment) return "LINE_SEGMENT";
-        if (item instanceof StepEdgeCurve) return "EDGE_CURVE";
-        if (item instanceof StepSurfacedEdgeCurve) return "SURFACED_EDGE_CURVE";
-        if (item instanceof StepCompositeCurveOnSurface) return "COMPOSITE_CURVE_ON_SURFACE";
-        if (item instanceof StepPath) return "PATH";
-        if (item instanceof StepOpenPath) return "OPEN_PATH";
-        if (item instanceof StepSubpath) return "SUBPATH";
-        if (item instanceof StepOrientedPath) return "ORIENTED_PATH";
-        if (item instanceof StepCurve) return "CURVE";
-        if (item instanceof StepBoundedCurve) return "BOUNDED_CURVE";
-        if (item instanceof StepCircle2D) return "CIRCLE_2D";
-        if (item instanceof StepEllipse2D) return "ELLIPSE_2D";
-        if (item instanceof StepPolyline2D) return "POLYLINE_2D";
-        if (item instanceof StepTrimmedCurve2D) return "TRIMMED_CURVE_2D";
-        if (item instanceof StepCompositeCurve2D) return "COMPOSITE_CURVE_2D";
-        if (item instanceof StepBezierCurve2D) return "BEZIER_CURVE_2D";
-        if (item instanceof StepQuasiUniformCurve2D) return "QUASI_UNIFORM_CURVE_2D";
-        if (item instanceof StepUniformCurve2D) return "UNIFORM_CURVE_2D";
-        if (item instanceof StepPiecewiseBezierCurve2D) return "PIECEWISE_BEZIER_CURVE_2D";
-        if (item instanceof StepIndexedPolyCurve2D) return "INDEXED_POLY_CURVE_2D";
-        if (item instanceof StepDegenerateCurve2D) return "DEGENERATE_CURVE_2D";
-        if (item instanceof StepBSplineCurve2D) return "B_SPLINE_CURVE_2D";
-        if (item instanceof StepRationalBSplineCurve2D) return "RATIONAL_B_SPLINE_CURVE_2D";
-        if (item instanceof StepLine2D) return "LINE_2D";
-        if (item instanceof StepCurve2D) return "CURVE_2D";
-        if (item instanceof StepHyperbola2D) return "HYPERBOLA_2D";
-        if (item instanceof StepParabola2D) return "PARABOLA_2D";
+        for (TypeNameRule rule : PREVIEW_CURVE_TYPE_NAME_RULES) {
+            if (rule.matches(item)) {
+                return rule.name().apply(item);
+            }
+        }
         return null;
     }
 
