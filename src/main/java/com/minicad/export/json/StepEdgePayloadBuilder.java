@@ -70,6 +70,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.minicad.geometry.Clothoid3;
 import com.minicad.geometry.DegenerateCurve3;
@@ -488,221 +490,151 @@ public final class StepEdgePayloadBuilder {
     // CURVE RESOLUTION METHODS
     // ================================================================================
 
-    static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
-        try {
-            if (item instanceof StepLine) {
-            StepLine line = (StepLine) item;
-                return builder.buildLine(line.id());
-            }
-            if (item instanceof StepCircle) {
-            StepCircle circle = (StepCircle) item;
-                return builder.buildCircle(circle.id());
-            }
-            if (item instanceof StepEllipse) {
-            StepEllipse ellipse = (StepEllipse) item;
-                return builder.buildEllipse(ellipse.id());
-            }
-            if (item instanceof StepConicCurve) {
-            StepConicCurve conic = (StepConicCurve) item;
-                List<CartesianPoint> points = ConicSamplingHelper.sampleConicCurvePoints(conic, builder);
+    @FunctionalInterface
+    private interface LooseEdgeCurveFactory {
+        Curve3 build(StepEntity item, StepCadBuilder builder);
+    }
+
+    private record LooseEdgeCurveRule(Class<?> type, Predicate<StepEntity> guard, LooseEdgeCurveFactory factory) {
+        boolean matches(StepEntity item) {
+            return type.isInstance(item) && (guard == null || guard.test(item));
+        }
+    }
+
+    private static LooseEdgeCurveRule looseEdgeRule(Class<?> type, LooseEdgeCurveFactory factory) {
+        return new LooseEdgeCurveRule(type, null, factory);
+    }
+
+    /** Types materialized through builder.buildCurveReference3. */
+    private static LooseEdgeCurveRule curveReferenceRule(Class<?> type) {
+        return looseEdgeRule(type, (item, builder) -> builder.buildCurveReference3(item.id()));
+    }
+
+    /** Wrapper curves resolved through the curve they reference. */
+    private static LooseEdgeCurveRule recurseRule(Class<?> type, Function<StepEntity, StepEntity> next) {
+        return looseEdgeRule(type, (item, builder) -> curveForLooseEdge(next.apply(item), builder));
+    }
+
+    /** Pcurve families whose builder result is a 2D curve lifted to 3D. */
+    private static LooseEdgeCurveRule pcurveRule(Class<?> type) {
+        return looseEdgeRule(type, (item, builder) -> {
+            Object built = builder.buildPcurve2(item.id());
+            return built instanceof Curve2 ? liftCurve2((Curve2) built) : null;
+        });
+    }
+
+    /** 2D curve families lifted to 3D through builder.buildCurve3From2D. */
+    private static final List<Class<?>> CURVE_FROM_2D_TYPES = List.of(
+            StepCircle2D.class,
+            StepEllipse2D.class,
+            StepHyperbola2D.class,
+            StepParabola2D.class,
+            StepPolyline2D.class,
+            StepTrimmedCurve2D.class,
+            StepCompositeCurve2D.class,
+            StepBezierCurve2D.class,
+            StepQuasiUniformCurve2D.class,
+            StepUniformCurve2D.class,
+            StepPiecewiseBezierCurve2D.class,
+            StepIndexedPolyCurve2D.class,
+            StepDegenerateCurve2D.class,
+            StepBSplineCurve2D.class,
+            StepRationalBSplineCurve2D.class,
+            StepLine2D.class,
+            StepCurve2D.class,
+            StepBoundedCurve2D.class
+    );
+
+    /**
+     * Loose-edge curve factories keyed by concrete type, replacing the former
+     * 45-branch if/else-if chain. Order mirrors the original chain (first
+     * match wins). Two dead duplicate branches (a second COMPOSITE_CURVE_ON_SURFACE
+     * and a second SEAM_CURVE entry, each unreachable behind an identical earlier
+     * match) are dropped. Rules in LOOSE_EDGE_CURVE_RULES run under the original
+     * try block and swallow builder failures as null; the trailing rules keep
+     * the old behavior of propagating those failures to the caller.
+     */
+    private static final List<LooseEdgeCurveRule> LOOSE_EDGE_CURVE_RULES = List.of(
+            looseEdgeRule(StepLine.class, (item, builder) -> builder.buildLine(item.id())),
+            looseEdgeRule(StepCircle.class, (item, builder) -> builder.buildCircle(item.id())),
+            looseEdgeRule(StepEllipse.class, (item, builder) -> builder.buildEllipse(item.id())),
+            looseEdgeRule(StepConicCurve.class, (item, builder) -> {
+                List<CartesianPoint> points = ConicSamplingHelper.sampleConicCurvePoints((StepConicCurve) item, builder);
                 return points == null ? null : new Polyline3(points);
-            }
-            if (item instanceof StepBezierCurve) {
-            StepBezierCurve curve = (StepBezierCurve) item;
-                return builder.buildCurveReference3(curve.id());
-            }
-            if (item instanceof StepUniformCurve) {
-            StepUniformCurve curve = (StepUniformCurve) item;
-                return builder.buildCurveReference3(curve.id());
-            }
-            if (item instanceof StepQuasiUniformCurve) {
-            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) item;
-                return builder.buildCurveReference3(curve.id());
-            }
-            if (item instanceof StepPiecewiseBezierCurve) {
-            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) item;
-                return builder.buildCurveReference3(curve.id());
-            }
-            if (item instanceof StepBSplineCurveWithKnots) {
-            StepBSplineCurveWithKnots spline = (StepBSplineCurveWithKnots) item;
-                return builder.buildBSplineCurve(spline.id());
-            }
-            if (item instanceof StepSurfaceCurve) {
-            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
-                return builder.buildSurfaceCurve(surfaceCurve.id());
-            }
-            if (item instanceof StepSeamCurve) {
-            StepSeamCurve seamCurve = (StepSeamCurve) item;
-                return builder.buildSeamCurve(seamCurve.id());
-            }
-            if (item instanceof StepTrimmedCurve) {
-            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
-                return builder.buildTrimmedCurve(trimmedCurve.id());
-            }
-            if (item instanceof StepPolyline) {
-            StepPolyline polyline = (StepPolyline) item;
-                return builder.buildPolyline(polyline.id());
-            }
-            if (item instanceof com.minicad.step.model.StepCompositeCurve) {
-                com.minicad.step.model.StepCompositeCurve compositeCurve = (com.minicad.step.model.StepCompositeCurve) item;
-                return builder.buildCompositeCurve(compositeCurve.id());
-            }
-            if (item instanceof com.minicad.step.model.StepCompositeCurveOnSurface) {
-                com.minicad.step.model.StepCompositeCurveOnSurface compositeCurveOnSurface = (com.minicad.step.model.StepCompositeCurveOnSurface) item;
-                return builder.buildCompositeCurve(compositeCurveOnSurface.id());
-            }
-            if (item instanceof com.minicad.step.model.StepRationalBSplineCurve) {
-                com.minicad.step.model.StepRationalBSplineCurve spline = (com.minicad.step.model.StepRationalBSplineCurve) item;
-                return builder.buildRationalBSplineCurve(spline.id());
-            }
-            if (item instanceof StepOffsetCurve2D) {
-            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
-                return liftCurve2(builder.buildOffsetCurve2(offsetCurve2D.id()));
-            }
-            if (item instanceof StepOffsetCurve3D) {
-            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
-                return builder.buildOffsetCurve3(offsetCurve3D.id());
-            }
-            if (item instanceof StepPcurve) {
-            StepPcurve pcurve = (StepPcurve) item;
-                Object built = builder.buildPcurve2(pcurve.id());
-                if (built instanceof Curve2) {
-                    Curve2 curve2 = (Curve2) built;
-                    return liftCurve2(curve2);
-                }
-                return null;
-            }
-            if (item instanceof StepDegeneratePcurve) {
-            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) item;
-                Object built = builder.buildPcurve2(pcurve.id());
-                if (built instanceof Curve2) {
-                    Curve2 curve2 = (Curve2) built;
-                    return liftCurve2(curve2);
-                }
-                return null;
-            }
-            if (item instanceof StepOrientedCurve) {
-            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
-                return curveForLooseEdge(orientedCurve.curveElement(), builder);
-            }
-            if (item instanceof StepAnnotationCurveOccurrence) {
-            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
-                return curveForLooseEdge(occurrence.item(), builder);
-            }
-            if (item instanceof StepDimensionCurve) {
-            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
-                return curveForLooseEdge(dimensionCurve.item(), builder);
-            }
-            if (item instanceof StepLeaderCurve) {
-            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
-                return curveForLooseEdge(leaderCurve.item(), builder);
-            }
-            if (item instanceof StepProjectionCurve) {
-            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
-                return curveForLooseEdge(projectionCurve.item(), builder);
-            }
-            if (item instanceof StepDraughtingAnnotationOccurrence) {
-            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
-                return curveForLooseEdge(annotationOccurrence.item(), builder);
-            }
-            if (item instanceof StepTerminatorSymbol) {
-            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
-                return curveForLooseEdge(terminatorSymbol.annotatedCurve(), builder);
-            }
-            if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-                List<CartesianPoint> points = sampleLooseEdgePoints(replica, builder);
-                return points == null ? null : new Polyline3(points);
-            }
-            if (item instanceof StepIndexedPolyCurve) {
-            StepIndexedPolyCurve polyCurve = (StepIndexedPolyCurve) item;
-                return builder.buildCurveReference3(polyCurve.id());
-            }
-            if (item instanceof StepClothoid) {
-            StepClothoid clothoid = (StepClothoid) item;
-                return builder.buildCurveReference3(clothoid.id());
-            }
-            if (item instanceof StepDegenerateCurve) {
-            StepDegenerateCurve degenerate = (StepDegenerateCurve) item;
-                return builder.buildCurveReference3(degenerate.id());
-            }
-            if (item instanceof StepBSplineCurve) {
-            StepBSplineCurve bspline = (StepBSplineCurve) item;
-                return builder.buildCurveReference3(bspline.id());
-            }
-            if (item instanceof StepCompositeCurveOnSurface) {
-            StepCompositeCurveOnSurface compositeOnSurface = (StepCompositeCurveOnSurface) item;
-                return builder.buildCurveReference3(compositeOnSurface.id());
-            }
-            if (item instanceof StepBSplineCurveWithKnotsAndBreakpoints) {
-            StepBSplineCurveWithKnotsAndBreakpoints splineBreak = (StepBSplineCurveWithKnotsAndBreakpoints) item;
-                return builder.buildBSplineCurveWithBreakpoints(splineBreak.id());
-            }
-            if (item instanceof StepLineSegment) {
-            StepLineSegment lineSeg = (StepLineSegment) item;
+            }),
+            curveReferenceRule(StepBezierCurve.class),
+            curveReferenceRule(StepUniformCurve.class),
+            curveReferenceRule(StepQuasiUniformCurve.class),
+            curveReferenceRule(StepPiecewiseBezierCurve.class),
+            looseEdgeRule(StepBSplineCurveWithKnots.class, (item, builder) -> builder.buildBSplineCurve(item.id())),
+            looseEdgeRule(StepSurfaceCurve.class, (item, builder) -> builder.buildSurfaceCurve(item.id())),
+            looseEdgeRule(StepSeamCurve.class, (item, builder) -> builder.buildSeamCurve(item.id())),
+            looseEdgeRule(StepTrimmedCurve.class, (item, builder) -> builder.buildTrimmedCurve(item.id())),
+            looseEdgeRule(StepPolyline.class, (item, builder) -> builder.buildPolyline(item.id())),
+            looseEdgeRule(StepCompositeCurve.class, (item, builder) -> builder.buildCompositeCurve(item.id())),
+            looseEdgeRule(StepCompositeCurveOnSurface.class, (item, builder) -> builder.buildCompositeCurve(item.id())),
+            looseEdgeRule(StepRationalBSplineCurve.class, (item, builder) -> builder.buildRationalBSplineCurve(item.id())),
+            looseEdgeRule(StepOffsetCurve2D.class, (item, builder) -> liftCurve2(builder.buildOffsetCurve2(item.id()))),
+            looseEdgeRule(StepOffsetCurve3D.class, (item, builder) -> builder.buildOffsetCurve3(item.id())),
+            pcurveRule(StepPcurve.class),
+            pcurveRule(StepDegeneratePcurve.class),
+            recurseRule(StepOrientedCurve.class, item -> ((StepOrientedCurve) item).curveElement()),
+            recurseRule(StepAnnotationCurveOccurrence.class, item -> ((StepAnnotationCurveOccurrence) item).item()),
+            recurseRule(StepDimensionCurve.class, item -> ((StepDimensionCurve) item).item()),
+            recurseRule(StepLeaderCurve.class, item -> ((StepLeaderCurve) item).item()),
+            recurseRule(StepProjectionCurve.class, item -> ((StepProjectionCurve) item).item()),
+            recurseRule(StepDraughtingAnnotationOccurrence.class, item -> ((StepDraughtingAnnotationOccurrence) item).item()),
+            recurseRule(StepTerminatorSymbol.class, item -> ((StepTerminatorSymbol) item).annotatedCurve()),
+            new LooseEdgeCurveRule(StepGeometricReplica.class,
+                    item -> "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()),
+                    (item, builder) -> {
+                        List<CartesianPoint> points = sampleLooseEdgePoints(item, builder);
+                        return points == null ? null : new Polyline3(points);
+                    }),
+            curveReferenceRule(StepIndexedPolyCurve.class),
+            curveReferenceRule(StepClothoid.class),
+            curveReferenceRule(StepDegenerateCurve.class),
+            curveReferenceRule(StepBSplineCurve.class),
+            looseEdgeRule(StepBSplineCurveWithKnotsAndBreakpoints.class, (item, builder) ->
+                    builder.buildBSplineCurveWithBreakpoints(item.id())),
+            looseEdgeRule(StepLineSegment.class, (item, builder) -> {
+                StepLineSegment lineSeg = (StepLineSegment) item;
                 return new Polyline3(List.of(
                         builder.buildPoint(lineSeg.startPoint().id()),
                         builder.buildPoint(lineSeg.endPoint().id())
                 ));
-            }
-            if (item instanceof StepEdgeCurve) {
-            StepEdgeCurve edgeCurve = (StepEdgeCurve) item;
-                return builder.buildCurveReference3(edgeCurve.id());
-            }
-            if (item instanceof StepSurfacedEdgeCurve) {
-            StepSurfacedEdgeCurve surfacedEdge = (StepSurfacedEdgeCurve) item;
-                return builder.buildCurveReference3(surfacedEdge.id());
-            }
-            if (item instanceof StepCompositeCurveOnSurface3D) {
-            StepCompositeCurveOnSurface3D compositeOnSurface3D = (StepCompositeCurveOnSurface3D) item;
-                return builder.buildCurveReference3(compositeOnSurface3D.id());
-            }
-            if (item instanceof StepPath) {
-            StepPath path = (StepPath) item;
-                return builder.buildPath(path.id());
-            }
-            if (item instanceof StepOpenPath) {
-            StepOpenPath openPath = (StepOpenPath) item;
-                return builder.buildPath(openPath.id());
-            }
-            if (item instanceof StepSubpath) {
-            StepSubpath subpath = (StepSubpath) item;
-                return builder.buildPath(subpath.id());
-            }
-            if (item instanceof StepSeamCurve) {
-            StepSeamCurve seamCurve = (StepSeamCurve) item;
-                return builder.buildSeamCurve(seamCurve.id()).curve3d();
-            }
-            if (item instanceof StepCircle2D
-                    || item instanceof StepEllipse2D
-                    || item instanceof StepHyperbola2D
-                    || item instanceof StepParabola2D
-                    || item instanceof StepPolyline2D
-                    || item instanceof StepTrimmedCurve2D
-                    || item instanceof StepCompositeCurve2D
-                    || item instanceof StepBezierCurve2D
-                    || item instanceof StepQuasiUniformCurve2D
-                    || item instanceof StepUniformCurve2D
-                    || item instanceof StepPiecewiseBezierCurve2D
-                    || item instanceof StepIndexedPolyCurve2D
-                    || item instanceof StepDegenerateCurve2D
-                    || item instanceof StepBSplineCurve2D
-                    || item instanceof StepRationalBSplineCurve2D
-                    || item instanceof StepLine2D
-                    || item instanceof StepCurve2D
-                    || item instanceof StepBoundedCurve2D) {
-                return builder.buildCurve3From2D(item.id());
+            }),
+            curveReferenceRule(StepEdgeCurve.class),
+            curveReferenceRule(StepSurfacedEdgeCurve.class),
+            curveReferenceRule(StepCompositeCurveOnSurface3D.class),
+            looseEdgeRule(StepPath.class, (item, builder) -> builder.buildPath(item.id())),
+            looseEdgeRule(StepOpenPath.class, (item, builder) -> builder.buildPath(item.id())),
+            looseEdgeRule(StepSubpath.class, (item, builder) -> builder.buildPath(item.id())),
+            new LooseEdgeCurveRule(StepEntity.class,
+                    item -> CURVE_FROM_2D_TYPES.stream().anyMatch(type -> type.isInstance(item)),
+                    (item, builder) -> builder.buildCurve3From2D(item.id()))
+    );
+
+    /** Trailing rules of the old chain that sat outside its try block. */
+    private static final List<LooseEdgeCurveRule> LOOSE_EDGE_FALLBACK_RULES = List.of(
+            curveReferenceRule(StepBoundedCurve.class),
+            recurseRule(StepMappedItem.class, item -> ((StepMappedItem) item).mappingTarget())
+    );
+
+    static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
+        try {
+            for (LooseEdgeCurveRule rule : LOOSE_EDGE_CURVE_RULES) {
+                if (rule.matches(item)) {
+                    return rule.factory().build(item, builder);
+                }
             }
         } catch (UnsupportedGeometryException | StepResolutionException ex) {
             return null;
         }
-        if (item instanceof StepBoundedCurve) {
-            StepBoundedCurve bounded = (StepBoundedCurve) item;
-            return builder.buildCurveReference3(bounded.id());
-        }
-        if (item instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) item;
-            return curveForLooseEdge(mappedItem.mappingTarget(), builder);
+        for (LooseEdgeCurveRule rule : LOOSE_EDGE_FALLBACK_RULES) {
+            if (rule.matches(item)) {
+                return rule.factory().build(item, builder);
+            }
         }
         return null;
     }
