@@ -2,6 +2,7 @@ package com.minicad.preview.sampling;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.export.json.StepCurveTypeNameResolver;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
 import com.minicad.geometry2d.*;
@@ -1091,46 +1092,14 @@ public final class PreviewCurveEvaluator {
         return null;
     }
 
+    /** Delegates to the shared resolver; see StepCurveTypeNameResolver.BASIS_CURVE_RULES. */
     public static String previewCurveBasisTypeName(StepEntity item) {
-        if (item instanceof StepSurfaceCurve) return previewCurveTypeName(((StepSurfaceCurve) item).curve3d());
-        if (item instanceof StepSeamCurve) return previewCurveTypeName(((StepSeamCurve) item).curve3d());
-        if (item instanceof StepTrimmedCurve) return previewCurveTypeName(((StepTrimmedCurve) item).basisCurve());
-        if (item instanceof StepOffsetCurve2D) return previewCurveTypeName(((StepOffsetCurve2D) item).basisCurve());
-        if (item instanceof StepOffsetCurve3D) return previewCurveTypeName(((StepOffsetCurve3D) item).basisCurve());
-        if (item instanceof StepOrientedCurve) return previewCurveTypeName(((StepOrientedCurve) item).curveElement());
-        if (item instanceof StepAnnotationCurveOccurrence) return previewCurveTypeName(((StepAnnotationCurveOccurrence) item).item());
-        if (item instanceof StepDimensionCurve) return previewCurveTypeName(((StepDimensionCurve) item).item());
-        if (item instanceof StepLeaderCurve) return previewCurveTypeName(((StepLeaderCurve) item).item());
-        if (item instanceof StepProjectionCurve) return previewCurveTypeName(((StepProjectionCurve) item).item());
-        if (item instanceof StepDraughtingAnnotationOccurrence) return previewCurveTypeName(((StepDraughtingAnnotationOccurrence) item).item());
-        if (item instanceof StepTerminatorSymbol) return previewCurveTypeName(((StepTerminatorSymbol) item).annotatedCurve());
-        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-            return previewCurveTypeName(replica.parent());
-        }
-        if (item instanceof StepTrimmedCurve2D) return previewCurveTypeName(((StepTrimmedCurve2D) item).basisCurve());
-        return null;
+        return StepCurveTypeNameResolver.previewCurveBasisTypeName(item);
     }
 
+    /** Delegates to the shared resolver; see StepCurveTypeNameResolver.BASIS_CURVE_RULES. */
     public static Integer previewCurveBasisStepId(StepEntity item) {
-        if (item instanceof StepSurfaceCurve) return ((StepSurfaceCurve) item).curve3d().id();
-        if (item instanceof StepSeamCurve) return ((StepSeamCurve) item).curve3d().id();
-        if (item instanceof StepTrimmedCurve) return ((StepTrimmedCurve) item).basisCurve().id();
-        if (item instanceof StepOffsetCurve2D) return ((StepOffsetCurve2D) item).basisCurve().id();
-        if (item instanceof StepOffsetCurve3D) return ((StepOffsetCurve3D) item).basisCurve().id();
-        if (item instanceof StepOrientedCurve) return ((StepOrientedCurve) item).curveElement().id();
-        if (item instanceof StepAnnotationCurveOccurrence) return ((StepAnnotationCurveOccurrence) item).item().id();
-        if (item instanceof StepDimensionCurve) return ((StepDimensionCurve) item).item().id();
-        if (item instanceof StepLeaderCurve) return ((StepLeaderCurve) item).item().id();
-        if (item instanceof StepProjectionCurve) return ((StepProjectionCurve) item).item().id();
-        if (item instanceof StepDraughtingAnnotationOccurrence) return ((StepDraughtingAnnotationOccurrence) item).item().id();
-        if (item instanceof StepTerminatorSymbol) return ((StepTerminatorSymbol) item).annotatedCurve().id();
-        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-            return replica.parent().id();
-        }
-        if (item instanceof StepTrimmedCurve2D) return ((StepTrimmedCurve2D) item).basisCurve().id();
-        return null;
+        return StepCurveTypeNameResolver.previewCurveBasisStepId(item);
     }
 
     public static Boolean previewCurveOrientation(StepEntity item) {
