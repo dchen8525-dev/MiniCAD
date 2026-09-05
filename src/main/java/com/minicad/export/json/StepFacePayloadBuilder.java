@@ -26,6 +26,7 @@ import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.helper.MathUtilityHelper;
 import com.minicad.helper.SurfaceGeometryHelper;
 import com.minicad.helper.StepMetadataExtractor;
+import com.minicad.preview.builder.PreviewFaceBuilder;
 import com.minicad.preview.mapper.ParametricSurfaceMapper;
 import com.minicad.preview.mapper.SurfaceMapperHelper;
 import com.minicad.preview.payload.FacePayload;
@@ -535,67 +536,9 @@ public final class StepFacePayloadBuilder {
     }
 
 
+    /** Delegates to the shared SURFACE_UNWRAP_RULES table; see PreviewFaceBuilder. */
     private static StepEntity unwrapParametricPreviewSurface(StepEntity geometry) {
-        StepEntity current = geometry;
-        for (int depth = 0; depth < 16 && current != null; depth++) {
-            if (current instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
-                current = trimmedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
-                current = boundedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
-                current = orientedSurface.surfaceElement();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
-                current = offsetSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface2) {
-            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) current;
-                current = offsetSurface2.basisSurface();
-                continue;
-            }
-            if (current instanceof StepSurfacePatch) {
-            StepSurfacePatch surfacePatch = (StepSurfacePatch) current;
-                current = surfacePatch.basisSurface();
-                continue;
-            }
-            if (current instanceof StepRectangularCompositeSurface) {
-            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) current;
-                current = compositeSurface.parentSurface();
-                continue;
-            }
-            if (current instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) current;
-                current = machinedSurface.face();
-                continue;
-            }
-            if (current instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) current;
-                current = blended.primarySurface();
-                continue;
-            }
-            if (current instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) current;
-                current = mappedItem.mappingTarget();
-                continue;
-            }
-            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) current;
-                current = replica.parent();
-                continue;
-            }
-            return current;
-        }
-        return current;
+        return PreviewFaceBuilder.unwrapParametricPreviewSurface(geometry);
     }
 
     private static String describeUnsupportedPreviewSurface(StepEntity surface) {
@@ -606,43 +549,8 @@ public final class StepFacePayloadBuilder {
         if (surface == null) {
             return null;
         }
-        if (surface instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) surface;
-            return describeUnsupportedPreviewSurface(trimmedSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface curveBoundedSurface = (StepCurveBoundedSurface) surface;
-            return describeUnsupportedPreviewSurface(curveBoundedSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) surface;
-            return describeUnsupportedPreviewSurface(orientedSurface.surfaceElement(), builder);
-        }
-        if (surface instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) surface;
-            return describeUnsupportedPreviewSurface(offsetSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepOffsetSurface2) {
-            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) surface;
-            return describeUnsupportedPreviewSurface(offsetSurface2.basisSurface(), builder);
-        }
-        if (surface instanceof StepSurfacePatch) {
-            StepSurfacePatch surfacePatch = (StepSurfacePatch) surface;
-            return describeUnsupportedPreviewSurface(surfacePatch.basisSurface(), builder);
-        }
-        if (surface instanceof StepRectangularCompositeSurface) {
-            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) surface;
-            return describeUnsupportedPreviewSurface(compositeSurface.parentSurface(), builder);
-        }
-        if (surface instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) surface;
-            return describeUnsupportedPreviewSurface(machinedSurface.face(), builder);
-        }
-        if (surface instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) surface;
-            return describeUnsupportedPreviewSurface(blended.primarySurface(), builder);
-        }
-        if (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
+        if (surface instanceof StepGeometricReplica
+                && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) surface;
             if (replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator) {
                 com.minicad.step.model.StepCartesianTransformationOperator transformation = (com.minicad.step.model.StepCartesianTransformationOperator) replica.transformation();
@@ -658,6 +566,15 @@ public final class StepFacePayloadBuilder {
                 }
             }
             return describeUnsupportedPreviewSurface(replica.parent(), builder);
+        }
+        // Unlike PreviewFaceBuilder.describeUnsupportedPreviewSurface, this copy
+        // does not recurse through MAPPED_ITEM - it reports the mapped item itself.
+        if (surface instanceof StepMappedItem) {
+            return StepTypeNameResolver.surfaceTypeName(surface);
+        }
+        StepEntity basis = PreviewFaceBuilder.unwrapBasisSurfaceOnce(surface);
+        if (basis != null) {
+            return describeUnsupportedPreviewSurface(basis, builder);
         }
         return StepTypeNameResolver.surfaceTypeName(surface);
     }

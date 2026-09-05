@@ -220,6 +220,11 @@ public final class PreviewFaceBuilder {
         return null;
     }
 
+    /** Single-level unwrap access for other classes reusing SURFACE_UNWRAP_RULES. */
+    public static StepEntity unwrapBasisSurfaceOnce(StepEntity surface) {
+        return unwrapBasisSurface(surface);
+    }
+
     public static StepEntity unwrapParametricPreviewSurface(StepEntity geometry) {
         StepEntity current = geometry;
         for (int depth = 0; depth < 16 && current != null; depth++) {
