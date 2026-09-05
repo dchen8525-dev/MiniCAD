@@ -1,6 +1,8 @@
 package com.minicad.export.json;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import com.minicad.step.model.*;
 
 /**
@@ -131,64 +133,57 @@ public final class StepCurveTypeNameResolver {
         curveTypeNameRule(StepParabola2D.class, (item) -> "PARABOLA_2D")
     );
 
-    public static String previewCurveBasisTypeName(StepEntity item) {
-        if (item instanceof StepSurfaceCurve) {
-            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
-            return previewCurveTypeName(surfaceCurve.curve3d());
+    private record BasisCurveRule(
+            Class<?> type,
+            Predicate<StepEntity> guard,
+            Function<StepEntity, StepEntity> basisCurve
+    ) {
+        boolean matches(StepEntity item) {
+            return type.isInstance(item) && (guard == null || guard.test(item));
         }
-        if (item instanceof StepSeamCurve) {
-            StepSeamCurve seamCurve = (StepSeamCurve) item;
-            return previewCurveTypeName(seamCurve.curve3d());
-        }
-        if (item instanceof StepTrimmedCurve) {
-            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
-            return previewCurveTypeName(trimmedCurve.basisCurve());
-        }
-        if (item instanceof StepOffsetCurve2D) {
-            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
-            return previewCurveTypeName(offsetCurve2D.basisCurve());
-        }
-        if (item instanceof StepOffsetCurve3D) {
-            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
-            return previewCurveTypeName(offsetCurve3D.basisCurve());
-        }
-        if (item instanceof StepOrientedCurve) {
-            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
-            return previewCurveTypeName(orientedCurve.curveElement());
-        }
-        if (item instanceof StepAnnotationCurveOccurrence) {
-            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
-            return previewCurveTypeName(occurrence.item());
-        }
-        if (item instanceof StepDimensionCurve) {
-            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
-            return previewCurveTypeName(dimensionCurve.item());
-        }
-        if (item instanceof StepLeaderCurve) {
-            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
-            return previewCurveTypeName(leaderCurve.item());
-        }
-        if (item instanceof StepProjectionCurve) {
-            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
-            return previewCurveTypeName(projectionCurve.item());
-        }
-        if (item instanceof StepDraughtingAnnotationOccurrence) {
-            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
-            return previewCurveTypeName(annotationOccurrence.item());
-        }
-        if (item instanceof StepTerminatorSymbol) {
-            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
-            return previewCurveTypeName(terminatorSymbol.annotatedCurve());
-        }
-        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-            return previewCurveTypeName(replica.parent());
-        }
-        if (item instanceof StepTrimmedCurve2D) {
-            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
-            return previewCurveTypeName(trimmedCurve2D.basisCurve());
+    }
+
+    private static BasisCurveRule basisCurveRule(Class<?> type, Function<StepEntity, StepEntity> basisCurve) {
+        return new BasisCurveRule(type, null, basisCurve);
+    }
+
+    /**
+     * Wrapper curves unwrapped to the basis curve their type names and ids
+     * refer to. Shared by previewCurveBasisTypeName and
+     * previewCurveBasisStepId, replacing their two former 14-branch
+     * if/else-if chains.
+     */
+    private static final List<BasisCurveRule> BASIS_CURVE_RULES = List.of(
+            basisCurveRule(StepSurfaceCurve.class, item -> ((StepSurfaceCurve) item).curve3d()),
+            basisCurveRule(StepSeamCurve.class, item -> ((StepSeamCurve) item).curve3d()),
+            basisCurveRule(StepTrimmedCurve.class, item -> ((StepTrimmedCurve) item).basisCurve()),
+            basisCurveRule(StepOffsetCurve2D.class, item -> ((StepOffsetCurve2D) item).basisCurve()),
+            basisCurveRule(StepOffsetCurve3D.class, item -> ((StepOffsetCurve3D) item).basisCurve()),
+            basisCurveRule(StepOrientedCurve.class, item -> ((StepOrientedCurve) item).curveElement()),
+            basisCurveRule(StepAnnotationCurveOccurrence.class, item -> ((StepAnnotationCurveOccurrence) item).item()),
+            basisCurveRule(StepDimensionCurve.class, item -> ((StepDimensionCurve) item).item()),
+            basisCurveRule(StepLeaderCurve.class, item -> ((StepLeaderCurve) item).item()),
+            basisCurveRule(StepProjectionCurve.class, item -> ((StepProjectionCurve) item).item()),
+            basisCurveRule(StepDraughtingAnnotationOccurrence.class, item -> ((StepDraughtingAnnotationOccurrence) item).item()),
+            basisCurveRule(StepTerminatorSymbol.class, item -> ((StepTerminatorSymbol) item).annotatedCurve()),
+            new BasisCurveRule(StepGeometricReplica.class,
+                    item -> "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()),
+                    item -> ((StepGeometricReplica) item).parent()),
+            basisCurveRule(StepTrimmedCurve2D.class, item -> ((StepTrimmedCurve2D) item).basisCurve())
+    );
+
+    private static StepEntity basisCurveOf(StepEntity item) {
+        for (BasisCurveRule rule : BASIS_CURVE_RULES) {
+            if (rule.matches(item)) {
+                return rule.basisCurve().apply(item);
+            }
         }
         return null;
+    }
+
+    public static String previewCurveBasisTypeName(StepEntity item) {
+        StepEntity basisCurve = basisCurveOf(item);
+        return basisCurve == null ? null : previewCurveTypeName(basisCurve);
     }
 
     /**
@@ -198,63 +193,8 @@ public final class StepCurveTypeNameResolver {
      * @return the basis curve step ID, or null if not applicable
      */
     public static Integer previewCurveBasisStepId(StepEntity item) {
-        if (item instanceof StepSurfaceCurve) {
-            StepSurfaceCurve surfaceCurve = (StepSurfaceCurve) item;
-            return surfaceCurve.curve3d().id();
-        }
-        if (item instanceof StepSeamCurve) {
-            StepSeamCurve seamCurve = (StepSeamCurve) item;
-            return seamCurve.curve3d().id();
-        }
-        if (item instanceof StepTrimmedCurve) {
-            StepTrimmedCurve trimmedCurve = (StepTrimmedCurve) item;
-            return trimmedCurve.basisCurve().id();
-        }
-        if (item instanceof StepOffsetCurve2D) {
-            StepOffsetCurve2D offsetCurve2D = (StepOffsetCurve2D) item;
-            return offsetCurve2D.basisCurve().id();
-        }
-        if (item instanceof StepOffsetCurve3D) {
-            StepOffsetCurve3D offsetCurve3D = (StepOffsetCurve3D) item;
-            return offsetCurve3D.basisCurve().id();
-        }
-        if (item instanceof StepOrientedCurve) {
-            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
-            return orientedCurve.curveElement().id();
-        }
-        if (item instanceof StepAnnotationCurveOccurrence) {
-            StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) item;
-            return occurrence.item().id();
-        }
-        if (item instanceof StepDimensionCurve) {
-            StepDimensionCurve dimensionCurve = (StepDimensionCurve) item;
-            return dimensionCurve.item().id();
-        }
-        if (item instanceof StepLeaderCurve) {
-            StepLeaderCurve leaderCurve = (StepLeaderCurve) item;
-            return leaderCurve.item().id();
-        }
-        if (item instanceof StepProjectionCurve) {
-            StepProjectionCurve projectionCurve = (StepProjectionCurve) item;
-            return projectionCurve.item().id();
-        }
-        if (item instanceof StepDraughtingAnnotationOccurrence) {
-            StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) item;
-            return annotationOccurrence.item().id();
-        }
-        if (item instanceof StepTerminatorSymbol) {
-            StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) item;
-            return terminatorSymbol.annotatedCurve().id();
-        }
-        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-            return replica.parent().id();
-        }
-        if (item instanceof StepTrimmedCurve2D) {
-            StepTrimmedCurve2D trimmedCurve2D = (StepTrimmedCurve2D) item;
-            return trimmedCurve2D.basisCurve().id();
-        }
-        return null;
+        StepEntity basisCurve = basisCurveOf(item);
+        return basisCurve == null ? null : basisCurve.id();
     }
 
     /**
