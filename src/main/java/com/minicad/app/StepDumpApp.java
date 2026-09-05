@@ -34,6 +34,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -318,770 +320,478 @@ public final class StepDumpApp {
 
     private static void appendBuildSummary(Map<Integer, StepEntity> resolved, StepCadBuilder builder, List<String> lines) {
         lines.add("Build Summary");
-
-        int openShells = 0;
-        int closedShells = 0;
-        int solids = 0;
-        int booleanResults = 0;
-        int standaloneFaceEntities = 0;
-        int standaloneEdgeEntities = 0;
-        int standaloneLoopEntities = 0;
-        int standalonePathEntities = 0;
-        int standaloneContainerEntities = 0;
-        int unsupportedFaces = 0;
-        int skipped2DEntities = 0;
-        Map<String, Integer> unsupportedReasons = new LinkedHashMap<>();
-        Map<String, Integer> unsupportedReasonCodes = new LinkedHashMap<>();
-        Set<Integer> shellFaceIds = StepEntityIdCollector.collectShellFaceIds(resolved.values());
-        Set<Integer> loopOrientedEdgeIds = StepEntityIdCollector.collectLoopOrientedEdgeIds(resolved.values());
-        Set<Integer> orientedEdgeElementIds = StepEntityIdCollector.collectOrientedEdgeElementIds(resolved.values());
-        Set<Integer> faceBoundLoopIds = StepEntityIdCollector.collectFaceBoundLoopIds(resolved.values());
-
+        SummaryAccumulator accumulator = new SummaryAccumulator(
+                builder,
+                lines,
+                StepEntityIdCollector.collectShellFaceIds(resolved.values()),
+                StepEntityIdCollector.collectLoopOrientedEdgeIds(resolved.values()),
+                StepEntityIdCollector.collectOrientedEdgeElementIds(resolved.values()),
+                StepEntityIdCollector.collectFaceBoundLoopIds(resolved.values())
+        );
         for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepOpenShell) {
+            accumulator.summarize(entity);
+        }
+        accumulator.appendTotals();
+    }
+
+    @FunctionalInterface
+    private interface SummaryAction {
+        String run() throws UnsupportedGeometryException, GeometryException, TopologyException, StepResolutionException;
+    }
+
+    private record SummaryRule(
+            Class<?> type,
+            BiPredicate<StepEntity, SummaryAccumulator> guard,
+            BiConsumer<StepEntity, SummaryAccumulator> handler
+    ) {
+        boolean matches(StepEntity entity, SummaryAccumulator accumulator) {
+            return type.isInstance(entity) && (guard == null || guard.test(entity, accumulator));
+        }
+    }
+
+    private static SummaryRule summaryRule(Class<?> type, BiConsumer<StepEntity, SummaryAccumulator> handler) {
+        return new SummaryRule(type, null, handler);
+    }
+
+    private static SummaryRule summaryRule(
+            Class<?> type,
+            BiPredicate<StepEntity, SummaryAccumulator> guard,
+            BiConsumer<StepEntity, SummaryAccumulator> handler
+    ) {
+        return new SummaryRule(type, guard, handler);
+    }
+
+    /**
+     * Build-summary rules keyed by exact concrete type, replacing the former
+     * 45-branch else-if chain. The generated STEP model hierarchy is flat
+     * (every class directly implements StepEntity), so rule order cannot
+     * change matching; the guarded rules keep the standalone-only filters
+     * that used to sit in the branch conditions.
+     */
+    private static final List<SummaryRule> SUMMARY_RULES = List.of(
+            summaryRule(StepOpenShell.class, (entity, acc) -> {
+                acc.openShells++;
                 StepOpenShell openShell = (StepOpenShell) entity;
-                FaceBuildCounts counts = summarizeShell(openShell.faces(), builder);
-                lines.add("  " + stepEntityTypeName(openShell) + " #" + openShell.id() + ": faces=" + counts.supportedFaces()
-                        + ", unsupportedFaces=" + counts.unsupportedFaces());
-                appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                openShells++;
-                unsupportedFaces += counts.unsupportedFaces();
-                mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepSurfacedOpenShell) {
-                StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
-                FaceBuildCounts counts = summarizeShell(surfacedOpenShell.faces(), builder);
-                lines.add("  " + stepEntityTypeName(surfacedOpenShell) + " #" + surfacedOpenShell.id() + ": faces=" + counts.supportedFaces()
-                        + ", unsupportedFaces=" + counts.unsupportedFaces());
-                appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                openShells++;
-                unsupportedFaces += counts.unsupportedFaces();
-                mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepClosedShell) {
+                acc.summarizeShellEntity(openShell, openShell.faces(), "faces");
+            }),
+            summaryRule(StepSurfacedOpenShell.class, (entity, acc) -> {
+                acc.openShells++;
+                StepSurfacedOpenShell openShell = (StepSurfacedOpenShell) entity;
+                acc.summarizeShellEntity(openShell, openShell.faces(), "faces");
+            }),
+            summaryRule(StepClosedShell.class, (entity, acc) -> {
+                acc.closedShells++;
                 StepClosedShell closedShell = (StepClosedShell) entity;
-                FaceBuildCounts counts = summarizeShell(closedShell.faces(), builder);
-                lines.add("  " + stepEntityTypeName(closedShell) + " #" + closedShell.id() + ": faces=" + counts.supportedFaces()
-                        + ", unsupportedFaces=" + counts.unsupportedFaces());
-                appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                closedShells++;
-                unsupportedFaces += counts.unsupportedFaces();
-                mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepOrientedOpenShell) {
-                StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
-                FaceBuildCounts counts = summarizeShell(orientedOpenShell.faces(), builder);
-                lines.add("  " + stepEntityTypeName(orientedOpenShell) + " #" + orientedOpenShell.id() + ": faces=" + counts.supportedFaces()
-                        + ", unsupportedFaces=" + counts.unsupportedFaces());
-                appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                openShells++;
-                unsupportedFaces += counts.unsupportedFaces();
-                mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepOrientedClosedShell) {
-                StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
-                FaceBuildCounts counts = summarizeShell(orientedClosedShell.faces(), builder);
-                lines.add("  " + stepEntityTypeName(orientedClosedShell) + " #" + orientedClosedShell.id() + ": faces=" + counts.supportedFaces()
-                        + ", unsupportedFaces=" + counts.unsupportedFaces());
-                appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                closedShells++;
-                unsupportedFaces += counts.unsupportedFaces();
-                mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepManifoldSolidBrep) {
+                acc.summarizeShellEntity(closedShell, closedShell.faces(), "faces");
+            }),
+            summaryRule(StepOrientedOpenShell.class, (entity, acc) -> {
+                acc.openShells++;
+                StepOrientedOpenShell openShell = (StepOrientedOpenShell) entity;
+                acc.summarizeShellEntity(openShell, openShell.faces(), "faces");
+            }),
+            summaryRule(StepOrientedClosedShell.class, (entity, acc) -> {
+                acc.closedShells++;
+                StepOrientedClosedShell closedShell = (StepOrientedClosedShell) entity;
+                acc.summarizeShellEntity(closedShell, closedShell.faces(), "faces");
+            }),
+            summaryRule(StepManifoldSolidBrep.class, (entity, acc) -> {
+                acc.solids++;
                 StepManifoldSolidBrep solidBrep = (StepManifoldSolidBrep) entity;
-                FaceBuildCounts counts = summarizeShell(shellFaces(solidBrep.outer()), builder);
-                lines.add("  " + stepEntityTypeName(solidBrep) + " #" + solidBrep.id() + ": shellFaces=" + counts.supportedFaces()
-                        + ", unsupportedFaces=" + counts.unsupportedFaces());
-                appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                solids++;
-                unsupportedFaces += counts.unsupportedFaces();
-                mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepBrepWithVoids) {
+                acc.summarizeShellEntity(solidBrep, shellFaces(solidBrep.outer()), "shellFaces");
+            }),
+            summaryRule(StepBrepWithVoids.class, (entity, acc) -> {
+                acc.solids++;
                 StepBrepWithVoids brepWithVoids = (StepBrepWithVoids) entity;
-                FaceBuildCounts counts = summarizeShell(shellFaces(brepWithVoids.outer()), builder);
+                FaceBuildCounts counts = summarizeShell(shellFaces(brepWithVoids.outer()), acc.builder);
                 for (StepEntity voidShell : brepWithVoids.voids()) {
-                    counts = counts.plus(summarizeShell(shellFaces(voidShell), builder));
+                    counts = counts.plus(summarizeShell(shellFaces(voidShell), acc.builder));
                 }
-                lines.add("  " + stepEntityTypeName(brepWithVoids) + " #" + brepWithVoids.id() + ": shellFaces=" + counts.supportedFaces()
-                        + ", unsupportedFaces=" + counts.unsupportedFaces());
-                appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                solids++;
-                unsupportedFaces += counts.unsupportedFaces();
-                mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-            } else if (entity instanceof StepSweptAreaSolid) {
-                StepSweptAreaSolid sweptAreaSolid = (StepSweptAreaSolid) entity;
-                try {
-                    int faceCount = builder.buildSolid(sweptAreaSolid.id()).outerShell().faces().size();
-                    lines.add("  " + stepEntityTypeName(sweptAreaSolid) + " #" + sweptAreaSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
-                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.swept_area", 1);
-                    lines.add("  " + stepEntityTypeName(sweptAreaSolid) + " #" + sweptAreaSolid.id() + ": shellFaces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, reasonCounts);
-                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
-                    unsupportedFaces++;
-                    mergeReasonCounts(unsupportedReasons, reasonCounts);
-                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
-                }
-                solids++;
-            } else if (entity instanceof StepExtrudedFaceSolid) {
-                StepExtrudedFaceSolid extrudedFaceSolid = (StepExtrudedFaceSolid) entity;
-                try {
-                    int faceCount = builder.buildSolid(extrudedFaceSolid.id()).outerShell().faces().size();
-                    lines.add("  " + stepEntityTypeName(extrudedFaceSolid) + " #" + extrudedFaceSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
-                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.extruded_face", 1);
-                    lines.add("  " + stepEntityTypeName(extrudedFaceSolid) + " #" + extrudedFaceSolid.id() + ": shellFaces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, reasonCounts);
-                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
-                    unsupportedFaces++;
-                    mergeReasonCounts(unsupportedReasons, reasonCounts);
-                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
-                }
-                solids++;
-            } else if (entity instanceof StepRevolvedFaceSolid) {
-                StepRevolvedFaceSolid revolvedFaceSolid = (StepRevolvedFaceSolid) entity;
-                try {
-                    int faceCount = builder.buildSolid(revolvedFaceSolid.id()).outerShell().faces().size();
-                    lines.add("  " + stepEntityTypeName(revolvedFaceSolid) + " #" + revolvedFaceSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
-                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.revolved_face", 1);
-                    lines.add("  " + stepEntityTypeName(revolvedFaceSolid) + " #" + revolvedFaceSolid.id() + ": shellFaces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, reasonCounts);
-                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
-                    unsupportedFaces++;
-                    mergeReasonCounts(unsupportedReasons, reasonCounts);
-                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
-                }
-                solids++;
-            } else if (entity instanceof StepSolidReplica) {
-                StepSolidReplica solidReplica = (StepSolidReplica) entity;
-                try {
-                    int faceCount = builder.buildSolid(solidReplica.id()).outerShell().faces().size();
-                    lines.add("  " + stepEntityTypeName(solidReplica) + " #" + solidReplica.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
-                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.replica", 1);
-                    lines.add("  " + stepEntityTypeName(solidReplica) + " #" + solidReplica.id() + ": shellFaces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, reasonCounts);
-                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
-                    unsupportedFaces++;
-                    mergeReasonCounts(unsupportedReasons, reasonCounts);
-                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
-                }
-                solids++;
-            } else if (entity instanceof StepCsgSolid) {
-                StepCsgSolid csgSolid = (StepCsgSolid) entity;
-                try {
-                    int faceCount = builder.buildSolid(csgSolid.id()).outerShell().faces().size();
-                    lines.add("  " + stepEntityTypeName(csgSolid) + " #" + csgSolid.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
-                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.csg", 1);
-                    lines.add("  " + stepEntityTypeName(csgSolid) + " #" + csgSolid.id() + ": shellFaces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, reasonCounts);
-                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
-                    unsupportedFaces++;
-                    mergeReasonCounts(unsupportedReasons, reasonCounts);
-                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
-                }
-                solids++;
-            } else if (entity instanceof StepCsgPrimitive) {
-                StepCsgPrimitive csgPrimitive = (StepCsgPrimitive) entity;
-                try {
-                    int faceCount = builder.buildSolid(csgPrimitive.id()).outerShell().faces().size();
-                    lines.add("  " + stepEntityTypeName(csgPrimitive) + " #" + csgPrimitive.id() + ": shellFaces=" + faceCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
-                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_solid.csg_primitive", 1);
-                    lines.add("  " + stepEntityTypeName(csgPrimitive) + " #" + csgPrimitive.id() + ": shellFaces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, reasonCounts);
-                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
-                    unsupportedFaces++;
-                    mergeReasonCounts(unsupportedReasons, reasonCounts);
-                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
-                }
-                solids++;
-            } else if (entity instanceof StepBooleanClippingResult) {
-                StepBooleanClippingResult clippingResult = (StepBooleanClippingResult) entity;
-                booleanResults++;
-                try {
-                    int faceCount = builder.buildSolid(clippingResult.id()).outerShell().faces().size();
-                    lines.add("  " + stepEntityTypeName(clippingResult) + " #" + clippingResult.id() + ": faces=" + faceCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
-                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_boolean.clipping_result", 1);
-                    lines.add("  " + stepEntityTypeName(clippingResult) + " #" + clippingResult.id() + ": faces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, reasonCounts);
-                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
-                    unsupportedFaces++;
-                    mergeReasonCounts(unsupportedReasons, reasonCounts);
-                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
-                }
-            } else if (entity instanceof StepBooleanResult) {
-                StepBooleanResult booleanResult = (StepBooleanResult) entity;
-                booleanResults++;
-                try {
-                    int faceCount = builder.buildSolid(booleanResult.id()).outerShell().faces().size();
-                    lines.add("  " + stepEntityTypeName(booleanResult) + " #" + booleanResult.id() + ": faces=" + faceCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
-                    Map<String, Integer> reasonCodeCounts = Map.of("unsupported_boolean.result", 1);
-                    lines.add("  " + stepEntityTypeName(booleanResult) + " #" + booleanResult.id() + ": faces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, reasonCounts);
-                    appendUnsupportedReasonCodes(lines, reasonCodeCounts);
-                    unsupportedFaces++;
-                    mergeReasonCounts(unsupportedReasons, reasonCounts);
-                    mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
-                }
-            } else if (entity instanceof StepFaceEntity && !shellFaceIds.contains(((StepFaceEntity) entity).id())) {
-                StepFaceEntity face = (StepFaceEntity) entity;
-                standaloneFaceEntities++;
-                try {
-                    builder.buildFace(face.id());
-                    lines.add("  " + stepEntityTypeName(face) + " #" + face.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(face) + " #" + face.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepOrientedEdge && !loopOrientedEdgeIds.contains(((StepOrientedEdge) entity).id())) {
-                StepOrientedEdge orientedEdge = (StepOrientedEdge) entity;
-                standaloneEdgeEntities++;
-                try {
-                    builder.buildOrientedEdge(orientedEdge.id());
-                    lines.add("  " + stepEntityTypeName(orientedEdge) + " #" + orientedEdge.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(orientedEdge) + " #" + orientedEdge.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepEdgeCurve && !orientedEdgeElementIds.contains(((StepEdgeCurve) entity).id())) {
-                StepEdgeCurve edgeCurve = (StepEdgeCurve) entity;
-                standaloneEdgeEntities++;
-                try {
-                    builder.buildEdge(edgeCurve.id());
-                    lines.add("  " + stepEntityTypeName(edgeCurve) + " #" + edgeCurve.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(edgeCurve) + " #" + edgeCurve.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepSubedge && !orientedEdgeElementIds.contains(((StepSubedge) entity).id())) {
-                StepSubedge subedge = (StepSubedge) entity;
-                standaloneEdgeEntities++;
-                try {
-                    builder.buildEdge(subedge.id());
-                    lines.add("  " + stepEntityTypeName(subedge) + " #" + subedge.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(subedge) + " #" + subedge.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepEdgeLoop && !faceBoundLoopIds.contains(((StepEdgeLoop) entity).id())) {
-                StepEdgeLoop edgeLoop = (StepEdgeLoop) entity;
-                standaloneLoopEntities++;
-                try {
-                    builder.buildEdgeLoop(edgeLoop.id());
-                    lines.add("  " + stepEntityTypeName(edgeLoop) + " #" + edgeLoop.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(edgeLoop) + " #" + edgeLoop.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepVertexLoop && !faceBoundLoopIds.contains(((StepVertexLoop) entity).id())) {
-                StepVertexLoop vertexLoop = (StepVertexLoop) entity;
-                standaloneLoopEntities++;
-                try {
-                    builder.buildVertexLoop(vertexLoop.id());
-                    lines.add("  " + stepEntityTypeName(vertexLoop) + " #" + vertexLoop.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(vertexLoop) + " #" + vertexLoop.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepPolyLoop && !faceBoundLoopIds.contains(((StepPolyLoop) entity).id())) {
-                StepPolyLoop polyLoop = (StepPolyLoop) entity;
-                standaloneLoopEntities++;
-                try {
-                    validatePolyLoop(polyLoop, builder);
-                    lines.add("  " + stepEntityTypeName(polyLoop) + " #" + polyLoop.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(polyLoop) + " #" + polyLoop.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepPath) {
-                StepPath path = (StepPath) entity;
-                standalonePathEntities++;
-                try {
-                    validatePathEdges(path.edges(), builder);
-                    lines.add("  " + stepEntityTypeName(path) + " #" + path.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(path) + " #" + path.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepOpenPath) {
-                StepOpenPath openPath = (StepOpenPath) entity;
-                standalonePathEntities++;
-                try {
-                    validatePathEdges(openPath.edges(), builder);
-                    lines.add("  " + stepEntityTypeName(openPath) + " #" + openPath.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(openPath) + " #" + openPath.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepSubpath) {
-                StepSubpath subpath = (StepSubpath) entity;
-                standalonePathEntities++;
-                try {
-                    validatePathEdges(subpath.edges(), builder);
-                    lines.add("  " + stepEntityTypeName(subpath) + " #" + subpath.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(subpath) + " #" + subpath.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepOrientedPath) {
-                StepOrientedPath orientedPath = (StepOrientedPath) entity;
-                standalonePathEntities++;
-                try {
-                    validatePathEdges(orientedPath.edges(), builder);
-                    lines.add("  " + stepEntityTypeName(orientedPath) + " #" + orientedPath.id() + ": built=true, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(orientedPath) + " #" + orientedPath.id() + ": built=false, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepConnectedEdgeSet) {
-                StepConnectedEdgeSet edgeSet = (StepConnectedEdgeSet) entity;
-                standaloneContainerEntities++;
-                try {
-                    int edgeCount = validateConnectedEdgeSet(edgeSet, builder);
-                    lines.add("  " + stepEntityTypeName(edgeSet) + " #" + edgeSet.id() + ": builtEdges=" + edgeCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(edgeSet) + " #" + edgeSet.id() + ": builtEdges=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepWireShell) {
-                StepWireShell wireShell = (StepWireShell) entity;
-                standaloneContainerEntities++;
-                try {
-                    int loopCount = validateWireShell(wireShell, builder);
-                    lines.add("  " + stepEntityTypeName(wireShell) + " #" + wireShell.id() + ": builtLoops=" + loopCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(wireShell) + " #" + wireShell.id() + ": builtLoops=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepVertexShell) {
-                StepVertexShell vertexShell = (StepVertexShell) entity;
-                standaloneContainerEntities++;
-                try {
-                    builder.buildVertexLoop(vertexShell.extent().id());
-                    lines.add("  " + stepEntityTypeName(vertexShell) + " #" + vertexShell.id() + ": builtVertices=1, unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(vertexShell) + " #" + vertexShell.id() + ": builtVertices=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepEdgeBasedWireframeModel) {
-                StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) entity;
-                standaloneContainerEntities++;
-                try {
+                acc.reportCounts(brepWithVoids, "shellFaces", counts);
+            }),
+            summaryRule(StepSweptAreaSolid.class, (entity, acc) -> {
+                acc.solids++;
+                acc.summarizeBuiltSolid(entity, "shellFaces", "unsupported_solid.swept_area");
+            }),
+            summaryRule(StepExtrudedFaceSolid.class, (entity, acc) -> {
+                acc.solids++;
+                acc.summarizeBuiltSolid(entity, "shellFaces", "unsupported_solid.extruded_face");
+            }),
+            summaryRule(StepRevolvedFaceSolid.class, (entity, acc) -> {
+                acc.solids++;
+                acc.summarizeBuiltSolid(entity, "shellFaces", "unsupported_solid.revolved_face");
+            }),
+            summaryRule(StepSolidReplica.class, (entity, acc) -> {
+                acc.solids++;
+                acc.summarizeBuiltSolid(entity, "shellFaces", "unsupported_solid.replica");
+            }),
+            summaryRule(StepCsgSolid.class, (entity, acc) -> {
+                acc.solids++;
+                acc.summarizeBuiltSolid(entity, "shellFaces", "unsupported_solid.csg");
+            }),
+            summaryRule(StepCsgPrimitive.class, (entity, acc) -> {
+                acc.solids++;
+                acc.summarizeBuiltSolid(entity, "shellFaces", "unsupported_solid.csg_primitive");
+            }),
+            summaryRule(StepBooleanClippingResult.class, (entity, acc) -> {
+                acc.booleanResults++;
+                acc.summarizeBuiltSolid(entity, "faces", "unsupported_boolean.clipping_result");
+            }),
+            summaryRule(StepBooleanResult.class, (entity, acc) -> {
+                acc.booleanResults++;
+                acc.summarizeBuiltSolid(entity, "faces", "unsupported_boolean.result");
+            }),
+            summaryRule(StepFaceEntity.class,
+                    (entity, acc) -> !acc.shellFaceIds.contains(entity.id()),
+                    (entity, acc) -> {
+                        acc.standaloneFaceEntities++;
+                        acc.summarizeStandalone(entity, "built=false", () -> {
+                            acc.builder.buildFace(entity.id());
+                            return "built=true";
+                        });
+                    }),
+            summaryRule(StepOrientedEdge.class,
+                    (entity, acc) -> !acc.loopOrientedEdgeIds.contains(entity.id()),
+                    (entity, acc) -> {
+                        acc.standaloneEdgeEntities++;
+                        acc.summarizeStandalone(entity, "built=false", () -> {
+                            acc.builder.buildOrientedEdge(entity.id());
+                            return "built=true";
+                        });
+                    }),
+            summaryRule(StepEdgeCurve.class,
+                    (entity, acc) -> !acc.orientedEdgeElementIds.contains(entity.id()),
+                    (entity, acc) -> {
+                        acc.standaloneEdgeEntities++;
+                        acc.summarizeStandalone(entity, "built=false", () -> {
+                            acc.builder.buildEdge(entity.id());
+                            return "built=true";
+                        });
+                    }),
+            summaryRule(StepSubedge.class,
+                    (entity, acc) -> !acc.orientedEdgeElementIds.contains(entity.id()),
+                    (entity, acc) -> {
+                        acc.standaloneEdgeEntities++;
+                        acc.summarizeStandalone(entity, "built=false", () -> {
+                            acc.builder.buildEdge(entity.id());
+                            return "built=true";
+                        });
+                    }),
+            summaryRule(StepEdgeLoop.class,
+                    (entity, acc) -> !acc.faceBoundLoopIds.contains(entity.id()),
+                    (entity, acc) -> {
+                        acc.standaloneLoopEntities++;
+                        acc.summarizeStandalone(entity, "built=false", () -> {
+                            acc.builder.buildEdgeLoop(entity.id());
+                            return "built=true";
+                        });
+                    }),
+            summaryRule(StepVertexLoop.class,
+                    (entity, acc) -> !acc.faceBoundLoopIds.contains(entity.id()),
+                    (entity, acc) -> {
+                        acc.standaloneLoopEntities++;
+                        acc.summarizeStandalone(entity, "built=false", () -> {
+                            acc.builder.buildVertexLoop(entity.id());
+                            return "built=true";
+                        });
+                    }),
+            summaryRule(StepPolyLoop.class,
+                    (entity, acc) -> !acc.faceBoundLoopIds.contains(entity.id()),
+                    (entity, acc) -> {
+                        acc.standaloneLoopEntities++;
+                        acc.summarizeStandalone(entity, "built=false", () -> {
+                            validatePolyLoop((StepPolyLoop) entity, acc.builder);
+                            return "built=true";
+                        });
+                    }),
+            summaryRule(StepPath.class, (entity, acc) -> {
+                acc.standalonePathEntities++;
+                acc.summarizeStandalone(entity, "built=false", () -> {
+                    validatePathEdges(((StepPath) entity).edges(), acc.builder);
+                    return "built=true";
+                });
+            }),
+            summaryRule(StepOpenPath.class, (entity, acc) -> {
+                acc.standalonePathEntities++;
+                acc.summarizeStandalone(entity, "built=false", () -> {
+                    validatePathEdges(((StepOpenPath) entity).edges(), acc.builder);
+                    return "built=true";
+                });
+            }),
+            summaryRule(StepSubpath.class, (entity, acc) -> {
+                acc.standalonePathEntities++;
+                acc.summarizeStandalone(entity, "built=false", () -> {
+                    validatePathEdges(((StepSubpath) entity).edges(), acc.builder);
+                    return "built=true";
+                });
+            }),
+            summaryRule(StepOrientedPath.class, (entity, acc) -> {
+                acc.standalonePathEntities++;
+                acc.summarizeStandalone(entity, "built=false", () -> {
+                    validatePathEdges(((StepOrientedPath) entity).edges(), acc.builder);
+                    return "built=true";
+                });
+            }),
+            summaryRule(StepConnectedEdgeSet.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtEdges=0", () ->
+                        "builtEdges=" + validateConnectedEdgeSet((StepConnectedEdgeSet) entity, acc.builder));
+            }),
+            summaryRule(StepWireShell.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtLoops=0", () ->
+                        "builtLoops=" + validateWireShell((StepWireShell) entity, acc.builder));
+            }),
+            summaryRule(StepVertexShell.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtVertices=0", () -> {
+                    acc.builder.buildVertexLoop(((StepVertexShell) entity).extent().id());
+                    return "builtVertices=1";
+                });
+            }),
+            summaryRule(StepEdgeBasedWireframeModel.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtEdges=0", () -> {
                     int edgeCount = 0;
-                    for (StepConnectedEdgeSet boundary : wireframeModel.boundaries()) {
-                        edgeCount += validateConnectedEdgeSet(boundary, builder);
+                    for (StepConnectedEdgeSet boundary : ((StepEdgeBasedWireframeModel) entity).boundaries()) {
+                        edgeCount += validateConnectedEdgeSet(boundary, acc.builder);
                     }
-                    lines.add("  " + stepEntityTypeName(wireframeModel) + " #" + wireframeModel.id() + ": builtEdges=" + edgeCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(wireframeModel) + " #" + wireframeModel.id() + ": builtEdges=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepShellBasedWireframeModel) {
-                StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) entity;
-                standaloneContainerEntities++;
+                    return "builtEdges=" + edgeCount;
+                });
+            }),
+            summaryRule(StepShellBasedWireframeModel.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtBoundaries=0", () ->
+                        "builtBoundaries=" + validateShellBasedWireframeModel((StepShellBasedWireframeModel) entity, acc.builder));
+            }),
+            summaryRule(StepFaceBasedSurfaceModel.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
                 try {
-                    int memberCount = validateShellBasedWireframeModel(wireframeModel, builder);
-                    lines.add("  " + stepEntityTypeName(wireframeModel) + " #" + wireframeModel.id() + ": builtBoundaries=" + memberCount + ", unsupportedFaces=0");
+                    FaceBuildCounts counts = validateFaceBasedSurfaceModel((StepFaceBasedSurfaceModel) entity, acc.builder);
+                    acc.reportCounts(entity, "faces", counts);
                 } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(wireframeModel) + " #" + wireframeModel.id() + ": builtBoundaries=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
+                    acc.summarizeFailedEntity(entity, "faces=0", ex);
                 }
-            } else if (entity instanceof StepFaceBasedSurfaceModel) {
-                StepFaceBasedSurfaceModel surfaceModel = (StepFaceBasedSurfaceModel) entity;
-                standaloneContainerEntities++;
+            }),
+            summaryRule(StepShellBasedSurfaceModel.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
                 try {
-                    FaceBuildCounts counts = validateFaceBasedSurfaceModel(surfaceModel, builder);
-                    lines.add("  " + stepEntityTypeName(surfaceModel) + " #" + surfaceModel.id() + ": faces=" + counts.supportedFaces()
-                            + ", unsupportedFaces=" + counts.unsupportedFaces());
-                    appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                    appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                    unsupportedFaces += counts.unsupportedFaces();
-                    mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                    mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
+                    FaceBuildCounts counts = validateShellBasedSurfaceModel((StepShellBasedSurfaceModel) entity, acc.builder);
+                    acc.reportCounts(entity, "faces", counts);
                 } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(surfaceModel) + " #" + surfaceModel.id() + ": faces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
+                    acc.summarizeFailedEntity(entity, "faces=0", ex);
                 }
-            } else if (entity instanceof StepShellBasedSurfaceModel) {
-                StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) entity;
-                standaloneContainerEntities++;
+            }),
+            summaryRule(StepGeometricCurveSet.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtMembers=0", () ->
+                        "builtMembers=" + validateGeometricCurveSet((StepGeometricCurveSet) entity, acc.builder));
+            }),
+            summaryRule(StepPointSet.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtMembers=0", () ->
+                        "builtMembers=" + validatePointSet((StepPointSet) entity, acc.builder));
+            }),
+            summaryRule(StepGeometricSet.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtMembers=0", () ->
+                        "builtMembers=" + validateGeometricSet((StepGeometricSet) entity, acc.builder));
+            }),
+            summaryRule(StepRepresentation.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
                 try {
-                    FaceBuildCounts counts = validateShellBasedSurfaceModel(surfaceModel, builder);
-                    lines.add("  " + stepEntityTypeName(surfaceModel) + " #" + surfaceModel.id() + ": faces=" + counts.supportedFaces()
-                            + ", unsupportedFaces=" + counts.unsupportedFaces());
-                    appendUnsupportedReasons(lines, counts.unsupportedReasons());
-                    appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
-                    unsupportedFaces += counts.unsupportedFaces();
-                    mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
-                    mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(surfaceModel) + " #" + surfaceModel.id() + ": faces=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepGeometricCurveSet) {
-                StepGeometricCurveSet curveSet = (StepGeometricCurveSet) entity;
-                standaloneContainerEntities++;
-                try {
-                    int memberCount = validateGeometricCurveSet(curveSet, builder);
-                    lines.add("  " + stepEntityTypeName(curveSet) + " #" + curveSet.id() + ": builtMembers=" + memberCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(curveSet) + " #" + curveSet.id() + ": builtMembers=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepPointSet) {
-                StepPointSet pointSet = (StepPointSet) entity;
-                standaloneContainerEntities++;
-                try {
-                    int memberCount = validatePointSet(pointSet, builder);
-                    lines.add("  " + stepEntityTypeName(pointSet) + " #" + pointSet.id() + ": builtMembers=" + memberCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(pointSet) + " #" + pointSet.id() + ": builtMembers=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepGeometricSet) {
-                StepGeometricSet geometricSet = (StepGeometricSet) entity;
-                standaloneContainerEntities++;
-                try {
-                    int memberCount = validateGeometricSet(geometricSet, builder);
-                    lines.add("  " + stepEntityTypeName(geometricSet) + " #" + geometricSet.id() + ": builtMembers=" + memberCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(geometricSet) + " #" + geometricSet.id() + ": builtMembers=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepRepresentation) {
-                StepRepresentation representation = (StepRepresentation) entity;
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateRepresentation(representation, builder);
-                    lines.add("  " + stepEntityTypeName(representation) + " #" + representation.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
+                    int itemCount = validateRepresentation((StepRepresentation) entity, acc.builder);
+                    acc.line(entity, "builtItems=" + itemCount + ", unsupportedFaces=0");
                 } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
                     if (is2DPcurveEntity(entity)) {
-                        standaloneContainerEntities--;
-                        skipped2DEntities++;
-                        continue;
+                        acc.standaloneContainerEntities--;
+                        acc.skipped2DEntities++;
+                        return;
                     }
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(representation) + " #" + representation.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
+                    acc.summarizeFailedEntity(entity, "builtItems=0", ex);
                 }
-            } else if (entity instanceof StepRepresentationMap) {
-                StepRepresentationMap representationMap = (StepRepresentationMap) entity;
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateRepresentationMap(representationMap, builder);
-                    lines.add("  " + stepEntityTypeName(representationMap) + " #" + representationMap.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(representationMap) + " #" + representationMap.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
+            }),
+            summaryRule(StepRepresentationMap.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtItems=0", () ->
+                        "builtItems=" + validateRepresentationMap((StepRepresentationMap) entity, acc.builder));
+            }),
+            summaryRule(StepMappedItem.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtItems=0", () ->
+                        "builtItems=" + validateMappedItem((StepMappedItem) entity, acc.builder));
+            }),
+            summaryRule(StepStyledItem.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtItems=0", () ->
+                        "builtItems=" + validateStyledItem((StepStyledItem) entity, acc.builder));
+            }),
+            summaryRule(StepOverRidingStyledItem.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtItems=0", () ->
+                        "builtItems=" + validateOverridingStyledItem((StepOverRidingStyledItem) entity, acc.builder));
+            }),
+            summaryRule(StepRepresentationRelationship.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtItems=0", () ->
+                        "builtItems=" + validateRepresentationRelationship((StepRepresentationRelationship) entity, acc.builder));
+            }),
+            summaryRule(StepRepresentationRelationshipWithTransformation.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtItems=0", () ->
+                        "builtItems=" + validateRepresentationRelationshipWithTransformation((StepRepresentationRelationshipWithTransformation) entity, acc.builder));
+            }),
+            summaryRule(StepShapeRepresentationRelationship.class, (entity, acc) -> {
+                acc.standaloneContainerEntities++;
+                acc.summarizeStandalone(entity, "builtItems=0", () ->
+                        "builtItems=" + validateShapeRepresentationRelationship((StepShapeRepresentationRelationship) entity, acc.builder));
+            })
+    );
+
+    /**
+     * Mutable state for one appendBuildSummary pass. Owns the running totals
+     * and the shared failure bookkeeping the per-type rules reuse.
+     */
+    private static final class SummaryAccumulator {
+        private final StepCadBuilder builder;
+        private final List<String> lines;
+        private final Set<Integer> shellFaceIds;
+        private final Set<Integer> loopOrientedEdgeIds;
+        private final Set<Integer> orientedEdgeElementIds;
+        private final Set<Integer> faceBoundLoopIds;
+        private int openShells;
+        private int closedShells;
+        private int solids;
+        private int booleanResults;
+        private int standaloneFaceEntities;
+        private int standaloneEdgeEntities;
+        private int standaloneLoopEntities;
+        private int standalonePathEntities;
+        private int standaloneContainerEntities;
+        private int skipped2DEntities;
+        private int unsupportedFaces;
+        private final Map<String, Integer> unsupportedReasons = new LinkedHashMap<>();
+        private final Map<String, Integer> unsupportedReasonCodes = new LinkedHashMap<>();
+
+        private SummaryAccumulator(
+                StepCadBuilder builder,
+                List<String> lines,
+                Set<Integer> shellFaceIds,
+                Set<Integer> loopOrientedEdgeIds,
+                Set<Integer> orientedEdgeElementIds,
+                Set<Integer> faceBoundLoopIds
+        ) {
+            this.builder = builder;
+            this.lines = lines;
+            this.shellFaceIds = shellFaceIds;
+            this.loopOrientedEdgeIds = loopOrientedEdgeIds;
+            this.orientedEdgeElementIds = orientedEdgeElementIds;
+            this.faceBoundLoopIds = faceBoundLoopIds;
+        }
+
+        void summarize(StepEntity entity) {
+            for (SummaryRule rule : SUMMARY_RULES) {
+                if (rule.matches(entity, this)) {
+                    rule.handler().accept(entity, this);
+                    return;
                 }
-            } else if (entity instanceof StepMappedItem) {
-                StepMappedItem mappedItem = (StepMappedItem) entity;
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateMappedItem(mappedItem, builder);
-                    lines.add("  " + stepEntityTypeName(mappedItem) + " #" + mappedItem.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(mappedItem) + " #" + mappedItem.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
+            }
+            summarizeGenericEntity(entity);
+        }
+
+        private void summarizeGenericEntity(StepEntity entity) {
+            standaloneContainerEntities++;
+            try {
+                int itemCount = validateSummaryEntity(entity, builder);
+                line(entity, "builtItems=" + itemCount + ", unsupportedFaces=0");
+            } catch (UnsupportedGeometryException ex) {
+                String reason = normalizeReason(ex.getMessage());
+                if (isGenericDumpUnsupported(entity, reason)) {
+                    standaloneContainerEntities--;
+                    return;
                 }
-            } else if (entity instanceof StepStyledItem) {
-                StepStyledItem styledItem = (StepStyledItem) entity;
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateStyledItem(styledItem, builder);
-                    lines.add("  " + stepEntityTypeName(styledItem) + " #" + styledItem.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(styledItem) + " #" + styledItem.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
+                if (is2DPcurveEntity(entity)) {
+                    standaloneContainerEntities--;
+                    skipped2DEntities++;
+                    return;
                 }
-            } else if (entity instanceof StepOverRidingStyledItem) {
-                StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) entity;
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateOverridingStyledItem(styledItem, builder);
-                    lines.add("  " + stepEntityTypeName(styledItem) + " #" + styledItem.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(styledItem) + " #" + styledItem.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
+                summarizeFailedEntity(entity, "builtItems=0", ex);
+            } catch (GeometryException | TopologyException | StepResolutionException ex) {
+                if (is2DPcurveEntity(entity)) {
+                    standaloneContainerEntities--;
+                    skipped2DEntities++;
+                    return;
                 }
-            } else if (entity instanceof StepRepresentationRelationship) {
-                StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateRepresentationRelationship(relationship, builder);
-                    lines.add("  " + stepEntityTypeName(relationship) + " #" + relationship.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(relationship) + " #" + relationship.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepRepresentationRelationshipWithTransformation) {
-                StepRepresentationRelationshipWithTransformation relationship = (StepRepresentationRelationshipWithTransformation) entity;
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateRepresentationRelationshipWithTransformation(relationship, builder);
-                    lines.add("  " + stepEntityTypeName(relationship) + " #" + relationship.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(relationship) + " #" + relationship.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else if (entity instanceof StepShapeRepresentationRelationship) {
-                StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateShapeRepresentationRelationship(relationship, builder);
-                    lines.add("  " + stepEntityTypeName(relationship) + " #" + relationship.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(relationship) + " #" + relationship.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
-            } else {
-                standaloneContainerEntities++;
-                try {
-                    int itemCount = validateSummaryEntity(entity, builder);
-                    lines.add("  " + stepEntityTypeName(entity) + " #" + entity.id() + ": builtItems=" + itemCount + ", unsupportedFaces=0");
-                } catch (UnsupportedGeometryException ex) {
-                    String reason = normalizeReason(ex.getMessage());
-                    if (isGenericDumpUnsupported(entity, reason)) {
-                        standaloneContainerEntities--;
-                        continue;
-                    }
-                    if (is2DPcurveEntity(entity)) {
-                        standaloneContainerEntities--;
-                        skipped2DEntities++;
-                        continue;
-                    }
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(entity) + " #" + entity.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                } catch (GeometryException | TopologyException | StepResolutionException ex) {
-                    if (is2DPcurveEntity(entity)) {
-                        standaloneContainerEntities--;
-                        skipped2DEntities++;
-                        continue;
-                    }
-                    String reason = normalizeReason(ex.getMessage());
-                    String reasonCode = classifyReasonCode(ex, reason);
-                    lines.add("  " + stepEntityTypeName(entity) + " #" + entity.id() + ": builtItems=0, unsupportedFaces=1");
-                    appendUnsupportedReasons(lines, Map.of(reason, 1));
-                    appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
-                    unsupportedFaces++;
-                    unsupportedReasons.merge(reason, 1, Integer::sum);
-                    unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
-                }
+                summarizeFailedEntity(entity, "builtItems=0", ex);
             }
         }
 
-        lines.add("  totals: openShells=" + openShells + ", closedShells=" + closedShells
-                + ", solids=" + solids + ", booleanResults=" + booleanResults
-                + ", standaloneFaceEntities=" + standaloneFaceEntities
-                + ", standaloneEdgeEntities=" + standaloneEdgeEntities
-                + ", standaloneLoopEntities=" + standaloneLoopEntities
-                + ", standalonePathEntities=" + standalonePathEntities
-                + ", standaloneContainerEntities=" + standaloneContainerEntities
-                + ", skipped2DEntities=" + skipped2DEntities
-                + ", unsupportedFaces=" + unsupportedFaces);
-        appendUnsupportedReasons(lines, unsupportedReasons);
-        appendUnsupportedReasonCodes(lines, unsupportedReasonCodes);
+        private void appendTotals() {
+            lines.add("  totals: openShells=" + openShells + ", closedShells=" + closedShells
+                    + ", solids=" + solids + ", booleanResults=" + booleanResults
+                    + ", standaloneFaceEntities=" + standaloneFaceEntities
+                    + ", standaloneEdgeEntities=" + standaloneEdgeEntities
+                    + ", standaloneLoopEntities=" + standaloneLoopEntities
+                    + ", standalonePathEntities=" + standalonePathEntities
+                    + ", standaloneContainerEntities=" + standaloneContainerEntities
+                    + ", skipped2DEntities=" + skipped2DEntities
+                    + ", unsupportedFaces=" + unsupportedFaces);
+            appendUnsupportedReasons(lines, unsupportedReasons);
+            appendUnsupportedReasonCodes(lines, unsupportedReasonCodes);
+        }
+
+        private void line(StepEntity entity, String detail) {
+            lines.add("  " + stepEntityTypeName(entity) + " #" + entity.id() + ": " + detail);
+        }
+
+        /** Per-face build counts of a shell-typed entity: line plus reason maps appended and merged into totals. */
+        private void summarizeShellEntity(StepEntity entity, Iterable<StepFaceEntity> faces, String countLabel) {
+            reportCounts(entity, countLabel, summarizeShell(faces, builder));
+        }
+
+        private void reportCounts(StepEntity entity, String countLabel, FaceBuildCounts counts) {
+            line(entity, countLabel + "=" + counts.supportedFaces() + ", unsupportedFaces=" + counts.unsupportedFaces());
+            appendUnsupportedReasons(lines, counts.unsupportedReasons());
+            appendUnsupportedReasonCodes(lines, counts.unsupportedReasonCodes());
+            unsupportedFaces += counts.unsupportedFaces();
+            mergeReasonCounts(unsupportedReasons, counts.unsupportedReasons());
+            mergeReasonCounts(unsupportedReasonCodes, counts.unsupportedReasonCodes());
+        }
+
+        /** Solids and boolean results summarized through builder.buildSolid; a failed build counts as one unsupported face. */
+        private void summarizeBuiltSolid(StepEntity entity, String countLabel, String reasonCode) {
+            try {
+                int faceCount = builder.buildSolid(entity.id()).outerShell().faces().size();
+                line(entity, countLabel + "=" + faceCount + ", unsupportedFaces=0");
+            } catch (UnsupportedGeometryException ex) {
+                Map<String, Integer> reasonCounts = Map.of(ex.getMessage(), 1);
+                Map<String, Integer> reasonCodeCounts = Map.of(reasonCode, 1);
+                line(entity, countLabel + "=0, unsupportedFaces=1");
+                appendUnsupportedReasons(lines, reasonCounts);
+                appendUnsupportedReasonCodes(lines, reasonCodeCounts);
+                unsupportedFaces++;
+                mergeReasonCounts(unsupportedReasons, reasonCounts);
+                mergeReasonCounts(unsupportedReasonCodes, reasonCodeCounts);
+            }
+        }
+
+        private void summarizeStandalone(StepEntity entity, String failureText, SummaryAction action) {
+            try {
+                line(entity, action.run() + ", unsupportedFaces=0");
+            } catch (UnsupportedGeometryException | GeometryException | TopologyException | StepResolutionException ex) {
+                summarizeFailedEntity(entity, failureText, ex);
+            }
+        }
+
+        private void summarizeFailedEntity(StepEntity entity, String failureText, Exception ex) {
+            String reason = normalizeReason(ex.getMessage());
+            String reasonCode = classifyReasonCode(ex, reason);
+            line(entity, failureText + ", unsupportedFaces=1");
+            appendUnsupportedReasons(lines, Map.of(reason, 1));
+            appendUnsupportedReasonCodes(lines, Map.of(reasonCode, 1));
+            unsupportedFaces++;
+            unsupportedReasons.merge(reason, 1, Integer::sum);
+            unsupportedReasonCodes.merge(reasonCode, 1, Integer::sum);
+        }
     }
 
     private static void validatePolyLoop(StepPolyLoop polyLoop, StepCadBuilder builder) {
