@@ -255,6 +255,7 @@ import com.minicad.topology.VertexLoop;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -3240,84 +3241,68 @@ public final class StepCadBuilder {
         return null;
     }
 
-    SurfaceGeometry buildSupportedFaceGeometry(StepEntity geometry, String faceType) {
-        if (geometry instanceof StepPlane) {
-            StepPlane plane = (StepPlane) geometry;
-            return buildPlane(plane.id());
+    @FunctionalInterface
+    private interface FaceGeometryHandler {
+        SurfaceGeometry build(StepEntity geometry, String faceType);
+    }
+
+    private record FaceGeometryRule(Class<?> type, Predicate<StepEntity> guard, FaceGeometryHandler handler) {
+        boolean matches(StepEntity geometry) {
+            return type.isInstance(geometry) && (guard == null || guard.test(geometry));
         }
-        if (geometry instanceof StepCylindricalSurface) {
-            StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) geometry;
-            return buildCylindricalSurface(cylindricalSurface.id());
-        }
-        if (geometry instanceof StepConicalSurface) {
-            StepConicalSurface conicalSurface = (StepConicalSurface) geometry;
-            return buildConicalSurface(conicalSurface.id());
-        }
-        if (geometry instanceof StepSphericalSurface) {
-            StepSphericalSurface sphericalSurface = (StepSphericalSurface) geometry;
-            return buildSphericalSurface(sphericalSurface.id());
-        }
-        if (geometry instanceof StepToroidalSurface) {
-            StepToroidalSurface toroidalSurface = (StepToroidalSurface) geometry;
-            return buildToroidalSurface(toroidalSurface.id());
-        }
-        if (geometry instanceof StepToroidalSurfaceWithSpecifiedBends) {
-            StepToroidalSurfaceWithSpecifiedBends toroidalSpecBends = (StepToroidalSurfaceWithSpecifiedBends) geometry;
-            return buildToroidalSurfaceFromSpecifiedBends(toroidalSpecBends);
-        }
-        if (geometry instanceof StepDegenerateToroidalSurface) {
-            StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) geometry;
-            return buildDegenerateToroidalSurface(degenerateToroidalSurface.id());
-        }
-        if (geometry instanceof StepSurfaceOfLinearExtrusion) {
-            StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) geometry;
-            return buildSurfaceOfLinearExtrusion(extrusionSurface.id());
-        }
-        if (geometry instanceof StepSurfaceOfRevolution) {
-            StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) geometry;
-            return buildSurfaceOfRevolution(revolutionSurface.id());
-        }
-        if (geometry instanceof StepBezierSurface) {
-            StepBezierSurface splineSurface = (StepBezierSurface) geometry;
-            return buildBezierSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepUniformSurface) {
-            StepUniformSurface splineSurface = (StepUniformSurface) geometry;
-            return buildUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepQuasiUniformSurface) {
-            StepQuasiUniformSurface splineSurface = (StepQuasiUniformSurface) geometry;
-            return buildQuasiUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepPiecewiseBezierSurface) {
-            StepPiecewiseBezierSurface splineSurface = (StepPiecewiseBezierSurface) geometry;
-            return buildPiecewiseBezierSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepBSplineSurfaceWithKnots) {
-            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
-            return buildBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepBSplineSurface) {
-            StepBSplineSurface splineSurface = (StepBSplineSurface) geometry;
-            return buildGenericBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepRationalBSplineSurface) {
-            StepRationalBSplineSurface rationalSplineSurface = (StepRationalBSplineSurface) geometry;
-            return buildRationalBSplineSurface(rationalSplineSurface.id());
-        }
-        if (geometry instanceof StepRectangularTrimmedSurface) {
+    }
+
+    /** Face geometry built from the STEP id, ignoring the face type. */
+    private FaceGeometryRule idFaceRule(Class<?> type, Function<Integer, SurfaceGeometry> builder) {
+        return new FaceGeometryRule(type, null, (geometry, faceType) -> builder.apply(geometry.id()));
+    }
+
+    /** Face geometry delegated to another referenced entity. */
+    private FaceGeometryRule recurseFaceRule(Class<?> type, Function<StepEntity, StepEntity> next) {
+        return new FaceGeometryRule(type, null,
+                (geometry, faceType) -> buildSupportedFaceGeometry(next.apply(geometry), faceType));
+    }
+
+    /**
+     * Supported-face rules keyed by concrete type, replacing the former
+     * 37-branch if/else-if chain. Order mirrors the original chain (first
+     * match wins). One dead duplicate branch (a second StepMachinedSurface
+     * entry after the identical earlier rule) is dropped. Unmatched geometry
+     * yields null, as the old trailing return did.
+     */
+    private final List<FaceGeometryRule> supportedFaceGeometryRules = createSupportedFaceGeometryRules();
+
+    private List<FaceGeometryRule> createSupportedFaceGeometryRules() {
+        List<FaceGeometryRule> rules = new ArrayList<>();
+        rules.add(idFaceRule(StepPlane.class, this::buildPlane));
+        rules.add(idFaceRule(StepCylindricalSurface.class, this::buildCylindricalSurface));
+        rules.add(idFaceRule(StepConicalSurface.class, this::buildConicalSurface));
+        rules.add(idFaceRule(StepSphericalSurface.class, this::buildSphericalSurface));
+        rules.add(idFaceRule(StepToroidalSurface.class, this::buildToroidalSurface));
+        rules.add(new FaceGeometryRule(StepToroidalSurfaceWithSpecifiedBends.class, null,
+                (geometry, faceType) -> buildToroidalSurfaceFromSpecifiedBends((StepToroidalSurfaceWithSpecifiedBends) geometry)));
+        rules.add(idFaceRule(StepDegenerateToroidalSurface.class, this::buildDegenerateToroidalSurface));
+        rules.add(idFaceRule(StepSurfaceOfLinearExtrusion.class, this::buildSurfaceOfLinearExtrusion));
+        rules.add(idFaceRule(StepSurfaceOfRevolution.class, this::buildSurfaceOfRevolution));
+        rules.add(idFaceRule(StepBezierSurface.class, this::buildBezierSurface));
+        rules.add(idFaceRule(StepUniformSurface.class, this::buildUniformSurface));
+        rules.add(idFaceRule(StepQuasiUniformSurface.class, this::buildQuasiUniformSurface));
+        rules.add(idFaceRule(StepPiecewiseBezierSurface.class, this::buildPiecewiseBezierSurface));
+        rules.add(idFaceRule(StepBSplineSurfaceWithKnots.class, this::buildBSplineSurface));
+        rules.add(idFaceRule(StepBSplineSurface.class, this::buildGenericBSplineSurface));
+        rules.add(idFaceRule(StepRationalBSplineSurface.class, this::buildRationalBSplineSurface));
+        rules.add(new FaceGeometryRule(StepRectangularTrimmedSurface.class, null, (geometry, faceType) -> {
             StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
             buildRectangularTrimmedSurface(trimmedSurface.id());
             return buildSupportedFaceGeometry(trimmedSurface.getBasisSurface(), faceType);
-        }
-        if (geometry instanceof StepCurveBoundedSurface) {
+        }));
+        rules.add(new FaceGeometryRule(StepCurveBoundedSurface.class, null, (geometry, faceType) -> {
             StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
             for (StepEntity boundary : boundedSurface.boundaries()) {
                 if (boundary instanceof StepPcurve) {
-            StepPcurve pcurve = (StepPcurve) boundary;
-                    buildPcurve2(pcurve.id());
+                    buildPcurve2(((StepPcurve) boundary).id());
                 } else if (boundary instanceof StepCompositeCurveOnSurface) {
-            StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) boundary;
+                    StepCompositeCurveOnSurface compositeCurveOnSurface = (StepCompositeCurveOnSurface) boundary;
                     boolean built2d = true;
                     for (StepCompositeCurveSegment segment : compositeCurveOnSurface.getSegments()) {
                         try {
@@ -3335,8 +3320,8 @@ public final class StepCadBuilder {
                 }
             }
             return buildSupportedFaceGeometry(boundedSurface.getBasisSurface(), faceType);
-        }
-        if (geometry instanceof StepOrientedSurface) {
+        }));
+        rules.add(new FaceGeometryRule(StepOrientedSurface.class, null, (geometry, faceType) -> {
             StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
             SurfaceGeometry base = buildSupportedFaceGeometry(orientedSurface.surfaceElement(), faceType);
             if (base == null) {
@@ -3346,129 +3331,81 @@ public final class StepCadBuilder {
                 return reverseSurfaceSense(base);
             }
             return base;
-        }
-        if (geometry instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
-            return offsetSupportedSurfaceGeometry(offsetSurface, faceType);
-        }
-        if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) geometry;
-            String replicaRestriction = unsupportedReplicaSurfaceTransformation(replica.transformation());
-            if (replicaRestriction != null) {
-                return null;
-            }
-            SurfaceGeometry base = buildSupportedFaceGeometry(replica.parent(), faceType);
-            if (base == null) {
-                return null;
-            }
-            return transformSurfaceGeometry(base, replica.transformation());
-        }
-        if (geometry instanceof StepRuledSurface) {
-            StepRuledSurface ruledSurface = (StepRuledSurface) geometry;
-            return buildRuledSurfaceGeometry(ruledSurface);
-        }
-        if (geometry instanceof StepSurfaceOfConstantRadius) {
-            StepSurfaceOfConstantRadius constantRadiusSurface = (StepSurfaceOfConstantRadius) geometry;
-            return buildSurfaceOfConstantRadiusGeometry(constantRadiusSurface, faceType);
-        }
-        if (geometry instanceof StepSurfacePatch) {
-            StepSurfacePatch surfacePatch = (StepSurfacePatch) geometry;
-            return buildSurfacePatchGeometry(surfacePatch, faceType);
-        }
-        if (geometry instanceof StepRectangularCompositeSurface) {
-            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) geometry;
-            return buildRectangularCompositeSurfaceGeometry(compositeSurface, faceType);
-        }
+        }));
+        rules.add(new FaceGeometryRule(StepOffsetSurface.class, null,
+                (geometry, faceType) -> offsetSupportedSurfaceGeometry((StepOffsetSurface) geometry, faceType)));
+        rules.add(new FaceGeometryRule(StepGeometricReplica.class,
+                geometry -> "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName()),
+                (geometry, faceType) -> {
+                    StepGeometricReplica replica = (StepGeometricReplica) geometry;
+                    String replicaRestriction = unsupportedReplicaSurfaceTransformation(replica.transformation());
+                    if (replicaRestriction != null) {
+                        return null;
+                    }
+                    SurfaceGeometry base = buildSupportedFaceGeometry(replica.parent(), faceType);
+                    if (base == null) {
+                        return null;
+                    }
+                    return transformSurfaceGeometry(base, replica.transformation());
+                }));
+        rules.add(new FaceGeometryRule(StepRuledSurface.class, null,
+                (geometry, faceType) -> buildRuledSurfaceGeometry((StepRuledSurface) geometry)));
+        rules.add(new FaceGeometryRule(StepSurfaceOfConstantRadius.class, null,
+                (geometry, faceType) -> buildSurfaceOfConstantRadiusGeometry((StepSurfaceOfConstantRadius) geometry, faceType)));
+        rules.add(new FaceGeometryRule(StepSurfacePatch.class, null,
+                (geometry, faceType) -> buildSurfacePatchGeometry((StepSurfacePatch) geometry, faceType)));
+        rules.add(new FaceGeometryRule(StepRectangularCompositeSurface.class, null,
+                (geometry, faceType) -> buildRectangularCompositeSurfaceGeometry((StepRectangularCompositeSurface) geometry, faceType)));
         // Elliptical axis surfaces - map to standard surface types with elliptical parameters
-        if (geometry instanceof StepCylindricalSurfaceWithEllipticalAxis) {
-            StepCylindricalSurfaceWithEllipticalAxis ellipticalCyl = (StepCylindricalSurfaceWithEllipticalAxis) geometry;
-            return buildCylindricalSurfaceWithEllipticalAxis(ellipticalCyl.id());
-        }
-        if (geometry instanceof StepConicalSurfaceWithEllipticalAxis) {
-            StepConicalSurfaceWithEllipticalAxis ellipticalCone = (StepConicalSurfaceWithEllipticalAxis) geometry;
-            return buildConicalSurfaceWithEllipticalAxis(ellipticalCone.id());
-        }
-        if (geometry instanceof StepSphericalSurfaceWithEllipticalAxis) {
-            StepSphericalSurfaceWithEllipticalAxis ellipticalSphere = (StepSphericalSurfaceWithEllipticalAxis) geometry;
-            return buildSphericalSurfaceWithEllipticalAxis(ellipticalSphere.id());
-        }
-        if (geometry instanceof StepToroidalSurfaceWithCylindricalAxis) {
-            StepToroidalSurfaceWithCylindricalAxis toroidalCyl = (StepToroidalSurfaceWithCylindricalAxis) geometry;
-            return buildToroidalSurfaceWithCylindricalAxis(toroidalCyl.id());
-        }
-        if (geometry instanceof StepToroidalSurfaceWithEllipticalAxis) {
-            StepToroidalSurfaceWithEllipticalAxis toroidalElliptical = (StepToroidalSurfaceWithEllipticalAxis) geometry;
-            return buildToroidalSurfaceWithEllipticalAxis(toroidalElliptical.id());
-        }
+        rules.add(idFaceRule(StepCylindricalSurfaceWithEllipticalAxis.class, this::buildCylindricalSurfaceWithEllipticalAxis));
+        rules.add(idFaceRule(StepConicalSurfaceWithEllipticalAxis.class, this::buildConicalSurfaceWithEllipticalAxis));
+        rules.add(idFaceRule(StepSphericalSurfaceWithEllipticalAxis.class, this::buildSphericalSurfaceWithEllipticalAxis));
+        rules.add(idFaceRule(StepToroidalSurfaceWithCylindricalAxis.class, this::buildToroidalSurfaceWithCylindricalAxis));
+        rules.add(idFaceRule(StepToroidalSurfaceWithEllipticalAxis.class, this::buildToroidalSurfaceWithEllipticalAxis));
         // B-spline surface with breakpoints - treat as regular B-spline surface
-        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
-            StepBSplineSurfaceWithKnotsAndBreakpoints splineBreakpoints = (StepBSplineSurfaceWithKnotsAndBreakpoints) geometry;
-            return buildBSplineSurfaceWithBreakpoints(splineBreakpoints.id());
-        }
+        rules.add(idFaceRule(StepBSplineSurfaceWithKnotsAndBreakpoints.class, this::buildBSplineSurfaceWithBreakpoints));
         // Offset surface type 2
-        if (geometry instanceof StepOffsetSurface2) {
-            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) geometry;
-            return buildOffsetSurface2Geometry(offsetSurface2, faceType);
-        }
+        rules.add(new FaceGeometryRule(StepOffsetSurface2.class, null,
+                (geometry, faceType) -> buildOffsetSurface2Geometry((StepOffsetSurface2) geometry, faceType)));
         // Blended surface - approximate as primary surface
-        if (geometry instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) geometry;
-            return buildBlendedSurface(blended, faceType);
-        }
+        rules.add(new FaceGeometryRule(StepBlendedSurface.class, null,
+                (geometry, faceType) -> buildBlendedSurface((StepBlendedSurface) geometry, faceType)));
         // Free-form surface - approximate as B-spline surface
-        if (geometry instanceof StepFreeFormSurface) {
-            StepFreeFormSurface freeForm = (StepFreeFormSurface) geometry;
-            return buildFreeFormSurface(freeForm);
-        }
+        rules.add(new FaceGeometryRule(StepFreeFormSurface.class, null,
+                (geometry, faceType) -> buildFreeFormSurface((StepFreeFormSurface) geometry)));
         // Machined surface: delegate to underlying face geometry
-        if (geometry instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) geometry;
-            return buildSupportedFaceGeometry(machinedSurface.face(), faceType);
-        }
+        rules.add(recurseFaceRule(StepMachinedSurface.class, geometry -> ((StepMachinedSurface) geometry).face()));
         // Bounded surface - marker type with no geometry data
-        if (geometry instanceof StepBoundedSurface) {
-            StepBoundedSurface boundedSurface = (StepBoundedSurface) geometry;
-            StepEntity actual = entitiesById.get(boundedSurface.id());
-            if (actual != null && actual != boundedSurface) {
+        rules.add(new FaceGeometryRule(StepBoundedSurface.class, null, (geometry, faceType) -> {
+            StepEntity actual = entitiesById.get(geometry.id());
+            if (actual != null && actual != geometry) {
                 return buildSupportedFaceGeometry(actual, faceType);
             }
             return null;
-        }
+        }));
         // Surface abstract base type - check for complex entity syntax at same ID
-        if (geometry instanceof StepSurface) {
-            StepSurface surface = (StepSurface) geometry;
-            StepEntity actual = entitiesById.get(surface.id());
-            if (actual != null && actual != surface) {
+        rules.add(new FaceGeometryRule(StepSurface.class, null, (geometry, faceType) -> {
+            StepEntity actual = entitiesById.get(geometry.id());
+            if (actual != null && actual != geometry) {
                 return buildSupportedFaceGeometry(actual, faceType);
             }
             return null;
-        }
-        // Machined surface: delegate to underlying face geometry
-        if (geometry instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) geometry;
-            return buildSupportedFaceGeometry(machinedSurface.face(), faceType);
-        }
+        }));
         // MAPPED_ITEM: dispatch through to mapping target for surface geometry
-        if (geometry instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) geometry;
-            return buildSupportedFaceGeometry(mappedItem.mappingTarget(), faceType);
-        }
+        rules.add(recurseFaceRule(StepMappedItem.class, geometry -> ((StepMappedItem) geometry).mappingTarget()));
         // Advanced analytical surfaces
-        if (geometry instanceof StepParaboloidSurface) {
-            StepParaboloidSurface paraboloid = (StepParaboloidSurface) geometry;
-            return buildParaboloidSurface(paraboloid.id());
-        }
-        if (geometry instanceof StepHyperboloidSurface) {
-            StepHyperboloidSurface hyperboloid = (StepHyperboloidSurface) geometry;
-            return buildHyperboloidSurface(hyperboloid.id());
-        }
-        if (geometry instanceof StepSurfaceOfTranslation) {
-            StepSurfaceOfTranslation translation = (StepSurfaceOfTranslation) geometry;
-            return buildSurfaceOfTranslation(translation.id());
-        }
-        if (geometry instanceof StepSurfaceOfProjection) {
-            StepSurfaceOfProjection projection = (StepSurfaceOfProjection) geometry;
-            return buildSurfaceOfProjection(projection.id());
+        rules.add(idFaceRule(StepParaboloidSurface.class, this::buildParaboloidSurface));
+        rules.add(idFaceRule(StepHyperboloidSurface.class, this::buildHyperboloidSurface));
+        rules.add(idFaceRule(StepSurfaceOfTranslation.class, this::buildSurfaceOfTranslation));
+        rules.add(idFaceRule(StepSurfaceOfProjection.class, this::buildSurfaceOfProjection));
+        return List.copyOf(rules);
+    }
+
+    SurfaceGeometry buildSupportedFaceGeometry(StepEntity geometry, String faceType) {
+        for (FaceGeometryRule rule : supportedFaceGeometryRules) {
+            if (rule.matches(geometry)) {
+                return rule.handler().build(geometry, faceType);
+            }
         }
         return null;
     }
