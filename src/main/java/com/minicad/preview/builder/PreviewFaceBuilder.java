@@ -72,6 +72,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Set;
@@ -173,65 +175,59 @@ public final class PreviewFaceBuilder {
 
     // ─── Surface unwrapping ──────────────────────────────────────────────
 
+    private record SurfaceUnwrapRule(
+            Class<?> type,
+            Predicate<StepEntity> guard,
+            Function<StepEntity, StepEntity> basis
+    ) {
+        boolean matches(StepEntity surface) {
+            return type.isInstance(surface) && (guard == null || guard.test(surface));
+        }
+    }
+
+    private static SurfaceUnwrapRule unwrapRule(Class<?> type, Function<StepEntity, StepEntity> basis) {
+        return new SurfaceUnwrapRule(type, null, basis);
+    }
+
+    /**
+     * Wrapper-surface types unwrapped to the surface they reference. Shared by
+     * unwrapParametricPreviewSurface and describeUnsupportedPreviewSurface;
+     * replaces their two former 11-branch if/else-if chains.
+     */
+    private static final List<SurfaceUnwrapRule> SURFACE_UNWRAP_RULES = List.of(
+            unwrapRule(StepRectangularTrimmedSurface.class, surface -> ((StepRectangularTrimmedSurface) surface).basisSurface()),
+            unwrapRule(StepCurveBoundedSurface.class, surface -> ((StepCurveBoundedSurface) surface).basisSurface()),
+            unwrapRule(StepOrientedSurface.class, surface -> ((StepOrientedSurface) surface).surfaceElement()),
+            unwrapRule(StepOffsetSurface.class, surface -> ((StepOffsetSurface) surface).basisSurface()),
+            unwrapRule(StepOffsetSurface2.class, surface -> ((StepOffsetSurface2) surface).basisSurface()),
+            unwrapRule(StepSurfacePatch.class, surface -> ((StepSurfacePatch) surface).basisSurface()),
+            unwrapRule(StepRectangularCompositeSurface.class, surface -> ((StepRectangularCompositeSurface) surface).parentSurface()),
+            unwrapRule(StepMachinedSurface.class, surface -> ((StepMachinedSurface) surface).face()),
+            unwrapRule(StepBlendedSurface.class, surface -> ((StepBlendedSurface) surface).primarySurface()),
+            unwrapRule(StepMappedItem.class, surface -> ((StepMappedItem) surface).mappingTarget()),
+            new SurfaceUnwrapRule(StepGeometricReplica.class,
+                    surface -> "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName()),
+                    surface -> ((StepGeometricReplica) surface).parent())
+    );
+
+    /** Basis surface of a wrapper type, or null when the surface is terminal. */
+    private static StepEntity unwrapBasisSurface(StepEntity surface) {
+        for (SurfaceUnwrapRule rule : SURFACE_UNWRAP_RULES) {
+            if (rule.matches(surface)) {
+                return rule.basis().apply(surface);
+            }
+        }
+        return null;
+    }
+
     public static StepEntity unwrapParametricPreviewSurface(StepEntity geometry) {
         StepEntity current = geometry;
         for (int depth = 0; depth < 16 && current != null; depth++) {
-            if (current instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
-                current = trimmedSurface.basisSurface();
-                continue;
+            StepEntity basis = unwrapBasisSurface(current);
+            if (basis == null) {
+                return current;
             }
-            if (current instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
-                current = boundedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
-                current = orientedSurface.surfaceElement();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
-                current = offsetSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface2) {
-            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) current;
-                current = offsetSurface2.basisSurface();
-                continue;
-            }
-            if (current instanceof StepSurfacePatch) {
-            StepSurfacePatch surfacePatch = (StepSurfacePatch) current;
-                current = surfacePatch.basisSurface();
-                continue;
-            }
-            if (current instanceof StepRectangularCompositeSurface) {
-            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) current;
-                current = compositeSurface.parentSurface();
-                continue;
-            }
-            if (current instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) current;
-                current = machinedSurface.face();
-                continue;
-            }
-            if (current instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) current;
-                current = blended.primarySurface();
-                continue;
-            }
-            if (current instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) current;
-                current = mappedItem.mappingTarget();
-                continue;
-            }
-            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) current;
-                current = replica.parent();
-                continue;
-            }
-            return current;
+            current = basis;
         }
         return current;
     }
@@ -244,43 +240,8 @@ public final class PreviewFaceBuilder {
         if (surface == null) {
             return null;
         }
-        if (surface instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) surface;
-            return describeUnsupportedPreviewSurface(trimmedSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface curveBoundedSurface = (StepCurveBoundedSurface) surface;
-            return describeUnsupportedPreviewSurface(curveBoundedSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) surface;
-            return describeUnsupportedPreviewSurface(orientedSurface.surfaceElement(), builder);
-        }
-        if (surface instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) surface;
-            return describeUnsupportedPreviewSurface(offsetSurface.basisSurface(), builder);
-        }
-        if (surface instanceof StepOffsetSurface2) {
-            StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) surface;
-            return describeUnsupportedPreviewSurface(offsetSurface2.basisSurface(), builder);
-        }
-        if (surface instanceof StepSurfacePatch) {
-            StepSurfacePatch surfacePatch = (StepSurfacePatch) surface;
-            return describeUnsupportedPreviewSurface(surfacePatch.basisSurface(), builder);
-        }
-        if (surface instanceof StepRectangularCompositeSurface) {
-            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) surface;
-            return describeUnsupportedPreviewSurface(compositeSurface.parentSurface(), builder);
-        }
-        if (surface instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) surface;
-            return describeUnsupportedPreviewSurface(machinedSurface.face(), builder);
-        }
-        if (surface instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) surface;
-            return describeUnsupportedPreviewSurface(blended.primarySurface(), builder);
-        }
-        if (surface instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
+        if (surface instanceof StepGeometricReplica
+                && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
             StepGeometricReplica replica = (StepGeometricReplica) surface;
             if (replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator) { com.minicad.step.model.StepCartesianTransformationOperator transformation = (com.minicad.step.model.StepCartesianTransformationOperator) replica.transformation();
                 double scale = transformation.scale() == null ? 1.0 : transformation.scale();
@@ -295,6 +256,10 @@ public final class PreviewFaceBuilder {
                 }
             }
             return describeUnsupportedPreviewSurface(replica.parent(), builder);
+        }
+        StepEntity basis = unwrapBasisSurface(surface);
+        if (basis != null) {
+            return describeUnsupportedPreviewSurface(basis, builder);
         }
         return StepTypeNameResolver.surfaceTypeName(surface);
     }
@@ -1471,42 +1436,40 @@ public final class PreviewFaceBuilder {
         return PayloadConversionHelper.toPbrPayload(metadata);
     }
 
+    private record SurfaceTypeNameEntry(Class<?> type, String name) {
+    }
+
+    /**
+     * Geometry surface type names, replacing the former 16-branch if/else-if
+     * chain. Order mirrors the original chain (first match wins), which also
+     * preserves the old resolution if subtype overlaps ever appear.
+     */
+    private static final List<SurfaceTypeNameEntry> SURFACE_TYPE_NAMES = List.of(
+            new SurfaceTypeNameEntry(Plane.class, "PLANE"),
+            new SurfaceTypeNameEntry(CylindricalSurface.class, "CYLINDRICAL_SURFACE"),
+            new SurfaceTypeNameEntry(ConicalSurface.class, "CONICAL_SURFACE"),
+            new SurfaceTypeNameEntry(SphericalSurface.class, "SPHERICAL_SURFACE"),
+            new SurfaceTypeNameEntry(ToroidalSurface.class, "TOROIDAL_SURFACE"),
+            new SurfaceTypeNameEntry(BSplineSurface3.class, "BSPLINE_SURFACE"),
+            new SurfaceTypeNameEntry(RationalBSplineSurface3.class, "RATIONAL_BSPLINE_SURFACE"),
+            new SurfaceTypeNameEntry(RuledSurface3.class, "RULED_SURFACE"),
+            new SurfaceTypeNameEntry(SurfaceOfRevolution3.class, "SURFACE_OF_REVOLUTION"),
+            new SurfaceTypeNameEntry(OffsetSurface3.class, "OFFSET_SURFACE"),
+            new SurfaceTypeNameEntry(SurfaceOfLinearExtrusion3.class, "SURFACE_OF_LINEAR_EXTRUSION"),
+            new SurfaceTypeNameEntry(SurfaceOfConstantRadius3.class, "SURFACE_OF_CONSTANT_RADIUS"),
+            new SurfaceTypeNameEntry(ParaboloidSurface.class, "PARABOLOID_SURFACE"),
+            new SurfaceTypeNameEntry(HyperboloidSurface.class, "HYPERBOLOID_SURFACE"),
+            new SurfaceTypeNameEntry(SurfaceOfTranslation3.class, "SURFACE_OF_TRANSLATION"),
+            new SurfaceTypeNameEntry(SurfaceOfProjection3.class, "SURFACE_OF_PROJECTION")
+    );
+
     public static String surfaceTypeNameForGeometry(SurfaceGeometry surface) {
-        if (surface instanceof Plane) {
-            return "PLANE";
-        } else if (surface instanceof CylindricalSurface) {
-            return "CYLINDRICAL_SURFACE";
-        } else if (surface instanceof ConicalSurface) {
-            return "CONICAL_SURFACE";
-        } else if (surface instanceof SphericalSurface) {
-            return "SPHERICAL_SURFACE";
-        } else if (surface instanceof ToroidalSurface) {
-            return "TOROIDAL_SURFACE";
-        } else if (surface instanceof BSplineSurface3) {
-            return "BSPLINE_SURFACE";
-        } else if (surface instanceof RationalBSplineSurface3) {
-            return "RATIONAL_BSPLINE_SURFACE";
-        } else if (surface instanceof RuledSurface3) {
-            return "RULED_SURFACE";
-        } else if (surface instanceof SurfaceOfRevolution3) {
-            return "SURFACE_OF_REVOLUTION";
-        } else if (surface instanceof OffsetSurface3) {
-            return "OFFSET_SURFACE";
-        } else if (surface instanceof SurfaceOfLinearExtrusion3) {
-            return "SURFACE_OF_LINEAR_EXTRUSION";
-        } else if (surface instanceof SurfaceOfConstantRadius3) {
-            return "SURFACE_OF_CONSTANT_RADIUS";
-        } else if (surface instanceof ParaboloidSurface) {
-            return "PARABOLOID_SURFACE";
-        } else if (surface instanceof HyperboloidSurface) {
-            return "HYPERBOLOID_SURFACE";
-        } else if (surface instanceof SurfaceOfTranslation3) {
-            return "SURFACE_OF_TRANSLATION";
-        } else if (surface instanceof SurfaceOfProjection3) {
-            return "SURFACE_OF_PROJECTION";
-        } else {
-            throw new IllegalArgumentException("Unknown value type: " + surface);
+        for (SurfaceTypeNameEntry entry : SURFACE_TYPE_NAMES) {
+            if (entry.type().isInstance(surface)) {
+                return entry.name();
+            }
         }
+        throw new IllegalArgumentException("Unknown value type: " + surface);
     }
 
     // ─── Local helper methods (copied from StepPreviewJsonExporter) ──────
