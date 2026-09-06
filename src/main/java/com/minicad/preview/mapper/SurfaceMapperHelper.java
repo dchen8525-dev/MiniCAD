@@ -54,6 +54,8 @@ import com.minicad.step.model.StepUniformSurface;
 import com.minicad.step.model.StepBlendedSurface;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import com.minicad.export.json.StepPlacementTransformer;
 import com.minicad.export.json.StepRepresentationPayloadBuilder;
 
@@ -62,16 +64,44 @@ import com.minicad.export.json.StepRepresentationPayloadBuilder;
  * Extracted from StepPreviewJsonExporter for maintainability.
  */
 public class SurfaceMapperHelper {
-    public static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) geometry;
-            return mapperForSurface(trimmedSurface.basisSurface(), builder);
+    
+    @FunctionalInterface
+    private interface SurfaceMapperHandler {
+        ParametricSurfaceMapper map(StepEntity geometry, StepCadBuilder builder);
+    }
+
+    private record SurfaceMapperRule(Class<?> type, Predicate<StepEntity> guard, SurfaceMapperHandler handler) {
+        boolean matches(StepEntity geometry) {
+            return type.isInstance(geometry) && (guard == null || guard.test(geometry));
         }
-        if (geometry instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) geometry;
-            return mapperForSurface(boundedSurface.basisSurface(), builder);
-        }
-        if (geometry instanceof StepOrientedSurface) {
+    }
+
+    private static SurfaceMapperRule mapperRule(Class<?> type, SurfaceMapperHandler handler) {
+        return new SurfaceMapperRule(type, null, handler);
+    }
+
+    /** Several surface types funnelling into the same mapper. */
+    private static SurfaceMapperRule mapperRule(List<Class<?>> types, SurfaceMapperHandler handler) {
+        return new SurfaceMapperRule(StepEntity.class,
+                geometry -> types.stream().anyMatch(type -> type.isInstance(geometry)),
+                handler);
+    }
+
+    /** Wrapper surfaces mapped through the surface they reference. */
+    private static SurfaceMapperRule recurseMapperRule(Class<?> type, Function<StepEntity, StepEntity> next) {
+        return mapperRule(type, (geometry, builder) -> mapperForSurface(next.apply(geometry), builder));
+    }
+
+    /**
+     * Parametric surface mapper rules keyed by concrete type, replacing the
+     * former ~25-branch if/else-if chain. Order mirrors the original chain
+     * (first match wins); the anonymous mapper bodies are verbatim. Any
+     * surface matching no rule maps to null.
+     */
+    private static final List<SurfaceMapperRule> SURFACE_MAPPER_RULES = List.of(
+            recurseMapperRule(StepRectangularTrimmedSurface.class, geometry -> ((StepRectangularTrimmedSurface) geometry).basisSurface()),
+            recurseMapperRule(StepCurveBoundedSurface.class, geometry -> ((StepCurveBoundedSurface) geometry).basisSurface()),
+            mapperRule(StepOrientedSurface.class, (geometry, builder) -> {
             StepOrientedSurface orientedSurface = (StepOrientedSurface) geometry;
             ParametricSurfaceMapper base = mapperForSurface(orientedSurface.surfaceElement(), builder);
             if (base == null) {
@@ -106,8 +136,8 @@ public class SurfaceMapperHelper {
                     return base.vPeriod();
                 }
             };
-        }
-        if (geometry instanceof StepOffsetSurface) {
+                }),
+            mapperRule(StepOffsetSurface.class, (geometry, builder) -> {
             StepOffsetSurface offsetSurface = (StepOffsetSurface) geometry;
             ParametricSurfaceMapper base = mapperForSurface(offsetSurface.basisSurface(), builder);
             if (base == null) {
@@ -141,9 +171,9 @@ public class SurfaceMapperHelper {
                     return base.vPeriod();
                 }
             };
-        }
-        // Elliptical-axis surfaces — CadBuilder approximates these as standard surfaces
-        if (geometry instanceof StepCylindricalSurfaceWithEllipticalAxis) {
+                }),
+            // Elliptical-axis surfaces — CadBuilder approximates these as standard surfaces
+            mapperRule(StepCylindricalSurfaceWithEllipticalAxis.class, (geometry, builder) -> {
             StepCylindricalSurfaceWithEllipticalAxis ellipticalAxis = (StepCylindricalSurfaceWithEllipticalAxis) geometry;
             CylindricalSurface surface = builder.buildCylindricalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
@@ -168,8 +198,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepConicalSurfaceWithEllipticalAxis) {
+                }),
+            mapperRule(StepConicalSurfaceWithEllipticalAxis.class, (geometry, builder) -> {
             StepConicalSurfaceWithEllipticalAxis ellipticalAxis = (StepConicalSurfaceWithEllipticalAxis) geometry;
             ConicalSurface surface = builder.buildConicalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
@@ -194,8 +224,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepSphericalSurfaceWithEllipticalAxis) {
+                }),
+            mapperRule(StepSphericalSurfaceWithEllipticalAxis.class, (geometry, builder) -> {
             StepSphericalSurfaceWithEllipticalAxis ellipticalAxis = (StepSphericalSurfaceWithEllipticalAxis) geometry;
             SphericalSurface surface = builder.buildSphericalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
@@ -220,8 +250,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepToroidalSurfaceWithCylindricalAxis) {
+                }),
+            mapperRule(StepToroidalSurfaceWithCylindricalAxis.class, (geometry, builder) -> {
             StepToroidalSurfaceWithCylindricalAxis ellipticalAxis = (StepToroidalSurfaceWithCylindricalAxis) geometry;
             ToroidalSurface surface = builder.buildToroidalSurfaceWithCylindricalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
@@ -254,8 +284,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepToroidalSurfaceWithEllipticalAxis) {
+                }),
+            mapperRule(StepToroidalSurfaceWithEllipticalAxis.class, (geometry, builder) -> {
             StepToroidalSurfaceWithEllipticalAxis ellipticalAxis = (StepToroidalSurfaceWithEllipticalAxis) geometry;
             ToroidalSurface surface = builder.buildToroidalSurfaceWithEllipticalAxis(ellipticalAxis.id());
             return new ParametricSurfaceMapper() {
@@ -288,8 +318,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepOffsetSurface2) {
+                }),
+            mapperRule(StepOffsetSurface2.class, (geometry, builder) -> {
             StepOffsetSurface2 offsetSurface2 = (StepOffsetSurface2) geometry;
             ParametricSurfaceMapper base = mapperForSurface(offsetSurface2.basisSurface(), builder);
             if (base == null) {
@@ -324,8 +354,10 @@ public class SurfaceMapperHelper {
                     return base.vPeriod();
                 }
             };
-        }
-        if (geometry instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName())) {
+                }),
+            new SurfaceMapperRule(StepGeometricReplica.class,
+                geometry -> "SURFACE_REPLICA".equals(((StepGeometricReplica) geometry).entityName()),
+                (geometry, builder) -> {
             StepGeometricReplica replica = (StepGeometricReplica) geometry;
             if (!(replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator)) {
                 return null;
@@ -370,8 +402,8 @@ public class SurfaceMapperHelper {
                     return base.vPeriod();
                 }
             };
-        }
-        if (geometry instanceof StepPlane) {
+                }),
+            mapperRule(StepPlane.class, (geometry, builder) -> {
             StepPlane stepPlane = (StepPlane) geometry;
             Axis2Placement3D placement = builder.buildPlacement(stepPlane.position().id());
             Plane plane = builder.buildPlane(stepPlane.id());
@@ -397,8 +429,8 @@ public class SurfaceMapperHelper {
                     return plane.normal().asVector();
                 }
             };
-        }
-        if (geometry instanceof StepCylindricalSurface) {
+                }),
+            mapperRule(StepCylindricalSurface.class, (geometry, builder) -> {
             StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) geometry;
             CylindricalSurface surface = builder.buildCylindricalSurface(cylindricalSurface.id());
             return new ParametricSurfaceMapper() {
@@ -423,8 +455,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepConicalSurface) {
+                }),
+            mapperRule(StepConicalSurface.class, (geometry, builder) -> {
             StepConicalSurface conicalSurface = (StepConicalSurface) geometry;
             ConicalSurface surface = builder.buildConicalSurface(conicalSurface.id());
             return new ParametricSurfaceMapper() {
@@ -449,8 +481,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepSphericalSurface) {
+                }),
+            mapperRule(StepSphericalSurface.class, (geometry, builder) -> {
             StepSphericalSurface sphericalSurface = (StepSphericalSurface) geometry;
             Axis2Placement3D placement = builder.buildPlacement(sphericalSurface.position().id());
             return new ParametricSurfaceMapper() {
@@ -475,8 +507,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepDegenerateToroidalSurface) {
+                }),
+            mapperRule(StepDegenerateToroidalSurface.class, (geometry, builder) -> {
             StepDegenerateToroidalSurface degenerateToroidalSurface = (StepDegenerateToroidalSurface) geometry;
             Axis2Placement3D placement = builder.buildPlacement(degenerateToroidalSurface.position().id());
             double majorRadius = degenerateToroidalSurface.majorRadius();
@@ -511,8 +543,8 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepToroidalSurface) {
+                }),
+            mapperRule(StepToroidalSurface.class, (geometry, builder) -> {
             StepToroidalSurface toroidalSurface = (StepToroidalSurface) geometry;
             ToroidalSurface surface = builder.buildToroidalSurface(toroidalSurface.id());
             return new ParametricSurfaceMapper() {
@@ -545,14 +577,14 @@ public class SurfaceMapperHelper {
                     return Math.PI * 2.0;
                 }
             };
-        }
-        if (geometry instanceof StepRationalBSplineSurface) {
+                }),
+            mapperRule(StepRationalBSplineSurface.class, (geometry, builder) -> {
             StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) geometry;
             RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(splineSurface.id());
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    return nearestUvOnRationalBSplineSurface(surface, point, previous);
+                    return SurfaceNearestUvSearch.nearestUvOnRationalBSplineSurface(surface, point, previous);
                 }
 
                 @Override
@@ -565,19 +597,13 @@ public class SurfaceMapperHelper {
                     return surface.normalAt(u, v);
                 }
             };
-        }
-        if (geometry instanceof StepBSplineSurfaceWithKnots
-                || geometry instanceof StepBSplineSurface
-                || geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints
-                || geometry instanceof StepBezierSurface
-                || geometry instanceof StepUniformSurface
-                || geometry instanceof StepQuasiUniformSurface
-                || geometry instanceof StepPiecewiseBezierSurface) {
+                }),
+            mapperRule(List.of(StepBSplineSurfaceWithKnots.class, StepBSplineSurface.class, StepBSplineSurfaceWithKnotsAndBreakpoints.class, StepBezierSurface.class, StepUniformSurface.class, StepQuasiUniformSurface.class, StepPiecewiseBezierSurface.class), (geometry, builder) -> {
             BSplineSurface3 surface = StepRepresentationPayloadBuilder.buildBsplineSurface(geometry, builder);
             return new ParametricSurfaceMapper() {
                 @Override
                 public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    return nearestUvOnBSplineSurface(surface, point, previous);
+                    return SurfaceNearestUvSearch.nearestUvOnBSplineSurface(surface, point, previous);
                 }
 
                 @Override
@@ -590,32 +616,23 @@ public class SurfaceMapperHelper {
                     return surface.normalAt(u, v);
                 }
             };
-        }
-        if (geometry instanceof StepSurfaceOfLinearExtrusion) {
+                }),
+            mapperRule(StepSurfaceOfLinearExtrusion.class, (geometry, builder) -> {
             StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) geometry;
             return extrusionMapper(extrusionSurface, builder);
-        }
-        if (geometry instanceof StepSurfaceOfRevolution) {
+                }),
+            mapperRule(StepSurfaceOfRevolution.class, (geometry, builder) -> {
             StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) geometry;
             return revolutionMapper(revolutionSurface, builder);
-        }
-        // Rectangular composite surface: delegate to parent surface mapper
-        if (geometry instanceof StepRectangularCompositeSurface) {
-            StepRectangularCompositeSurface compositeSurface = (StepRectangularCompositeSurface) geometry;
-            return mapperForSurface(compositeSurface.parentSurface(), builder);
-        }
-        // Surface patch: delegate to basis surface mapper
-        if (geometry instanceof StepSurfacePatch) {
-            StepSurfacePatch surfacePatch = (StepSurfacePatch) geometry;
-            return mapperForSurface(surfacePatch.basisSurface(), builder);
-        }
-        // Blended surface: delegate to primary surface mapper
-        if (geometry instanceof StepBlendedSurface) {
-            StepBlendedSurface blended = (StepBlendedSurface) geometry;
-            return mapperForSurface(blended.primarySurface(), builder);
-        }
-        // Free-form surface: build as BSplineSurface3 and use grid-based parametric mapping
-        if (geometry instanceof StepFreeFormSurface) {
+                }),
+            // Rectangular composite surface: delegate to parent surface mapper
+            recurseMapperRule(StepRectangularCompositeSurface.class, geometry -> ((StepRectangularCompositeSurface) geometry).parentSurface()),
+            // Surface patch: delegate to basis surface mapper
+            recurseMapperRule(StepSurfacePatch.class, geometry -> ((StepSurfacePatch) geometry).basisSurface()),
+            // Blended surface: delegate to primary surface mapper
+            recurseMapperRule(StepBlendedSurface.class, geometry -> ((StepBlendedSurface) geometry).primarySurface()),
+            // Free-form surface: build as BSplineSurface3 and use grid-based parametric mapping
+            mapperRule(StepFreeFormSurface.class, (geometry, builder) -> {
             StepFreeFormSurface freeForm = (StepFreeFormSurface) geometry;
             BSplineSurface3 surface = StepRepresentationPayloadBuilder.buildFreeFormSurface(freeForm, builder);
             double uSpan = surface.uEnd() - surface.uStart();
@@ -638,126 +655,18 @@ public class SurfaceMapperHelper {
                     return surface.normalAt(u, v);
                 }
             };
+                })
+    );
+
+    public static ParametricSurfaceMapper mapperForSurface(StepEntity geometry, StepCadBuilder builder) {
+        for (SurfaceMapperRule rule : SURFACE_MAPPER_RULES) {
+            if (rule.matches(geometry)) {
+                return rule.handler().map(geometry, builder);
+            }
         }
         return null;
     }
-    public static UvPoint nearestUvOnBSplineSurface(BSplineSurface3 surface, CartesianPoint point, UvPoint previous) {
-        double uStart = surface.uStart();
-        double uEnd = surface.uEnd();
-        double vStart = surface.vStart();
-        double vEnd = surface.vEnd();
-        boolean hasPrevious = previous != null;
 
-        double bestU = hasPrevious ? MathUtilityHelper.clamp(previous.u(), uStart, uEnd) : uStart;
-        double bestV = hasPrevious ? MathUtilityHelper.clamp(previous.v(), vStart, vEnd) : vStart;
-        double bestDistance = surface.pointAt(bestU, bestV).distanceTo(point);
-
-        int uSamples = hasPrevious ? 4 : 12;
-        int vSamples = hasPrevious ? 4 : 12;
-        double coarseWindowU = (uEnd - uStart) * (hasPrevious ? 0.08 : 0.25);
-        double coarseWindowV = (vEnd - vStart) * (hasPrevious ? 0.08 : 0.25);
-        double coarseMinU = hasPrevious ? Math.max(uStart, bestU - coarseWindowU) : uStart;
-        double coarseMaxU = hasPrevious ? Math.min(uEnd, bestU + coarseWindowU) : uEnd;
-        double coarseMinV = hasPrevious ? Math.max(vStart, bestV - coarseWindowV) : vStart;
-        double coarseMaxV = hasPrevious ? Math.min(vEnd, bestV + coarseWindowV) : vEnd;
-
-        for (int ui = 0; ui <= uSamples; ui++) {
-            double u = coarseMinU + (coarseMaxU - coarseMinU) * ui / (double) uSamples;
-            for (int vi = 0; vi <= vSamples; vi++) {
-                double v = coarseMinV + (coarseMaxV - coarseMinV) * vi / (double) vSamples;
-                double distance = surface.pointAt(u, v).distanceTo(point);
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestU = u;
-                    bestV = v;
-                }
-            }
-        }
-
-        double windowU = Math.max((uEnd - uStart) * (hasPrevious ? 0.03 : 0.08), 1.0e-5);
-        double windowV = Math.max((vEnd - vStart) * (hasPrevious ? 0.03 : 0.08), 1.0e-5);
-        int refinements = hasPrevious ? 3 : 4;
-        int refinementSamples = hasPrevious ? 4 : 6;
-        for (int refinement = 0; refinement < refinements; refinement++) {
-            double minU = Math.max(uStart, bestU - windowU);
-            double maxU = Math.min(uEnd, bestU + windowU);
-            double minV = Math.max(vStart, bestV - windowV);
-            double maxV = Math.min(vEnd, bestV + windowV);
-            for (int ui = 0; ui <= refinementSamples; ui++) {
-                double u = minU + (maxU - minU) * ui / (double) refinementSamples;
-                for (int vi = 0; vi <= refinementSamples; vi++) {
-                    double v = minV + (maxV - minV) * vi / (double) refinementSamples;
-                    double distance = surface.pointAt(u, v).distanceTo(point);
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestU = u;
-                        bestV = v;
-                    }
-                }
-            }
-            if (bestDistance <= 1.0e-6) {
-                break;
-            }
-            windowU *= 0.5;
-            windowV *= 0.5;
-        }
-        return new UvPoint(bestU, bestV);
-    }
-    public static UvPoint nearestUvOnRationalBSplineSurface(
-            RationalBSplineSurface3 surface,
-            CartesianPoint point,
-            UvPoint previous
-    ) {
-        double uStart = surface.uStart();
-        double uEnd = surface.uEnd();
-        double vStart = surface.vStart();
-        double vEnd = surface.vEnd();
-        boolean hasPrevious = previous != null;
-
-        double bestU = hasPrevious ? MathUtilityHelper.clamp(previous.u(), uStart, uEnd) : uStart;
-        double bestV = hasPrevious ? MathUtilityHelper.clamp(previous.v(), vStart, vEnd) : vStart;
-        double bestDistance = surface.pointAt(bestU, bestV).distanceTo(point);
-
-        int uSamples = hasPrevious ? 4 : 12;
-        int vSamples = hasPrevious ? 4 : 12;
-        double coarseWindowU = (uEnd - uStart) * (hasPrevious ? 0.08 : 0.25);
-        double coarseWindowV = (vEnd - vStart) * (hasPrevious ? 0.08 : 0.25);
-        double coarseMinU = hasPrevious ? Math.max(uStart, bestU - coarseWindowU) : uStart;
-        double coarseMaxU = hasPrevious ? Math.min(uEnd, bestU + coarseWindowU) : uEnd;
-        double coarseMinV = hasPrevious ? Math.max(vStart, bestV - coarseWindowV) : vStart;
-        double coarseMaxV = hasPrevious ? Math.min(vEnd, bestV + coarseWindowV) : vEnd;
-
-        for (int i = 0; i <= uSamples; i++) {
-            double u = coarseMinU + (coarseMaxU - coarseMinU) * i / Math.max(uSamples, 1);
-            for (int j = 0; j <= vSamples; j++) {
-                double v = coarseMinV + (coarseMaxV - coarseMinV) * j / Math.max(vSamples, 1);
-                double distance = surface.pointAt(u, v).distanceTo(point);
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestU = u;
-                    bestV = v;
-                }
-            }
-        }
-
-        for (int iteration = 0; iteration < 4; iteration++) {
-            double stepU = (uEnd - uStart) / Math.pow(4.0, iteration + 2);
-            double stepV = (vEnd - vStart) / Math.pow(4.0, iteration + 2);
-            for (int du = -1; du <= 1; du++) {
-                for (int dv = -1; dv <= 1; dv++) {
-                    double u = MathUtilityHelper.clamp(bestU + du * stepU, uStart, uEnd);
-                    double v = MathUtilityHelper.clamp(bestV + dv * stepV, vStart, vEnd);
-                    double distance = surface.pointAt(u, v).distanceTo(point);
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestU = u;
-                        bestV = v;
-                    }
-                }
-            }
-        }
-        return new UvPoint(bestU, bestV);
-    }
     public static ParametricSurfaceMapper extrusionMapper(
             StepSurfaceOfLinearExtrusion extrusionSurface,
             StepCadBuilder builder

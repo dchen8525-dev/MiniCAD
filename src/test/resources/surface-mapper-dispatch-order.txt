@@ -1,0 +1,43 @@
+# Branch order of SurfaceMapperHelper.mapperForSurface, captured from the
+# original ~25-branch `if (geometry instanceof X)` chain before it was folded
+# into SURFACE_MAPPER_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch: instanceof also
+# matches subtypes, so a dropped, duplicated or reordered rule silently changes
+# which mapper a surface gets. The B-spline family shares one rule (listed as
+# its seven member types); StepGeometricReplica is a guarded SURFACE_REPLICA
+# rule. Items matching no rule map to null, so the frozen file also protects
+# the fallback boundary. All types are final classes implementing StepEntity
+# directly (no subtype relation today) -- the frozen file turns any future
+# reordering into a test failure rather than a silent behaviour change.
+StepRectangularTrimmedSurface
+StepCurveBoundedSurface
+StepOrientedSurface
+StepOffsetSurface
+StepCylindricalSurfaceWithEllipticalAxis
+StepConicalSurfaceWithEllipticalAxis
+StepSphericalSurfaceWithEllipticalAxis
+StepToroidalSurfaceWithCylindricalAxis
+StepToroidalSurfaceWithEllipticalAxis
+StepOffsetSurface2
+StepGeometricReplica
+StepPlane
+StepCylindricalSurface
+StepConicalSurface
+StepSphericalSurface
+StepDegenerateToroidalSurface
+StepToroidalSurface
+StepRationalBSplineSurface
+StepBSplineSurfaceWithKnots
+StepBSplineSurface
+StepBSplineSurfaceWithKnotsAndBreakpoints
+StepBezierSurface
+StepUniformSurface
+StepQuasiUniformSurface
+StepPiecewiseBezierSurface
+StepSurfaceOfLinearExtrusion
+StepSurfaceOfRevolution
+StepRectangularCompositeSurface
+StepSurfacePatch
+StepBlendedSurface
+StepFreeFormSurface
