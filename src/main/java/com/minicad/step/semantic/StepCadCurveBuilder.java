@@ -1651,7 +1651,7 @@ final class StepCadCurveBuilder {
             Curve3 baseCurve = self.buildCurve3Callback.apply(orientedCurve.curveElement().id());
             if (!orientedCurve.isOrientation() && baseCurve instanceof CompositeCurve3) {
             CompositeCurve3 composite = (CompositeCurve3) baseCurve;
-            return self.reverseCompositeCurve(composite);
+            return StepGeometryReverser.reverseCompositeCurve(composite);
             }
             return baseCurve;
         }),
@@ -1821,83 +1821,6 @@ final class StepCadCurveBuilder {
         Direction3 axis = new Direction3(0, 0, 1);
         Direction3 xDirection = new Direction3(refDir.getX(), refDir.getY(), 0);
         return new Axis2Placement3D(location3D, axis, xDirection);
-    }
-
-    private CompositeCurve3 reverseCompositeCurve(CompositeCurve3 original) {
-        List<Curve3> reversedSegments = new ArrayList<>(original.getSegments());
-        java.util.Collections.reverse(reversedSegments);
-        for (int i = 0; i < reversedSegments.size(); i++) {
-            reversedSegments.set(i, reverseCurve3(reversedSegments.get(i)));
-        }
-        return new CompositeCurve3(List.copyOf(reversedSegments));
-    }
-
-    private Curve3 reverseCurve3(Curve3 curve) {
-        if (curve instanceof Line3) {
-            Line3 line = (Line3) curve;
-            return new Line3(line.getOrigin(), line.getDirection().reverse(), line.getParameterScale());
-        }
-        if (curve instanceof Polyline3) {
-            Polyline3 polyline = (Polyline3) curve;
-            List<CartesianPoint> reversedPoints = new ArrayList<>(polyline.getPoints());
-            java.util.Collections.reverse(reversedPoints);
-            return new Polyline3(reversedPoints);
-        }
-        if (curve instanceof CompositeCurve3) {
-            return reverseCompositeCurve((CompositeCurve3) curve);
-        }
-        if (curve instanceof Circle) {
-            Circle circle = (Circle) curve;
-            Axis2Placement3D p = circle.getPosition();
-            return new Circle(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), circle.getRadius());
-        }
-        if (curve instanceof Ellipse3) {
-            Ellipse3 ellipse = (Ellipse3) curve;
-            Axis2Placement3D p = ellipse.getPosition();
-            return new Ellipse3(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), ellipse.getSemiAxis1(), ellipse.getSemiAxis2());
-        }
-        if (curve instanceof Parabola3) {
-            Parabola3 parabola = (Parabola3) curve;
-            Axis2Placement3D p = parabola.getPosition();
-            return new Parabola3(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), parabola.getFocalLength());
-        }
-        if (curve instanceof Hyperbola3) {
-            Hyperbola3 hyperbola = (Hyperbola3) curve;
-            Axis2Placement3D p = hyperbola.getPosition();
-            return new Hyperbola3(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), hyperbola.getSemiAxisA(), hyperbola.getSemiAxisB());
-        }
-        if (curve instanceof Clothoid3) {
-            Clothoid3 clothoid = (Clothoid3) curve;
-            Axis2Placement3D p = clothoid.getPosition();
-            return new Clothoid3(new Axis2Placement3D(p.getLocation(), p.getAxis(), p.xDirection().reverse()), clothoid.xAxisIntercept(), clothoid.curvature());
-        }
-        if (curve instanceof DegenerateCurve3) {
-            DegenerateCurve3 degenerate = (DegenerateCurve3) curve;
-            return new DegenerateCurve3(degenerate.point());
-        }
-        if (curve instanceof TrimmedCurve3) {
-            TrimmedCurve3 trimmed = (TrimmedCurve3) curve;
-            return new TrimmedCurve3(reverseCurve3(trimmed.getBasisCurve()), trimmed.getTrimParamEnd(), trimmed.getTrimParamStart(), !trimmed.isSenseAgreement());
-        }
-        if (curve instanceof SurfaceCurve3) {
-            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
-            return new SurfaceCurve3(reverseCurve3(surfaceCurve.getCurve3d()), surfaceCurve.getParametricCurves());
-        }
-        if (curve instanceof BSplineCurve3) {
-            BSplineCurve3 bspline = (BSplineCurve3) curve;
-            return new BSplineCurve3(bspline.getDegree(), reverseList(bspline.getControlPoints()), bspline.getKnotMultiplicities(), bspline.getKnots());
-        }
-        if (curve instanceof RationalBSplineCurve3) {
-            RationalBSplineCurve3 rational = (RationalBSplineCurve3) curve;
-            return new RationalBSplineCurve3(rational.getDegree(), reverseList(rational.getControlPoints()), rational.getWeights(), rational.getKnotMultiplicities(), rational.getKnots());
-        }
-        return curve;
-    }
-
-    private static <T> List<T> reverseList(List<T> list) {
-        List<T> reversed = new ArrayList<>(list);
-        java.util.Collections.reverse(reversed);
-        return List.copyOf(reversed);
     }
 
     private Curve3 approximateOffsetCurve3(Curve3 basisCurve, double distance, Direction3 refDirection) {

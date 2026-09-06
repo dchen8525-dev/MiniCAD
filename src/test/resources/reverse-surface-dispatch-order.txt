@@ -1,0 +1,26 @@
+# Branch order of StepGeometryReverser.reverseSurfaceSense, captured from the
+# original 16-branch `if (surface instanceof X)` chain before it was folded into
+# REVERSE_SURFACE_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch: instanceof also
+# matches subtypes, so a dropped, duplicated or reordered rule silently changes
+# which geometry is reversed. The 16 types are final classes implementing
+# SurfaceGeometry directly (no subtype relation today), so the order is currently
+# behaviour neutral -- the frozen file turns any future reordering into a test
+# failure rather than a silent behaviour change.
+Plane
+CylindricalSurface
+ConicalSurface
+SphericalSurface
+ToroidalSurface
+SurfaceOfLinearExtrusion3
+SurfaceOfRevolution3
+RuledSurface3
+SurfaceOfConstantRadius3
+OffsetSurface3
+BSplineSurface3
+RationalBSplineSurface3
+ParaboloidSurface
+HyperboloidSurface
+SurfaceOfTranslation3
+SurfaceOfProjection3
