@@ -368,8 +368,30 @@ public final class StepEdgePayloadBuilder {
         }
     }
 
-    static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
-        if (curve instanceof TrimmedCurve3) {
+    
+    @FunctionalInterface
+    private interface EdgeSampleHandler {
+        List<CartesianPoint> sample(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward);
+    }
+
+    private record EdgeSampleRule(Class<?> type, EdgeSampleHandler handler) {
+        boolean matches(Curve3 curve) {
+            return type.isInstance(curve);
+        }
+    }
+
+    private static EdgeSampleRule edgeSampleRule(Class<?> type, EdgeSampleHandler handler) {
+        return new EdgeSampleRule(type, handler);
+    }
+
+    /**
+     * Edge-sampling rules keyed by concrete curve type, replacing the former
+     * 13-branch if/else-if chain. Order mirrors the original chain (first
+     * match wins); branch bodies are verbatim. Any curve matching no rule
+     * throws the original terminal UnsupportedGeometryException.
+     */
+    private static final List<EdgeSampleRule> EDGE_SAMPLE_RULES = List.of(
+            edgeSampleRule(TrimmedCurve3.class, (start, end, curve, naturalForward) -> {
             TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>(Curve3SamplingHelper.sampleTrimmedCurve3(trimmedCurve, 72));
             if (!naturalForward) {
@@ -378,12 +400,12 @@ public final class StepEdgePayloadBuilder {
             points.set(0, start);
             points.set(points.size() - 1, end);
             return List.copyOf(points);
-        }
-        if (curve instanceof SurfaceCurve3) {
+                }),
+            edgeSampleRule(SurfaceCurve3.class, (start, end, curve, naturalForward) -> {
             SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
             return sampleEdge(start, end, surfaceCurve.curve3d(), naturalForward);
-        }
-        if (curve instanceof BSplineCurve3) {
+                }),
+            edgeSampleRule(BSplineCurve3.class, (start, end, curve, naturalForward) -> {
             BSplineCurve3 splineCurve = (BSplineCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>(splineCurve.sample(72));
             if (!naturalForward) {
@@ -392,8 +414,8 @@ public final class StepEdgePayloadBuilder {
             points.set(0, start);
             points.set(points.size() - 1, end);
             return List.copyOf(points);
-        }
-        if (curve instanceof RationalBSplineCurve3) {
+                }),
+            edgeSampleRule(RationalBSplineCurve3.class, (start, end, curve, naturalForward) -> {
             RationalBSplineCurve3 splineCurve = (RationalBSplineCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>(splineCurve.sample(72));
             if (!naturalForward) {
@@ -402,19 +424,19 @@ public final class StepEdgePayloadBuilder {
             points.set(0, start);
             points.set(points.size() - 1, end);
             return List.copyOf(points);
-        }
-        if (curve instanceof Line3) {
+                }),
+            edgeSampleRule(Line3.class, (start, end, curve, naturalForward) -> {
             return List.of(start, end);
-        }
-        if (curve instanceof Circle) {
+                }),
+            edgeSampleRule(Circle.class, (start, end, curve, naturalForward) -> {
             Circle circle = (Circle) curve;
             return Curve3SamplingHelper.sampleCircleArc(circle, start, end, naturalForward);
-        }
-        if (curve instanceof Ellipse3) {
+                }),
+            edgeSampleRule(Ellipse3.class, (start, end, curve, naturalForward) -> {
             Ellipse3 ellipse = (Ellipse3) curve;
             return Curve3SamplingHelper.sampleEllipseArc(ellipse, start, end, naturalForward);
-        }
-        if (curve instanceof Polyline3) {
+                }),
+            edgeSampleRule(Polyline3.class, (start, end, curve, naturalForward) -> {
             Polyline3 polyline = (Polyline3) curve;
             List<CartesianPoint> points = new ArrayList<>(polyline.points());
             if (!naturalForward) {
@@ -423,8 +445,8 @@ public final class StepEdgePayloadBuilder {
             points.set(0, start);
             points.set(points.size() - 1, end);
             return List.copyOf(points);
-        }
-        if (curve instanceof CompositeCurve3) {
+                }),
+            edgeSampleRule(CompositeCurve3.class, (start, end, curve, naturalForward) -> {
             CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
             List<CartesianPoint> points = new ArrayList<>();
             boolean firstSegment = true;
@@ -441,8 +463,8 @@ public final class StepEdgePayloadBuilder {
                 points.set(points.size() - 1, end);
             }
             return List.copyOf(points);
-        }
-        if (curve instanceof Parabola3) {
+                }),
+            edgeSampleRule(Parabola3.class, (start, end, curve, naturalForward) -> {
             Parabola3 parabola = (Parabola3) curve;
             List<CartesianPoint> points = new ArrayList<>(parabola.sample(72));
             if (!naturalForward) {
@@ -453,8 +475,8 @@ public final class StepEdgePayloadBuilder {
                 points.set(points.size() - 1, end);
             }
             return List.copyOf(points);
-        }
-        if (curve instanceof Hyperbola3) {
+                }),
+            edgeSampleRule(Hyperbola3.class, (start, end, curve, naturalForward) -> {
             Hyperbola3 hyperbola = (Hyperbola3) curve;
             List<CartesianPoint> points = new ArrayList<>(hyperbola.sample(72));
             if (!naturalForward) {
@@ -465,8 +487,8 @@ public final class StepEdgePayloadBuilder {
                 points.set(points.size() - 1, end);
             }
             return List.copyOf(points);
-        }
-        if (curve instanceof Clothoid3) {
+                }),
+            edgeSampleRule(Clothoid3.class, (start, end, curve, naturalForward) -> {
             Clothoid3 clothoid = (Clothoid3) curve;
             List<CartesianPoint> points = new ArrayList<>(clothoid.sample(72));
             if (!naturalForward) {
@@ -477,14 +499,23 @@ public final class StepEdgePayloadBuilder {
                 points.set(points.size() - 1, end);
             }
             return List.copyOf(points);
-        }
-        if (curve instanceof DegenerateCurve3) {
+                }),
+            edgeSampleRule(DegenerateCurve3.class, (start, end, curve, naturalForward) -> {
             DegenerateCurve3 degenerate = (DegenerateCurve3) curve;
             // Degenerate curve: a single collapsed point; return start-end as a degenerate edge
             return List.of(start, end);
+                })
+    );
+
+    public static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
+        for (EdgeSampleRule rule : EDGE_SAMPLE_RULES) {
+            if (rule.matches(curve)) {
+                return rule.handler().sample(start, end, curve, naturalForward);
+            }
         }
         throw new UnsupportedGeometryException("preview export requires LINE, CIRCLE, ELLIPSE, PARABOLA, HYPERBOLA, CLOTHOID, POLYLINE, COMPOSITE_CURVE, B_SPLINE, RATIONAL_B_SPLINE_CURVE, OFFSET_CURVE_2D/3D, SURFACE_CURVE, SEAM_CURVE, DEGENERATE_CURVE or TRIMMED_CURVE topology");
     }
+
 
     // ================================================================================
     // CURVE RESOLUTION METHODS

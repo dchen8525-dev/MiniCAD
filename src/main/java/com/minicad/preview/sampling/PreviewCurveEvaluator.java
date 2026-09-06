@@ -3,6 +3,7 @@ package com.minicad.preview.sampling;
 import com.minicad.common.Epsilon;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.export.json.StepCurveTypeNameResolver;
+import com.minicad.export.json.StepEdgePayloadBuilder;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
 import com.minicad.geometry2d.*;
@@ -532,121 +533,9 @@ public final class PreviewCurveEvaluator {
 
     // ─── Edge sampling ───────────────────────────────────────────────────
 
+    /** Delegates to the shared EDGE_SAMPLE_RULES table; see StepEdgePayloadBuilder. */
     public static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
-        if (curve instanceof TrimmedCurve3) {
-            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
-            List<CartesianPoint> points = new ArrayList<>(sampleTrimmedCurve3(trimmedCurve, 72));
-            if (!naturalForward) {
-                Collections.reverse(points);
-            }
-            points.set(0, start);
-            points.set(points.size() - 1, end);
-            return List.copyOf(points);
-        }
-        if (curve instanceof SurfaceCurve3) {
-            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
-            return sampleEdge(start, end, surfaceCurve.curve3d(), naturalForward);
-        }
-        if (curve instanceof BSplineCurve3) {
-            BSplineCurve3 splineCurve = (BSplineCurve3) curve;
-            List<CartesianPoint> points = new ArrayList<>(splineCurve.sample(72));
-            if (!naturalForward) {
-                Collections.reverse(points);
-            }
-            points.set(0, start);
-            points.set(points.size() - 1, end);
-            return List.copyOf(points);
-        }
-        if (curve instanceof RationalBSplineCurve3) {
-            RationalBSplineCurve3 splineCurve = (RationalBSplineCurve3) curve;
-            List<CartesianPoint> points = new ArrayList<>(splineCurve.sample(72));
-            if (!naturalForward) {
-                Collections.reverse(points);
-            }
-            points.set(0, start);
-            points.set(points.size() - 1, end);
-            return List.copyOf(points);
-        }
-        if (curve instanceof Line3) {
-            return List.of(start, end);
-        }
-        if (curve instanceof Circle) {
-            Circle circle = (Circle) curve;
-            return sampleCircleArc(circle, start, end, naturalForward);
-        }
-        if (curve instanceof Ellipse3) {
-            Ellipse3 ellipse = (Ellipse3) curve;
-            return sampleEllipseArc(ellipse, start, end, naturalForward);
-        }
-        if (curve instanceof Polyline3) {
-            Polyline3 polyline = (Polyline3) curve;
-            List<CartesianPoint> points = new ArrayList<>(polyline.points());
-            if (!naturalForward) {
-                Collections.reverse(points);
-            }
-            points.set(0, start);
-            points.set(points.size() - 1, end);
-            return List.copyOf(points);
-        }
-        if (curve instanceof CompositeCurve3) {
-            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
-            List<CartesianPoint> points = new ArrayList<>();
-            boolean firstSegment = true;
-            for (Curve3 segment : compositeCurve.segments()) {
-                List<CartesianPoint> segmentPoints = sampleEdge(start, end, segment, naturalForward);
-                int startIndex = firstSegment ? 0 : 1;
-                for (int i = startIndex; i < segmentPoints.size(); i++) {
-                    points.add(segmentPoints.get(i));
-                }
-                firstSegment = false;
-            }
-            if (!points.isEmpty()) {
-                points.set(0, start);
-                points.set(points.size() - 1, end);
-            }
-            return List.copyOf(points);
-        }
-        if (curve instanceof Parabola3) {
-            Parabola3 parabola = (Parabola3) curve;
-            List<CartesianPoint> points = new ArrayList<>(parabola.sample(72));
-            if (!naturalForward) {
-                Collections.reverse(points);
-            }
-            if (points.size() >= 2) {
-                points.set(0, start);
-                points.set(points.size() - 1, end);
-            }
-            return List.copyOf(points);
-        }
-        if (curve instanceof Hyperbola3) {
-            Hyperbola3 hyperbola = (Hyperbola3) curve;
-            List<CartesianPoint> points = new ArrayList<>(hyperbola.sample(72));
-            if (!naturalForward) {
-                Collections.reverse(points);
-            }
-            if (points.size() >= 2) {
-                points.set(0, start);
-                points.set(points.size() - 1, end);
-            }
-            return List.copyOf(points);
-        }
-        if (curve instanceof Clothoid3) {
-            Clothoid3 clothoid = (Clothoid3) curve;
-            List<CartesianPoint> points = new ArrayList<>(clothoid.sample(72));
-            if (!naturalForward) {
-                Collections.reverse(points);
-            }
-            if (points.size() >= 2) {
-                points.set(0, start);
-                points.set(points.size() - 1, end);
-            }
-            return List.copyOf(points);
-        }
-        if (curve instanceof DegenerateCurve3) {
-            DegenerateCurve3 degenerate = (DegenerateCurve3) curve;
-            return List.of(start, end);
-        }
-        throw new UnsupportedGeometryException("preview export requires LINE, CIRCLE, ELLIPSE, PARABOLA, HYPERBOLA, CLOTHOID, POLYLINE, COMPOSITE_CURVE, B_SPLINE, RATIONAL_B_SPLINE_CURVE, OFFSET_CURVE_2D/3D, SURFACE_CURVE, SEAM_CURVE, DEGENERATE_CURVE or TRIMMED_CURVE topology");
+        return StepEdgePayloadBuilder.sampleEdge(start, end, curve, naturalForward);
     }
 
     public static List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {
