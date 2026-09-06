@@ -1,0 +1,26 @@
+# Branch order of PreviewCurveEvaluator.sampleLooseEdgePoints, captured from the
+# original 14-branch `if (item instanceof X)` chain before it was folded into
+# LOOSE_EDGE_POINTS_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch: instanceof also
+# matches subtypes, so a dropped, duplicated or reordered rule silently changes
+# which entity gets sampled how. Items matching no rule fall through to the
+# trailing curveForLooseEdge sampling, so the frozen file also protects that
+# fallback boundary. All 14 types are final classes implementing StepEntity
+# directly (no subtype relation today), so the order is currently behaviour
+# neutral -- the frozen file turns any future reordering into a test failure
+# rather than a silent behaviour change.
+StepAnnotationFillArea
+StepAnnotationFillAreaOccurrence
+StepEdgeBasedWireframeModel
+StepShellBasedWireframeModel
+StepAnnotationSymbol
+StepAnnotationText
+StepAnnotationTextCharacter
+StepGeometricReplica
+StepOrientedCurve
+StepGeometricSet
+StepGeometricCurveSet
+StepConnectedEdgeSet
+StepWireShell
+StepEdgeWire
