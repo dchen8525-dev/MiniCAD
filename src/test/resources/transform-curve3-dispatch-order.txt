@@ -1,0 +1,23 @@
+# Branch order of StepCadGeometryOps.transformCurve3, captured from the original
+# 13-branch `if (curve instanceof X)` chain before it was folded into
+# TRANSFORM_CURVE3_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch: instanceof also
+# matches subtypes, so a dropped, duplicated or reordered rule silently changes
+# which geometry is transformed. The 13 types are final classes implementing
+# Curve3 directly (no subtype relation today), so the order is currently
+# behaviour neutral -- the frozen file turns any future reordering into a test
+# failure rather than a silent behaviour change.
+Line3
+Circle
+Ellipse3
+Polyline3
+BSplineCurve3
+RationalBSplineCurve3
+SurfaceCurve3
+TrimmedCurve3
+CompositeCurve3
+Parabola3
+Hyperbola3
+Clothoid3
+DegenerateCurve3
