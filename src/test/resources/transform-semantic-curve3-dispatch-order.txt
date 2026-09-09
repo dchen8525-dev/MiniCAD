@@ -1,0 +1,22 @@
+# Branch order of StepMeshExporter.transformSemanticCurve3, captured from the
+# original 9-branch `if (curve instanceof X)` chain before it was folded into
+# TRANSFORM_SEMANTIC_CURVE3_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch: instanceof also
+# matches subtypes, so a dropped, duplicated or reordered rule silently changes
+# which curve is transformed how. Curves matching no rule fall through to the
+# trailing `return null` (the caller treats null as "unsupported, keep
+# looking"), so the frozen file also protects that fallback boundary. All 9
+# types are final classes implementing Curve3 directly (no subtype relation
+# today), so the order is currently behaviour neutral -- the frozen file turns
+# any future reordering into a test failure rather than a silent behaviour
+# change.
+Line3
+Circle
+Ellipse3
+Polyline3
+BSplineCurve3
+RationalBSplineCurve3
+CompositeCurve3
+TrimmedCurve3
+SurfaceCurve3

@@ -319,39 +319,50 @@ public final class StepMeshExporter {
         return null;
     }
 
-    private static Curve3 transformSemanticCurve3(
-            Curve3 curve,
-            com.minicad.step.model.StepCartesianTransformationOperator transformation,
-            StepCadBuilder builder
-    ) {
-        double scale = transformationScale(transformation);
-        if (curve instanceof Line3) {
+    // transformSemanticCurve3 dispatch table (first match wins, mirrors the
+    // original sequential ifs; a null result propagates to the caller).
+    private record TransformSemanticCurve3Rule(
+            Class<? extends Curve3> type, TransformSemanticCurve3Handler handler) {}
+
+    private interface TransformSemanticCurve3Handler {
+        Curve3 transform(Curve3 curve,
+                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                double scale, StepCadBuilder builder);
+    }
+
+    private static TransformSemanticCurve3Rule transformSemanticCurve3Rule(
+            Class<? extends Curve3> type, TransformSemanticCurve3Handler handler) {
+        return new TransformSemanticCurve3Rule(type, handler);
+    }
+
+    private static final List<TransformSemanticCurve3Rule> TRANSFORM_SEMANTIC_CURVE3_RULES = List.of(
+        transformSemanticCurve3Rule(Line3.class, (curve, transformation, scale, builder) -> {
             Line3 line = (Line3) curve;
             return new Line3(
                     transformPoint3(line.origin(), transformation, builder),
                     transformDirection3(line.direction(), transformation, builder),
                     line.parameterScale() * Math.abs(scale));
-        }
-        if (curve instanceof Circle) {
+        }),
+        transformSemanticCurve3Rule(Circle.class, (curve, transformation, scale, builder) -> {
             Circle circle = (Circle) curve;
             return new Circle(
                     transformPlacement(circle.position(), transformation, builder),
                     circle.radius() * Math.abs(scale));
-        }
-        if (curve instanceof Ellipse3) {
+        }),
+        transformSemanticCurve3Rule(Ellipse3.class, (curve, transformation, scale, builder) -> {
             Ellipse3 ellipse = (Ellipse3) curve;
             return new Ellipse3(
                     transformPlacement(ellipse.position(), transformation, builder),
                     ellipse.semiAxis1() * Math.abs(scale),
                     ellipse.semiAxis2() * Math.abs(scale));
-        }
-        if (curve instanceof Polyline3) {
+        }),
+        transformSemanticCurve3Rule(Polyline3.class, (curve, transformation, scale, builder) -> {
             Polyline3 polyline = (Polyline3) curve;
             return new Polyline3(polyline.points().stream()
                     .map(point -> transformPoint3(point, transformation, builder))
                     .collect(Collectors.toList()));
-        }
-        if (curve instanceof BSplineCurve3) {
+        }),
+        transformSemanticCurve3Rule(BSplineCurve3.class, (curve, transformation, scale, builder) -> {
             BSplineCurve3 bsplineCurve = (BSplineCurve3) curve;
             return new BSplineCurve3(
                     bsplineCurve.degree(),
@@ -360,8 +371,8 @@ public final class StepMeshExporter {
                             .collect(Collectors.toList()),
                     bsplineCurve.knotMultiplicities(),
                     bsplineCurve.knots());
-        }
-        if (curve instanceof RationalBSplineCurve3) {
+        }),
+        transformSemanticCurve3Rule(RationalBSplineCurve3.class, (curve, transformation, scale, builder) -> {
             RationalBSplineCurve3 rationalBSplineCurve = (RationalBSplineCurve3) curve;
             return new RationalBSplineCurve3(
                     rationalBSplineCurve.degree(),
@@ -371,8 +382,8 @@ public final class StepMeshExporter {
                     rationalBSplineCurve.weights(),
                     rationalBSplineCurve.knotMultiplicities(),
                     rationalBSplineCurve.knots());
-        }
-        if (curve instanceof CompositeCurve3) {
+        }),
+        transformSemanticCurve3Rule(CompositeCurve3.class, (curve, transformation, scale, builder) -> {
             CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
             List<Curve3> transformedSegments = new ArrayList<>(compositeCurve.segments().size());
             for (Curve3 segment : compositeCurve.segments()) {
@@ -383,8 +394,8 @@ public final class StepMeshExporter {
                 transformedSegments.add(transformed);
             }
             return new CompositeCurve3(transformedSegments);
-        }
-        if (curve instanceof TrimmedCurve3) {
+        }),
+        transformSemanticCurve3Rule(TrimmedCurve3.class, (curve, transformation, scale, builder) -> {
             TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
             Curve3 basisCurve = transformSemanticCurve3(trimmedCurve.basisCurve(), transformation, builder);
             if (basisCurve == null) {
@@ -395,14 +406,27 @@ public final class StepMeshExporter {
                     trimmedCurve.trimParamStart(),
                     trimmedCurve.trimParamEnd(),
                     trimmedCurve.senseAgreement());
-        }
-        if (curve instanceof SurfaceCurve3) {
+        }),
+        transformSemanticCurve3Rule(SurfaceCurve3.class, (curve, transformation, scale, builder) -> {
             SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
             Curve3 curve3d = transformSemanticCurve3(surfaceCurve.curve3d(), transformation, builder);
             if (curve3d == null) {
                 return null;
             }
             return new SurfaceCurve3(curve3d, surfaceCurve.parametricCurves());
+        })
+    );
+
+    private static Curve3 transformSemanticCurve3(
+            Curve3 curve,
+            com.minicad.step.model.StepCartesianTransformationOperator transformation,
+            StepCadBuilder builder
+    ) {
+        double scale = transformationScale(transformation);
+        for (TransformSemanticCurve3Rule rule : TRANSFORM_SEMANTIC_CURVE3_RULES) {
+            if (rule.type().isInstance(curve)) {
+                return rule.handler().transform(curve, transformation, scale, builder);
+            }
         }
         return null;
     }
