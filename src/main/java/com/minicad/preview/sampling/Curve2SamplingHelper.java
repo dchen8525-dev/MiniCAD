@@ -43,60 +43,79 @@ public final class Curve2SamplingHelper {
         // Utility class
     }
 
-    public static List<Point2> sampleLooseCurve2(Curve2 curve) {
-        if (curve instanceof Line2) {
-            Line2 line = (Line2) curve;
-            return List.of(line.pointAt(0.0), line.pointAt(1.0));
+    @FunctionalInterface
+    private interface Curve2SampleHandler {
+        List<Point2> sample(Curve2 curve);
+    }
+
+    private record Curve2SampleRule(Class<?> type, Curve2SampleHandler handler) {
+        boolean matches(Curve2 curve) {
+            return type.isInstance(curve);
         }
-        if (curve instanceof Circle2) {
-            Circle2 circle = (Circle2) curve;
-            return sampleCircle2Points(circle, 72);
-        }
-        if (curve instanceof Ellipse2) {
-            Ellipse2 ellipse = (Ellipse2) curve;
-            return sampleEllipse2Points(ellipse, 72);
-        }
-        if (curve instanceof Parabola2) {
-            Parabola2 parabola = (Parabola2) curve;
-            return parabola.sample(72);
-        }
-        if (curve instanceof Hyperbola2) {
-            Hyperbola2 hyperbola = (Hyperbola2) curve;
-            return hyperbola.sample(72);
-        }
-        if (curve instanceof DegenerateCurve2) {
-            DegenerateCurve2 degenerate = (DegenerateCurve2) curve;
-            return List.of(degenerate.point());
-        }
-        if (curve instanceof BSplineCurve2) {
-            BSplineCurve2 spline = (BSplineCurve2) curve;
-            return spline.sample(72);
-        }
-        if (curve instanceof RationalBSplineCurve2) {
-            RationalBSplineCurve2 spline = (RationalBSplineCurve2) curve;
-            return spline.sample(72);
-        }
-        if (curve instanceof TrimmedCurve2) {
-            TrimmedCurve2 trimmedCurve = (TrimmedCurve2) curve;
-            return sampleTrimmedCurve2(trimmedCurve, 72);
-        }
-        if (curve instanceof Polyline2) {
-            Polyline2 polyline = (Polyline2) curve;
-            return polyline.points();
-        }
-        if (curve instanceof CompositeCurve2) {
-            CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
-            List<Point2> points = new ArrayList<>();
-            boolean first = true;
-            for (Curve2 segment : compositeCurve.segments()) {
-                List<Point2> segmentPoints = sampleLooseCurve2(segment);
-                int start = first ? 0 : 1;
-                for (int i = start; i < segmentPoints.size(); i++) {
-                    points.add(segmentPoints.get(i));
+    }
+
+    private static Curve2SampleRule curve2SampleRule(Class<?> type, Curve2SampleHandler handler) {
+        return new Curve2SampleRule(type, handler);
+    }
+
+    /** Types whose loose sample is the interface's own sample(72). */
+    private static Curve2SampleRule sampledRule(Class<?> type) {
+        return curve2SampleRule(type, (curve) -> curve.sample(72));
+    }
+
+    /**
+     * Loose 2D curve sampling rules keyed by concrete curve type, replacing the
+     * former 11-branch if/else-if chain. Order mirrors the original chain
+     * (first match wins); a curve matching no rule throws
+     * UnsupportedGeometryException, as the old trailing statement did. The
+     * sampledRule bodies call Curve2.sample directly: the original branches
+     * downcast to the concrete type first, but every listed type overrides the
+     * interface default, so dynamic dispatch reaches the same method.
+     */
+    private static final List<Curve2SampleRule> CURVE2_SAMPLE_RULES = List.of(
+            curve2SampleRule(Line2.class, (curve) -> {
+                Line2 line = (Line2) curve;
+                return List.of(line.pointAt(0.0), line.pointAt(1.0));
+            }),
+            curve2SampleRule(Circle2.class, (curve) -> sampleCircle2Points((Circle2) curve, 72)),
+            curve2SampleRule(Ellipse2.class, (curve) -> sampleEllipse2Points((Ellipse2) curve, 72)),
+            sampledRule(Parabola2.class),
+            sampledRule(Hyperbola2.class),
+            curve2SampleRule(DegenerateCurve2.class, (curve) -> {
+                DegenerateCurve2 degenerate = (DegenerateCurve2) curve;
+                return List.of(degenerate.point());
+            }),
+            sampledRule(BSplineCurve2.class),
+            sampledRule(RationalBSplineCurve2.class),
+            curve2SampleRule(TrimmedCurve2.class, (curve) -> {
+                TrimmedCurve2 trimmedCurve = (TrimmedCurve2) curve;
+                return sampleTrimmedCurve2(trimmedCurve, 72);
+            }),
+            curve2SampleRule(Polyline2.class, (curve) -> {
+                Polyline2 polyline = (Polyline2) curve;
+                return polyline.points();
+            }),
+            curve2SampleRule(CompositeCurve2.class, (curve) -> {
+                CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
+                List<Point2> points = new ArrayList<>();
+                boolean first = true;
+                for (Curve2 segment : compositeCurve.segments()) {
+                    List<Point2> segmentPoints = sampleLooseCurve2(segment);
+                    int start = first ? 0 : 1;
+                    for (int i = start; i < segmentPoints.size(); i++) {
+                        points.add(segmentPoints.get(i));
+                    }
+                    first = false;
                 }
-                first = false;
+                return List.copyOf(points);
+            })
+    );
+
+    public static List<Point2> sampleLooseCurve2(Curve2 curve) {
+        for (Curve2SampleRule rule : CURVE2_SAMPLE_RULES) {
+            if (rule.matches(curve)) {
+                return rule.handler().sample(curve);
             }
-            return List.copyOf(points);
         }
         throw new UnsupportedGeometryException("2D curve sampling for " + curveTypeName(curve) + " is unsupported");
     }
