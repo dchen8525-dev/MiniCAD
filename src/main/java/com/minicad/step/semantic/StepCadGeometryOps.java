@@ -258,33 +258,62 @@ final class StepCadGeometryOps {
         return List.copyOf(reversed);
     }
 
-    List<CartesianPoint> sampleCurve3(Curve3 curve, int segments) {
-        if (curve instanceof TrimmedCurve3) {
-            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
-            return sampleTrimmedCurve3(trimmedCurve, segments);
-        }
-        if (curve instanceof SurfaceCurve3) {
-            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
-            return sampleCurve3(surfaceCurve.getCurve3d(), segments);
-        }
-        if (curve instanceof Polyline3) {
-            Polyline3 polyline = (Polyline3) curve;
-            return polyline.getPoints();
-        }
-        if (curve instanceof CompositeCurve3) {
-            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
-            List<CartesianPoint> points = new ArrayList<>();
-            boolean first = true;
-            for (Curve3 segment : compositeCurve.getSegments()) {
-                List<CartesianPoint> segmentPoints = sampleCurve3(segment, segments);
-                int start = first ? 0 : 1;
-                for (int i = start; i < segmentPoints.size(); i++) {
-                    points.add(segmentPoints.get(i));
+    private interface SampleCurve3Handler {
+        List<CartesianPoint> apply(StepCadGeometryOps ops, Curve3 curve, int segments);
+    }
+
+    private record SampleCurve3Rule(
+            Class<? extends Curve3> type, SampleCurve3Handler handler) {}
+
+    private static SampleCurve3Rule sampleCurve3Rule(
+            Class<? extends Curve3> type, SampleCurve3Handler handler) {
+        return new SampleCurve3Rule(type, handler);
+    }
+
+    /**
+     * Curve sampling rules keyed by concrete curve type, replacing the former
+     * 4-branch if/else-if chain. Unlike the throw-on-miss tables, a curve
+     * matching no rule falls through to the generic Curve3.sample(segments)
+     * fallback, matching the original trailing default (which only threw when
+     * the generic sample returned no points).
+     */
+    private static final List<SampleCurve3Rule> SAMPLE_CURVE3_RULES = List.of(
+            sampleCurve3Rule(TrimmedCurve3.class, (ops, curve, segments) -> {
+                TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
+                return ops.sampleTrimmedCurve3(trimmedCurve, segments);
+            }),
+            sampleCurve3Rule(SurfaceCurve3.class, (ops, curve, segments) -> {
+                SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
+                return ops.sampleCurve3(surfaceCurve.getCurve3d(), segments);
+            }),
+            sampleCurve3Rule(Polyline3.class, (ops, curve, segments) -> {
+                Polyline3 polyline = (Polyline3) curve;
+                return polyline.getPoints();
+            }),
+            sampleCurve3Rule(CompositeCurve3.class, (ops, curve, segments) -> {
+                CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
+                List<CartesianPoint> points = new ArrayList<>();
+                boolean first = true;
+                for (Curve3 segment : compositeCurve.getSegments()) {
+                    List<CartesianPoint> segmentPoints = ops.sampleCurve3(segment, segments);
+                    int start = first ? 0 : 1;
+                    for (int i = start; i < segmentPoints.size(); i++) {
+                        points.add(segmentPoints.get(i));
+                    }
+                    first = false;
                 }
-                first = false;
+                return List.copyOf(points);
+            })
+    );
+
+    List<CartesianPoint> sampleCurve3(Curve3 curve, int segments) {
+        for (SampleCurve3Rule rule : SAMPLE_CURVE3_RULES) {
+            if (rule.type().isInstance(curve)) {
+                return rule.handler().apply(this, curve, segments);
             }
-            return List.copyOf(points);
         }
+        // Generic fallback for curve types not in the table: every Curve3 has a
+        // default sample(segments) implementation, used as the original tail did.
         List<CartesianPoint> points = curve.sample(segments);
         if (points.isEmpty()) {
             throw new UnsupportedGeometryException("curve sampling for " + curve.getClass().getSimpleName() + " is unsupported");
