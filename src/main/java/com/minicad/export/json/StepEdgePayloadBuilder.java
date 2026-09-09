@@ -1415,50 +1415,27 @@ public final class StepEdgePayloadBuilder {
     // UNWRAP HELPER METHODS
     // ================================================================================
 
-    private static StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
+    /**
+     * Unwraps associated curve geometry to its base curve, dispatching through
+     * SEMANTIC_CURVE_UNWRAP_RULES. Unlike previewCurveSemanticItem (same table,
+     * unbounded), this loop keeps the original 16-step depth cap: a cyclic
+     * wrapper chain returns the entity reached at the cap instead of spinning.
+     * Package-private so StepSummaryBuilder shares one copy of the dispatch.
+     */
+    static StepEntity unwrapAssociatedCurveGeometry(StepEntity edgeGeometry) {
         StepEntity current = edgeGeometry;
         for (int depth = 0; depth < 16; depth++) {
-            if (current instanceof StepOrientedCurve) {
-                StepOrientedCurve orientedCurve = (StepOrientedCurve) current;
-                current = orientedCurve.curveElement();
-                continue;
+            StepEntity next = null;
+            for (SemanticCurveUnwrapRule rule : SEMANTIC_CURVE_UNWRAP_RULES) {
+                if (rule.matches(current)) {
+                    next = rule.next().apply(current);
+                    break;
+                }
             }
-            if (current instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) current;
-                current = replica.parent();
-                continue;
+            if (next == null) {
+                return current;
             }
-            if (current instanceof StepAnnotationCurveOccurrence) {
-                StepAnnotationCurveOccurrence occurrence = (StepAnnotationCurveOccurrence) current;
-                current = occurrence.item();
-                continue;
-            }
-            if (current instanceof StepDimensionCurve) {
-                StepDimensionCurve dimensionCurve = (StepDimensionCurve) current;
-                current = dimensionCurve.item();
-                continue;
-            }
-            if (current instanceof StepLeaderCurve) {
-                StepLeaderCurve leaderCurve = (StepLeaderCurve) current;
-                current = leaderCurve.item();
-                continue;
-            }
-            if (current instanceof StepProjectionCurve) {
-                StepProjectionCurve projectionCurve = (StepProjectionCurve) current;
-                current = projectionCurve.item();
-                continue;
-            }
-            if (current instanceof StepDraughtingAnnotationOccurrence) {
-                StepDraughtingAnnotationOccurrence annotationOccurrence = (StepDraughtingAnnotationOccurrence) current;
-                current = annotationOccurrence.item();
-                continue;
-            }
-            if (current instanceof StepTerminatorSymbol) {
-                StepTerminatorSymbol terminatorSymbol = (StepTerminatorSymbol) current;
-                current = terminatorSymbol.annotatedCurve();
-                continue;
-            }
-            return current;
+            current = next;
         }
         return current;
     }
