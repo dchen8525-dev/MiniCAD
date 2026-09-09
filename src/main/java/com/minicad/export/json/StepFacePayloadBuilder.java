@@ -1548,13 +1548,29 @@ public final class StepFacePayloadBuilder {
         return new UvBounds(minU, minV, maxU, maxV);
     }
 
-    private static FaceSurfacePayload faceSurfacePayload(
-            StepEntity geometry,
-            UvBounds uvBounds,
-            StepCadBuilder builder
-    ) {
-        StepEntity surfaceGeometry = unwrapParametricPreviewSurface(geometry);
-        if (surfaceGeometry instanceof StepPlane) {
+    // faceSurfacePayload dispatch table.
+    // The original chain was a sequence of `if (surfaceGeometry instanceof T) { ...; return payload; }`
+    // blocks that all returned non-null, so dispatch is first-match-wins with a trailing
+    // `return null` for unsupported surfaces. The compound b-spline rule keeps its OR predicate
+    // (primary type StepBSplineSurfaceWithKnots). Handlers receive both the unwrapped
+    // surfaceGeometry (dispatch target and cast source) and the original geometry (source
+    // metadata), mirroring the two locals the original branches closed over.
+    private record FaceSurfacePayloadRule(Class<?> type, Predicate<StepEntity> matches, FaceSurfacePayloadHandler handler) {
+        boolean matches(StepEntity entity) {
+            return matches.test(entity);
+        }
+    }
+
+    private interface FaceSurfacePayloadHandler {
+        FaceSurfacePayload payload(StepEntity surfaceGeometry, StepEntity geometry, UvBounds uvBounds, StepCadBuilder builder);
+    }
+
+    private static FaceSurfacePayloadRule faceSurfacePayloadRule(Class<?> type, Predicate<StepEntity> matches, FaceSurfacePayloadHandler handler) {
+        return new FaceSurfacePayloadRule(type, matches, handler);
+    }
+
+    private static final List<FaceSurfacePayloadRule> FACE_SURFACE_PAYLOAD_RULES = List.of(
+        faceSurfacePayloadRule(StepPlane.class, StepPlane.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepPlane stepPlane = (StepPlane) surfaceGeometry;
             Plane plane = builder.buildPlane(stepPlane.id());
             Direction3 normal = plane.normal();
@@ -1574,8 +1590,8 @@ public final class StepFacePayloadBuilder {
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepCylindricalSurface) {
+        }),
+        faceSurfacePayloadRule(StepCylindricalSurface.class, StepCylindricalSurface.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepCylindricalSurface cylindricalSurface = (StepCylindricalSurface) surfaceGeometry;
             CylindricalSurface surface = builder.buildCylindricalSurface(cylindricalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
@@ -1594,8 +1610,8 @@ public final class StepFacePayloadBuilder {
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepConicalSurface) {
+        }),
+        faceSurfacePayloadRule(StepConicalSurface.class, StepConicalSurface.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepConicalSurface conicalSurface = (StepConicalSurface) surfaceGeometry;
             ConicalSurface surface = builder.buildConicalSurface(conicalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
@@ -1614,8 +1630,8 @@ public final class StepFacePayloadBuilder {
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepSphericalSurface) {
+        }),
+        faceSurfacePayloadRule(StepSphericalSurface.class, StepSphericalSurface.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepSphericalSurface sphericalSurface = (StepSphericalSurface) surfaceGeometry;
             SphericalSurface surface = builder.buildSphericalSurface(sphericalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
@@ -1634,8 +1650,8 @@ public final class StepFacePayloadBuilder {
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepToroidalSurface) {
+        }),
+        faceSurfacePayloadRule(StepToroidalSurface.class, StepToroidalSurface.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepToroidalSurface toroidalSurface = (StepToroidalSurface) surfaceGeometry;
             ToroidalSurface surface = builder.buildToroidalSurface(toroidalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
@@ -1654,8 +1670,8 @@ public final class StepFacePayloadBuilder {
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepDegenerateToroidalSurface) {
+        }),
+        faceSurfacePayloadRule(StepDegenerateToroidalSurface.class, StepDegenerateToroidalSurface.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepDegenerateToroidalSurface toroidalSurface = (StepDegenerateToroidalSurface) surfaceGeometry;
             ToroidalSurface surface = builder.buildDegenerateToroidalSurface(toroidalSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
@@ -1674,8 +1690,8 @@ public final class StepFacePayloadBuilder {
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepSurfaceOfLinearExtrusion) {
+        }),
+        faceSurfacePayloadRule(StepSurfaceOfLinearExtrusion.class, StepSurfaceOfLinearExtrusion.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepSurfaceOfLinearExtrusion extrusionSurface = (StepSurfaceOfLinearExtrusion) surfaceGeometry;
             SurfaceOfLinearExtrusion3 surface = builder.buildSurfaceOfLinearExtrusion(extrusionSurface.id());
             Direction3 axis = surface.extrusionVector().normalize().asDirection();
@@ -1695,8 +1711,8 @@ public final class StepFacePayloadBuilder {
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepSurfaceOfRevolution) {
+        }),
+        faceSurfacePayloadRule(StepSurfaceOfRevolution.class, StepSurfaceOfRevolution.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepSurfaceOfRevolution revolutionSurface = (StepSurfaceOfRevolution) surfaceGeometry;
             SurfaceOfRevolution3 surface = builder.buildSurfaceOfRevolution(revolutionSurface.id());
             return withSurfaceSourceMetadata(new FaceSurfacePayload(
@@ -1715,8 +1731,8 @@ public final class StepFacePayloadBuilder {
                     null, null, null, null, null, null,
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepRationalBSplineSurface) {
+        }),
+        faceSurfacePayloadRule(StepRationalBSplineSurface.class, StepRationalBSplineSurface.class::isInstance, (surfaceGeometry, geometry, uvBounds, builder) -> {
             StepRationalBSplineSurface splineSurface = (StepRationalBSplineSurface) surfaceGeometry;
             RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(splineSurface.id());
             List<List<List<Double>>> controlPoints = surface.controlPoints().stream()
@@ -1745,12 +1761,17 @@ public final class StepFacePayloadBuilder {
                     surface.vKnots(),
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
-        }
-        if (surfaceGeometry instanceof StepBSplineSurfaceWithKnots
-                || surfaceGeometry instanceof StepBezierSurface
-                || surfaceGeometry instanceof StepUniformSurface
-                || surfaceGeometry instanceof StepQuasiUniformSurface
-                || surfaceGeometry instanceof StepPiecewiseBezierSurface) {
+        }),
+        // Compound OR rule: primary type StepBSplineSurfaceWithKnots, predicate mirrors the
+        // original `||` chain verbatim (note: unlike PreviewMeshExporter's copy, this chain
+        // does not test StepBSplineSurface).
+        faceSurfacePayloadRule(StepBSplineSurfaceWithKnots.class,
+                surfaceGeometry -> surfaceGeometry instanceof StepBSplineSurfaceWithKnots
+                        || surfaceGeometry instanceof StepBezierSurface
+                        || surfaceGeometry instanceof StepUniformSurface
+                        || surfaceGeometry instanceof StepQuasiUniformSurface
+                        || surfaceGeometry instanceof StepPiecewiseBezierSurface,
+                (surfaceGeometry, geometry, uvBounds, builder) -> {
             BSplineSurface3 surface = PreviewMeshExporter.buildBsplineSurface(surfaceGeometry, builder);
             List<List<List<Double>>> controlPoints = surface.controlPoints().stream()
                     .map(row -> row.stream()
@@ -1778,6 +1799,19 @@ public final class StepFacePayloadBuilder {
                     surface.vKnots(),
                     null, null, null, null, null, null, null, null, null, null, null, null
             ), geometry);
+        })
+    );
+
+    private static FaceSurfacePayload faceSurfacePayload(
+            StepEntity geometry,
+            UvBounds uvBounds,
+            StepCadBuilder builder
+    ) {
+        StepEntity surfaceGeometry = unwrapParametricPreviewSurface(geometry);
+        for (FaceSurfacePayloadRule rule : FACE_SURFACE_PAYLOAD_RULES) {
+            if (rule.matches(surfaceGeometry)) {
+                return rule.handler().payload(surfaceGeometry, geometry, uvBounds, builder);
+            }
         }
         return null;
     }

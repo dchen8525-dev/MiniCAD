@@ -1,0 +1,14 @@
+# Frozen branch order of StepFacePayloadBuilder.faceSurfacePayload, captured from
+# the original if/else-if chain. Primary types only; the last rule is a compound
+# OR whose predicate additionally matches StepBezierSurface, StepUniformSurface,
+# StepQuasiUniformSurface and StepPiecewiseBezierSurface.
+StepPlane
+StepCylindricalSurface
+StepConicalSurface
+StepSphericalSurface
+StepToroidalSurface
+StepDegenerateToroidalSurface
+StepSurfaceOfLinearExtrusion
+StepSurfaceOfRevolution
+StepRationalBSplineSurface
+StepBSplineSurfaceWithKnots
