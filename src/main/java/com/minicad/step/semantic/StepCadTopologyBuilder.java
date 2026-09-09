@@ -279,70 +279,89 @@ final class StepCadTopologyBuilder {
         return com.minicad.topology.Edge.isClosedCurve(curve);
     }
 
+    @FunctionalInterface
+    private interface ProjectOntoCurveHandler {
+        CartesianPoint project(CartesianPoint point, Curve3 curve);
+    }
+
+    private record ProjectOntoCurveRule(Class<? extends Curve3> type, ProjectOntoCurveHandler handler) {
+    }
+
+    private static ProjectOntoCurveRule projectOntoCurveRule(
+            Class<? extends Curve3> type, ProjectOntoCurveHandler handler) {
+        return new ProjectOntoCurveRule(type, handler);
+    }
+
+    /**
+     * Closest-point projection rules keyed by concrete curve type, replacing
+     * the former 9-branch if/else-if chain. Order mirrors the original chain
+     * (first match wins); a curve matching no rule returns the point
+     * unchanged, as the old trailing statement did (the Edge constructor
+     * validates afterwards).
+     */
+    private static final List<ProjectOntoCurveRule> PROJECT_ONTO_CURVE_RULES = List.of(
+            projectOntoCurveRule(com.minicad.geometry.BSplineCurve3.class, (point, curve) ->
+                    ((com.minicad.geometry.BSplineCurve3) curve).closestPointTo(point)),
+            projectOntoCurveRule(com.minicad.geometry.RationalBSplineCurve3.class, (point, curve) ->
+                    ((com.minicad.geometry.RationalBSplineCurve3) curve).closestPointTo(point)),
+            projectOntoCurveRule(com.minicad.geometry.Line3.class, (point, curve) -> {
+                com.minicad.geometry.Line3 line = (com.minicad.geometry.Line3) curve;
+                // Project onto infinite line: t is signed distance along direction
+                Vector3 offset = point.subtract(line.getOrigin());
+                double t = offset.dot(line.getDirection().asVector());
+                return line.getOrigin().add(line.getDirection().asVector().scale(t));
+            }),
+            projectOntoCurveRule(com.minicad.geometry.Circle.class, (point, curve) -> {
+                com.minicad.geometry.Circle circle = (com.minicad.geometry.Circle) curve;
+                // Project onto circle: normalize vector from center, scale by radius
+                CartesianPoint center = circle.getPosition().getLocation();
+                Vector3 fromCenter = point.subtract(center);
+                if (fromCenter.normSquared() <= Epsilon.EPS) {
+                    // Point is at center - pick arbitrary point on circle
+                    Vector3 xDir = circle.getPosition().xDirection().asVector();
+                    return center.add(xDir.scale(circle.getRadius()));
+                }
+                return center.add(fromCenter.normalize().asVector().scale(circle.getRadius()));
+            }),
+            projectOntoCurveRule(com.minicad.geometry.Ellipse3.class, (point, curve) -> {
+                com.minicad.geometry.Ellipse3 ellipse = (com.minicad.geometry.Ellipse3) curve;
+                // Approximate by sampling - good enough for projection
+                return ellipse.closestPointTo(point);
+            }),
+            projectOntoCurveRule(com.minicad.geometry.Polyline3.class, (point, curve) ->
+                    // Find closest point on polyline segments
+                    polylineClosestPoint(point, (com.minicad.geometry.Polyline3) curve)),
+            projectOntoCurveRule(com.minicad.geometry.TrimmedCurve3.class, (point, curve) ->
+                    projectOntoCurve(point, ((com.minicad.geometry.TrimmedCurve3) curve).getBasisCurve())),
+            projectOntoCurveRule(com.minicad.geometry.SurfaceCurve3.class, (point, curve) ->
+                    projectOntoCurve(point, ((com.minicad.geometry.SurfaceCurve3) curve).getCurve3d())),
+            projectOntoCurveRule(com.minicad.geometry.CompositeCurve3.class, (point, curve) -> {
+                com.minicad.geometry.CompositeCurve3 composite = (com.minicad.geometry.CompositeCurve3) curve;
+                // Find closest point across all segments
+                CartesianPoint closest = null;
+                double minDist = Double.POSITIVE_INFINITY;
+                for (Curve3 segment : composite.getSegments()) {
+                    CartesianPoint candidate = projectOntoCurve(point, segment);
+                    double dist = point.distanceTo(candidate);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closest = candidate;
+                    }
+                }
+                return closest;
+            })
+    );
+
     /**
      * Projects a point onto a curve using closest-point projection.
+     * Dispatch goes through PROJECT_ONTO_CURVE_RULES.
      * Handles all supported curve types.
      */
     private static CartesianPoint projectOntoCurve(CartesianPoint point, Curve3 curve) {
-        if (curve instanceof com.minicad.geometry.BSplineCurve3) {
-            com.minicad.geometry.BSplineCurve3 bspline = (com.minicad.geometry.BSplineCurve3) curve;
-            return bspline.closestPointTo(point);
-        }
-        if (curve instanceof com.minicad.geometry.RationalBSplineCurve3) {
-            com.minicad.geometry.RationalBSplineCurve3 rational = (com.minicad.geometry.RationalBSplineCurve3) curve;
-            return rational.closestPointTo(point);
-        }
-        if (curve instanceof com.minicad.geometry.Line3) {
-            com.minicad.geometry.Line3 line = (com.minicad.geometry.Line3) curve;
-            // Project onto infinite line: t is signed distance along direction
-            Vector3 offset = point.subtract(line.getOrigin());
-            double t = offset.dot(line.getDirection().asVector());
-            return line.getOrigin().add(line.getDirection().asVector().scale(t));
-        }
-        if (curve instanceof com.minicad.geometry.Circle) {
-            com.minicad.geometry.Circle circle = (com.minicad.geometry.Circle) curve;
-            // Project onto circle: normalize vector from center, scale by radius
-            CartesianPoint center = circle.getPosition().getLocation();
-            Vector3 fromCenter = point.subtract(center);
-            if (fromCenter.normSquared() <= Epsilon.EPS) {
-                // Point is at center - pick arbitrary point on circle
-                Vector3 xDir = circle.getPosition().xDirection().asVector();
-                return center.add(xDir.scale(circle.getRadius()));
+        for (ProjectOntoCurveRule rule : PROJECT_ONTO_CURVE_RULES) {
+            if (rule.type().isInstance(curve)) {
+                return rule.handler().project(point, curve);
             }
-            return center.add(fromCenter.normalize().asVector().scale(circle.getRadius()));
-        }
-        if (curve instanceof com.minicad.geometry.Ellipse3) {
-            com.minicad.geometry.Ellipse3 ellipse = (com.minicad.geometry.Ellipse3) curve;
-            // Approximate by sampling - good enough for projection
-            return ellipse.closestPointTo(point);
-        }
-        if (curve instanceof com.minicad.geometry.Polyline3) {
-            com.minicad.geometry.Polyline3 polyline = (com.minicad.geometry.Polyline3) curve;
-            // Find closest point on polyline segments
-            return polylineClosestPoint(point, polyline);
-        }
-        if (curve instanceof com.minicad.geometry.TrimmedCurve3) {
-            com.minicad.geometry.TrimmedCurve3 trimmed = (com.minicad.geometry.TrimmedCurve3) curve;
-            return projectOntoCurve(point, trimmed.getBasisCurve());
-        }
-        if (curve instanceof com.minicad.geometry.SurfaceCurve3) {
-            com.minicad.geometry.SurfaceCurve3 sc = (com.minicad.geometry.SurfaceCurve3) curve;
-            return projectOntoCurve(point, sc.getCurve3d());
-        }
-        if (curve instanceof com.minicad.geometry.CompositeCurve3) {
-            com.minicad.geometry.CompositeCurve3 composite = (com.minicad.geometry.CompositeCurve3) curve;
-            // Find closest point across all segments
-            CartesianPoint closest = null;
-            double minDist = Double.POSITIVE_INFINITY;
-            for (Curve3 segment : composite.getSegments()) {
-                CartesianPoint candidate = projectOntoCurve(point, segment);
-                double dist = point.distanceTo(candidate);
-                if (dist < minDist) {
-                    minDist = dist;
-                    closest = candidate;
-                }
-            }
-            return closest;
         }
         // Fallback: return original point (Edge constructor will validate)
         return point;
