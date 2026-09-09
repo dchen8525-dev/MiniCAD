@@ -1,0 +1,22 @@
+# Branch order of StepCadGeometryOps.sampleCurve2, captured from the original
+# 10-branch `if (curve instanceof X)` chain before it was folded into
+# SAMPLE_CURVE2_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch: instanceof also
+# matches subtypes, so a dropped, duplicated or reordered rule silently changes
+# which curve is sampled how. Curves matching no rule fall through to the
+# terminal UnsupportedGeometryException, so the frozen file also protects that
+# fallback boundary. All 10 types are final classes implementing Curve2
+# directly (no subtype relation today), so the order is currently behaviour
+# neutral -- the frozen file turns any future reordering into a test failure
+# rather than a silent behaviour change.
+Line2
+Circle2
+Ellipse2
+BSplineCurve2
+RationalBSplineCurve2
+TrimmedCurve2
+Polyline2
+CompositeCurve2
+Parabola2
+Hyperbola2

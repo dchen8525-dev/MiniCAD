@@ -111,84 +111,103 @@ final class StepCadGeometryOps {
         return new Polyline3(offsetPoints);
     }
 
-    List<Point2> sampleCurve2(Curve2 curve, int segments) {
-        if (curve instanceof Line2) {
-            Line2 line = (Line2) curve;
-            return List.of(line.pointAt(0.0), line.pointAt(1.0));
-        }
-        if (curve instanceof Circle2) {
-            Circle2 circle = (Circle2) curve;
+    private interface SampleCurve2Handler {
+        List<Point2> apply(StepCadGeometryOps ops, Curve2 curve, int segments);
+    }
+
+    private record SampleCurve2Rule(
+            Class<? extends Curve2> type, SampleCurve2Handler handler) {}
+
+    private static SampleCurve2Rule sampleCurve2Rule(
+            Class<? extends Curve2> type, SampleCurve2Handler handler) {
+        return new SampleCurve2Rule(type, handler);
+    }
+
+    /** Types sampled over the full 0..2pi sweep of their pointAt parameter. */
+    private static SampleCurve2Rule fullSweepRule(Class<? extends Curve2> type) {
+        return sampleCurve2Rule(type, (ops, curve, segments) -> {
             List<Point2> points = new ArrayList<>(segments + 1);
             for (int index = 0; index <= segments; index++) {
-                points.add(circle.pointAt(Math.PI * 2.0 * index / segments));
+                points.add(curve.pointAt(Math.PI * 2.0 * index / segments));
             }
             return List.copyOf(points);
-        }
-        if (curve instanceof Ellipse2) {
-            Ellipse2 ellipse = (Ellipse2) curve;
+        });
+    }
+
+    /** Types sampled over a fixed [tMin, tMax] window of their pointAt parameter. */
+    private static SampleCurve2Rule rangeSweepRule(
+            Class<? extends Curve2> type, double tMin, double tMax) {
+        return sampleCurve2Rule(type, (ops, curve, segments) -> {
             List<Point2> points = new ArrayList<>(segments + 1);
             for (int index = 0; index <= segments; index++) {
-                points.add(ellipse.pointAt(Math.PI * 2.0 * index / segments));
+                points.add(curve.pointAt(tMin + (tMax - tMin) * index / segments));
             }
             return List.copyOf(points);
-        }
-        if (curve instanceof BSplineCurve2) {
-            BSplineCurve2 spline = (BSplineCurve2) curve;
-            List<Point2> points = new ArrayList<>(segments + 1);
-            double start = spline.startParameter();
-            double end = spline.endParameter();
-            for (int index = 0; index <= segments; index++) {
-                points.add(spline.pointAt(start + (end - start) * index / segments));
-            }
-            return List.copyOf(points);
-        }
-        if (curve instanceof RationalBSplineCurve2) {
-            RationalBSplineCurve2 spline = (RationalBSplineCurve2) curve;
-            return spline.sample(segments);
-        }
-        if (curve instanceof TrimmedCurve2) {
-            TrimmedCurve2 trimmedCurve = (TrimmedCurve2) curve;
-            return sampleTrimmedCurve2(trimmedCurve, segments);
-        }
-        if (curve instanceof Polyline2) {
-            Polyline2 polyline = (Polyline2) curve;
-            return polyline.getPoints();
-        }
-        if (curve instanceof CompositeCurve2) {
-            CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
-            List<Point2> points = new ArrayList<>();
-            boolean first = true;
-            for (Curve2 segment : compositeCurve.getSegments()) {
-                List<Point2> segmentPoints = sampleCurve2(segment, segments);
-                int start = first ? 0 : 1;
-                for (int i = start; i < segmentPoints.size(); i++) {
-                    points.add(segmentPoints.get(i));
+        });
+    }
+
+    /**
+     * Curve sampling rules keyed by concrete curve type, replacing the former
+     * 10-branch if/else-if chain. Order mirrors the original chain (first match
+     * wins); a curve matching no rule throws UnsupportedGeometryException, as
+     * the old trailing statement did. The fullSweepRule and rangeSweepRule
+     * bodies call Curve2.pointAt directly: the original branches downcast to
+     * the concrete type first, but pointAt is virtual and every listed type
+     * overrides the interface default, so dynamic dispatch reaches the same
+     * method.
+     */
+    private static final List<SampleCurve2Rule> SAMPLE_CURVE2_RULES = List.of(
+            sampleCurve2Rule(Line2.class, (ops, curve, segments) -> {
+                Line2 line = (Line2) curve;
+                return List.of(line.pointAt(0.0), line.pointAt(1.0));
+            }),
+            fullSweepRule(Circle2.class),
+            fullSweepRule(Ellipse2.class),
+            sampleCurve2Rule(BSplineCurve2.class, (ops, curve, segments) -> {
+                BSplineCurve2 spline = (BSplineCurve2) curve;
+                List<Point2> points = new ArrayList<>(segments + 1);
+                double start = spline.startParameter();
+                double end = spline.endParameter();
+                for (int index = 0; index <= segments; index++) {
+                    points.add(spline.pointAt(start + (end - start) * index / segments));
                 }
-                first = false;
+                return List.copyOf(points);
+            }),
+            sampleCurve2Rule(RationalBSplineCurve2.class, (ops, curve, segments) -> {
+                RationalBSplineCurve2 spline = (RationalBSplineCurve2) curve;
+                return spline.sample(segments);
+            }),
+            sampleCurve2Rule(TrimmedCurve2.class, (ops, curve, segments) -> {
+                TrimmedCurve2 trimmedCurve = (TrimmedCurve2) curve;
+                return ops.sampleTrimmedCurve2(trimmedCurve, segments);
+            }),
+            sampleCurve2Rule(Polyline2.class, (ops, curve, segments) -> {
+                Polyline2 polyline = (Polyline2) curve;
+                return polyline.getPoints();
+            }),
+            sampleCurve2Rule(CompositeCurve2.class, (ops, curve, segments) -> {
+                CompositeCurve2 compositeCurve = (CompositeCurve2) curve;
+                List<Point2> points = new ArrayList<>();
+                boolean first = true;
+                for (Curve2 segment : compositeCurve.getSegments()) {
+                    List<Point2> segmentPoints = ops.sampleCurve2(segment, segments);
+                    int start = first ? 0 : 1;
+                    for (int i = start; i < segmentPoints.size(); i++) {
+                        points.add(segmentPoints.get(i));
+                    }
+                    first = false;
+                }
+                return List.copyOf(points);
+            }),
+            rangeSweepRule(Parabola2.class, -2.0, 2.0),
+            rangeSweepRule(Hyperbola2.class, 1.0, 2.0)
+    );
+
+    List<Point2> sampleCurve2(Curve2 curve, int segments) {
+        for (SampleCurve2Rule rule : SAMPLE_CURVE2_RULES) {
+            if (rule.type().isInstance(curve)) {
+                return rule.handler().apply(this, curve, segments);
             }
-            return List.copyOf(points);
-        }
-        if (curve instanceof Parabola2) {
-            Parabola2 parabola = (Parabola2) curve;
-            List<Point2> points = new ArrayList<>(segments + 1);
-            double tMin = -2.0;
-            double tMax = 2.0;
-            for (int index = 0; index <= segments; index++) {
-                double t = tMin + (tMax - tMin) * index / segments;
-                points.add(parabola.pointAt(t));
-            }
-            return List.copyOf(points);
-        }
-        if (curve instanceof Hyperbola2) {
-            Hyperbola2 hyperbola = (Hyperbola2) curve;
-            List<Point2> points = new ArrayList<>(segments + 1);
-            double tMin = 1.0;
-            double tMax = 2.0;
-            for (int index = 0; index <= segments; index++) {
-                double t = tMin + (tMax - tMin) * index / segments;
-                points.add(hyperbola.pointAt(t));
-            }
-            return List.copyOf(points);
         }
         throw new UnsupportedGeometryException("curve sampling for " + curveTypeName(curve) + " is unsupported");
     }

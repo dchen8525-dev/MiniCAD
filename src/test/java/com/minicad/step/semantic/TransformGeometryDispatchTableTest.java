@@ -21,19 +21,20 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Guards the table-driven dispatch introduced for the StepCadGeometryOps
- * Cartesian-transformation methods.
+ * Cartesian-transformation methods and the sampleCurve2 method.
  *
  * transformCurve3 (13 branches), transformCurve2 (10) and
  * transformSurfaceGeometry (16) used to be sequential if/else-if chains that
  * cast the geometry object and returned a transformed copy, with a shared tail
- * throw for unsupported types. Each is now an ordered list of (type, handler)
- * rules walked by a first-match-wins loop.
+ * throw for unsupported types. sampleCurve2 (10) used to be a chain that cast
+ * the curve and sampled it per type, with a shared tail throw. Each is now an
+ * ordered list of (type, handler) rules walked by a first-match-wins loop.
  *
  * Two things can go wrong in that shape, and neither is visible to the compiler:
  *
  *   1. a branch dropped, duplicated or reordered -- ordering is load-bearing
  *      because instanceof also matches subtypes and the first match wins. All
- *      39 types are final classes implementing Curve3 / Curve2 /
+ *      49 types are final classes implementing Curve3 / Curve2 /
  *      SurfaceGeometry directly, so the order happens not to matter today, but
  *      the frozen files turn any future reordering into a test failure rather
  *      than a silent behaviour change;
@@ -57,6 +58,8 @@ class TransformGeometryDispatchTableTest {
             Paths.get("src/test/resources/transform-curve2-dispatch-order.txt");
     private static final Path SURFACE_FROZEN_ORDER =
             Paths.get("src/test/resources/transform-surface-dispatch-order.txt");
+    private static final Path SAMPLE_CURVE2_FROZEN_ORDER =
+            Paths.get("src/test/resources/sample-curve2-dispatch-order.txt");
 
     @Test
     @DisplayName("transformCurve3 dispatch table keeps the original branch order")
@@ -74,6 +77,12 @@ class TransformGeometryDispatchTableTest {
     @DisplayName("transformSurfaceGeometry dispatch table keeps the original branch order")
     void surfaceTableShouldMatchFrozenOrder() throws Exception {
         assertMatchesFrozenOrder("TRANSFORM_SURFACE_RULES", SURFACE_FROZEN_ORDER);
+    }
+
+    @Test
+    @DisplayName("sampleCurve2 dispatch table keeps the original branch order")
+    void sampleCurve2TableShouldMatchFrozenOrder() throws Exception {
+        assertMatchesFrozenOrder("SAMPLE_CURVE2_RULES", SAMPLE_CURVE2_FROZEN_ORDER);
     }
 
     @Test
@@ -100,6 +109,14 @@ class TransformGeometryDispatchTableTest {
                         + "because the first match returns.");
     }
 
+    @Test
+    @DisplayName("sampleCurve2 dispatch table has no duplicate types")
+    void sampleCurve2TableShouldHaveNoDuplicateTypes() throws Exception {
+        assertEquals(List.of(), duplicates(liveHandlerTypes("SAMPLE_CURVE2_RULES")),
+                "Duplicate types in SAMPLE_CURVE2_RULES: later entries are unreachable, "
+                        + "because the first match returns.");
+    }
+
     /**
      * The entry methods must dispatch through the rule tables, not grow
      * instanceof branches back: a chain next to the table would be a second,
@@ -111,6 +128,7 @@ class TransformGeometryDispatchTableTest {
         assertNoInstanceofInMethod("Curve3 transformCurve3(");
         assertNoInstanceofInMethod("Curve2 transformCurve2(");
         assertNoInstanceofInMethod("SurfaceGeometry transformSurfaceGeometry(");
+        assertNoInstanceofInMethod("List<Point2> sampleCurve2(");
     }
 
     private static void assertNoInstanceofInMethod(String signature) throws Exception {
@@ -181,8 +199,12 @@ class TransformGeometryDispatchTableTest {
             fail("Unterminated " + tableField + " table in " + HOST_SOURCE);
         }
         String body = text.substring(paren + 1, close);
+        // `\.class\b` rather than `\.class,`: some entries close a factory call
+        // before the list separator (e.g. `fullSweepRule(Circle2.class),`), where
+        // the `.class` is followed by `)`. The table bodies hold no other `.class`
+        // occurrences, so every match is a rule key.
         List<String> types = new ArrayList<>();
-        Matcher m = Pattern.compile("([\\w.]+)\\.class\\s*,").matcher(body);
+        Matcher m = Pattern.compile("([\\w.]+)\\.class\\b").matcher(body);
         while (m.find()) {
             String fqn = m.group(1);
             types.add(fqn.substring(fqn.lastIndexOf('.') + 1));
