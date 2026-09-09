@@ -1,0 +1,17 @@
+# Frozen dispatch order for StepEdgePayloadBuilder.edgeCurvePayload.
+# 7 rules, in first-match-wins order. The original chain had 8 branches; the
+# trailing StepLine duplicate was dead (unreachable behind the first StepLine
+# rule) and is dropped. Edit ONLY by re-verifying against a
+# behaviour-preserving change.
+# The order is load-bearing: instanceof matches subtypes and the first match
+# wins, so a dropped, duplicated or reordered rule silently changes which
+# curve is payloaded how. All primaries are final classes implementing
+# StepEntity directly (no subtype relation today).
+
+StepLine
+StepCircle
+StepEllipse
+StepBSplineCurveWithKnots
+StepBSplineCurve
+StepRationalBSplineCurve
+StepPolyline

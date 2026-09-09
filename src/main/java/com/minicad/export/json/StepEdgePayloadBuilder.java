@@ -833,18 +833,34 @@ public final class StepEdgePayloadBuilder {
         );
     }
 
-    private static EdgeCurvePayload edgeCurvePayload(
-            StepEntity edgeGeometry,
-            CartesianPoint start,
-            CartesianPoint end,
-            boolean naturalForward,
-            StepCadBuilder builder
-    ) {
-        try {
-            if (edgeGeometry instanceof StepLine) {
-                return sampledCurvePayload(edgeGeometry, builder);
-            }
-            if (edgeGeometry instanceof StepCircle) {
+    @FunctionalInterface
+    private interface EdgeCurvePayloadHandler {
+        EdgeCurvePayload payload(StepEntity edgeGeometry, CartesianPoint start, CartesianPoint end, boolean naturalForward, StepCadBuilder builder);
+    }
+
+    private record EdgeCurvePayloadRule(Class<?> type, EdgeCurvePayloadHandler handler) {
+        boolean matches(StepEntity edgeGeometry) {
+            return type.isInstance(edgeGeometry);
+        }
+    }
+
+    private static EdgeCurvePayloadRule edgeCurvePayloadRule(Class<?> type, EdgeCurvePayloadHandler handler) {
+        return new EdgeCurvePayloadRule(type, handler);
+    }
+
+    /**
+     * Edge-curve payload rules keyed by concrete STEP curve type, replacing the
+     * former 8-branch if/else-if chain. Order mirrors the original chain (first
+     * match wins); branch bodies are verbatim. The trailing dead duplicate
+     * StepLine branch (unreachable behind the first StepLine rule) is dropped,
+     * which also frees newLineCurvePayload. Curves matching no rule fall through
+     * to the generic sampledCurvePayload; a builder failure inside any handler
+     * propagates to the caller's try block exactly as before.
+     */
+    private static final List<EdgeCurvePayloadRule> EDGE_CURVE_PAYLOAD_RULES = List.of(
+            edgeCurvePayloadRule(StepLine.class, (edgeGeometry, start, end, naturalForward, builder) ->
+                    sampledCurvePayload(edgeGeometry, builder)),
+            edgeCurvePayloadRule(StepCircle.class, (edgeGeometry, start, end, naturalForward, builder) -> {
                 StepCircle circle = (StepCircle) edgeGeometry;
                 Circle geometry = builder.buildCircle(circle.id());
                 Axis2Placement3D placement = geometry.position();
@@ -875,8 +891,8 @@ public final class StepEdgePayloadBuilder {
                         startAngle,
                         Curve3SamplingHelper.arcSweep(startAngle, endAngle, start.distanceTo(end) <= Epsilon.EPS, naturalForward)
                 );
-            }
-            if (edgeGeometry instanceof StepEllipse) {
+            }),
+            edgeCurvePayloadRule(StepEllipse.class, (edgeGeometry, start, end, naturalForward, builder) -> {
                 StepEllipse ellipse = (StepEllipse) edgeGeometry;
                 Ellipse3 geometry = builder.buildEllipse(ellipse.id());
                 Axis2Placement3D placement = geometry.position();
@@ -907,30 +923,41 @@ public final class StepEdgePayloadBuilder {
                         startAngle,
                         Curve3SamplingHelper.arcSweep(startAngle, endAngle, start.distanceTo(end) <= Epsilon.EPS, naturalForward)
                 );
-            }
-            if (edgeGeometry instanceof StepBSplineCurveWithKnots) {
+            }),
+            edgeCurvePayloadRule(StepBSplineCurveWithKnots.class, (edgeGeometry, start, end, naturalForward, builder) -> {
                 StepBSplineCurveWithKnots bspline = (StepBSplineCurveWithKnots) edgeGeometry;
                 BSplineCurve3 geometry = builder.buildBSplineCurve(bspline.id());
                 return newBSplineCurvePayload(edgeGeometry.id(), geometry);
-            }
-            if (edgeGeometry instanceof StepBSplineCurve) {
+            }),
+            edgeCurvePayloadRule(StepBSplineCurve.class, (edgeGeometry, start, end, naturalForward, builder) -> {
                 StepBSplineCurve bspline = (StepBSplineCurve) edgeGeometry;
                 BSplineCurve3 geometry = builder.buildBSplineCurve(bspline.id());
                 return newBSplineCurvePayload(edgeGeometry.id(), geometry);
-            }
-            if (edgeGeometry instanceof StepRationalBSplineCurve) {
+            }),
+            edgeCurvePayloadRule(StepRationalBSplineCurve.class, (edgeGeometry, start, end, naturalForward, builder) -> {
                 StepRationalBSplineCurve rational = (StepRationalBSplineCurve) edgeGeometry;
                 RationalBSplineCurve3 geometry = builder.buildRationalBSplineCurve3(rational.id());
                 return newRationalBSplineCurvePayload(edgeGeometry.id(), geometry);
-            }
-            if (edgeGeometry instanceof StepPolyline) {
+            }),
+            edgeCurvePayloadRule(StepPolyline.class, (edgeGeometry, start, end, naturalForward, builder) -> {
                 StepPolyline polyline = (StepPolyline) edgeGeometry;
                 Polyline3 geometry = builder.buildPolyline(polyline.id());
                 return newPolylineCurvePayload(edgeGeometry.id(), geometry, start, end);
-            }
-            if (edgeGeometry instanceof StepLine) {
-                StepLine line = (StepLine) edgeGeometry;
-                return newLineCurvePayload(edgeGeometry.id(), builder, line, start, end);
+            })
+    );
+
+    private static EdgeCurvePayload edgeCurvePayload(
+            StepEntity edgeGeometry,
+            CartesianPoint start,
+            CartesianPoint end,
+            boolean naturalForward,
+            StepCadBuilder builder
+    ) {
+        try {
+            for (EdgeCurvePayloadRule rule : EDGE_CURVE_PAYLOAD_RULES) {
+                if (rule.matches(edgeGeometry)) {
+                    return rule.handler().payload(edgeGeometry, start, end, naturalForward, builder);
+                }
             }
             EdgeCurvePayload generic = sampledCurvePayload(edgeGeometry, builder);
             if (generic != null) {
@@ -957,12 +984,6 @@ public final class StepEdgePayloadBuilder {
     private static EdgeCurvePayload newPolylineCurvePayload(int stepId, Polyline3 geometry, CartesianPoint start, CartesianPoint end) {
         return new EdgeCurvePayload(
                 stepId, "polyline", null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0);
-    }
-
-    private static EdgeCurvePayload newLineCurvePayload(int stepId, StepCadBuilder builder, StepLine line, CartesianPoint start, CartesianPoint end) {
-        return new EdgeCurvePayload(
-                stepId, "line", null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, 0.0, 0.0);
     }
 
