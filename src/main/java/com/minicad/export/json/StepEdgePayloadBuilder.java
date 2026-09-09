@@ -195,101 +195,112 @@ public final class StepEdgePayloadBuilder {
         return new EdgePayload(item.id(), PayloadConversionHelper.toPointPayloads(points), sampledCurvePayload(item, builder), null);
     }
 
+    @FunctionalInterface
+    private interface LoosePointsHandler {
+        List<CartesianPoint> sample(StepEntity item, StepCadBuilder builder);
+    }
+
+    private record LoosePointsRule(Class<?> type, Predicate<StepEntity> guard, LoosePointsHandler handler) {
+        boolean matches(StepEntity item) {
+            return type.isInstance(item) && (guard == null || guard.test(item));
+        }
+    }
+
+    private static LoosePointsRule loosePointsRule(Class<?> type, LoosePointsHandler handler) {
+        return new LoosePointsRule(type, null, handler);
+    }
+
+    /** Collection families whose points are the concatenation of their members' samples. */
+    private static LoosePointsRule collectionRule(Class<?> type, Function<StepEntity, List<? extends StepEntity>> members) {
+        return loosePointsRule(type, (item, builder) -> sampleGeometricCollectionPoints(members.apply(item), builder));
+    }
+
+    /** Mapped annotation carriers whose points come from their mapped representation. */
+    private static LoosePointsRule mappedAnnotationRule(
+            Class<?> type,
+            Function<StepEntity, StepRepresentation> mappedRepresentation,
+            Function<StepEntity, StepEntity> mappedOrigin,
+            Function<StepEntity, StepEntity> mappingTarget
+    ) {
+        return loosePointsRule(type, (item, builder) -> sampleMappedAnnotationPoints(
+                mappedRepresentation.apply(item), mappedOrigin.apply(item), mappingTarget.apply(item), builder));
+    }
+
     /**
-     * Samples loose edge points from a STEP entity.
+     * Loose-edge point sampling rules keyed by concrete type, replacing the
+     * former 14-branch if/else-if chain. Order mirrors the original chain
+     * (first match wins); any item matching no rule falls back to sampling its
+     * loose curve via curveForLooseEdge, as the old trailing branch did.
+     */
+    private static final List<LoosePointsRule> LOOSE_EDGE_POINTS_RULES = List.of(
+            loosePointsRule(StepAnnotationFillArea.class, (item, builder) ->
+                    sampleAnnotationFillAreaPoints((StepAnnotationFillArea) item, builder)),
+            loosePointsRule(StepAnnotationFillAreaOccurrence.class, (item, builder) ->
+                    sampleAnnotationFillAreaPoints(((StepAnnotationFillAreaOccurrence) item).item(), builder)),
+            loosePointsRule(StepEdgeBasedWireframeModel.class, (item, builder) ->
+                    sampleWireframeBoundaryPoints(((StepEdgeBasedWireframeModel) item).boundaries(), builder)),
+            loosePointsRule(StepShellBasedWireframeModel.class, (item, builder) ->
+                    sampleWireframeBoundaryPoints(((StepShellBasedWireframeModel) item).boundaries(), builder)),
+            mappedAnnotationRule(StepAnnotationSymbol.class,
+                    item -> ((StepAnnotationSymbol) item).mappingSource().mappedRepresentation(),
+                    item -> ((StepAnnotationSymbol) item).mappingSource().mappedOrigin(),
+                    item -> ((StepAnnotationSymbol) item).mappingTarget()),
+            mappedAnnotationRule(StepAnnotationText.class,
+                    item -> ((StepAnnotationText) item).mappingSource().mappedRepresentation(),
+                    item -> ((StepAnnotationText) item).mappingSource().mappedOrigin(),
+                    item -> ((StepAnnotationText) item).mappingTarget()),
+            mappedAnnotationRule(StepAnnotationTextCharacter.class,
+                    item -> ((StepAnnotationTextCharacter) item).mappingSource().mappedRepresentation(),
+                    item -> ((StepAnnotationTextCharacter) item).mappingSource().mappedOrigin(),
+                    item -> ((StepAnnotationTextCharacter) item).mappingTarget()),
+            new LoosePointsRule(StepGeometricReplica.class,
+                    item -> "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()),
+                    (item, builder) -> {
+                        StepGeometricReplica replica = (StepGeometricReplica) item;
+                        List<CartesianPoint> parentPoints = sampleLooseEdgePoints(replica.parent(), builder);
+                        if (parentPoints == null) {
+                            return null;
+                        }
+                        List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
+                        for (CartesianPoint point : parentPoints) {
+                            transformed.add(StepPointExtractor.transformPoint(point, replica.transformation(), builder));
+                        }
+                        return List.copyOf(transformed);
+                    }),
+            loosePointsRule(StepOrientedCurve.class, (item, builder) -> {
+                StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
+                List<CartesianPoint> points = sampleLooseEdgePoints(orientedCurve.curveElement(), builder);
+                if (points == null) {
+                    return null;
+                }
+                if (orientedCurve.orientation()) {
+                    return points;
+                }
+                List<CartesianPoint> reversed = new ArrayList<>(points);
+                Collections.reverse(reversed);
+                return List.copyOf(reversed);
+            }),
+            collectionRule(StepGeometricSet.class, item -> ((StepGeometricSet) item).elements()),
+            collectionRule(StepGeometricCurveSet.class, item -> ((StepGeometricCurveSet) item).elements()),
+            collectionRule(StepConnectedEdgeSet.class, item -> ((StepConnectedEdgeSet) item).edges()),
+            loosePointsRule(StepWireShell.class, (item, builder) ->
+                    sampleWireShellPoints((StepWireShell) item, builder)),
+            collectionRule(StepEdgeWire.class, item -> ((StepEdgeWire) item).edges())
+    );
+
+    /**
+     * Samples loose edge points from a STEP entity. Dispatch goes through
+     * LOOSE_EDGE_POINTS_RULES.
      *
      * @param item the STEP entity
      * @param builder the CAD builder
      * @return list of sampled points, or null if not applicable
      */
     public static List<CartesianPoint> sampleLooseEdgePoints(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepAnnotationFillArea) {
-            StepAnnotationFillArea fillArea = (StepAnnotationFillArea) item;
-            return sampleAnnotationFillAreaPoints(fillArea, builder);
-        }
-        if (item instanceof StepAnnotationFillAreaOccurrence) {
-            StepAnnotationFillAreaOccurrence fillAreaOccurrence = (StepAnnotationFillAreaOccurrence) item;
-            return sampleAnnotationFillAreaPoints(fillAreaOccurrence.item(), builder);
-        }
-        if (item instanceof StepEdgeBasedWireframeModel) {
-            StepEdgeBasedWireframeModel wireframeModel = (StepEdgeBasedWireframeModel) item;
-            return sampleWireframeBoundaryPoints(wireframeModel.boundaries(), builder);
-        }
-        if (item instanceof StepShellBasedWireframeModel) {
-            StepShellBasedWireframeModel wireframeModel = (StepShellBasedWireframeModel) item;
-            return sampleWireframeBoundaryPoints(wireframeModel.boundaries(), builder);
-        }
-        if (item instanceof StepAnnotationSymbol) {
-            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
-            return sampleMappedAnnotationPoints(
-                    annotationSymbol.mappingSource().mappedRepresentation(),
-                    annotationSymbol.mappingSource().mappedOrigin(),
-                    annotationSymbol.mappingTarget(),
-                    builder
-            );
-        }
-        if (item instanceof StepAnnotationText) {
-            StepAnnotationText annotationText = (StepAnnotationText) item;
-            return sampleMappedAnnotationPoints(
-                    annotationText.mappingSource().mappedRepresentation(),
-                    annotationText.mappingSource().mappedOrigin(),
-                    annotationText.mappingTarget(),
-                    builder
-            );
-        }
-        if (item instanceof StepAnnotationTextCharacter) {
-            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
-            return sampleMappedAnnotationPoints(
-                    annotationTextCharacter.mappingSource().mappedRepresentation(),
-                    annotationTextCharacter.mappingSource().mappedOrigin(),
-                    annotationTextCharacter.mappingTarget(),
-                    builder
-            );
-        }
-        if (item instanceof StepGeometricReplica && "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-            List<CartesianPoint> parentPoints = sampleLooseEdgePoints(replica.parent(), builder);
-            if (parentPoints == null) {
-                return null;
+        for (LoosePointsRule rule : LOOSE_EDGE_POINTS_RULES) {
+            if (rule.matches(item)) {
+                return rule.handler().sample(item, builder);
             }
-            List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
-            for (CartesianPoint point : parentPoints) {
-                transformed.add(StepPointExtractor.transformPoint(point, replica.transformation(), builder));
-            }
-            return List.copyOf(transformed);
-        }
-        if (item instanceof StepOrientedCurve) {
-            StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
-            List<CartesianPoint> points = sampleLooseEdgePoints(orientedCurve.curveElement(), builder);
-            if (points == null) {
-                return null;
-            }
-            if (orientedCurve.orientation()) {
-                return points;
-            }
-            List<CartesianPoint> reversed = new ArrayList<>(points);
-            Collections.reverse(reversed);
-            return List.copyOf(reversed);
-        }
-        if (item instanceof StepGeometricSet) {
-            StepGeometricSet geometricSet = (StepGeometricSet) item;
-            return sampleGeometricCollectionPoints(geometricSet.elements(), builder);
-        }
-        if (item instanceof StepGeometricCurveSet) {
-            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
-            return sampleGeometricCollectionPoints(curveSet.elements(), builder);
-        }
-        if (item instanceof StepConnectedEdgeSet) {
-            StepConnectedEdgeSet connectedEdgeSet = (StepConnectedEdgeSet) item;
-            return sampleGeometricCollectionPoints(connectedEdgeSet.edges(), builder);
-        }
-        if (item instanceof StepWireShell) {
-            StepWireShell wireShell = (StepWireShell) item;
-            return sampleWireShellPoints(wireShell, builder);
-        }
-        if (item instanceof StepEdgeWire) {
-            StepEdgeWire edgeWire = (StepEdgeWire) item;
-            return sampleGeometricCollectionPoints(edgeWire.edges(), builder);
         }
         Curve3 curve = curveForLooseEdge(item, builder);
         if (curve == null) {
@@ -1330,7 +1341,7 @@ public final class StepEdgePayloadBuilder {
     // ================================================================================
 
     private static List<CartesianPoint> sampleGeometricCollectionPoints(
-            List<StepEntity> elements,
+            List<? extends StepEntity> elements,
             StepCadBuilder builder
     ) {
         List<CartesianPoint> points = new ArrayList<>();
