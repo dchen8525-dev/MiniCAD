@@ -64,7 +64,7 @@ import com.minicad.export.json.StepRepresentationPayloadBuilder;
  * Extracted from StepPreviewJsonExporter for maintainability.
  */
 public class SurfaceMapperHelper {
-    
+
     @FunctionalInterface
     private interface SurfaceMapperHandler {
         ParametricSurfaceMapper map(StepEntity geometry, StepCadBuilder builder);

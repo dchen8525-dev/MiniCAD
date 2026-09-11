@@ -379,7 +379,7 @@ public final class StepEdgePayloadBuilder {
         }
     }
 
-    
+
     @FunctionalInterface
     private interface EdgeSampleHandler {
         List<CartesianPoint> sample(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward);
