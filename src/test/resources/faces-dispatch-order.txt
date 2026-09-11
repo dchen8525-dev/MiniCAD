@@ -1,0 +1,7 @@
+StepOpenShell
+StepSurfacedOpenShell
+StepOrientedOpenShell
+StepClosedShell
+StepOrientedClosedShell
+StepConnectedFaceSet
+StepConnectedFaceSubSet

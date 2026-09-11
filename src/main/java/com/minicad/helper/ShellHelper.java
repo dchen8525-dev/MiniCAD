@@ -31,39 +31,62 @@ public final class ShellHelper {
         // Static helper class - no instances
     }
 
+    // shellFaces dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record FacesRule(
+            Class<? extends StepEntity> type, FacesHandler handler) {}
+
+    private interface FacesHandler {
+        List<StepFaceEntity> build(StepEntity entity);
+    }
+
+    private static FacesRule facesRule(
+            Class<? extends StepEntity> type, FacesHandler handler) {
+        return new FacesRule(type, handler);
+    }
+
+    private static final List<FacesRule> FACES_RULES = List.of(
+        facesRule(StepOpenShell.class, (entity) -> {
+            StepOpenShell openShell = (StepOpenShell) entity;
+            return openShell.faces();
+        }),
+        facesRule(StepSurfacedOpenShell.class, (entity) -> {
+            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
+            return surfacedOpenShell.faces();
+        }),
+        facesRule(StepOrientedOpenShell.class, (entity) -> {
+            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
+            return orientedOpenShell.faces();
+        }),
+        facesRule(StepClosedShell.class, (entity) -> {
+            StepClosedShell closedShell = (StepClosedShell) entity;
+            return closedShell.faces();
+        }),
+        facesRule(StepOrientedClosedShell.class, (entity) -> {
+            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
+            return orientedClosedShell.faces();
+        }),
+        facesRule(StepConnectedFaceSet.class, (entity) -> {
+            StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) entity;
+            return connectedFaceSet.faces();
+        }),
+        facesRule(StepConnectedFaceSubSet.class, (entity) -> {
+            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
+            return connectedFaceSubSet.faces();
+        })
+    );
+
     /**
      * Returns the faces of a shell-like entity.
      * Supports open/closed shells, connected face sets, and face subsets.
      */
     public static List<StepFaceEntity> shellFaces(StepEntity entity) {
-        if (entity instanceof StepOpenShell) {
-            StepOpenShell openShell = (StepOpenShell) entity;
-            return openShell.faces();
+        for (FacesRule rule : FACES_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().build(entity);
+            }
         }
-        if (entity instanceof StepSurfacedOpenShell) {
-            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
-            return surfacedOpenShell.faces();
-        }
-        if (entity instanceof StepOrientedOpenShell) {
-            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
-            return orientedOpenShell.faces();
-        }
-        if (entity instanceof StepClosedShell) {
-            StepClosedShell closedShell = (StepClosedShell) entity;
-            return closedShell.faces();
-        }
-        if (entity instanceof StepOrientedClosedShell) {
-            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
-            return orientedClosedShell.faces();
-        }
-        if (entity instanceof StepConnectedFaceSet) {
-            StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) entity;
-            return connectedFaceSet.faces();
-        }
-        if (entity instanceof StepConnectedFaceSubSet) {
-            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
-            return connectedFaceSubSet.faces();
-        }
+
         throw new UnsupportedGeometryException(
                 "preview export requires shell or connected face set geometry");
     }
