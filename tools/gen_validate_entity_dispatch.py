@@ -142,6 +142,33 @@ def read_lines(path):
     return text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
 
 
+def strip_string_literals(text):
+    """Blank out string literals so paren counting is not fooled by `("(")`."""
+    return re.sub(r'"(?:\\.|[^"\\])*"', '""', text)
+
+
+def statement_start(lines, idx, floor):
+    """Walk `idx` back to the FIRST line of a possibly multi-line statement.
+
+    A terminal such as
+
+        throw new UnsupportedGeometryException(
+                "preview export requires shell geometry");
+
+    spans two lines. Callers need the index of the `throw`, not of the last
+    continuation line, otherwise the continuation is mistaken for a statement
+    sitting between the chain and the terminal.
+    """
+    i = idx
+    while i > floor:
+        seg = strip_string_literals("\n".join(lines[i : idx + 1]))
+        if seg.count(")") > seg.count("("):
+            i -= 1
+        else:
+            break
+    return i
+
+
 def method_bounds(lines, sig):
     """Return (method_idx, body_start, terminal_idx, end_idx).
 
@@ -173,7 +200,8 @@ def method_bounds(lines, sig):
         )
     mi = hits[0]
     end = next(i for i in range(mi + 1, len(lines)) if lines[i] == "    }")
-    return mi, mi + 1, end - 1, end
+    terminal = statement_start(lines, end - 1, mi + 1)
+    return mi, mi + 1, terminal, end
 
 
 def parse_params(decl_line):
@@ -1068,11 +1096,28 @@ def main():
         action="store_true",
         help="analyse the chain and print the plan without touching any file",
     )
+    ap.add_argument(
+        "--slug",
+        help="override the order-file / guard-test name (use when two classes "
+        "share the method name, so their resources do not collide)",
+    )
+    ap.add_argument(
+        "--force",
+        action="store_true",
+        help="allow overwriting an existing frozen-order file",
+    )
     args = ap.parse_args()
 
     SRC = Path(args.source).resolve()
 
     names = derive(args.method)
+    if args.slug:
+        # Disambiguate two same-named methods in different classes: the order
+        # file and guard test are named from the method, not the host.
+        names["slug"] = args.slug
+        names["test_class"] = "".join(
+            w.capitalize() for w in re.split(r"[-_]", args.slug)
+        ) + "DispatchTableTest"
 
     text = SRC.read_text(encoding="utf-8")
     for ident in (names["table"], names["record"], names["handler"], names["factory"]):
@@ -1321,6 +1366,18 @@ def main():
     SRC.write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8")
 
     order_txt = RES_DIR / (names["slug"] + "-dispatch-order.txt")
+    # The order file is flat and named after the method, so two same-named
+    # methods in different classes (shellFaces lives in both ShellHelper and
+    # PreviewFaceBuilder) would silently clobber each other's frozen order and
+    # break the guard test shipped with the FIRST fold. Pass --slug to give the
+    # second one its own file.
+    if order_txt.exists() and not args.force:
+        raise SystemExit(
+            "ABORT: %s already exists. Another chain already ships that slug "
+            "(same method name in a different class?). Re-run with --slug <name> "
+            "to give this one its own order file, or --force to overwrite."
+            % order_txt
+        )
     order_txt.parent.mkdir(parents=True, exist_ok=True)
     order_txt.write_text(
         "\n".join(s for b in branches for s in b["simple"]) + "\n", encoding="utf-8"
