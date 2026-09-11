@@ -3244,45 +3244,73 @@ public final class StepCadBuilder {
         if (base == null) {
             return null;
         }
-        if (base instanceof Plane) {
-            Plane plane = (Plane) base;
+        return offsetSurfaceGeometry(base, offsetSurface.getDistance());
+    }
+
+    /**
+     * Offset-surface dispatch table (first match wins, mirrors the original
+     * sequential ifs shared verbatim by the OFFSET_SURFACE and
+     * OFFSET_SURFACE_2 chains). Unmatched bases fall through to the generic
+     * OffsetSurface3 wrapper, as the old trailing return did.
+     */
+    @FunctionalInterface
+    private interface OffsetSurfaceHandler {
+        SurfaceGeometry offset(SurfaceGeometry surface, double distance);
+    }
+
+    private record OffsetSurfaceRule(Class<? extends SurfaceGeometry> type, OffsetSurfaceHandler handler) {}
+
+    private static OffsetSurfaceRule offsetSurfaceRule(
+            Class<? extends SurfaceGeometry> type, OffsetSurfaceHandler handler) {
+        return new OffsetSurfaceRule(type, handler);
+    }
+
+    private static final List<OffsetSurfaceRule> OFFSET_SURFACE_RULES = List.of(
+        offsetSurfaceRule(Plane.class, (surface, distance) -> {
+            Plane plane = (Plane) surface;
             return new Plane(
-                    plane.getOrigin().add(plane.getNormal().asVector().scale(offsetSurface.getDistance())),
+                    plane.getOrigin().add(plane.getNormal().asVector().scale(distance)),
                     plane.getNormal());
-        }
-        if (base instanceof CylindricalSurface) {
-            CylindricalSurface cylindricalSurface = (CylindricalSurface) base;
+        }),
+        offsetSurfaceRule(CylindricalSurface.class, (surface, distance) -> {
+            CylindricalSurface cylindricalSurface = (CylindricalSurface) surface;
             return new CylindricalSurface(
                     cylindricalSurface.getPosition(),
-                    cylindricalSurface.getRadius() + offsetSurface.getDistance());
-        }
-        if (base instanceof SphericalSurface) {
-            SphericalSurface sphericalSurface = (SphericalSurface) base;
+                    cylindricalSurface.getRadius() + distance);
+        }),
+        offsetSurfaceRule(SphericalSurface.class, (surface, distance) -> {
+            SphericalSurface sphericalSurface = (SphericalSurface) surface;
             return new SphericalSurface(
                     sphericalSurface.getPosition(),
-                    sphericalSurface.getRadius() + offsetSurface.getDistance());
-        }
-        if (base instanceof ConicalSurface) {
-            ConicalSurface conicalSurface = (ConicalSurface) base;
-            return offsetConicalSurface(conicalSurface, offsetSurface.getDistance());
-        }
-        if (base instanceof ToroidalSurface) {
-            ToroidalSurface toroidalSurface = (ToroidalSurface) base;
+                    sphericalSurface.getRadius() + distance);
+        }),
+        offsetSurfaceRule(ConicalSurface.class, (surface, distance) ->
+                offsetConicalSurface((ConicalSurface) surface, distance)),
+        offsetSurfaceRule(ToroidalSurface.class, (surface, distance) -> {
+            ToroidalSurface toroidalSurface = (ToroidalSurface) surface;
             return new ToroidalSurface(
                     toroidalSurface.getPosition(),
                     toroidalSurface.getMajorRadius(),
-                    toroidalSurface.getMinorRadius() + offsetSurface.getDistance());
-        }
-        if (base instanceof OffsetSurface3) {
-            OffsetSurface3 nestedOffsetSurface = (OffsetSurface3) base;
+                    toroidalSurface.getMinorRadius() + distance);
+        }),
+        offsetSurfaceRule(OffsetSurface3.class, (surface, distance) -> {
+            OffsetSurface3 nestedOffsetSurface = (OffsetSurface3) surface;
             return new OffsetSurface3(
                     nestedOffsetSurface.getBasisSurface(),
-                    nestedOffsetSurface.getDistance() + offsetSurface.getDistance());
+                    nestedOffsetSurface.getDistance() + distance);
+        })
+    );
+
+    private static SurfaceGeometry offsetSurfaceGeometry(SurfaceGeometry base, double distance) {
+        for (OffsetSurfaceRule rule : OFFSET_SURFACE_RULES) {
+            if (rule.type().isInstance(base)) {
+                return rule.handler().offset(base, distance);
+            }
         }
-        return new OffsetSurface3(base, offsetSurface.getDistance());
+        return new OffsetSurface3(base, distance);
     }
 
-    private ConicalSurface offsetConicalSurface(ConicalSurface conicalSurface, double distance) {
+    private static ConicalSurface offsetConicalSurface(ConicalSurface conicalSurface, double distance) {
         double semiAngle = conicalSurface.getSemiAngle();
         double radialOffset = distance * Math.cos(semiAngle);
         double axisOffset = -distance * Math.sin(semiAngle);
@@ -3395,42 +3423,7 @@ public final class StepCadBuilder {
             return null;
         }
         // Same logic as regular offset surface
-        if (base instanceof Plane) {
-            Plane plane = (Plane) base;
-            return new Plane(
-                    plane.getOrigin().add(plane.getNormal().asVector().scale(offsetSurface2.getDistance())),
-                    plane.getNormal());
-        }
-        if (base instanceof CylindricalSurface) {
-            CylindricalSurface cylindricalSurface = (CylindricalSurface) base;
-            return new CylindricalSurface(
-                    cylindricalSurface.getPosition(),
-                    cylindricalSurface.getRadius() + offsetSurface2.getDistance());
-        }
-        if (base instanceof SphericalSurface) {
-            SphericalSurface sphericalSurface = (SphericalSurface) base;
-            return new SphericalSurface(
-                    sphericalSurface.getPosition(),
-                    sphericalSurface.getRadius() + offsetSurface2.getDistance());
-        }
-        if (base instanceof ConicalSurface) {
-            ConicalSurface conicalSurface = (ConicalSurface) base;
-            return offsetConicalSurface(conicalSurface, offsetSurface2.getDistance());
-        }
-        if (base instanceof ToroidalSurface) {
-            ToroidalSurface toroidalSurface = (ToroidalSurface) base;
-            return new ToroidalSurface(
-                    toroidalSurface.getPosition(),
-                    toroidalSurface.getMajorRadius(),
-                    toroidalSurface.getMinorRadius() + offsetSurface2.getDistance());
-        }
-        if (base instanceof OffsetSurface3) {
-            OffsetSurface3 nestedOffsetSurface = (OffsetSurface3) base;
-            return new OffsetSurface3(
-                    nestedOffsetSurface.getBasisSurface(),
-                    nestedOffsetSurface.getDistance() + offsetSurface2.getDistance());
-        }
-        return new OffsetSurface3(base, offsetSurface2.getDistance());
+        return offsetSurfaceGeometry(base, offsetSurface2.getDistance());
     }
 
     private SurfaceGeometry buildBlendedSurface(StepBlendedSurface blended, String faceType) {

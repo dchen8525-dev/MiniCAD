@@ -1,0 +1,11 @@
+# Frozen branch order of the StepCadBuilder offset-surface dispatch chain
+# (OFFSET_SURFACE_RULES). Captured from the original sequential ifs shared by
+# offsetSupportedSurfaceGeometry and buildOffsetSurface2Geometry. The table is
+# ordered data, not control flow: instanceof matches subtypes and the first
+# match wins, so any reordering must be an explicit, reviewed change.
+Plane
+CylindricalSurface
+SphericalSurface
+ConicalSurface
+ToroidalSurface
+OffsetSurface3

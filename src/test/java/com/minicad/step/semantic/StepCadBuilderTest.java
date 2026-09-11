@@ -2326,6 +2326,118 @@ class StepCadBuilderTest {
     }
 
     @Test
+    void shouldBuildOffset2PlaneFaceGeometry() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);\n"
+        + "#5=PLANE('PL0',#4);\n"
+        + "#6=OFFSET_SURFACE_2('OS2',#5,.POINT.,0.75,.F.);\n"
+        + "#7=CARTESIAN_POINT('P0',(0.0,0.0,0.75));\n"
+        + "#8=CARTESIAN_POINT('P1',(1.0,0.0,0.75));\n"
+        + "#9=CARTESIAN_POINT('P2',(0.0,1.0,0.75));\n"
+        + "#10=POLY_LOOP('L0',(#7,#8,#9));\n"
+        + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
+        + "#12=ADVANCED_FACE('F0',(#11),#6,.T.);\n"
+        + "ENDSEC;"
+        );
+
+        Face face = builder.buildFace(12);
+        Plane surface = assertInstanceOf(Plane.class, face.surface());
+
+        assertEquals(0.75, surface.origin().z(), 1.0e-12);
+    }
+
+    @Test
+    void shouldBuildOffset2CylindricalFaceGeometry() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);\n"
+        + "#5=CYLINDRICAL_SURFACE('CY0',#4,2.0);\n"
+        + "#6=OFFSET_SURFACE_2('OS2',#5,.POINT.,0.5,.F.);\n"
+        + "#7=CARTESIAN_POINT('P0',(2.5,0.0,0.0));\n"
+        + "#8=CARTESIAN_POINT('P1',(0.0,2.5,0.0));\n"
+        + "#9=CARTESIAN_POINT('P2',(0.0,0.0,1.0));\n"
+        + "#10=POLY_LOOP('L0',(#7,#8,#9));\n"
+        + "#11=FACE_OUTER_BOUND('B0',#10,.T.);\n"
+        + "#12=ADVANCED_FACE('F0',(#11),#6,.T.);\n"
+        + "ENDSEC;"
+        );
+
+        Face face = builder.buildFace(12);
+        CylindricalSurface surface = assertInstanceOf(CylindricalSurface.class, face.surface());
+
+        assertEquals(2.5, surface.radius(), 1.0e-12);
+    }
+
+    @Test
+    void shouldFlattenNestedOffsetSurface2Geometry() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#3=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#4=AXIS2_PLACEMENT_3D('AX',#1,#2,#3);\n"
+        + "#5=(B_SPLINE_SURFACE(1,1,((#6,#7),(#8,#9)),.UNSPECIFIED.,.F.,.F.,.F.)\n"
+        + "    B_SPLINE_SURFACE_WITH_KNOTS((2,2),(2,2),(0.0,1.0),(0.0,1.0),.UNSPECIFIED.));\n"
+        + "#6=CARTESIAN_POINT('P00',(0.0,0.0,0.0));\n"
+        + "#7=CARTESIAN_POINT('P01',(0.0,1.0,0.0));\n"
+        + "#8=CARTESIAN_POINT('P10',(1.0,0.0,0.0));\n"
+        + "#9=CARTESIAN_POINT('P11',(1.0,1.0,0.0));\n"
+        + "#10=OFFSET_SURFACE('OS0',#5,0.25,.F.);\n"
+        + "#11=OFFSET_SURFACE_2('OS2',#10,.POINT.,0.5,.F.);\n"
+        + "#12=CARTESIAN_POINT('Q0',(0.0,0.0,0.0));\n"
+        + "#13=CARTESIAN_POINT('Q1',(1.0,0.0,0.0));\n"
+        + "#14=CARTESIAN_POINT('Q2',(0.0,1.0,0.0));\n"
+        + "#15=POLY_LOOP('L0',(#12,#13,#14));\n"
+        + "#16=FACE_OUTER_BOUND('B0',#15,.T.);\n"
+        + "#17=ADVANCED_FACE('F0',(#16),#11,.T.);\n"
+        + "ENDSEC;"
+        );
+
+        Face face = builder.buildFace(17);
+        OffsetSurface3 surface = assertInstanceOf(OffsetSurface3.class, face.surface());
+
+        // The OFFSET_SURFACE_2 rule flattens the nested OffsetSurface3 base:
+        // basis stays the B-spline surface, distances add up.
+        assertEquals(0.75, surface.distance(), 1.0e-12);
+        assertInstanceOf(BSplineSurface3.class, surface.basisSurface());
+    }
+
+    @Test
+    void shouldBuildOffset2LinearExtrusionFaceGeometry() {
+        StepCadBuilder builder = builder(
+        "DATA;\n"
+        + "#1=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#4=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#5=VECTOR('VZ',#3,1.0);\n"
+        + "#6=LINE('GEN',#1,#5);\n"
+        + "#7=SURFACE_OF_LINEAR_EXTRUSION('SLE0',#6,#5);\n"
+        + "#8=OFFSET_SURFACE_2('OS2',#7,.POINT.,1.5,.F.);\n"
+        + "#9=CARTESIAN_POINT('Q0',(1.0,0.0,0.0));\n"
+        + "#10=CARTESIAN_POINT('Q1',(1.0,0.0,1.0));\n"
+        + "#11=CARTESIAN_POINT('Q2',(1.0,0.0,2.0));\n"
+        + "#12=POLY_LOOP('L0',(#9,#10,#11));\n"
+        + "#13=FACE_OUTER_BOUND('B0',#12,.T.);\n"
+        + "#14=ADVANCED_FACE('F0',(#13),#8,.T.);\n"
+        + "ENDSEC;"
+        );
+
+        Face face = builder.buildFace(14);
+        OffsetSurface3 surface = assertInstanceOf(OffsetSurface3.class, face.surface());
+
+        assertEquals(1.5, surface.distance(), 1.0e-12);
+        assertInstanceOf(SurfaceOfLinearExtrusion3.class, surface.basisSurface());
+    }
+
+    @Test
     void shouldBuildReplicaCylindricalFaceGeometry() {
         StepCadBuilder builder = builder(
         "DATA;\n"
