@@ -254,48 +254,58 @@ public final class StepMeshExporter {
                 semiAngle);
     }
 
-    private static SurfaceGeometry transformSemanticSurfaceGeometry(
-            SurfaceGeometry surface,
-            com.minicad.step.model.StepCartesianTransformationOperator transformation,
-            StepCadBuilder builder
-    ) {
-        if (surface == null) {
-            return null;
-        }
-        double scale = Math.abs(transformationScale(transformation));
-        if (surface instanceof Plane) {
+    // transformSemanticSurfaceGeometry dispatch table (first match wins,
+    // mirrors the original sequential ifs; a null result propagates to the
+    // caller). The scale is hoisted by the entry method as Math.abs(...) of
+    // the operator scale, matching the original chain.
+    private record TransformSemanticSurfaceRule(
+            Class<? extends SurfaceGeometry> type, TransformSemanticSurfaceHandler handler) {}
+
+    private interface TransformSemanticSurfaceHandler {
+        SurfaceGeometry transform(SurfaceGeometry surface,
+                com.minicad.step.model.StepCartesianTransformationOperator transformation,
+                double scale, StepCadBuilder builder);
+    }
+
+    private static TransformSemanticSurfaceRule transformSemanticSurfaceRule(
+            Class<? extends SurfaceGeometry> type, TransformSemanticSurfaceHandler handler) {
+        return new TransformSemanticSurfaceRule(type, handler);
+    }
+
+    private static final List<TransformSemanticSurfaceRule> TRANSFORM_SEMANTIC_SURFACE_RULES = List.of(
+        transformSemanticSurfaceRule(Plane.class, (surface, transformation, scale, builder) -> {
             Plane plane = (Plane) surface;
             return new Plane(
                     transformPoint3(plane.origin(), transformation, builder),
                     transformDirection3(plane.normal(), transformation, builder));
-        }
-        if (surface instanceof CylindricalSurface) {
+        }),
+        transformSemanticSurfaceRule(CylindricalSurface.class, (surface, transformation, scale, builder) -> {
             CylindricalSurface cylindricalSurface = (CylindricalSurface) surface;
             return new CylindricalSurface(
                     transformPlacement(cylindricalSurface.position(), transformation, builder),
                     cylindricalSurface.radius() * scale);
-        }
-        if (surface instanceof ConicalSurface) {
+        }),
+        transformSemanticSurfaceRule(ConicalSurface.class, (surface, transformation, scale, builder) -> {
             ConicalSurface conicalSurface = (ConicalSurface) surface;
             return new ConicalSurface(
                     transformPlacement(conicalSurface.position(), transformation, builder),
                     conicalSurface.radius() * scale,
                     conicalSurface.semiAngle());
-        }
-        if (surface instanceof SphericalSurface) {
+        }),
+        transformSemanticSurfaceRule(SphericalSurface.class, (surface, transformation, scale, builder) -> {
             SphericalSurface sphericalSurface = (SphericalSurface) surface;
             return new SphericalSurface(
                     transformPlacement(sphericalSurface.position(), transformation, builder),
                     sphericalSurface.radius() * scale);
-        }
-        if (surface instanceof ToroidalSurface) {
+        }),
+        transformSemanticSurfaceRule(ToroidalSurface.class, (surface, transformation, scale, builder) -> {
             ToroidalSurface toroidalSurface = (ToroidalSurface) surface;
             return new ToroidalSurface(
                     transformPlacement(toroidalSurface.position(), transformation, builder),
                     toroidalSurface.majorRadius() * scale,
                     toroidalSurface.minorRadius() * scale);
-        }
-        if (surface instanceof SurfaceOfRevolution3) {
+        }),
+        transformSemanticSurfaceRule(SurfaceOfRevolution3.class, (surface, transformation, scale, builder) -> {
             SurfaceOfRevolution3 revolutionSurface = (SurfaceOfRevolution3) surface;
             Curve3 sweptCurve = transformSemanticCurve3(revolutionSurface.sweptCurve(), transformation, builder);
             if (sweptCurve == null) {
@@ -305,8 +315,8 @@ public final class StepMeshExporter {
                     sweptCurve,
                     transformPoint3(revolutionSurface.axisOrigin(), transformation, builder),
                     transformDirection3(revolutionSurface.axisDirection(), transformation, builder));
-        }
-        if (surface instanceof SurfaceOfLinearExtrusion3) {
+        }),
+        transformSemanticSurfaceRule(SurfaceOfLinearExtrusion3.class, (surface, transformation, scale, builder) -> {
             SurfaceOfLinearExtrusion3 extrusionSurface = (SurfaceOfLinearExtrusion3) surface;
             Curve3 sweptCurve = transformSemanticCurve3(extrusionSurface.sweptCurve(), transformation, builder);
             if (sweptCurve == null) {
@@ -315,6 +325,22 @@ public final class StepMeshExporter {
             return new SurfaceOfLinearExtrusion3(
                     sweptCurve,
                     transformVector3(extrusionSurface.extrusionVector(), transformation, builder));
+        })
+    );
+
+    private static SurfaceGeometry transformSemanticSurfaceGeometry(
+            SurfaceGeometry surface,
+            com.minicad.step.model.StepCartesianTransformationOperator transformation,
+            StepCadBuilder builder
+    ) {
+        if (surface == null) {
+            return null;
+        }
+        double scale = Math.abs(transformationScale(transformation));
+        for (TransformSemanticSurfaceRule rule : TRANSFORM_SEMANTIC_SURFACE_RULES) {
+            if (rule.type().isInstance(surface)) {
+                return rule.handler().transform(surface, transformation, scale, builder);
+            }
         }
         return null;
     }
