@@ -1,0 +1,7 @@
+StringValue
+NumberValue
+EnumValue
+ReferenceValue
+OmittedValue
+NotProvidedValue
+TypedValue

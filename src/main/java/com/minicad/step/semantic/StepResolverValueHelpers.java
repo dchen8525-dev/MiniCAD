@@ -525,32 +525,57 @@ final class StepResolverValueHelpers {
     return current;
   }
 
+  // literalText dispatch table (first match wins, mirrors the original
+  // sequential ifs). This is the value-helpers copy; StepParameterReader keeps
+  // a separate public twin that additionally formats ListValue. The two differ
+  // on purpose and must not be merged: here a ListValue falls through to the
+  // terminal throw, which the callers (literalList already unwrap lists; the
+  // VALUE-representation-item caller passes a scalar) rely on.
+  private interface LiteralTextHandler {
+    String text(StepValue value);
+  }
+
+  private record LiteralTextRule(Class<? extends StepValue> type, LiteralTextHandler handler) {
+    boolean matches(StepValue value) {
+      return type.isInstance(value);
+    }
+  }
+
+  private static LiteralTextRule literalTextRule(
+      Class<? extends StepValue> type, LiteralTextHandler handler) {
+    return new LiteralTextRule(type, handler);
+  }
+
+  private static final List<LiteralTextRule> LITERAL_TEXT_RULES = List.of(
+      literalTextRule(StepValue.StringValue.class, (value) -> {
+        StepValue.StringValue stringValue = (StepValue.StringValue) value;
+        return stringValue.value();
+      }),
+      literalTextRule(StepValue.NumberValue.class, (value) -> {
+        StepValue.NumberValue numberValue = (StepValue.NumberValue) value;
+        return numberValue.raw();
+      }),
+      literalTextRule(StepValue.EnumValue.class, (value) -> {
+        StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
+        return "." + enumValue.value() + ".";
+      }),
+      literalTextRule(StepValue.ReferenceValue.class, (value) -> {
+        StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
+        return "#" + referenceValue.id();
+      }),
+      literalTextRule(StepValue.OmittedValue.class, (value) -> "$"),
+      literalTextRule(StepValue.NotProvidedValue.class, (value) -> "*"),
+      literalTextRule(StepValue.TypedValue.class, (value) -> {
+        StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
+        return typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
+      })
+  );
+
   static String literalText(StepValue value) {
-    if (value instanceof StepValue.StringValue) {
-      StepValue.StringValue stringValue = (StepValue.StringValue) value;
-      return stringValue.value();
-    }
-    if (value instanceof StepValue.NumberValue) {
-      StepValue.NumberValue numberValue = (StepValue.NumberValue) value;
-      return numberValue.raw();
-    }
-    if (value instanceof StepValue.EnumValue) {
-      StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
-      return "." + enumValue.value() + ".";
-    }
-    if (value instanceof StepValue.ReferenceValue) {
-      StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
-      return "#" + referenceValue.id();
-    }
-    if (value instanceof StepValue.OmittedValue) {
-      return "$";
-    }
-    if (value instanceof StepValue.NotProvidedValue) {
-      return "*";
-    }
-    if (value instanceof StepValue.TypedValue) {
-      StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
-      return typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
+    for (LiteralTextRule rule : LITERAL_TEXT_RULES) {
+      if (rule.matches(value)) {
+        return rule.handler().text(value);
+      }
     }
     throw new IllegalArgumentException();
   }
