@@ -92,6 +92,74 @@ final class StepCadTopologyBuilder {
         this.pointBuilder = pointBuilder;
         this.curve3Builder = curve3Builder;
         this.surfaceGeometryBuilder = surfaceGeometryBuilder;
+        FACE_RULES = List.of(
+            faceRule(StepOrientedFace.class, (entity, id) -> {
+                StepOrientedFace orientedFace = (StepOrientedFace) entity;
+                Face baseFace = buildFace(orientedFace.faceElement().id());
+                Face built = new Face(
+                        baseFace.surface(),
+                        baseFace.bounds(),
+                        orientedFace.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
+                );
+                faces.put(id, built);
+                return built;
+            }),
+            faceRule(StepAdvancedFace.class, (entity, id) -> {
+                StepAdvancedFace advancedFace = (StepAdvancedFace) entity;
+                Face built = buildFaceSurface(advancedFace, "ADVANCED_FACE");
+                faces.put(id, built);
+                return built;
+            }),
+            faceRule(StepFaceSurface.class, (entity, id) -> {
+                StepFaceSurface faceSurface = (StepFaceSurface) entity;
+                Face built = buildFaceSurface(faceSurface, "FACE_SURFACE");
+                faces.put(id, built);
+                return built;
+            }),
+            faceRule(StepSubface.class, (entity, id) -> {
+                StepSubface subface = (StepSubface) entity;
+                Face built = buildFace(subface.faceElement().id());
+                faces.put(id, built);
+                return built;
+            }),
+            faceRule(StepOrientedSubface.class, (entity, id) -> {
+                StepOrientedSubface orientedSubface = (StepOrientedSubface) entity;
+                Face baseFace = buildFace(orientedSubface.faceElement().id());
+                Face built = new Face(
+                        baseFace.surface(),
+                        baseFace.bounds(),
+                        orientedSubface.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
+                );
+                faces.put(id, built);
+                return built;
+            }),
+            faceRule(StepMachinedSurface.class, (entity, id) -> {
+                StepMachinedSurface machinedSurface = (StepMachinedSurface) entity;
+                Face built = buildFace(machinedSurface.face().id());
+                faces.put(id, built);
+                return built;
+            }),
+            faceRule(StepFace.class, (entity, id) -> {
+                StepFace face = (StepFace) entity;
+                StepEntity actual = builder.resolvedEntity(face.id());
+                if (actual != null && actual != face) {
+                    if (actual instanceof StepOrientedFace || actual instanceof StepAdvancedFace
+                            || actual instanceof StepFaceSurface || actual instanceof StepSubface
+                            || actual instanceof StepOrientedSubface || actual instanceof StepMachinedSurface) {
+                        return buildFace(actual.id());
+                    }
+                    throw new StepResolutionException("entity #" + id + " is an abstract FACE with unsupported subtype " + StepCadBuilder.stepEntityTypeName(actual));
+                }
+                throw new StepResolutionException("entity #" + id + " is an abstract FACE with no concrete subtype");
+            }),
+            faceRule(StepMappedItem.class, (entity, id) -> {
+                StepMappedItem mappedItem = (StepMappedItem) entity;
+                Face built = buildFace(mappedItem.mappingTarget().id());
+                faces.put(id, built);
+                return built;
+            })
+        );
+
     }
 
     // ========================================================================
@@ -561,6 +629,22 @@ final class StepCadTopologyBuilder {
     // Face building
     // ========================================================================
 
+    // buildFace dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record FaceRule(
+            Class<? extends StepEntity> type, FaceHandler handler) {}
+
+    private interface FaceHandler {
+        Face build(StepEntity entity, int id);
+    }
+
+    private static FaceRule faceRule(
+            Class<? extends StepEntity> type, FaceHandler handler) {
+        return new FaceRule(type, handler);
+    }
+
+    private final List<FaceRule> FACE_RULES;
+
     /**
      * Builds a planar face.
      *
@@ -573,71 +657,12 @@ final class StepCadTopologyBuilder {
             return existing;
         }
         StepEntity entity = requireExistingEntity(id);
-        if (entity instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) entity;
-            Face baseFace = buildFace(orientedFace.faceElement().id());
-            Face built = new Face(
-                    baseFace.surface(),
-                    baseFace.bounds(),
-                    orientedFace.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
-            );
-            faces.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepAdvancedFace) {
-            StepAdvancedFace advancedFace = (StepAdvancedFace) entity;
-            Face built = buildFaceSurface(advancedFace, "ADVANCED_FACE");
-            faces.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepFaceSurface) {
-            StepFaceSurface faceSurface = (StepFaceSurface) entity;
-            Face built = buildFaceSurface(faceSurface, "FACE_SURFACE");
-            faces.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepSubface) {
-            StepSubface subface = (StepSubface) entity;
-            Face built = buildFace(subface.faceElement().id());
-            faces.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepOrientedSubface) {
-            StepOrientedSubface orientedSubface = (StepOrientedSubface) entity;
-            Face baseFace = buildFace(orientedSubface.faceElement().id());
-            Face built = new Face(
-                    baseFace.surface(),
-                    baseFace.bounds(),
-                    orientedSubface.orientation() ? baseFace.sameSense() : !baseFace.sameSense()
-            );
-            faces.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepMachinedSurface) {
-            StepMachinedSurface machinedSurface = (StepMachinedSurface) entity;
-            Face built = buildFace(machinedSurface.face().id());
-            faces.put(id, built);
-            return built;
-        }
-        if (entity instanceof StepFace) {
-            StepFace face = (StepFace) entity;
-            StepEntity actual = builder.resolvedEntity(face.id());
-            if (actual != null && actual != face) {
-                if (actual instanceof StepOrientedFace || actual instanceof StepAdvancedFace
-                        || actual instanceof StepFaceSurface || actual instanceof StepSubface
-                        || actual instanceof StepOrientedSubface || actual instanceof StepMachinedSurface) {
-                    return buildFace(actual.id());
-                }
-                throw new StepResolutionException("entity #" + id + " is an abstract FACE with unsupported subtype " + StepCadBuilder.stepEntityTypeName(actual));
+        for (FaceRule rule : FACE_RULES) {
+            if (rule.type().isInstance(entity)) {
+                return rule.handler().build(entity, id);
             }
-            throw new StepResolutionException("entity #" + id + " is an abstract FACE with no concrete subtype");
         }
-        if (entity instanceof StepMappedItem) {
-            StepMappedItem mappedItem = (StepMappedItem) entity;
-            Face built = buildFace(mappedItem.mappingTarget().id());
-            faces.put(id, built);
-            return built;
-        }
+
         throw new StepResolutionException("entity #" + id + " is not a FACE");
     }
 

@@ -1,0 +1,8 @@
+StepOrientedFace
+StepAdvancedFace
+StepFaceSurface
+StepSubface
+StepOrientedSubface
+StepMachinedSurface
+StepFace
+StepMappedItem
