@@ -84,6 +84,11 @@ NEEDED_IMPORT = "import java.util.List;"
 # so the table field is non-static and the handler takes only the subject.
 IS_STATIC = True
 PARAM_TYPES = ("StepEntity", "StepCadBuilder")
+# Declared type of the instanceof operand. Derived per method: it is the
+# operand's own type, which is NOT necessarily PARAM_TYPES[0] -- the operand
+# may be a local declared in the body instead of a parameter (buildFace
+# dispatches on `StepEntity entity = requireExistingEntity(id);`).
+SUBJECT_TYPE = "StepEntity"
 
 HEADER_RE = re.compile(r"if \((.*)\)\s*\{$")
 # Kept as the entity-default for the historical reindent/audit importers; live
@@ -210,6 +215,63 @@ def declaration_text(lines, mi):
     return " ".join(s.strip() for s in out)
 
 
+def detect_subject(lines, body_start, terminal, decl):
+    """(name, type) of the instanceof operand, read from the chain itself.
+
+    The operand is not always a parameter. `buildFace` dispatches on a local
+    (`StepEntity entity = requireExistingEntity(id);`), so trusting params[0]
+    searches for `if (id instanceof ` and dies with StopIteration instead of
+    naming the real cause. Returns (None, None) when no chain is visible.
+    """
+    name = None
+    for i in range(body_start, terminal):
+        m = re.match(r"\s*if \((\w+) instanceof ", lines[i])
+        if m:
+            name = m.group(1)
+            break
+    if name is None:
+        return None, None
+    for t, n in parse_params(decl):
+        if n == name:
+            return name, t
+    pat = re.compile(
+        r"^\s*(?:final\s+)?([\w.]+)(?:<[^>]*>)?\s+%s\s*=" % re.escape(name)
+    )
+    for i in range(body_start, terminal):
+        m = pat.match(lines[i])
+        if m:
+            return name, m.group(1)
+    return name, None
+
+
+def prefix_locals(prefix_lines):
+    """Names declared by the statements that precede the chain."""
+    pat = re.compile(r"^\s*(?:final\s+)?[\w.]+(?:<[^>]*>)?(?:\[\])*\s+(\w+)\s*=")
+    out = []
+    for ln in prefix_lines:
+        m = pat.match(ln)
+        if m:
+            out.append(m.group(1))
+    return out
+
+
+def reassigned(lines, body_start, end, name):
+    """True when `name` is assigned more than once.
+
+    A lambda may capture a local only if it is effectively final, so a local
+    declared before the chain is harmless when assigned once. Only a REASSIGNED
+    local genuinely cannot be captured -- that is what must abort.
+    """
+    # Built by concatenation: the class below contains a literal '%', which
+    # would be read as a format spec by `%`-formatting.
+    pat = re.compile(
+        r"(?<![=!<>+\-*/%&|^\w])\b"
+        + re.escape(name)
+        + r"\s*(?:=(?!=)|\+\+|--|[+\-*/|&^]=)"
+    )
+    return sum(1 for i in range(body_start, end) if pat.search(lines[i])) > 1
+
+
 def subject_type():
     """Declared type of the instanceof operand.
 
@@ -218,7 +280,7 @@ def subject_type():
     a symbol that may not even be imported in the host file. Fold 21 hit
     exactly that (COMPILATION ERROR: cannot find symbol StepEntity).
     """
-    return PARAM_TYPES[0] if PARAM_TYPES else "StepEntity"
+    return SUBJECT_TYPE
 
 
 def derive_shape(decl, method, overrides):
@@ -236,6 +298,7 @@ def derive_shape(decl, method, overrides):
     This lets one generator fold any chain without per-method scripting.
     """
     global RESULT_TYPE, PARAMS, SUBJECT, HANDLER_METHOD, TERMINAL, IS_STATIC, PARAM_TYPES
+    global SUBJECT_TYPE
     parsed = parse_params(decl)
     is_static = bool(re.search(r"\bstatic\b", decl))
 
@@ -243,12 +306,13 @@ def derive_shape(decl, method, overrides):
     before = decl[:idx].split()
     result_type = overrides.get("result_type") or (before[-1] if before else "void")
 
+    param_names = [n for _, n in parsed]
     if overrides.get("params"):
         pnames = [p.strip() for p in overrides["params"].split(",")]
     elif is_static:
-        pnames = [n for _, n in parsed]
+        pnames = list(param_names)
     else:
-        pnames = [parsed[0][1]] if parsed else []
+        pnames = param_names[:1]
 
     subject = overrides.get("subject") or (pnames[0] if pnames else "entity")
     handler_method = overrides.get("handler_method")
@@ -256,13 +320,36 @@ def derive_shape(decl, method, overrides):
         handler_method = "validate" if method.startswith("validate") else "build"
     terminal = overrides.get("terminal") or "return null;"
 
+    # Type of the operand: its own declared type. When the operand is a local
+    # rather than a parameter, the declaration carries no such parameter, so
+    # the caller supplies the type it read from the local's declaration.
+    subj_type = overrides.get("subject_type")
+    if not subj_type:
+        for t, n in parsed:
+            if n == subject:
+                subj_type = t
+                break
+    if not subj_type:
+        subj_type = "StepEntity"
+
+    if subject in param_names:
+        param_types = tuple(t for t, _ in parsed)
+    else:
+        # Operand is a local, not a parameter: the handler takes it PLUS the
+        # method's own parameters. An instance table is built in the
+        # constructor and a static one in a static initialiser, so neither can
+        # capture a method parameter -- those have to arrive as arguments.
+        pnames = [subject] + param_names
+        param_types = (subj_type,) + tuple(t for t, _ in parsed)
+
     RESULT_TYPE = result_type
     PARAMS = tuple(pnames)
     SUBJECT = subject
     HANDLER_METHOD = handler_method
     TERMINAL = terminal
     IS_STATIC = is_static
-    PARAM_TYPES = tuple(t for t, _ in parsed)
+    PARAM_TYPES = param_types
+    SUBJECT_TYPE = subj_type
     return {
         "is_static": is_static,
         "result_type": result_type,
@@ -304,16 +391,18 @@ def find_constructors(lines, host_class):
     pat = re.compile(r"\b" + re.escape(host_class) + r"\s*\(")
     cts = []
     for i, ln in enumerate(lines):
-        if pat.search(ln) and ln.rstrip().endswith("{"):
-            cts.append(i)
-    if not cts:
-        for i, ln in enumerate(lines):
-            if pat.search(ln):
-                j = i + 1
-                while j < len(lines) and not lines[j].strip():
-                    j += 1
-                if j < len(lines) and lines[j].strip().endswith("{"):
-                    cts.append(i)
+        if not pat.search(ln):
+            continue
+        # The parameter list may wrap: StepCadTopologyBuilder's ctor opens on
+        # one line and puts `{` five lines later. The index recorded is the
+        # BRACE line, because constructor_end() counts braces from there and
+        # would otherwise return a wrapped parameter line.
+        depth = 0
+        for j in range(i, min(i + 40, len(lines))):
+            depth += lines[j].count("(") - lines[j].count(")")
+            if depth <= 0 and "{" in lines[j]:
+                cts.append(j)
+                break
     return cts
 
 
@@ -1009,7 +1098,17 @@ def main():
         overrides["handler_method"] = args.handler_method
     if args.terminal != "return null;":
         overrides["terminal"] = args.terminal
-    derive_shape(declaration_text(lines, mi), args.method, overrides)
+    decl_text = declaration_text(lines, mi)
+    derive_shape(decl_text, args.method, overrides)
+    # The operand is not always a parameter: it may be a local declared in the
+    # body. Re-derive with the operand actually found in the chain when it
+    # differs, so the branch search does not hunt for `if (id instanceof `.
+    det_name, det_type = detect_subject(lines, body_start, terminal, decl_text)
+    if det_name and det_name != SUBJECT:
+        overrides["subject"] = det_name
+        if det_type:
+            overrides["subject_type"] = det_type
+        derive_shape(decl_text, args.method, overrides)
     terminal_text = lines[terminal].strip()
 
     bi = next(
@@ -1019,18 +1118,32 @@ def main():
     )
     if bi != body_start:
         # Comments and blank lines before the chain are harmless (they stay put,
-        # the fold only replaces the branch region). A real statement/declaration
-        # preceding the chain would be a local the lambdas cannot capture, so it
-        # still aborts.
+        # the fold only replaces the branch region). A preceding statement that
+        # declares a local is fine when that local is effectively final: the
+        # lambdas simply capture it (buildFace declares `entity`, the operand
+        # itself, before its chain). Only a REASSIGNED local cannot be captured.
         prefix = [
             lines[i]
             for i in range(body_start, bi)
             if lines[i].strip() and not lines[i].strip().startswith("//")
         ]
         if prefix:
-            raise SystemExit(
-                "ABORT: statements precede the chain and may declare locals the "
-                "lambdas would need to capture:\n  " + "\n  ".join(prefix)
+            stuck = [
+                n
+                for n in prefix_locals(prefix)
+                if reassigned(lines, body_start, end, n)
+            ]
+            if stuck:
+                raise SystemExit(
+                    "ABORT: statements precede the chain and declare %s, which "
+                    "is reassigned -- a lambda cannot capture a local that is "
+                    "not effectively final:\n  %s"
+                    % (", ".join(sorted(stuck)), "\n  ".join(prefix))
+                )
+            print(
+                "note: %d statement(s) precede the chain and stay put; the "
+                "locals they declare are effectively final, so the lambdas "
+                "capture them." % len(prefix)
             )
 
     branches, region_end = extract_branches(lines, bi, terminal, SUBJECT)

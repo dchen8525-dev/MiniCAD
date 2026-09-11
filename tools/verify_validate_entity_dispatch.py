@@ -128,9 +128,18 @@ def table_entries(text, names):
     return entries
 
 
-def shipped_mode(lines, method):
+def shipped_mode(lines, method, table):
     mi, _bs, _t, end = gen.method_bounds(lines, method)
-    body = "\n".join(lines[mi:end])
+    # Scanned from the dispatch loop, not from the whole method: a folded
+    # method may keep statements before the chain (buildFace's memoisation
+    # guard is `if (existing != null)`), and that `!= null` would otherwise be
+    # misread as the null-fallthrough loop.
+    start = mi
+    for i in range(mi, end):
+        if "for (" in lines[i] and table in lines[i]:
+            start = i
+            break
+    body = "\n".join(lines[start:end])
     # The fold only replaces the branch region [first branch, last branch), so
     # the terminal statement after the chain is always preserved verbatim --
     # there is no terminal string to require here (it may be `return null;`,
@@ -178,7 +187,11 @@ def main():
     # instead of trusting module defaults: SUBJECT would otherwise stay
     # "entity" for every non-validateXxxEntity chain, so the branch search
     # found nothing and died with StopIteration rather than naming the cause.
-    mi, _bs, _t, _end = gen.method_bounds(cur_lines, args.method)
+    # Everything is read from the PRE-fold source: the operand may be a local
+    # that only the original chain reveals (the folded loop has no
+    # `if (x instanceof `), and the terminal is the pre-fold statement.
+    h_mi, h_bs, h_term, _h_end = gen.method_bounds(head_lines, args.method)
+    h_decl = gen.declaration_text(head_lines, h_mi)
     overrides = {
         k: v
         for k, v in (
@@ -187,14 +200,19 @@ def main():
         )
         if v
     }
-    gen.derive_shape(gen.declaration_text(cur_lines, mi), args.method, overrides)
+    gen.derive_shape(h_decl, args.method, overrides)
+    det_name, det_type = gen.detect_subject(head_lines, h_bs, h_term, h_decl)
+    if det_name and det_name != gen.SUBJECT:
+        overrides["subject"] = det_name
+        if det_type:
+            overrides["subject_type"] = det_type
+        gen.derive_shape(h_decl, args.method, overrides)
 
     # Read the real terminal off the pre-fold chain rather than assuming
     # "return null;".
     if args.terminal:
         gen.TERMINAL = args.terminal
     else:
-        _hmi, _hbs, h_term, _hend = gen.method_bounds(head_lines, args.method)
         gen.TERMINAL = (
             head_lines[h_term].strip() if 0 <= h_term < len(head_lines) else "return null;"
         )
@@ -211,7 +229,7 @@ def main():
         sys.exit(1)
 
     needs = "null-fallthrough" if any(not b["exits"] for b in orig) else "first-match"
-    ships = shipped_mode(cur_lines, args.method)
+    ships = shipped_mode(cur_lines, args.method, names["table"])
     if needs != ships:
         print("MISMATCH semantics: chain needs %s, folded method ships %s" % (needs, ships))
         ok = False
