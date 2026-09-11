@@ -660,36 +660,59 @@ public final class PreviewMeshExporter {
 
     // ─── B-Spline Surface Building ──────────────────────────────────────────────────
 
-    public static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepBSplineSurfaceWithKnots) {
+    // buildBsplineSurface dispatch table (first-match-return,
+    // mirrors the original sequential ifs).
+    private record BsplineSurfaceRule(
+            Class<? extends StepEntity> type, BsplineSurfaceHandler handler) {}
+
+    private interface BsplineSurfaceHandler {
+        BSplineSurface3 build(StepEntity geometry, StepCadBuilder builder);
+    }
+
+    private static BsplineSurfaceRule bsplineSurfaceRule(
+            Class<? extends StepEntity> type, BsplineSurfaceHandler handler) {
+        return new BsplineSurfaceRule(type, handler);
+    }
+
+    private static final List<BsplineSurfaceRule> BSPLINE_SURFACE_RULES = List.of(
+        bsplineSurfaceRule(StepBSplineSurfaceWithKnots.class, (geometry, builder) -> {
             StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
             return builder.buildBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepBSplineSurface) {
+        }),
+        bsplineSurfaceRule(StepBSplineSurface.class, (geometry, builder) -> {
             StepBSplineSurface splineSurface = (StepBSplineSurface) geometry;
             return builder.buildGenericBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
+        }),
+        bsplineSurfaceRule(StepBSplineSurfaceWithKnotsAndBreakpoints.class, (geometry, builder) -> {
             StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface =
                     (StepBSplineSurfaceWithKnotsAndBreakpoints) geometry;
             return builder.buildBSplineSurfaceWithBreakpoints(splineSurface.id());
-        }
-        if (geometry instanceof StepBezierSurface) {
+        }),
+        bsplineSurfaceRule(StepBezierSurface.class, (geometry, builder) -> {
             StepBezierSurface splineSurface = (StepBezierSurface) geometry;
             return builder.buildBezierSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepUniformSurface) {
+        }),
+        bsplineSurfaceRule(StepUniformSurface.class, (geometry, builder) -> {
             StepUniformSurface splineSurface = (StepUniformSurface) geometry;
             return builder.buildUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepQuasiUniformSurface) {
+        }),
+        bsplineSurfaceRule(StepQuasiUniformSurface.class, (geometry, builder) -> {
             StepQuasiUniformSurface splineSurface = (StepQuasiUniformSurface) geometry;
             return builder.buildQuasiUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepPiecewiseBezierSurface) {
+        }),
+        bsplineSurfaceRule(StepPiecewiseBezierSurface.class, (geometry, builder) -> {
             StepPiecewiseBezierSurface splineSurface = (StepPiecewiseBezierSurface) geometry;
             return builder.buildPiecewiseBezierSurface(splineSurface.id());
+        })
+    );
+
+    public static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
+        for (BsplineSurfaceRule rule : BSPLINE_SURFACE_RULES) {
+            if (rule.type().isInstance(geometry)) {
+                return rule.handler().build(geometry, builder);
+            }
         }
+
         throw new UnsupportedGeometryException(
                 StepTypeNameResolver.surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
     }

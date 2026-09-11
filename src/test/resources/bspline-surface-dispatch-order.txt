@@ -1,0 +1,7 @@
+StepBSplineSurfaceWithKnots
+StepBSplineSurface
+StepBSplineSurfaceWithKnotsAndBreakpoints
+StepBezierSurface
+StepUniformSurface
+StepQuasiUniformSurface
+StepPiecewiseBezierSurface
