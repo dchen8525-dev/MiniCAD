@@ -15,7 +15,7 @@ import com.minicad.topology.EdgeLoop;
 import java.util.ArrayList;
 import java.util.List;
 import com.minicad.export.json.StepEdgePayloadBuilder;
-import com.minicad.export.json.StepTypeNameResolver;
+import com.minicad.export.glb.PreviewMeshExporter;
 
 /** Surface parameterization, grid sampling, and triangulation.
  *  Extracted from StepPreviewJsonExporter to isolate sampling logic. */
@@ -42,35 +42,7 @@ public final class PreviewSurfaceSampler {
     // ─── B-spline surface construction ───────────────────────────────────
 
     public static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepBSplineSurfaceWithKnots) {
-            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
-            return builder.buildBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepBSplineSurface) {
-            StepBSplineSurface splineSurface = (StepBSplineSurface) geometry;
-            return builder.buildGenericBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
-            StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface = (StepBSplineSurfaceWithKnotsAndBreakpoints) geometry;
-            return builder.buildBSplineSurfaceWithBreakpoints(splineSurface.id());
-        }
-        if (geometry instanceof StepBezierSurface) {
-            StepBezierSurface splineSurface = (StepBezierSurface) geometry;
-            return builder.buildBezierSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepUniformSurface) {
-            StepUniformSurface splineSurface = (StepUniformSurface) geometry;
-            return builder.buildUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepQuasiUniformSurface) {
-            StepQuasiUniformSurface splineSurface = (StepQuasiUniformSurface) geometry;
-            return builder.buildQuasiUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepPiecewiseBezierSurface) {
-            StepPiecewiseBezierSurface splineSurface = (StepPiecewiseBezierSurface) geometry;
-            return builder.buildPiecewiseBezierSurface(splineSurface.id());
-        }
-        throw new UnsupportedGeometryException(surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
+        return PreviewMeshExporter.buildBsplineSurface(geometry, builder);
     }
 
     public static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
@@ -267,11 +239,6 @@ public final class PreviewSurfaceSampler {
     // ─── Delegate methods needed from StepPreviewJsonExporter ────────────
     // These are called by the methods above and must remain accessible.
     // They will be updated to delegate once the facade is finalized.
-
-    private static String surfaceTypeName(StepEntity entity) {
-        // Temporary: delegate to StepPreviewJsonExporter until facade extraction
-        return StepTypeNameResolver.surfaceTypeName(entity);
-    }
 
     private static List<CartesianPoint> sampleOrientedEdge(com.minicad.topology.OrientedEdge edge) {
         // Temporary: delegate to StepPreviewJsonExporter

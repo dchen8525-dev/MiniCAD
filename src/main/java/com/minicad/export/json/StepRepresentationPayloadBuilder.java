@@ -371,35 +371,7 @@ public final class StepRepresentationPayloadBuilder {
 
 
     public static BSplineSurface3 buildBsplineSurface(StepEntity geometry, StepCadBuilder builder) {
-        if (geometry instanceof StepBSplineSurfaceWithKnots) {
-            StepBSplineSurfaceWithKnots splineSurface = (StepBSplineSurfaceWithKnots) geometry;
-            return builder.buildBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepBSplineSurface) {
-            StepBSplineSurface splineSurface = (StepBSplineSurface) geometry;
-            return builder.buildGenericBSplineSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepBSplineSurfaceWithKnotsAndBreakpoints) {
-            StepBSplineSurfaceWithKnotsAndBreakpoints splineSurface = (StepBSplineSurfaceWithKnotsAndBreakpoints) geometry;
-            return builder.buildBSplineSurfaceWithBreakpoints(splineSurface.id());
-        }
-        if (geometry instanceof StepBezierSurface) {
-            StepBezierSurface splineSurface = (StepBezierSurface) geometry;
-            return builder.buildBezierSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepUniformSurface) {
-            StepUniformSurface splineSurface = (StepUniformSurface) geometry;
-            return builder.buildUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepQuasiUniformSurface) {
-            StepQuasiUniformSurface splineSurface = (StepQuasiUniformSurface) geometry;
-            return builder.buildQuasiUniformSurface(splineSurface.id());
-        }
-        if (geometry instanceof StepPiecewiseBezierSurface) {
-            StepPiecewiseBezierSurface splineSurface = (StepPiecewiseBezierSurface) geometry;
-            return builder.buildPiecewiseBezierSurface(splineSurface.id());
-        }
-        throw new UnsupportedGeometryException(StepTypeNameResolver.surfaceTypeName(geometry) + " is not a supported B-spline-like surface");
+        return PreviewMeshExporter.buildBsplineSurface(geometry, builder);
     }
 
 

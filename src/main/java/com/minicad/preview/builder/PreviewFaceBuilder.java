@@ -14,6 +14,7 @@ import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.export.json.StepValidationHelper;
 import com.minicad.geometry.*;
 import com.minicad.helper.MathUtilityHelper;
+import com.minicad.helper.ShellHelper;
 import com.minicad.preview.mapper.PreviewUvCoords;
 import com.minicad.preview.sampling.PreviewCurveEvaluator;
 import com.minicad.preview.sampling.PreviewSurfaceSampler;
@@ -1330,36 +1331,7 @@ public final class PreviewFaceBuilder {
     // ─── Shell/vertex utilities ──────────────────────────────────────────
 
     public static List<StepFaceEntity> shellFaces(StepEntity entity) {
-        if (entity instanceof StepOpenShell) {
-            StepOpenShell openShell = (StepOpenShell) entity;
-            return openShell.faces();
-        }
-        if (entity instanceof StepSurfacedOpenShell) {
-            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
-            return surfacedOpenShell.faces();
-        }
-        if (entity instanceof StepOrientedOpenShell) {
-            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
-            return orientedOpenShell.faces();
-        }
-        if (entity instanceof StepClosedShell) {
-            StepClosedShell closedShell = (StepClosedShell) entity;
-            return closedShell.faces();
-        }
-        if (entity instanceof StepOrientedClosedShell) {
-            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
-            return orientedClosedShell.faces();
-        }
-        if (entity instanceof StepConnectedFaceSet) {
-            StepConnectedFaceSet connectedFaceSet = (StepConnectedFaceSet) entity;
-            return connectedFaceSet.faces();
-        }
-        if (entity instanceof StepConnectedFaceSubSet) {
-            StepConnectedFaceSubSet connectedFaceSubSet = (StepConnectedFaceSubSet) entity;
-            return connectedFaceSubSet.faces();
-        }
-        throw new UnsupportedGeometryException(
-                "preview export requires shell or connected face set geometry");
+        return ShellHelper.shellFaces(entity);
     }
 
     public static boolean isShellEntity(StepEntity entity) {
