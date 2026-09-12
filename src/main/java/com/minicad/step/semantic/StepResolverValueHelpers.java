@@ -734,30 +734,41 @@ final class StepResolverValueHelpers {
     return "NAMED_UNIT";
   }
 
+  // matchesUnitKind dispatch table (first match wins, mirrors the original
+  // sequential ifs). Every branch extracted the entity's unitKind() and
+  // compared it to the expected kind; a non-unit entity matched no rule and
+  // returned false, as the old trailing return did.
+  private interface UnitKindHandler {
+    String unitKind(StepEntity entity);
+  }
+
+  private record UnitKindRule(Class<? extends StepEntity> type, UnitKindHandler handler) {
+    boolean matches(StepEntity entity) {
+      return type.isInstance(entity);
+    }
+  }
+
+  private static UnitKindRule unitKindRule(Class<? extends StepEntity> type, UnitKindHandler handler) {
+    return new UnitKindRule(type, handler);
+  }
+
+  private static final List<UnitKindRule> UNIT_KIND_RULES = List.of(
+      unitKindRule(StepNamedUnit.class, (entity) -> ((StepNamedUnit) entity).unitKind()),
+      unitKindRule(StepSiUnit.class, (entity) -> ((StepSiUnit) entity).unitKind()),
+      unitKindRule(StepConversionBasedUnit.class,
+          (entity) -> ((StepConversionBasedUnit) entity).unitKind()),
+      unitKindRule(StepConversionBasedUnitWithOffset.class,
+          (entity) -> ((StepConversionBasedUnitWithOffset) entity).unitKind()),
+      unitKindRule(StepContextDependentUnit.class,
+          (entity) -> ((StepContextDependentUnit) entity).unitKind()),
+      unitKindRule(StepDerivedUnit.class, (entity) -> ((StepDerivedUnit) entity).unitKind())
+  );
+
   static boolean matchesUnitKind(StepEntity entity, String expectedUnitKind) {
-    if (entity instanceof StepNamedUnit) {
-            StepNamedUnit namedUnit = (StepNamedUnit) entity;
-      return expectedUnitKind.equals(namedUnit.unitKind());
-    }
-    if (entity instanceof StepSiUnit) {
-            StepSiUnit siUnit = (StepSiUnit) entity;
-      return expectedUnitKind.equals(siUnit.unitKind());
-    }
-    if (entity instanceof StepConversionBasedUnit) {
-            StepConversionBasedUnit conversionBasedUnit = (StepConversionBasedUnit) entity;
-      return expectedUnitKind.equals(conversionBasedUnit.unitKind());
-    }
-    if (entity instanceof StepConversionBasedUnitWithOffset) {
-            StepConversionBasedUnitWithOffset conversionBasedUnitWithOffset = (StepConversionBasedUnitWithOffset) entity;
-      return expectedUnitKind.equals(conversionBasedUnitWithOffset.unitKind());
-    }
-    if (entity instanceof StepContextDependentUnit) {
-            StepContextDependentUnit contextDependentUnit = (StepContextDependentUnit) entity;
-      return expectedUnitKind.equals(contextDependentUnit.unitKind());
-    }
-    if (entity instanceof StepDerivedUnit) {
-            StepDerivedUnit derivedUnit = (StepDerivedUnit) entity;
-      return expectedUnitKind.equals(derivedUnit.unitKind());
+    for (UnitKindRule rule : UNIT_KIND_RULES) {
+      if (rule.matches(entity)) {
+        return expectedUnitKind.equals(rule.handler().unitKind(entity));
+      }
     }
     return false;
   }

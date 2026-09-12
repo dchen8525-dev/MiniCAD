@@ -1,0 +1,10 @@
+# Frozen branch order of the StepResolverValueHelpers.matchesUnitKind dispatch
+# chain (UNIT_KIND_RULES). Captured from the original sequential ifs. The table
+# is ordered data, not control flow: instanceof matches subtypes and the first
+# match wins, so any reordering must be an explicit, reviewed change.
+StepNamedUnit
+StepSiUnit
+StepConversionBasedUnit
+StepConversionBasedUnitWithOffset
+StepContextDependentUnit
+StepDerivedUnit
