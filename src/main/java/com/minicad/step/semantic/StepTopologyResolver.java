@@ -668,26 +668,45 @@ final class StepTopologyResolver {
         || entity instanceof StepEdgeLoop;
   }
 
+  /**
+   * Path-edge rules keyed by concrete type, replacing the former 5-branch
+   * if/else-if chain (first match wins, mirrors the original sequential ifs).
+   * Every branch cast the entity and returned its edges(); all 5 types are
+   * final and unrelated (each implements StepEntity directly, StepEdgeLoop via
+   * StepLoop), so the order is behaviour neutral today but frozen by
+   * path-edges-dispatch-order.txt. An entity matching no rule throws, as the
+   * old trailing statement did.
+   */
+  @FunctionalInterface
+  private interface PathEdgesHandler {
+    List<StepOrientedEdge> edges(StepEntity entity);
+  }
+
+  private record PathEdgesRule(Class<? extends StepEntity> type, PathEdgesHandler handler) {
+    boolean matches(StepEntity entity) {
+      return type.isInstance(entity);
+    }
+  }
+
+  private static PathEdgesRule pathEdgesRule(
+          Class<? extends StepEntity> type, PathEdgesHandler handler) {
+    return new PathEdgesRule(type, handler);
+  }
+
+  private static final List<PathEdgesRule> PATH_EDGES_RULES = List.of(
+      pathEdgesRule(StepPath.class, (entity) -> ((StepPath) entity).edges()),
+      pathEdgesRule(StepOpenPath.class, (entity) -> ((StepOpenPath) entity).edges()),
+      pathEdgesRule(StepSubpath.class, (entity) -> ((StepSubpath) entity).edges()),
+      pathEdgesRule(StepOrientedPath.class,
+              (entity) -> ((StepOrientedPath) entity).edges()),
+      pathEdgesRule(StepEdgeLoop.class, (entity) -> ((StepEdgeLoop) entity).edges())
+  );
+
   private static List<StepOrientedEdge> pathEdges(StepEntity entity) {
-    if (entity instanceof StepPath) {
-      StepPath path = (StepPath) entity;
-      return path.edges();
-    }
-    if (entity instanceof StepOpenPath) {
-      StepOpenPath openPath = (StepOpenPath) entity;
-      return openPath.edges();
-    }
-    if (entity instanceof StepSubpath) {
-      StepSubpath subpath = (StepSubpath) entity;
-      return subpath.edges();
-    }
-    if (entity instanceof StepOrientedPath) {
-      StepOrientedPath orientedPath = (StepOrientedPath) entity;
-      return orientedPath.edges();
-    }
-    if (entity instanceof StepEdgeLoop) {
-      StepEdgeLoop edgeLoop = (StepEdgeLoop) entity;
-      return edgeLoop.edges();
+    for (PathEdgesRule rule : PATH_EDGES_RULES) {
+      if (rule.matches(entity)) {
+        return rule.handler().edges(entity);
+      }
     }
     throw new IllegalArgumentException("Unknown value type: " + entity);
   }

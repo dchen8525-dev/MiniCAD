@@ -1,0 +1,10 @@
+# Branch order of StepTopologyResolver.pathEdges, captured from the original
+# 5-branch sequential ifs (PATH_EDGES_RULES). An entity matching no rule throws
+# IllegalArgumentException, as the old trailing statement did. The table is
+# ordered data, not control flow: instanceof matches subtypes and the first
+# match wins, so any reordering must be an explicit, reviewed change.
+StepPath
+StepOpenPath
+StepSubpath
+StepOrientedPath
+StepEdgeLoop
