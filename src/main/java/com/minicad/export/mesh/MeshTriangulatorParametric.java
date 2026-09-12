@@ -300,163 +300,199 @@ final class MeshTriangulatorParametric {
         }
     }
 
-    static ParametricMapper mapperFor(SurfaceGeometry surface) {
-        if (surface instanceof CylindricalSurface) {
-            CylindricalSurface cylinder = (CylindricalSurface) surface;
-            return new ParametricMapper() {
-                @Override
-                public CartesianPoint pointAt(double u, double v) {
-                    return cylinder.pointAt(u, v);
-                }
-                @Override
-                public Vector3 normalAt(double u, double v) {
-                    return cylinder.normalAt(u);
-                }
-                @Override
-                public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    Vector3 offset = point.subtract(cylinder.position().location());
-                    double v = offset.dot(cylinder.position().axis().asVector());
-                    Vector3 radial = offset.subtract(cylinder.position().axis().asVector().scale(v));
-                    double u = Math.atan2(
-                            radial.dot(cylinder.position().yDirection().asVector()),
-                            radial.dot(cylinder.position().xDirection().asVector())
-                    );
-                    return new UvPoint(u, v);
-                }
-                @Override
-                public Double uPeriod() {
-                    return Math.PI * 2.0;
-                }
-            };
+    /**
+     * Builds the {@link ParametricMapper} for one concrete surface type. The
+     * handler receives the already type-tested surface and owns the cast, so
+     * each rule body is the original branch body verbatim.
+     */
+    @FunctionalInterface
+    private interface ParametricMapperHandler {
+        ParametricMapper build(SurfaceGeometry surface);
+    }
+
+    private record ParametricMapperRule(
+            Class<? extends SurfaceGeometry> type, ParametricMapperHandler handler) {
+        boolean matches(SurfaceGeometry surface) {
+            return type.isInstance(surface);
         }
-        if (surface instanceof ConicalSurface) {
-            ConicalSurface cone = (ConicalSurface) surface;
-            return new ParametricMapper() {
-                @Override
-                public CartesianPoint pointAt(double u, double v) {
-                    return cone.pointAt(u, v);
-                }
-                @Override
-                public Vector3 normalAt(double u, double v) {
-                    return cone.normalAt(u);
-                }
-                @Override
-                public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    Vector3 offset = point.subtract(cone.position().location());
-                    double v = offset.dot(cone.position().axis().asVector());
-                    Vector3 radial = offset.subtract(cone.position().axis().asVector().scale(v));
-                    double u = Math.atan2(
-                            radial.dot(cone.position().yDirection().asVector()),
-                            radial.dot(cone.position().xDirection().asVector())
-                    );
-                    return new UvPoint(u, v);
-                }
-                @Override
-                public Double uPeriod() {
-                    return Math.PI * 2.0;
-                }
-            };
-        }
-        if (surface instanceof ToroidalSurface) {
-            ToroidalSurface torus = (ToroidalSurface) surface;
-            return new ParametricMapper() {
-                @Override
-                public CartesianPoint pointAt(double u, double v) {
-                    return torus.pointAt(u, v);
-                }
-                @Override
-                public Vector3 normalAt(double u, double v) {
-                    return torus.normalAt(u, v);
-                }
-                @Override
-                public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    Vector3 offset = point.subtract(torus.position().location());
-                    double localX = offset.dot(torus.position().xDirection().asVector());
-                    double localY = offset.dot(torus.position().yDirection().asVector());
-                    double localZ = offset.dot(torus.position().axis().asVector());
-                    double u = Math.atan2(localY, localX);
-                    double radialDist = Math.sqrt(localX * localX + localY * localY);
-                    double v = Math.atan2(localZ, radialDist - torus.majorRadius());
-                    return new UvPoint(u, v);
-                }
-                @Override
-                public Double uPeriod() {
-                    return Math.PI * 2.0;
-                }
-                @Override
-                public Double vPeriod() {
-                    return Math.PI * 2.0;
-                }
-            };
-        }
-        if (surface instanceof SphericalSurface) {
-            SphericalSurface sphere = (SphericalSurface) surface;
-            return new ParametricMapper() {
-                @Override
-                public CartesianPoint pointAt(double u, double v) {
-                    return sphere.pointAt(u, v);
-                }
-                @Override
-                public Vector3 normalAt(double u, double v) {
-                    return sphere.normalAt(u, v);
-                }
-                @Override
-                public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    Vector3 offset = point.subtract(sphere.position().location());
-                    double radial = offset.norm();
-                    if (radial <= PLANAR_EPS) {
-                        return null;
+    }
+
+    private static ParametricMapperRule parametricMapperRule(
+            Class<? extends SurfaceGeometry> type, ParametricMapperHandler handler) {
+        return new ParametricMapperRule(type, handler);
+    }
+
+    /**
+     * Parametric-mapper rules keyed by concrete surface type, replacing the
+     * former 6-branch if/else-if chain. Order mirrors the original chain (first
+     * match wins); a surface matching no rule yields null, as the old trailing
+     * return did, which the callers read as "not parametrically triangulable".
+     */
+    private static final List<ParametricMapperRule> MAPPER_RULES = List.of(
+            parametricMapperRule(CylindricalSurface.class, (surface) -> {
+                CylindricalSurface cylinder = (CylindricalSurface) surface;
+                return new ParametricMapper() {
+                    @Override
+                    public CartesianPoint pointAt(double u, double v) {
+                        return cylinder.pointAt(u, v);
                     }
-                    double u = Math.atan2(
-                            offset.dot(sphere.position().yDirection().asVector()),
-                            offset.dot(sphere.position().xDirection().asVector())
-                    );
-                    double v = Math.acos(offset.dot(sphere.position().axis().asVector()) / radial);
-                    return new UvPoint(u, v);
-                }
-                @Override
-                public Double uPeriod() {
-                    return Math.PI * 2.0;
-                }
-            };
-        }
-        if (surface instanceof SurfaceOfRevolution3) {
-            SurfaceOfRevolution3 revolution = (SurfaceOfRevolution3) surface;
-            return new ParametricMapper() {
-                @Override
-                public CartesianPoint pointAt(double u, double v) {
-                    return revolution.pointAt(v, u);
-                }
-                @Override
-                public Vector3 normalAt(double u, double v) {
-                    return revolution.normalAt(v, u);
-                }
-                @Override
-                public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    return projectRevolutionUv(revolution, point, previous);
-                }
-                @Override
-                public Double uPeriod() {
-                    return Math.PI * 2.0;
-                }
-            };
-        }
-        if (surface instanceof SurfaceOfLinearExtrusion3) {
-            SurfaceOfLinearExtrusion3 extrusion = (SurfaceOfLinearExtrusion3) surface;
-            return new ParametricMapper() {
-                @Override
-                public CartesianPoint pointAt(double u, double v) {
-                    return extrusion.pointAt(u, v);
-                }
-                @Override
-                public Vector3 normalAt(double u, double v) {
-                    return extrusion.normalAt(u, v);
-                }
-                @Override
-                public UvPoint project(CartesianPoint point, UvPoint previous) {
-                    return projectExtrusionUv(extrusion, point, previous);
-                }
-            };
+                    @Override
+                    public Vector3 normalAt(double u, double v) {
+                        return cylinder.normalAt(u);
+                    }
+                    @Override
+                    public UvPoint project(CartesianPoint point, UvPoint previous) {
+                        Vector3 offset = point.subtract(cylinder.position().location());
+                        double v = offset.dot(cylinder.position().axis().asVector());
+                        Vector3 radial = offset.subtract(cylinder.position().axis().asVector().scale(v));
+                        double u = Math.atan2(
+                                radial.dot(cylinder.position().yDirection().asVector()),
+                                radial.dot(cylinder.position().xDirection().asVector())
+                        );
+                        return new UvPoint(u, v);
+                    }
+                    @Override
+                    public Double uPeriod() {
+                        return Math.PI * 2.0;
+                    }
+                };
+            }),
+            parametricMapperRule(ConicalSurface.class, (surface) -> {
+                ConicalSurface cone = (ConicalSurface) surface;
+                return new ParametricMapper() {
+                    @Override
+                    public CartesianPoint pointAt(double u, double v) {
+                        return cone.pointAt(u, v);
+                    }
+                    @Override
+                    public Vector3 normalAt(double u, double v) {
+                        return cone.normalAt(u);
+                    }
+                    @Override
+                    public UvPoint project(CartesianPoint point, UvPoint previous) {
+                        Vector3 offset = point.subtract(cone.position().location());
+                        double v = offset.dot(cone.position().axis().asVector());
+                        Vector3 radial = offset.subtract(cone.position().axis().asVector().scale(v));
+                        double u = Math.atan2(
+                                radial.dot(cone.position().yDirection().asVector()),
+                                radial.dot(cone.position().xDirection().asVector())
+                        );
+                        return new UvPoint(u, v);
+                    }
+                    @Override
+                    public Double uPeriod() {
+                        return Math.PI * 2.0;
+                    }
+                };
+            }),
+            parametricMapperRule(ToroidalSurface.class, (surface) -> {
+                ToroidalSurface torus = (ToroidalSurface) surface;
+                return new ParametricMapper() {
+                    @Override
+                    public CartesianPoint pointAt(double u, double v) {
+                        return torus.pointAt(u, v);
+                    }
+                    @Override
+                    public Vector3 normalAt(double u, double v) {
+                        return torus.normalAt(u, v);
+                    }
+                    @Override
+                    public UvPoint project(CartesianPoint point, UvPoint previous) {
+                        Vector3 offset = point.subtract(torus.position().location());
+                        double localX = offset.dot(torus.position().xDirection().asVector());
+                        double localY = offset.dot(torus.position().yDirection().asVector());
+                        double localZ = offset.dot(torus.position().axis().asVector());
+                        double u = Math.atan2(localY, localX);
+                        double radialDist = Math.sqrt(localX * localX + localY * localY);
+                        double v = Math.atan2(localZ, radialDist - torus.majorRadius());
+                        return new UvPoint(u, v);
+                    }
+                    @Override
+                    public Double uPeriod() {
+                        return Math.PI * 2.0;
+                    }
+                    @Override
+                    public Double vPeriod() {
+                        return Math.PI * 2.0;
+                    }
+                };
+            }),
+            parametricMapperRule(SphericalSurface.class, (surface) -> {
+                SphericalSurface sphere = (SphericalSurface) surface;
+                return new ParametricMapper() {
+                    @Override
+                    public CartesianPoint pointAt(double u, double v) {
+                        return sphere.pointAt(u, v);
+                    }
+                    @Override
+                    public Vector3 normalAt(double u, double v) {
+                        return sphere.normalAt(u, v);
+                    }
+                    @Override
+                    public UvPoint project(CartesianPoint point, UvPoint previous) {
+                        Vector3 offset = point.subtract(sphere.position().location());
+                        double radial = offset.norm();
+                        if (radial <= PLANAR_EPS) {
+                            return null;
+                        }
+                        double u = Math.atan2(
+                                offset.dot(sphere.position().yDirection().asVector()),
+                                offset.dot(sphere.position().xDirection().asVector())
+                        );
+                        double v = Math.acos(offset.dot(sphere.position().axis().asVector()) / radial);
+                        return new UvPoint(u, v);
+                    }
+                    @Override
+                    public Double uPeriod() {
+                        return Math.PI * 2.0;
+                    }
+                };
+            }),
+            parametricMapperRule(SurfaceOfRevolution3.class, (surface) -> {
+                SurfaceOfRevolution3 revolution = (SurfaceOfRevolution3) surface;
+                return new ParametricMapper() {
+                    @Override
+                    public CartesianPoint pointAt(double u, double v) {
+                        return revolution.pointAt(v, u);
+                    }
+                    @Override
+                    public Vector3 normalAt(double u, double v) {
+                        return revolution.normalAt(v, u);
+                    }
+                    @Override
+                    public UvPoint project(CartesianPoint point, UvPoint previous) {
+                        return projectRevolutionUv(revolution, point, previous);
+                    }
+                    @Override
+                    public Double uPeriod() {
+                        return Math.PI * 2.0;
+                    }
+                };
+            }),
+            parametricMapperRule(SurfaceOfLinearExtrusion3.class, (surface) -> {
+                SurfaceOfLinearExtrusion3 extrusion = (SurfaceOfLinearExtrusion3) surface;
+                return new ParametricMapper() {
+                    @Override
+                    public CartesianPoint pointAt(double u, double v) {
+                        return extrusion.pointAt(u, v);
+                    }
+                    @Override
+                    public Vector3 normalAt(double u, double v) {
+                        return extrusion.normalAt(u, v);
+                    }
+                    @Override
+                    public UvPoint project(CartesianPoint point, UvPoint previous) {
+                        return projectExtrusionUv(extrusion, point, previous);
+                    }
+                };
+            })
+    );
+
+    static ParametricMapper mapperFor(SurfaceGeometry surface) {
+        for (ParametricMapperRule rule : MAPPER_RULES) {
+            if (rule.matches(surface)) {
+                return rule.handler().build(surface);
+            }
         }
         return null;
     }

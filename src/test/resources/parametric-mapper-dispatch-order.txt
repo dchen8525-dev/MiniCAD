@@ -1,0 +1,10 @@
+# Branch order of MeshTriangulatorParametric.mapperFor, captured from the
+# original sequential ifs (MAPPER_RULES). The table is ordered data, not
+# control flow: instanceof matches subtypes and the first match wins, so any
+# reordering must be an explicit, reviewed change.
+CylindricalSurface
+ConicalSurface
+ToroidalSurface
+SphericalSurface
+SurfaceOfRevolution3
+SurfaceOfLinearExtrusion3
