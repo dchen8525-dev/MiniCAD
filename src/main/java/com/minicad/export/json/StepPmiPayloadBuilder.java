@@ -982,51 +982,64 @@ public final class StepPmiPayloadBuilder {
     // Utility Methods
 
 
+    /**
+     * Annotation-target point rules keyed by concrete type, replacing the
+     * former 9-branch if/else-if chain (two branches were OR-guards over
+     * annotation types and are split one rule per type, all sharing the
+     * occurrence-delegation handler). Order mirrors the original chain (first
+     * match wins); unmatched items yield null, as the old trailing return did.
+     * Reuses the OccurrencePointRule/pointRule plumbing of
+     * ANNOTATION_POINT_RULES above.
+     */
+    private static final List<OccurrencePointRule> ANNOTATION_TARGET_POINT_RULES = List.of(
+            pointRule(StepCartesianPoint.class, (item, builder) ->
+                    StepPointExtractor.pointFromStep((StepCartesianPoint) item)),
+            pointRule(StepVertexPoint.class, (item, builder) ->
+                    StepPointExtractor.pointFromStep(((StepVertexPoint) item).point())),
+            pointRule(StepVertexShell.class, (item, builder) ->
+                    StepPointExtractor.pointFromStep(
+                            ((StepVertexShell) item).extent().loopVertex().point())),
+            pointRule(StepPointSet.class, (item, builder) ->
+                    pointFromPointSet((StepPointSet) item, builder)),
+            pointRule(StepGeometricSet.class, (item, builder) ->
+                    pointFromGeometricSet((StepGeometricSet) item, builder)),
+            pointRule(StepGeometricCurveSet.class, (item, builder) ->
+                    pointFromGeometricCurveSet((StepGeometricCurveSet) item, builder)),
+            pointRule(StepAnnotationSymbol.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationText.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationTextCharacter.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationFillArea.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationPointOccurrence.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationFillAreaOccurrence.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationTextOccurrence.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationPlaceholderOccurrence.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationSymbolOccurrence.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationSubfigureOccurrence.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepDraughtingAnnotationOccurrence.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            pointRule(StepAnnotationPlane.class, (item, builder) ->
+                    pointFromAnnotationOccurrence(item, builder)),
+            new OccurrencePointRule(StepGeometricReplica.class,
+                    item -> "POINT_REPLICA".equals(((StepGeometricReplica) item).entityName()),
+                    (item, builder) -> builder == null
+                            ? null
+                            : pointFromReplica((StepGeometricReplica) item, builder))
+    );
+
     public static CartesianPoint pointFromAnnotationPoint(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepCartesianPoint) {
-            StepCartesianPoint point = (StepCartesianPoint) item;
-            return StepPointExtractor.pointFromStep(point);
-        }
-        if (item instanceof StepVertexPoint) {
-            StepVertexPoint vertexPoint = (StepVertexPoint) item;
-            return StepPointExtractor.pointFromStep(vertexPoint.point());
-        }
-        if (item instanceof StepVertexShell) {
-            StepVertexShell vertexShell = (StepVertexShell) item;
-            return StepPointExtractor.pointFromStep(vertexShell.extent().loopVertex().point());
-        }
-        if (item instanceof StepPointSet) {
-            StepPointSet pointSet = (StepPointSet) item;
-            return StepPmiPayloadBuilder.pointFromPointSet(pointSet, builder);
-        }
-        if (item instanceof StepGeometricSet) {
-            StepGeometricSet geometricSet = (StepGeometricSet) item;
-            return StepPmiPayloadBuilder.pointFromGeometricSet(geometricSet, builder);
-        }
-        if (item instanceof StepGeometricCurveSet) {
-            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
-            return StepPmiPayloadBuilder.pointFromGeometricCurveSet(curveSet, builder);
-        }
-        if (item instanceof StepAnnotationSymbol
-                || item instanceof StepAnnotationText
-                || item instanceof StepAnnotationTextCharacter
-                || item instanceof StepAnnotationFillArea) {
-            return StepPmiPayloadBuilder.pointFromAnnotationOccurrence(item, builder);
-        }
-        if (item instanceof StepAnnotationPointOccurrence
-                || item instanceof StepAnnotationFillAreaOccurrence
-                || item instanceof StepAnnotationTextOccurrence
-                || item instanceof StepAnnotationPlaceholderOccurrence
-                || item instanceof StepAnnotationSymbolOccurrence
-                || item instanceof StepAnnotationSubfigureOccurrence
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepAnnotationPlane) {
-            return StepPmiPayloadBuilder.pointFromAnnotationOccurrence(item, builder);
-        }
-        if (builder != null && item instanceof StepGeometricReplica) {
-            StepGeometricReplica replica = (StepGeometricReplica) item;
-            if ("POINT_REPLICA".equals(replica.entityName())) {
-                return pointFromReplica(replica, builder);
+        for (OccurrencePointRule rule : ANNOTATION_TARGET_POINT_RULES) {
+            if (rule.matches(item)) {
+                return rule.handler().point(item, builder);
             }
         }
         return null;

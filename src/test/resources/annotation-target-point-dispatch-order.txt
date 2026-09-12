@@ -1,0 +1,25 @@
+# Branch order of StepPmiPayloadBuilder.pointFromAnnotationPoint, captured from
+# the original 9-branch sequential ifs (ANNOTATION_TARGET_POINT_RULES). The two
+# OR-guard branches were split one rule per type, all sharing the occurrence
+# delegation handler; the split keeps the original relative order. The table is
+# ordered data, not control flow: instanceof matches subtypes and the first
+# match wins, so any reordering must be an explicit, reviewed change.
+StepCartesianPoint
+StepVertexPoint
+StepVertexShell
+StepPointSet
+StepGeometricSet
+StepGeometricCurveSet
+StepAnnotationSymbol
+StepAnnotationText
+StepAnnotationTextCharacter
+StepAnnotationFillArea
+StepAnnotationPointOccurrence
+StepAnnotationFillAreaOccurrence
+StepAnnotationTextOccurrence
+StepAnnotationPlaceholderOccurrence
+StepAnnotationSymbolOccurrence
+StepAnnotationSubfigureOccurrence
+StepDraughtingAnnotationOccurrence
+StepAnnotationPlane
+StepGeometricReplica
