@@ -140,10 +140,26 @@ collectMappedAnnotationCarrierEdges · PreviewFaceBuilder.toRectangularComposite
 (→REASON_CODE_RULES，30 条 reason.contains 含一个 3 选 1 OR 组 + 4 条 ex instanceof
 + "unknown" 回退；冻结文件列 **code 序列**而非类型，守卫反射读 rule 的 `code()`；
 `contains` 顺序敏感——泛化 "SURFACE_REPLICA" 必须排在具体 replica 规则之后)
-`scan_instanceof_chains.py --min 6` 现应为 0 run(s)；`--min 5` 实测 **5 run(s)**
-（2 带守卫 + 3 无守卫）；`--min 4` 为 **9 run(s)**。剩余 5 分支里
+`scan_instanceof_chains.py --min 6` 现应为 0 run(s)；`--min 5` 实测 **4 run(s)**
+（1 带守卫 + 3 无守卫）；`--min 4` 为 **8 run(s)**。剩余 5 分支里
 StepFacePayloadBuilder:1954 与 StepTrimResolver:275 是**异构长链**（各分支体逻辑/长度差异大，
 前者还在 for 循环内需回传可变状态），折叠收益低风险高，优先找同构链。
+
+**谓词→boolean 链（返回 boolean 的 instanceof 链）**：`Edge.isClosedCurve(5)` →
+`CLOSED_CURVE_RULES`，规则形态 `record ClosedCurveRule(Class<? extends T> type,
+Predicate<T> handler)`，循环 `if (rule.type().isInstance(curve)) return
+rule.handler().test(curve);`。要点：
+- 所有类型 `final` 直接实现接口 ⇒ 互斥，原链的落穿语义（某分支条件不满足继续向后
+  instanceof）可安全改为 handler 直接返回 false —— 但这条等价性论证必须写进 record
+  javadoc 或 order 文件头注释。
+- `Circle || Ellipse3` 一分支拆两型一规则（均返回 true，行为中立）。
+- **窄参数方法引用不兼容宽谓词**：`Edge::isClosedBSpline` 不能当 `Predicate<Curve3>`
+  （`test(Curve3)` 要求 handler 接受超类型，参数逆变），须 lambda + cast：
+  `curve -> isClosedBSpline((BSplineCurve3) curve)`。
+- 零覆盖谓词折叠时应**同时补行为测试**（参考 `EdgeClosedCurveDispatchTableTest`：
+  3 守卫 + 5 行为）。fixture 坑：`Line3.sample(2)` 采样无限直线 ±10 世界单位窗口而非
+  线段端点（线段 Composite 永远保守判 not-closed）；`CompositeCurve3` 构造器拒绝空段
+  列表，"空集合"行为测试无法构造——先查构造器校验再写 fixture。
 
 **静态表的参数传递约束**：表若声明为 `private static final`，其 handler **无法捕获宿主
 方法的参数**（如 `json` / `builder` / `positions`）；必须把该参数纳入 handler 签名
