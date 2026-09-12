@@ -119,7 +119,19 @@ offsetSupportedSurfaceGeometry+buildOffsetSurface2Geometry(6×2→共享表)
 · MeshTriangulatorParametric.mapperFor(6) · StepPmiPayloadBuilder.pointFromAnnotationPoint(9→19)
 · StepDumpApp.stepEntityTypeName(6，与 StepEntityNamingUtils 非重复，刻意两份表)
 · StepDumpApp.validateGeometricPrimitiveEntity(23) 等。
+5 分支层：StepTopologyResolver.pathEdges · MeshTriangulatorParametric
+mapPointIntoFaceGeometry+acceptablePcurveBasisSurfaceIds(5×2→共享 SURFACE_UNWRAP_RULES)
+· MeshTriangulatorParametric.sampleCurve2 · PcurveSamplingHelper.sampleCurve2
+· StepMeshExporter.offsetSemanticSurfaceGeometry · PreviewGeometryCollector
+collectMappedAnnotationCarrierEdges · PreviewFaceBuilder.toRectangularCompositeSurfaceFacePayload
+(→COMPOSITE_BASIS_FACE_RULES，本文件原为并发会话半成品，补了 order 文件+守卫测试)。
 `scan_instanceof_chains.py --min 6` 现应为 0 run(s)；剩余为 5/4 分支收益递减层。
+
+## 关键教训：半成品折叠
+生成器一次产出**三个**文件（宿主 java + `<slug>-dispatch-order.txt` + `<Name>DispatchTableTest.java`）。
+agent 手工折叠时容易只改宿主、漏掉后两者 —— 那样的树**编译通过、测试也绿**，因为旧守卫根本没建立。
+接手任何"看起来已折好"的未提交改动前，先 `git status` 看是否三件套齐全；缺件就补齐
+（order 文件写类型 simpleName + 头部注释，守卫测试抄同目录既有 `*DispatchTableTest`）。
 
 ## 关键教训
 - 同名方法未必是重复：折叠前先比对两处实现的行为（StepDumpApp vs StepEntityNamingUtils
