@@ -126,9 +126,22 @@ mapPointIntoFaceGeometry+acceptablePcurveBasisSurfaceIds(5×2→共享 SURFACE_U
 · MeshTriangulatorParametric.sampleCurve2 · PcurveSamplingHelper.sampleCurve2
 · StepMeshExporter.offsetSemanticSurfaceGeometry · PreviewGeometryCollector
 collectMappedAnnotationCarrierEdges · PreviewFaceBuilder.toRectangularCompositeSurfaceFacePayload
-(→COMPOSITE_BASIS_FACE_RULES，本文件原为并发会话半成品，补了 order 文件+守卫测试)。
-`scan_instanceof_chains.py --min 6` 现应为 0 run(s)；`--min 5` 实测 **6 run(s)**
-（3 无守卫 + 3 带守卫），剩余为 4 分支收益递减层。
+(→COMPOSITE_BASIS_FACE_RULES，本文件原为并发会话半成品，补了 order 文件+守卫测试)
+· PreviewSerializers.appendJsonValue(→JSON_VALUE_RULES，含 2 组 OR-guard，
+拆成一型一规则)
+4 分支层：StepPmiPayloadBuilder.pointFromPlaceholderItem(→PLACEHOLDER_POINT_RULES)
++ collectPlaceholderPositions(→PLACEHOLDER_CHILDREN_RULES)
+——两表类型集合相同但**顺序不同**（children 表 PointSet 在前），刻意保留两张表
++ 两个 order 文件，折叠不得顺手统一两条本就不同的链。
+`scan_instanceof_chains.py --min 6` 现应为 0 run(s)；`--min 5` 实测 **5 run(s)**
+（2 带守卫 + 3 无守卫）；`--min 4` 为 13 run(s)。剩余 5 分支里
+StepFacePayloadBuilder:1954 与 StepTrimResolver:275 是**异构长链**（各分支体逻辑/长度差异大，
+前者还在 for 循环内需回传可变状态），折叠收益低风险高，优先找同构链。
+
+**静态表的参数传递约束**：表若声明为 `private static final`，其 handler **无法捕获宿主
+方法的参数**（如 `json` / `builder` / `positions`）；必须把该参数纳入 handler 签名
+（`void write(StringBuilder json, Object value)`），并在循环里传入。否则只能退化成方法内
+的局部表 —— 而局部表无法被顺序守卫从源码解析出来，等于放弃冻结保护。
 5 分支层另 2 条已按"重复实现收敛"改委托（不折表，commit `c0a1b868`，net −85 行）：
 `StepDumpApp.shellFaces -> ShellHelper`、
 `StepLegacyGeometryBuilder.collectShellLikeIds -> PreviewGeometryCollector`；
@@ -141,6 +154,12 @@ collectMappedAnnotationCarrierEdges · PreviewFaceBuilder.toRectangularComposite
 agent 手工折叠时容易只改宿主、漏掉后两者 —— 那样的树**编译通过、测试也绿**，因为旧守卫根本没建立。
 接手任何"看起来已折好"的未提交改动前，先 `git status` 看是否三件套齐全；缺件就补齐
 （order 文件写类型 simpleName + 头部注释，守卫测试抄同目录既有 `*DispatchTableTest`）。
+
+另一种手工折叠的半成品是**"表建好了但宿主没走表"**（方法体仍是旧 if 链，或反之表是死代码）：
+编译通过、旧测试也绿，因为行为没变而守卫只解析表本身。**对策**：在守卫测试里加一条源码断言，
+钉住入口方法确实遍历了自己的表，例如
+`assertTrue(text.contains("for (PlaceholderChildrenRule rule : PLACEHOLDER_CHILDREN_RULES)"))`
+（参考 `PmiPlaceholderPointDispatchTableTest`）。
 
 ## 关键教训
 - 同名方法未必是重复：折叠前先比对两处实现的行为（StepDumpApp vs StepEntityNamingUtils
