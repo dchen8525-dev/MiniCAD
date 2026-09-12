@@ -141,9 +141,27 @@ collectMappedAnnotationCarrierEdges · PreviewFaceBuilder.toRectangularComposite
 + "unknown" 回退；冻结文件列 **code 序列**而非类型，守卫反射读 rule 的 `code()`；
 `contains` 顺序敏感——泛化 "SURFACE_REPLICA" 必须排在具体 replica 规则之后)
 `scan_instanceof_chains.py --min 6` 现应为 0 run(s)；`--min 5` 实测 **4 run(s)**
-（1 带守卫 + 3 无守卫）；`--min 4` 为 **8 run(s)**。剩余 5 分支里
+（1 带守卫 + 2 无守卫）；`--min 4` 为 **7 run(s)**（StepEdgePayloadBuilder:133 是
+分支内含 null 守卫的异构链，不建议折）。剩余 5 分支里
 StepFacePayloadBuilder:1954 与 StepTrimResolver:275 是**异构长链**（各分支体逻辑/长度差异大，
 前者还在 for 循环内需回传可变状态），折叠收益低风险高，优先找同构链。
+
+**收敛"同名重复链"前先核对 helper 逐字等价**：StepCadCurveBuilder.implicitBSplineCurveData
+是 StepCadBuilder 折叠表的逐字副本，但两类的 `stepEntityTypeName` **不等价**
+（Builder → StepEntityNamingUtils 渲染 UPPER_SNAKE；CurveBuilder 本地副本 camelCase）。
+收敛模式：拆出包内可见静态 `implicitBSplineCurveDataOrNull`（无匹配返回 null），
+**各调用方保留自己的抛错文案**；守卫测试加"委托存在 + 本地 instanceof 链不存在"双断言。
+同类先例：`literalText` 有刻意双胞胎（StepParameterReader 渲染 ListValue "(a,b)"，
+StepResolverValueHelpers 看不到 ListValue）——测试 javadoc 写明"两副本故意不同、
+保持独立表"的，**不得合并**，各自独立折表（reader 侧 ParameterLiteralTextDispatchTableTest）。
+镜像折表：`Curve3SamplingHelper.sampleLooseCurve(4)` → LOOSE_CURVE_SAMPLERS 完全
+照抄既有 Curve2SamplingHelper 形态。
+**第三次踩同一坑**：Line3.sample 采样无限直线 ±10 窗口（首点 origin−10·dir 而非 origin；
+sample(72)=73 点）——写 fixture 断言前先查该类的 sample 语义。
+
+**环境坑**：`.git/refs/remotes/origin/` 目录可能被并发进程实时删除（mkdir 后毫秒级消失、
+packed-refs 停在旧值）⇒ `git status -sb` 显示 "ahead N" 假象。判据：`git ls-remote
+origin main` 对比 `git rev-parse HEAD`，一致即推送成功，忽略 tracking ref 显示。
 
 **谓词→boolean 链（返回 boolean 的 instanceof 链）**：`Edge.isClosedCurve(5)` →
 `CLOSED_CURVE_RULES`，规则形态 `record ClosedCurveRule(Class<? extends T> type,
