@@ -133,8 +133,15 @@ collectMappedAnnotationCarrierEdges · PreviewFaceBuilder.toRectangularComposite
 + collectPlaceholderPositions(→PLACEHOLDER_CHILDREN_RULES)
 ——两表类型集合相同但**顺序不同**（children 表 PointSet 在前），刻意保留两张表
 + 两个 order 文件，折叠不得顺手统一两条本就不同的链。
+· StepCadBuilder.implicitBSplineCurveData + implicitBSplineSurfaceData + buildSurfaceGeometry
+(4×3，一次折完；PARAMETRIC_SURFACE_RULES 用未绑定实例方法引用 `StepCadBuilder::buildXxx`
+匹配 `(builder, id) -> SurfaceGeometry`——静态表调用实例方法的技巧)
+非 instanceof 的"条件→常量"链：StepReasonCodeClassifier.classifyReasonCode(34)
+(→REASON_CODE_RULES，30 条 reason.contains 含一个 3 选 1 OR 组 + 4 条 ex instanceof
++ "unknown" 回退；冻结文件列 **code 序列**而非类型，守卫反射读 rule 的 `code()`；
+`contains` 顺序敏感——泛化 "SURFACE_REPLICA" 必须排在具体 replica 规则之后)
 `scan_instanceof_chains.py --min 6` 现应为 0 run(s)；`--min 5` 实测 **5 run(s)**
-（2 带守卫 + 3 无守卫）；`--min 4` 为 13 run(s)。剩余 5 分支里
+（2 带守卫 + 3 无守卫）；`--min 4` 为 **9 run(s)**。剩余 5 分支里
 StepFacePayloadBuilder:1954 与 StepTrimResolver:275 是**异构长链**（各分支体逻辑/长度差异大，
 前者还在 for 循环内需回传可变状态），折叠收益低风险高，优先找同构链。
 
@@ -142,6 +149,15 @@ StepFacePayloadBuilder:1954 与 StepTrimResolver:275 是**异构长链**（各�
 方法的参数**（如 `json` / `builder` / `positions`）；必须把该参数纳入 handler 签名
 （`void write(StringBuilder json, Object value)`），并在循环里传入。否则只能退化成方法内
 的局部表 —— 而局部表无法被顺序守卫从源码解析出来，等于放弃冻结保护。
+若 handler 需要调用宿主的**实例方法**，用未绑定实例方法引用 `Host::buildXxx` 匹配
+`(Host self, int id) -> R` 签名（builder 作为首参在循环里传 `this`），表仍是 static ——
+参考 `StepCadBuilder.PARAMETRIC_SURFACE_RULES`。
+
+**谓词不是类型时的守卫变体**：`reason.contains(...)` 这类字符串分发链无法用
+`Class` 表达规则，冻结文件改列**返回 code 的序列**（允许同 code 重复出现，头注释说明），
+守卫测试反射读表（`getDeclaredField` + record 的 `code()`，`setAccessible(true)`）
+比对序列 —— 比源码解析字符串字面量可靠得多。顺序敏感点（泛化片段必须排在具体片段之后）
+单独写一条行为钉测。参考 `StepReasonCodeClassifierDispatchTableTest`。
 5 分支层另 2 条已按"重复实现收敛"改委托（不折表，commit `c0a1b868`，net −85 行）：
 `StepDumpApp.shellFaces -> ShellHelper`、
 `StepLegacyGeometryBuilder.collectShellLikeIds -> PreviewGeometryCollector`；
