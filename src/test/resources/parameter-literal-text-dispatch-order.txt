@@ -1,0 +1,27 @@
+# Branch order of StepParameterReader.literalText, captured from the original
+# 8-branch `if (value instanceof X)` chain before it was folded into
+# LITERAL_TEXT_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch: instanceof also
+# matches subtypes, so a dropped, duplicated or reordered rule silently
+# changes which value is rendered how. Values matching no rule fall through to
+# the terminal bare IllegalArgumentException.
+#
+# This is the deliberate twin of StepResolverValueHelpers' LITERAL_TEXT_RULES
+# (already table-driven, see LiteralTextDispatchTableTest): this copy
+# additionally renders ListValue as "(a,b)" because its callers can reach it,
+# while the resolver copy never sees a ListValue. The twins stay separate
+# tables on purpose -- do not merge them.
+#
+# All 8 variants are static final classes implementing StepValue directly (no
+# subtype relation today), so the order is currently behaviour neutral; the
+# frozen file turns any future reordering into a test failure rather than a
+# silent behaviour change.
+StringValue
+NumberValue
+EnumValue
+ReferenceValue
+OmittedValue
+NotProvidedValue
+TypedValue
+ListValue

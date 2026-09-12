@@ -324,37 +324,53 @@ public final class StepParameterReader {
     }
   }
 
+  @FunctionalInterface
+  private interface LiteralTextHandler {
+    String render(StepValue value);
+  }
+
+  private record LiteralTextRule(Class<? extends StepValue> type, LiteralTextHandler handler) {
+    boolean matches(StepValue value) {
+      return type.isInstance(value);
+    }
+  }
+
+  /**
+   * Ordered literal-text dispatch table, first match wins; the type order is
+   * frozen by {@code ParameterLiteralTextDispatchTableTest}. This is the
+   * deliberate twin of StepResolverValueHelpers' LITERAL_TEXT_RULES: this copy
+   * additionally formats ListValue as "(a,b)" (its callers can reach it), the
+   * resolver copy never does. All 8 StepValue variants are static final
+   * classes directly implementing StepValue (no subtype relation today), so
+   * the order is currently behaviour neutral. An unmatched value falls
+   * through to the original bare IllegalArgumentException.
+   */
+  private static final List<LiteralTextRule> LITERAL_TEXT_RULES = List.of(
+      new LiteralTextRule(StepValue.StringValue.class, value -> ((StepValue.StringValue) value).value()),
+      new LiteralTextRule(StepValue.NumberValue.class, value -> ((StepValue.NumberValue) value).raw()),
+      new LiteralTextRule(StepValue.EnumValue.class, value -> "." + ((StepValue.EnumValue) value).value() + "."),
+      new LiteralTextRule(StepValue.ReferenceValue.class, value -> "#" + ((StepValue.ReferenceValue) value).id()),
+      new LiteralTextRule(StepValue.OmittedValue.class, value -> "$"),
+      new LiteralTextRule(StepValue.NotProvidedValue.class, value -> "*"),
+      new LiteralTextRule(StepValue.TypedValue.class, value -> {
+        StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
+        return typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
+      }),
+      new LiteralTextRule(StepValue.ListValue.class, value -> {
+        StepValue.ListValue listValue = (StepValue.ListValue) value;
+        return "(" + listValue.elements().stream()
+            .map(StepParameterReader::literalText)
+            .collect(java.util.stream.Collectors.joining(",")) + ")";
+      }));
+
   /**
    * Converts a StepValue back to its STEP literal text representation.
    */
   public static String literalText(StepValue value) {
-    if (value instanceof StepValue.StringValue) {
-      StepValue.StringValue stringValue = (StepValue.StringValue) value;
-      return stringValue.value();
-    }
-    if (value instanceof StepValue.NumberValue) {
-      StepValue.NumberValue numberValue = (StepValue.NumberValue) value;
-      return numberValue.raw();
-    }
-    if (value instanceof StepValue.EnumValue) {
-      StepValue.EnumValue enumValue = (StepValue.EnumValue) value;
-      return "." + enumValue.value() + ".";
-    }
-    if (value instanceof StepValue.ReferenceValue) {
-      StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) value;
-      return "#" + referenceValue.id();
-    }
-    if (value instanceof StepValue.OmittedValue) return "$";
-    if (value instanceof StepValue.NotProvidedValue) return "*";
-    if (value instanceof StepValue.TypedValue) {
-      StepValue.TypedValue typedValue = (StepValue.TypedValue) value;
-      return typedValue.typeName() + "(" + literalText(typedValue.value()) + ")";
-    }
-    if (value instanceof StepValue.ListValue) {
-      StepValue.ListValue listValue = (StepValue.ListValue) value;
-      return "(" + listValue.elements().stream()
-          .map(StepParameterReader::literalText)
-          .collect(java.util.stream.Collectors.joining(",")) + ")";
+    for (LiteralTextRule rule : LITERAL_TEXT_RULES) {
+      if (rule.matches(value)) {
+        return rule.handler().render(value);
+      }
     }
     throw new IllegalArgumentException();
   }

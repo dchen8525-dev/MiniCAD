@@ -2799,13 +2799,27 @@ public final class StepCadBuilder {
                 return StepBSplineKnotGenerator.implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
             }));
 
-    private StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
+    /**
+     * Shared implicit-curve-knot dispatch. Returns {@code null} when no rule
+     * matches so each caller keeps its own exception wording (StepCadBuilder
+     * renders UPPER_SNAKE type names via StepEntityNamingUtils, while
+     * StepCadCurveBuilder keeps its camelCase twin).
+     */
+    static StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveDataOrNull(StepEntity entity) {
         for (ImplicitCurveDataRule rule : IMPLICIT_CURVE_DATA_RULES) {
             if (rule.matches(entity)) {
                 return rule.handler().build(entity);
             }
         }
-        throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
+        return null;
+    }
+
+    private StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
+        StepBSplineKnotGenerator.ImplicitBSplineCurveData data = implicitBSplineCurveDataOrNull(entity);
+        if (data == null) {
+            throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
+        }
+        return data;
     }
 
     @FunctionalInterface

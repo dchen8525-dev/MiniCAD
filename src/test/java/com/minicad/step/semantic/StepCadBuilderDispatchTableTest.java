@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -98,6 +99,27 @@ class StepCadBuilderDispatchTableTest {
                 "implicitBSplineSurfaceData must iterate IMPLICIT_SURFACE_DATA_RULES.");
         assertTrue(text.contains("for (ParametricSurfaceRule rule : PARAMETRIC_SURFACE_RULES)"),
                 "buildSurfaceGeometry must iterate PARAMETRIC_SURFACE_RULES.");
+    }
+
+    /**
+     * StepCadCurveBuilder used to carry a verbatim copy of the implicit-curve
+     * if-chain. It now delegates to the canonical
+     * {@code implicitBSplineCurveDataOrNull} dispatch; only its camelCase
+     * exception wording stays local. This guard fails if the duplicate chain
+     * is ever reintroduced or the delegation is dropped.
+     */
+    @Test
+    @DisplayName("StepCadCurveBuilder delegates to the canonical implicit-curve table")
+    void curveBuilderShouldDelegateImplicitCurveData() throws Exception {
+        Path curveBuilderSource =
+                Paths.get("src/main/java/com/minicad/step/semantic/StepCadCurveBuilder.java");
+        String text = Files.readString(curveBuilderSource, StandardCharsets.UTF_8);
+        assertTrue(text.contains("StepCadBuilder.implicitBSplineCurveDataOrNull(entity)"),
+                "StepCadCurveBuilder.implicitBSplineCurveData must delegate to the "
+                        + "canonical table in StepCadBuilder, not re-dispatch locally.");
+        assertFalse(text.contains("instanceof StepBezierCurve"),
+                "StepCadCurveBuilder must not keep its own implicit-curve instanceof "
+                        + "chain; the type dispatch lives in StepCadBuilder.");
     }
 
     private static void assertTableMatchesFrozen(String tableField, Path frozenOrder) throws Exception {

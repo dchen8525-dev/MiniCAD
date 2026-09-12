@@ -24,42 +24,60 @@ public final class Curve3SamplingHelper {
         // Utility class
     }
 
+    @FunctionalInterface
+    private interface LooseCurveSampler {
+        List<CartesianPoint> sample(Curve3 curve);
+    }
+
+    private record LooseCurveRule(Class<? extends Curve3> type, LooseCurveSampler sampler) {
+        boolean matches(Curve3 curve) {
+            return type.isInstance(curve);
+        }
+    }
+
+    /**
+     * Ordered loose-curve dispatch table, first match wins; the type order is
+     * frozen by {@code Curve3LooseSampleDispatchTableTest}. All 4 types are
+     * final classes implementing Curve3 directly (no subtype relation today),
+     * so the order is currently behaviour neutral. Curves matching no rule
+     * (Line3, Circle, Ellipse3, B-splines) fall through to the shared
+     * {@code curve.sample(72)} + empty-check tail.
+     */
+    private static final List<LooseCurveRule> LOOSE_CURVE_SAMPLERS = List.of(
+            new LooseCurveRule(TrimmedCurve3.class, curve -> sampleTrimmedCurve3((TrimmedCurve3) curve, 72)),
+            new LooseCurveRule(SurfaceCurve3.class, curve -> sampleLooseCurve(((SurfaceCurve3) curve).curve3d())),
+            new LooseCurveRule(Polyline3.class, curve -> ((Polyline3) curve).points()),
+            new LooseCurveRule(CompositeCurve3.class, curve -> compositePoints((CompositeCurve3) curve)));
+
     /**
      * Samples any loose 3D curve without requiring edge context. The single
      * shared implementation — the export/preview copies delegate here.
      */
     public static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
-        if (curve instanceof TrimmedCurve3) {
-            TrimmedCurve3 trimmedCurve = (TrimmedCurve3) curve;
-            return sampleTrimmedCurve3(trimmedCurve, 72);
-        }
-        if (curve instanceof SurfaceCurve3) {
-            SurfaceCurve3 surfaceCurve = (SurfaceCurve3) curve;
-            return sampleLooseCurve(surfaceCurve.curve3d());
-        }
-        if (curve instanceof Polyline3) {
-            Polyline3 polyline = (Polyline3) curve;
-            return polyline.points();
-        }
-        if (curve instanceof CompositeCurve3) {
-            CompositeCurve3 compositeCurve = (CompositeCurve3) curve;
-            List<CartesianPoint> points = new ArrayList<>();
-            boolean first = true;
-            for (Curve3 segment : compositeCurve.segments()) {
-                List<CartesianPoint> segmentPoints = sampleLooseCurve(segment);
-                int start = first ? 0 : 1;
-                for (int i = start; i < segmentPoints.size(); i++) {
-                    points.add(segmentPoints.get(i));
-                }
-                first = false;
+        for (LooseCurveRule rule : LOOSE_CURVE_SAMPLERS) {
+            if (rule.matches(curve)) {
+                return rule.sampler().sample(curve);
             }
-            return List.copyOf(points);
         }
         List<CartesianPoint> points = curve.sample(72);
         if (points.isEmpty()) {
             throw new UnsupportedGeometryException("curve sampling for " + curve.getClass().getSimpleName() + " is unsupported");
         }
         return points;
+    }
+
+    private static List<CartesianPoint> compositePoints(CompositeCurve3 compositeCurve) {
+        List<CartesianPoint> points = new ArrayList<>();
+        boolean first = true;
+        for (Curve3 segment : compositeCurve.segments()) {
+            List<CartesianPoint> segmentPoints = sampleLooseCurve(segment);
+            int start = first ? 0 : 1;
+            for (int i = start; i < segmentPoints.size(); i++) {
+                points.add(segmentPoints.get(i));
+            }
+            first = false;
+        }
+        return List.copyOf(points);
     }
 
     public static double arcSweep(double startAngle, double endAngle, boolean closed, boolean naturalForward) {

@@ -1,0 +1,16 @@
+# Branch order of Curve3SamplingHelper.sampleLooseCurve, captured from the
+# original 4-branch `if (curve instanceof X)` chain before it was folded into
+# LOOSE_CURVE_SAMPLERS.
+#
+# Every branch returns, so this is first-match-wins dispatch: instanceof also
+# matches subtypes, so a dropped, duplicated or reordered rule silently
+# changes which curve is sampled how. Curves matching no rule (Line3, Circle,
+# Ellipse3, the B-spline families) fall through to the shared
+# curve.sample(72) + empty-check tail, so the frozen file also protects that
+# fallback boundary. All 4 types are final classes implementing Curve3
+# directly (no subtype relation today), so the order is currently behaviour
+# neutral.
+TrimmedCurve3
+SurfaceCurve3
+Polyline3
+CompositeCurve3

@@ -1241,24 +1241,18 @@ final class StepCadCurveBuilder {
 
     // ==================== Implicit B-Spline Curve Data ====================
 
+    /**
+     * Delegates the type dispatch to the canonical
+     * {@link StepCadBuilder#implicitBSplineCurveDataOrNull} table; only the
+     * exception wording stays local (camelCase type names, unlike
+     * StepCadBuilder's UPPER_SNAKE rendering).
+     */
     private StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
-        if (entity instanceof StepBezierCurve) {
-            StepBezierCurve curve = (StepBezierCurve) entity;
-            return StepBSplineKnotGenerator.implicitBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+        StepBSplineKnotGenerator.ImplicitBSplineCurveData data = StepCadBuilder.implicitBSplineCurveDataOrNull(entity);
+        if (data == null) {
+            throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
         }
-        if (entity instanceof StepUniformCurve) {
-            StepUniformCurve curve = (StepUniformCurve) entity;
-            return StepBSplineKnotGenerator.implicitUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
-        }
-        if (entity instanceof StepQuasiUniformCurve) {
-            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) entity;
-            return StepBSplineKnotGenerator.implicitQuasiUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
-        }
-        if (entity instanceof StepPiecewiseBezierCurve) {
-            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) entity;
-            return StepBSplineKnotGenerator.implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
-        }
-        throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
+        return data;
     }
 
     // ==================== 3D Curve Builders ====================
