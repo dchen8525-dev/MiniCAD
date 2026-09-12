@@ -1,0 +1,13 @@
+# Branch order of StepCadBuilder.implicitBSplineCurveData, captured from the
+# original `if (entity instanceof X)` chain before it was folded into
+# IMPLICIT_CURVE_DATA_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch. All four types are
+# final classes implementing StepEntity directly (no subtype relation today), so
+# the order is currently behaviour neutral -- the frozen file turns any future
+# reordering, drop or duplication into a test failure rather than a silent change
+# in which knot layout a B-spline curve gets.
+StepBezierCurve
+StepUniformCurve
+StepQuasiUniformCurve
+StepPiecewiseBezierCurve

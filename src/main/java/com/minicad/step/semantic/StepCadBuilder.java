@@ -2760,42 +2760,98 @@ public final class StepCadBuilder {
         return new DegenerateCurve3(point);
     }
 
+    @FunctionalInterface
+    private interface ImplicitCurveDataHandler {
+        StepBSplineKnotGenerator.ImplicitBSplineCurveData build(StepEntity entity);
+    }
+
+    private record ImplicitCurveDataRule(Class<? extends StepEntity> type, ImplicitCurveDataHandler handler) {
+        boolean matches(StepEntity entity) {
+            return type.isInstance(entity);
+        }
+    }
+
+    private static ImplicitCurveDataRule implicitCurveDataRule(
+            Class<? extends StepEntity> type, ImplicitCurveDataHandler handler) {
+        return new ImplicitCurveDataRule(type, handler);
+    }
+
+    /**
+     * Ordered implicit-curve-knot dispatch table, first match wins; the type
+     * order is frozen by {@code StepCadBuilderDispatchTableTest}. An unmatched
+     * entity falls through to the original UnsupportedGeometryException.
+     */
+    private static final List<ImplicitCurveDataRule> IMPLICIT_CURVE_DATA_RULES = List.of(
+            implicitCurveDataRule(StepBezierCurve.class, entity -> {
+                StepBezierCurve curve = (StepBezierCurve) entity;
+                return StepBSplineKnotGenerator.implicitBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            }),
+            implicitCurveDataRule(StepUniformCurve.class, entity -> {
+                StepUniformCurve curve = (StepUniformCurve) entity;
+                return StepBSplineKnotGenerator.implicitUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            }),
+            implicitCurveDataRule(StepQuasiUniformCurve.class, entity -> {
+                StepQuasiUniformCurve curve = (StepQuasiUniformCurve) entity;
+                return StepBSplineKnotGenerator.implicitQuasiUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            }),
+            implicitCurveDataRule(StepPiecewiseBezierCurve.class, entity -> {
+                StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) entity;
+                return StepBSplineKnotGenerator.implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+            }));
+
     private StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
-        if (entity instanceof StepBezierCurve) {
-            StepBezierCurve curve = (StepBezierCurve) entity;
-            return StepBSplineKnotGenerator.implicitBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
-        }
-        if (entity instanceof StepUniformCurve) {
-            StepUniformCurve curve = (StepUniformCurve) entity;
-            return StepBSplineKnotGenerator.implicitUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
-        }
-        if (entity instanceof StepQuasiUniformCurve) {
-            StepQuasiUniformCurve curve = (StepQuasiUniformCurve) entity;
-            return StepBSplineKnotGenerator.implicitQuasiUniformCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
-        }
-        if (entity instanceof StepPiecewiseBezierCurve) {
-            StepPiecewiseBezierCurve curve = (StepPiecewiseBezierCurve) entity;
-            return StepBSplineKnotGenerator.implicitPiecewiseBezierCurve(curve.getDegree(), curve.getControlPoints(), stepEntityTypeName(entity));
+        for (ImplicitCurveDataRule rule : IMPLICIT_CURVE_DATA_RULES) {
+            if (rule.matches(entity)) {
+                return rule.handler().build(entity);
+            }
         }
         throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
     }
 
+    @FunctionalInterface
+    private interface ImplicitSurfaceDataHandler {
+        StepBSplineKnotGenerator.ImplicitBSplineSurfaceData build(StepEntity entity);
+    }
+
+    private record ImplicitSurfaceDataRule(Class<? extends StepEntity> type, ImplicitSurfaceDataHandler handler) {
+        boolean matches(StepEntity entity) {
+            return type.isInstance(entity);
+        }
+    }
+
+    private static ImplicitSurfaceDataRule implicitSurfaceDataRule(
+            Class<? extends StepEntity> type, ImplicitSurfaceDataHandler handler) {
+        return new ImplicitSurfaceDataRule(type, handler);
+    }
+
+    /**
+     * Ordered implicit-surface-knot dispatch table, first match wins; the type
+     * order is frozen by {@code StepCadBuilderDispatchTableTest}. An unmatched
+     * entity falls through to the original UnsupportedGeometryException.
+     */
+    private static final List<ImplicitSurfaceDataRule> IMPLICIT_SURFACE_DATA_RULES = List.of(
+            implicitSurfaceDataRule(StepBezierSurface.class, entity -> {
+                StepBezierSurface surface = (StepBezierSurface) entity;
+                return StepBSplineKnotGenerator.implicitBezierSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+            }),
+            implicitSurfaceDataRule(StepUniformSurface.class, entity -> {
+                StepUniformSurface surface = (StepUniformSurface) entity;
+                return StepBSplineKnotGenerator.implicitUniformSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+            }),
+            implicitSurfaceDataRule(StepQuasiUniformSurface.class, entity -> {
+                StepQuasiUniformSurface surface = (StepQuasiUniformSurface) entity;
+                return StepBSplineKnotGenerator.implicitQuasiUniformSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+            }),
+            implicitSurfaceDataRule(StepPiecewiseBezierSurface.class, entity -> {
+                StepPiecewiseBezierSurface surface = (StepPiecewiseBezierSurface) entity;
+                return StepBSplineKnotGenerator.implicitPiecewiseBezierSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+            }));
+
     private StepBSplineKnotGenerator.ImplicitBSplineSurfaceData implicitBSplineSurfaceData(StepEntity entity) {
-        if (entity instanceof StepBezierSurface) {
-            StepBezierSurface surface = (StepBezierSurface) entity;
-            return StepBSplineKnotGenerator.implicitBezierSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
-        }
-        if (entity instanceof StepUniformSurface) {
-            StepUniformSurface surface = (StepUniformSurface) entity;
-            return StepBSplineKnotGenerator.implicitUniformSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
-        }
-        if (entity instanceof StepQuasiUniformSurface) {
-            StepQuasiUniformSurface surface = (StepQuasiUniformSurface) entity;
-            return StepBSplineKnotGenerator.implicitQuasiUniformSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
-        }
-        if (entity instanceof StepPiecewiseBezierSurface) {
-            StepPiecewiseBezierSurface surface = (StepPiecewiseBezierSurface) entity;
-            return StepBSplineKnotGenerator.implicitPiecewiseBezierSurface(surface.getUDegree(), surface.getVDegree(), surface.getControlPoints(), stepEntityTypeName(entity));
+        for (ImplicitSurfaceDataRule rule : IMPLICIT_SURFACE_DATA_RULES) {
+            if (rule.matches(entity)) {
+                return rule.handler().build(entity);
+            }
         }
         throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
     }
@@ -3866,23 +3922,45 @@ public final class StepCadBuilder {
         return built;
     }
 
+    @FunctionalInterface
+    private interface ParametricSurfaceHandler {
+        SurfaceGeometry build(StepCadBuilder builder, int id);
+    }
+
+    private record ParametricSurfaceRule(Class<? extends StepEntity> type, ParametricSurfaceHandler handler) {
+        boolean matches(StepEntity entity) {
+            return type.isInstance(entity);
+        }
+    }
+
+    private static ParametricSurfaceRule parametricSurfaceRule(
+            Class<? extends StepEntity> type, ParametricSurfaceHandler handler) {
+        return new ParametricSurfaceRule(type, handler);
+    }
+
+    /**
+     * Ordered parametric-surface dispatch table, first match wins; the type
+     * order is frozen by {@code StepCadBuilderDispatchTableTest}. The handlers
+     * are unbound instance-method references (the builder is passed as the first
+     * argument), which keeps the table static. An unmatched entity falls through
+     * to the original UnsupportedGeometryException.
+     */
+    private static final List<ParametricSurfaceRule> PARAMETRIC_SURFACE_RULES = List.of(
+            parametricSurfaceRule(StepParaboloidSurface.class, StepCadBuilder::buildParaboloidSurface),
+            parametricSurfaceRule(StepHyperboloidSurface.class, StepCadBuilder::buildHyperboloidSurface),
+            parametricSurfaceRule(StepSurfaceOfTranslation.class, StepCadBuilder::buildSurfaceOfTranslation),
+            parametricSurfaceRule(StepSurfaceOfProjection.class, StepCadBuilder::buildSurfaceOfProjection));
+
     /**
      * Builds a SurfaceGeometry from a surface entity ID.
      * Dispatches to the appropriate typed builder for parametric surfaces.
      */
     public SurfaceGeometry buildSurfaceGeometry(int id) {
         StepEntity entity = requireExistingEntity(id);
-        if (entity instanceof StepParaboloidSurface) {
-            return buildParaboloidSurface(id);
-        }
-        if (entity instanceof StepHyperboloidSurface) {
-            return buildHyperboloidSurface(id);
-        }
-        if (entity instanceof StepSurfaceOfTranslation) {
-            return buildSurfaceOfTranslation(id);
-        }
-        if (entity instanceof StepSurfaceOfProjection) {
-            return buildSurfaceOfProjection(id);
+        for (ParametricSurfaceRule rule : PARAMETRIC_SURFACE_RULES) {
+            if (rule.matches(entity)) {
+                return rule.handler().build(this, id);
+            }
         }
         throw new UnsupportedGeometryException("entity #" + id + " is not a supported parametric surface");
     }
