@@ -6,6 +6,7 @@ import com.minicad.export.glb.PreviewMeshExporter;
 import com.minicad.export.glb.TessellatedFaceExporter;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
+import com.minicad.helper.ShellHelper;
 import com.minicad.helper.StepMetadataExtractor;
 import com.minicad.preview.payload.EdgePayload;
 import com.minicad.preview.payload.FacePayload;
@@ -303,7 +304,7 @@ public final class PreviewGeometryCollector {
             collectShellLikeIds(styledItem.item(), shellIds);
             return;
         }
-        if (PreviewFaceBuilder.isShellLikeEntity(item)) {
+        if (ShellHelper.isShellLikeEntity(item)) {
             shellIds.add(item.id());
             return;
         }

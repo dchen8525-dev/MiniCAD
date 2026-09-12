@@ -4,6 +4,7 @@ import com.minicad.common.*;
 import com.minicad.geometry.*;
 import com.minicad.geometry2d.*;
 import com.minicad.export.json.JsonBuilder;
+import com.minicad.helper.ShellHelper;
 import com.minicad.helper.StepTextReader;
 import com.minicad.helper.UnitExtractor;
 import com.minicad.step.model.*;
@@ -3128,25 +3129,8 @@ public final class StepDumpApp {
     }
 
     private static Iterable<StepFaceEntity> shellFaces(StepEntity entity) {
-        if (entity instanceof StepOpenShell) {
-            StepOpenShell openShell = (StepOpenShell) entity;
-            return openShell.faces();
-        }
-        if (entity instanceof StepSurfacedOpenShell) {
-            StepSurfacedOpenShell surfacedOpenShell = (StepSurfacedOpenShell) entity;
-            return surfacedOpenShell.faces();
-        }
-        if (entity instanceof StepOrientedOpenShell) {
-            StepOrientedOpenShell orientedOpenShell = (StepOrientedOpenShell) entity;
-            return orientedOpenShell.faces();
-        }
-        if (entity instanceof StepClosedShell) {
-            StepClosedShell closedShell = (StepClosedShell) entity;
-            return closedShell.faces();
-        }
-        if (entity instanceof StepOrientedClosedShell) {
-            StepOrientedClosedShell orientedClosedShell = (StepOrientedClosedShell) entity;
-            return orientedClosedShell.faces();
+        if (ShellHelper.isShellEntity(entity)) {
+            return ShellHelper.shellFaces(entity);
         }
         throw new StepResolutionException("entity #" + entity.id() + " is not a supported shell");
     }

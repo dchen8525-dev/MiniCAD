@@ -8,6 +8,7 @@ import com.minicad.step.semantic.*;
 import com.minicad.topology.*;
 import com.minicad.geometry.*;
 import com.minicad.common.*;
+import com.minicad.preview.builder.PreviewGeometryCollector;
 import com.minicad.preview.payload.*;
 import com.minicad.preview.statistics.*;
 import com.minicad.export.glb.*;
@@ -249,62 +250,9 @@ public final class StepLegacyGeometryBuilder {
     }
 
 
+    // Delegate to PreviewGeometryCollector - the canonical shell-like id collector.
     static void collectShellLikeIds(StepEntity item, Set<Integer> shellIds) {
-        if (item instanceof StepStyledItem) {
-            StepStyledItem styledItem = (StepStyledItem) item;
-            collectShellLikeIds(styledItem.item(), shellIds);
-            return;
-        }
-        if (item instanceof StepOverRidingStyledItem) {
-            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) item;
-            collectShellLikeIds(styledItem.item(), shellIds);
-            return;
-        }
-        if (ShellHelper.isShellLikeEntity(item)) {
-            shellIds.add(item.id());
-            return;
-        }
-        // B-rep solid types (MANIFOLD_SOLID_BREP, FACETTED_BREP, etc.) are now handled
-        // through the solid path — skip shell collection to avoid duplicate output.
-        if (item instanceof StepManifoldSolidBrep
-                || item instanceof StepFacettedBrep
-                || item instanceof StepNonManifoldSolidBrep
-                || item instanceof StepAdvancedBrep
-                || item instanceof StepBrepWithVoids
-                || item instanceof StepFacetedBrepAndBrepWithVoids
-                || item instanceof StepMappedItem
-                || item instanceof StepSolidModel
-                || item instanceof StepSurfacePatch) {
-            return;
-        }
-        if (item instanceof StepShellBasedSurfaceModel) {
-            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) item;
-            for (StepEntity shell : surfaceModel.shells()) {
-                collectShellLikeIds(shell, shellIds);
-            }
-            return;
-        }
-        if (item instanceof StepTessellatedFaceSet) {
-            shellIds.add(item.id());
-            return;
-        }
-        if (item instanceof StepTessellatedFace) {
-            shellIds.add(item.id());
-            return;
-        }
-        if (item instanceof StepManifoldSurfaceModel) {
-            StepManifoldSurfaceModel manifoldModel = (StepManifoldSurfaceModel) item;
-            for (StepEntity shell : manifoldModel.shells()) {
-                collectShellLikeIds(shell, shellIds);
-            }
-            return;
-        }
-        if (item instanceof StepFaceBasedSurfaceModel) {
-            StepFaceBasedSurfaceModel faceModel = (StepFaceBasedSurfaceModel) item;
-            for (StepEntity faceSet : faceModel.faceSets()) {
-                collectShellLikeIds(faceSet, shellIds);
-            }
-        }
+        PreviewGeometryCollector.collectShellLikeIds(item, shellIds);
     }
 
     // Delegate to StepValidationHelper - extracted utility class

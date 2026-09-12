@@ -29,17 +29,13 @@ import com.minicad.step.model.StepAnnotationTextCharacter;
 import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
 import com.minicad.step.model.StepLeaderCurve;
 import com.minicad.step.model.StepOverRidingStyledItem;
-import com.minicad.step.model.StepPlanarBox;
-import com.minicad.step.model.StepPlanarExtent;
 import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.model.StepTerminatorSymbol;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepFaceEntity;
-import com.minicad.step.model.StepFiniteElementMesh;
 import com.minicad.step.model.*;
 import com.minicad.step.model.StepChamferEdge;
 import com.minicad.step.model.StepFilletEdge;
-import com.minicad.step.model.StepFlatPattern;
 import com.minicad.step.model.StepMachinedSurface;
 import com.minicad.step.model.*;
 import com.minicad.step.model.StepDimensionCurve;
@@ -1363,25 +1359,11 @@ public final class PreviewFaceBuilder {
     }
 
     public static boolean isShellEntity(StepEntity entity) {
-        return entity instanceof StepOpenShell
-                || entity instanceof StepSurfacedOpenShell
-                || entity instanceof StepOrientedOpenShell
-                || entity instanceof StepClosedShell
-                || entity instanceof StepOrientedClosedShell;
+        return ShellHelper.isShellEntity(entity);
     }
 
     public static boolean isShellLikeEntity(StepEntity entity) {
-        return isShellEntity(entity)
-                || entity instanceof StepConnectedFaceSet
-                || entity instanceof StepConnectedFaceSubSet
-                || entity instanceof StepTessellatedFaceSet
-                || entity instanceof StepTessellatedFace
-                || entity instanceof StepGeometricSurfaceSet
-                || entity instanceof StepPlanarBox
-                || entity instanceof StepPlanarExtent
-                || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern
-                || entity instanceof StepSurfacePatch;
+        return ShellHelper.isShellLikeEntity(entity);
     }
 
     public static PointPayload pointPayloadFromVertex(StepEntity vertex) {
