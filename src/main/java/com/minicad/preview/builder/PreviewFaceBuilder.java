@@ -1112,6 +1112,48 @@ public final class PreviewFaceBuilder {
         );
     }
 
+    /**
+     * Composite-surface basis rules keyed by concrete basis type, replacing the
+     * former 5-branch if/else-if chain (first match wins, mirrors the original
+     * sequential ifs). Each rule casts the basis surface and delegates to the
+     * matching face-payload builder; a basis matching no rule returns null, as
+     * the old trailing statement did. All 5 types are final direct StepEntity
+     * implementations (no subtype relation today), so the order is behaviour
+     * neutral but frozen by composite-basis-face-dispatch-order.txt. The Plane
+     * rule keeps the original call shape (passes the uncast basis plus swapped
+     * metadata/builder argument order to toFourSidedPatchFacePayload).
+     */
+    @FunctionalInterface
+    private interface CompositeBasisFaceHandler {
+        FacePayload build(StepFaceEntity stepFace, StepEntity basis, StepCadBuilder builder,
+                StepMetadataExtractor.DisplayMetadata metadata);
+    }
+
+    private record CompositeBasisFaceRule(
+            Class<? extends StepEntity> type, CompositeBasisFaceHandler handler) {
+        boolean matches(StepEntity basis) {
+            return type.isInstance(basis);
+        }
+    }
+
+    private static CompositeBasisFaceRule compositeBasisFaceRule(
+            Class<? extends StepEntity> type, CompositeBasisFaceHandler handler) {
+        return new CompositeBasisFaceRule(type, handler);
+    }
+
+    private static final List<CompositeBasisFaceRule> COMPOSITE_BASIS_FACE_RULES = List.of(
+            compositeBasisFaceRule(StepCylindricalSurface.class, (stepFace, basis, builder, metadata) ->
+                    toCylindricalFacePayload(stepFace, (StepCylindricalSurface) basis, builder, metadata)),
+            compositeBasisFaceRule(StepConicalSurface.class, (stepFace, basis, builder, metadata) ->
+                    toConicalFacePayload(stepFace, (StepConicalSurface) basis, builder, metadata)),
+            compositeBasisFaceRule(StepSphericalSurface.class, (stepFace, basis, builder, metadata) ->
+                    toSphericalFacePayload(stepFace, (StepSphericalSurface) basis, builder, metadata)),
+            compositeBasisFaceRule(StepToroidalSurface.class, (stepFace, basis, builder, metadata) ->
+                    toToroidalFacePayload(stepFace, (StepToroidalSurface) basis, builder, metadata)),
+            compositeBasisFaceRule(StepPlane.class, (stepFace, basis, builder, metadata) ->
+                    toFourSidedPatchFacePayload(stepFace, basis, metadata, builder))
+    );
+
     public static FacePayload toRectangularCompositeSurfaceFacePayload(
             StepFaceEntity stepFace,
             StepRectangularCompositeSurface stepSurface,
@@ -1119,24 +1161,10 @@ public final class PreviewFaceBuilder {
             StepCadBuilder builder
     ) {
         StepEntity basis = stepSurface.parentSurface();
-        if (basis instanceof StepCylindricalSurface) {
-            StepCylindricalSurface cyl = (StepCylindricalSurface) basis;
-            return toCylindricalFacePayload(stepFace, cyl, builder, metadata);
-        }
-        if (basis instanceof StepConicalSurface) {
-            StepConicalSurface cone = (StepConicalSurface) basis;
-            return toConicalFacePayload(stepFace, cone, builder, metadata);
-        }
-        if (basis instanceof StepSphericalSurface) {
-            StepSphericalSurface sphere = (StepSphericalSurface) basis;
-            return toSphericalFacePayload(stepFace, sphere, builder, metadata);
-        }
-        if (basis instanceof StepToroidalSurface) {
-            StepToroidalSurface torus = (StepToroidalSurface) basis;
-            return toToroidalFacePayload(stepFace, torus, builder, metadata);
-        }
-        if (basis instanceof StepPlane) {
-            return toFourSidedPatchFacePayload(stepFace, basis, metadata, builder);
+        for (CompositeBasisFaceRule rule : COMPOSITE_BASIS_FACE_RULES) {
+            if (rule.matches(basis)) {
+                return rule.handler().build(stepFace, basis, builder, metadata);
+            }
         }
         return null;
     }
