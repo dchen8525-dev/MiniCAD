@@ -93,6 +93,9 @@ mvn verify "-Djacoco.skip=true"
 ```
 须：`BUILD SUCCESS`、`Failures: 0, Errors: 0`、`forbiddenapis ... 0 error(s)`。
 先只跑新测试快速验：`mvn test -Dtest=<NewTest> -DfailIfNoTests=false "-Djacoco.skip=true"`。
+**行数上限**:主源文件有 1000 行硬门禁（verify 报 `<file>: NNN lines (max: 1000)`）。
+表定义比原 if 链冗长，接近上限的文件折叠前先 `(Get-Content <file>).Count`，超了就把
+表内同形重复块抽成共享 helper（顺带真去重）。
 
 ### 7. 提交并推送
 - 冻结 txt 用**文本级**换行归一为 CRLF（仓库约定）：
