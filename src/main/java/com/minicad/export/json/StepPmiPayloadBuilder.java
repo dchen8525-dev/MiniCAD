@@ -857,22 +857,43 @@ public final class StepPmiPayloadBuilder {
         return null;
     }
 
+    @FunctionalInterface
+    private interface PlaceholderPointHandler {
+        CartesianPoint apply(StepEntity item, StepCadBuilder builder);
+    }
+
+    private record PlaceholderPointRule(Class<? extends StepEntity> type, PlaceholderPointHandler handler) {
+        boolean matches(StepEntity item) {
+            return type.isInstance(item);
+        }
+    }
+
+    private static PlaceholderPointRule placeholderPointRule(
+            Class<? extends StepEntity> type, PlaceholderPointHandler handler) {
+        return new PlaceholderPointRule(type, handler);
+    }
+
+    /**
+     * Ordered placeholder-point dispatch table, first match wins. The original
+     * chain was a sequence of {@code if (item instanceof X)} branches; the order
+     * is frozen by {@code PmiPlaceholderPointDispatchTableTest} because the first
+     * match returns.
+     */
+    private static final List<PlaceholderPointRule> PLACEHOLDER_POINT_RULES = List.of(
+            placeholderPointRule(StepGeometricSet.class,
+                    (item, builder) -> pointFromGeometricSet((StepGeometricSet) item, builder)),
+            placeholderPointRule(StepGeometricCurveSet.class,
+                    (item, builder) -> pointFromGeometricCurveSet((StepGeometricCurveSet) item, builder)),
+            placeholderPointRule(StepPointSet.class,
+                    (item, builder) -> pointFromPointSet((StepPointSet) item, builder)),
+            placeholderPointRule(StepAnnotationPlane.class,
+                    (item, builder) -> pointFromAnnotationPlane((StepAnnotationPlane) item, builder)));
+
     private static CartesianPoint pointFromPlaceholderItem(StepEntity item, StepCadBuilder builder) {
-        if (item instanceof StepGeometricSet) {
-            StepGeometricSet geometricSet = (StepGeometricSet) item;
-            return pointFromGeometricSet(geometricSet, builder);
-        }
-        if (item instanceof StepGeometricCurveSet) {
-            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
-            return pointFromGeometricCurveSet(curveSet, builder);
-        }
-        if (item instanceof StepPointSet) {
-            StepPointSet pointSet = (StepPointSet) item;
-            return pointFromPointSet(pointSet, builder);
-        }
-        if (item instanceof StepAnnotationPlane) {
-            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) item;
-            return pointFromAnnotationPlane(annotationPlane, builder);
+        for (PlaceholderPointRule rule : PLACEHOLDER_POINT_RULES) {
+            if (rule.matches(item)) {
+                return rule.handler().apply(item, builder);
+            }
         }
         CartesianPoint point = pointFromAnnotationOccurrence(item, builder);
         if (point != null) {
@@ -881,38 +902,48 @@ public final class StepPmiPayloadBuilder {
         return StepPmiPayloadBuilder.pointFromAnnotationPoint(item, builder);
     }
 
+    @FunctionalInterface
+    private interface PlaceholderChildrenHandler {
+        void apply(StepEntity item, List<CartesianPoint> positions, StepCadBuilder builder);
+    }
+
+    private record PlaceholderChildrenRule(Class<? extends StepEntity> type, PlaceholderChildrenHandler handler) {
+        boolean matches(StepEntity item) {
+            return type.isInstance(item);
+        }
+    }
+
+    private static PlaceholderChildrenRule placeholderChildrenRule(
+            Class<? extends StepEntity> type, PlaceholderChildrenHandler handler) {
+        return new PlaceholderChildrenRule(type, handler);
+    }
+
+    /**
+     * Ordered placeholder-child dispatch table, first match wins. The original
+     * chain recursed into the children of every container type and then fell
+     * back to collecting a single annotation point; the order is frozen by
+     * {@code PmiPlaceholderPointDispatchTableTest}.
+     */
+    private static final List<PlaceholderChildrenRule> PLACEHOLDER_CHILDREN_RULES = List.of(
+            placeholderChildrenRule(StepPointSet.class,
+                    (item, positions, builder) -> collectPlaceholderChildren(((StepPointSet) item).points(), positions, builder)),
+            placeholderChildrenRule(StepGeometricSet.class,
+                    (item, positions, builder) -> collectPlaceholderChildren(((StepGeometricSet) item).elements(), positions, builder)),
+            placeholderChildrenRule(StepGeometricCurveSet.class,
+                    (item, positions, builder) -> collectPlaceholderChildren(((StepGeometricCurveSet) item).elements(), positions, builder)),
+            placeholderChildrenRule(StepAnnotationPlane.class,
+                    (item, positions, builder) -> collectPlaceholderChildren(((StepAnnotationPlane) item).elements(), positions, builder)));
+
     private static void collectPlaceholderPositions(
             StepEntity item,
             List<CartesianPoint> positions,
             StepCadBuilder builder
     ) {
-        if (item instanceof StepPointSet) {
-            StepPointSet pointSet = (StepPointSet) item;
-            for (StepEntity point : pointSet.points()) {
-                collectPlaceholderPositions(point, positions, builder);
+        for (PlaceholderChildrenRule rule : PLACEHOLDER_CHILDREN_RULES) {
+            if (rule.matches(item)) {
+                rule.handler().apply(item, positions, builder);
+                return;
             }
-            return;
-        }
-        if (item instanceof StepGeometricSet) {
-            StepGeometricSet geometricSet = (StepGeometricSet) item;
-            for (StepEntity element : geometricSet.elements()) {
-                collectPlaceholderPositions(element, positions, builder);
-            }
-            return;
-        }
-        if (item instanceof StepGeometricCurveSet) {
-            StepGeometricCurveSet curveSet = (StepGeometricCurveSet) item;
-            for (StepEntity element : curveSet.elements()) {
-                collectPlaceholderPositions(element, positions, builder);
-            }
-            return;
-        }
-        if (item instanceof StepAnnotationPlane) {
-            StepAnnotationPlane annotationPlane = (StepAnnotationPlane) item;
-            for (StepEntity element : annotationPlane.elements()) {
-                collectPlaceholderPositions(element, positions, builder);
-            }
-            return;
         }
         CartesianPoint point = pointFromAnnotationOccurrence(item, builder);
         if (point == null) {
@@ -920,6 +951,13 @@ public final class StepPmiPayloadBuilder {
         }
         if (point != null) {
             positions.add(point);
+        }
+    }
+
+    private static void collectPlaceholderChildren(
+            List<StepEntity> children, List<CartesianPoint> positions, StepCadBuilder builder) {
+        for (StepEntity child : children) {
+            collectPlaceholderPositions(child, positions, builder);
         }
     }
 

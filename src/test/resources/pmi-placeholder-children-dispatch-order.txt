@@ -1,0 +1,13 @@
+# Branch order of StepPmiPayloadBuilder.collectPlaceholderPositions, captured
+# from the original `if (item instanceof X)` chain before it was folded into
+# PLACEHOLDER_CHILDREN_RULES.
+#
+# Every branch recurses into the item's children and then returns, so this is
+# first-match-wins dispatch. All four types are final classes implementing
+# StepEntity directly (no subtype relation today). The order differs from
+# pointFromPlaceholderItem -- StepPointSet comes first here -- because the two
+# chains were never identical; folding must not silently unify them.
+StepPointSet
+StepGeometricSet
+StepGeometricCurveSet
+StepAnnotationPlane
