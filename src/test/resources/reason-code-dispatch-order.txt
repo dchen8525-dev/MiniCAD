@@ -1,0 +1,47 @@
+# Frozen reason codes of StepReasonCodeClassifier.classifyReasonCode, captured
+# from the original if-chain before it was folded into REASON_CODE_RULES.
+#
+# Every branch returns, so this is first-match-wins dispatch. Unlike the
+# type-driven tables elsewhere, the predicates here are substring matches (and
+# four trailing exception-type checks), so the frozen unit is the returned code
+# rather than a class simpleName. The same code can legitimately appear twice
+# (replica_zero_scale / replica_non_uniform_scale are matched both with and
+# without the "construction for" prefix, and both spellings map to one code).
+#
+# Order is load bearing in one place: the generic "construction for
+# SURFACE_REPLICA" rule must stay after the zero-scale / non-uniform-scale
+# variants, otherwise the generic code would shadow the specific one.
+unsupported_surface.cylindrical
+unsupported_surface.conical
+unsupported_surface.toroidal
+unsupported_surface.degenerate_toroidal
+unsupported_surface.bspline
+unsupported_surface.rational_bspline
+unsupported_surface.rectangular_trimmed
+unsupported_surface.curve_bounded
+unsupported_surface.oriented
+unsupported_surface.replica_zero_scale
+unsupported_surface.replica_non_uniform_scale
+unsupported_surface.replica_zero_scale
+unsupported_surface.replica_non_uniform_scale
+unsupported_surface.replica
+unsupported_surface.linear_extrusion
+unsupported_surface.revolution
+unsupported_surface.spherical
+unsupported_curve.rational_bspline
+unsupported_curve.replica
+unsupported_curve.offset_2d
+unsupported_curve.oriented
+unsupported_curve.conic
+unsupported_boolean.result
+unsupported_boolean.clipping_result
+unsupported_loop.poly
+topology.edge_vertex_off_curve
+topology.edge_loop_not_closed
+topology.face_vertex_off_plane
+topology.face_missing_outer_bound
+unsupported_surface.non_planar_for_builder
+unsupported_geometry.other
+topology.other
+resolution.other
+geometry.other
