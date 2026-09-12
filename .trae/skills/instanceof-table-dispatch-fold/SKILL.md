@@ -94,8 +94,10 @@ mvn verify "-Djacoco.skip=true"
 须：`BUILD SUCCESS`、`Failures: 0, Errors: 0`、`forbiddenapis ... 0 error(s)`。
 先只跑新测试快速验：`mvn test -Dtest=<NewTest> -DfailIfNoTests=false "-Djacoco.skip=true"`。
 **行数上限**:主源文件有 1000 行硬门禁（verify 报 `<file>: NNN lines (max: 1000)`）。
-表定义比原 if 链冗长，接近上限的文件折叠前先 `(Get-Content <file>).Count`，超了就把
-表内同形重复块抽成共享 helper（顺带真去重）。
+表定义比原 if 链冗长，接近上限的文件折叠前先 `wc -l <file>`（`(Get-Content).Count`
+亦可），超了就把表内同形重复块抽成共享 helper（顺带真去重）。
+**已知贴顶文件**：`preview/builder/PreviewGeometryCollector.java`（997 行，仅 3 行余量）
+——动它之前必须先数行数，或先把既有同形块抽成 helper 腾空间。
 
 ### 7. 提交并推送
 - 冻结 txt 用**文本级**换行归一为 CRLF（仓库约定）：
@@ -125,7 +127,14 @@ mapPointIntoFaceGeometry+acceptablePcurveBasisSurfaceIds(5×2→共享 SURFACE_U
 · StepMeshExporter.offsetSemanticSurfaceGeometry · PreviewGeometryCollector
 collectMappedAnnotationCarrierEdges · PreviewFaceBuilder.toRectangularCompositeSurfaceFacePayload
 (→COMPOSITE_BASIS_FACE_RULES，本文件原为并发会话半成品，补了 order 文件+守卫测试)。
-`scan_instanceof_chains.py --min 6` 现应为 0 run(s)；剩余为 5/4 分支收益递减层。
+`scan_instanceof_chains.py --min 6` 现应为 0 run(s)；`--min 5` 实测 **6 run(s)**
+（3 无守卫 + 3 带守卫），剩余为 4 分支收益递减层。
+5 分支层另 2 条已按"重复实现收敛"改委托（不折表，commit `c0a1b868`，net −85 行）：
+`StepDumpApp.shellFaces -> ShellHelper`、
+`StepLegacyGeometryBuilder.collectShellLikeIds -> PreviewGeometryCollector`；
+`PreviewFaceBuilder.isShellEntity/isShellLikeEntity -> ShellHelper` 同时收敛谓词副本。
+注意 `PreviewGeometryCollector.collectShellLikeIds` 现在**是** canonical，但它本身仍是
+一条 5 分支链（可达 321 行处），因贴 1000 行上限暂不折。
 
 ## 关键教训：半成品折叠
 生成器一次产出**三个**文件（宿主 java + `<slug>-dispatch-order.txt` + `<Name>DispatchTableTest.java`）。
@@ -139,3 +148,29 @@ agent 手工折叠时容易只改宿主、漏掉后两者 —— 那样的树**�
 - 既有"不对称"原样保留并显式钉测：如球面 mapper project 返回余纬而 pointAt 收纬度、
   quadric project 返回裸 atan2 不 wrap——别假设 round-trip，按实际契约断言。
 - 并行对同一文件发多个 Edit 会竞态丢改，务必串行。
+
+## 重复实现收敛（delegation，比给小链加表更有价值）
+
+同一方法在多个类里出现多份逐字/近似副本时，**先判断能否收敛**，别机械地每份都折一张表。
+收敛 = 选定一个 canonical 实现，其余改成"保留入口签名 + 一行委托"（仓库既有范式，
+如 `PreviewFaceBuilder.shellFaces -> ShellHelper`、
+`StepRepresentationPayloadBuilder.buildBsplineSurface -> PreviewMeshExporter`）。
+
+**等价性三重核对（缺一不可，凭 diff 相似就合并是事故源）**：
+1. **受理集**：两版接受的类型/条件是否一致。最好能找到现成谓词精确对应
+   （如 `StepDumpApp.shellFaces` 的 5 分支恰好等于 `ShellHelper.isShellEntity`）。
+2. **终态**：异常类型与**逐字**文案、返回值（null / 反射尾 / 类名尾）是否一致。
+   不同就保留各自的终态（外层 if 谓词 + 委托 + 原终态）。
+3. **副作用/跳过表**：差异项是否真的可观测。例：legacy 的
+   `collectShellLikeIds` 跳过表多一个 `StepFacetedBrepAndBrepWithVoids`，而该型在
+   canonical 里会**逐条落到方法末尾、同样什么都不做** → 等价（no-op），可直接合并。
+   反例：折 27 的 `OFFSET_SURFACE_RULES` 入口 hoist 的 scale 语义不同（带/不带 abs），
+   绝不能"顺手统一"。
+
+**方向选择**：优先让"已是其他入口的委托目标"的类当 canonical
+（`PreviewGeometryCollector` 已被 `PreviewFaceBuilder` 委托），保持收敛故事单一。
+包间依赖双向都已有先例（`export/json` ↔ `preview/builder`）时不算新增违例，但需核实。
+
+**清理**：删掉谓词/分支体后，原文件可能留下失效的显式 import（`javac` 不报，
+spotless 若未开 `removeUnusedImports` 也不会清），要自己 grep 一遍删掉；
+若有 `import x.*;` 通配兜底则删除更安全。
