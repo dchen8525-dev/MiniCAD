@@ -262,35 +262,61 @@ public final class StepDumpApp {
         }
     }
 
+    /**
+     * Dump-side entity-type-name rules keyed by concrete type, replacing the
+     * former 6-branch if/else-if chain (first match wins, mirrors the original
+     * sequential ifs). This is deliberately NOT the shared
+     * StepEntityNamingUtils.stepEntityTypeName: the dump keeps its own copy
+     * because it resolves StepRepresentation from its entityName/shape flags
+     * and falls back to reflective entityName() before the class-name tail.
+     * Unmatched entities fall through to that tail, as the old chain did.
+     */
+    @FunctionalInterface
+    private interface DumpTypeNameHandler {
+        String name(StepEntity entity);
+    }
+
+    private record DumpTypeNameRule(
+            Class<? extends StepEntity> type, DumpTypeNameHandler handler) {
+        boolean matches(StepEntity entity) {
+            return type.isInstance(entity);
+        }
+    }
+
+    private static DumpTypeNameRule dumpTypeNameRule(
+            Class<? extends StepEntity> type, DumpTypeNameHandler handler) {
+        return new DumpTypeNameRule(type, handler);
+    }
+
+    private static final List<DumpTypeNameRule> DUMP_TYPE_NAME_RULES = List.of(
+            dumpTypeNameRule(StepFaceBound.class, (entity) -> {
+                StepFaceBound faceBound = (StepFaceBound) entity;
+                return faceBound.outer() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
+            }),
+            dumpTypeNameRule(StepAxis2Placement2D.class, (entity) -> "AXIS2_PLACEMENT_2D"),
+            dumpTypeNameRule(StepAxis2Placement3D.class, (entity) -> "AXIS2_PLACEMENT_3D"),
+            dumpTypeNameRule(StepOffsetCurve2D.class, (entity) -> "OFFSET_CURVE_2D"),
+            dumpTypeNameRule(StepOffsetCurve3D.class, (entity) -> "OFFSET_CURVE_3D"),
+            dumpTypeNameRule(StepRepresentation.class, (entity) -> {
+                StepRepresentation representation = (StepRepresentation) entity;
+                if (representation.entityName() != null
+                        && !representation.entityName().isBlank()
+                        && !"REPRESENTATION".equals(representation.entityName())
+                        && !"SHAPE_REPRESENTATION".equals(representation.entityName())) {
+                    return representation.entityName();
+                }
+                if (representation.shapeRepresentation()) {
+                    return "SHAPE_REPRESENTATION";
+                }
+                return "REPRESENTATION";
+            })
+    );
+
     private static String stepEntityTypeName(StepEntity entity) {
-        if (entity instanceof com.minicad.step.model.StepFaceBound) {
-            com.minicad.step.model.StepFaceBound faceBound = (com.minicad.step.model.StepFaceBound) entity;
-            return faceBound.outer() ? "FACE_OUTER_BOUND" : "FACE_BOUND";
-        }
-        if (entity instanceof StepAxis2Placement2D) {
-            return "AXIS2_PLACEMENT_2D";
-        }
-        if (entity instanceof StepAxis2Placement3D) {
-            return "AXIS2_PLACEMENT_3D";
-        }
-        if (entity instanceof StepOffsetCurve2D) {
-            return "OFFSET_CURVE_2D";
-        }
-        if (entity instanceof StepOffsetCurve3D) {
-            return "OFFSET_CURVE_3D";
-        }
-        if (entity instanceof com.minicad.step.model.StepRepresentation) {
-            com.minicad.step.model.StepRepresentation representation = (com.minicad.step.model.StepRepresentation) entity;
-            if (representation.entityName() != null
-                    && !representation.entityName().isBlank()
-                    && !"REPRESENTATION".equals(representation.entityName())
-                    && !"SHAPE_REPRESENTATION".equals(representation.entityName())) {
-                return representation.entityName();
+        for (DumpTypeNameRule rule : DUMP_TYPE_NAME_RULES) {
+            if (rule.matches(entity)) {
+                return rule.handler().name(entity);
             }
-            if (representation.shapeRepresentation()) {
-                return "SHAPE_REPRESENTATION";
-            }
-            return "REPRESENTATION";
         }
         // Attempt to get entityName via reflection; if the method doesn't exist, fall back to class name
         try {

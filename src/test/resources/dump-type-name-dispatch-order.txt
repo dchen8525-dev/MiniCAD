@@ -1,0 +1,12 @@
+# Branch order of StepDumpApp.stepEntityTypeName, captured from the original
+# 6-branch sequential ifs (DUMP_TYPE_NAME_RULES). Entities matching no rule
+# fall through to the reflective entityName() tail and then the class-name
+# tail, as before. The table is ordered data, not control flow: instanceof
+# matches subtypes and the first match wins, so any reordering must be an
+# explicit, reviewed change.
+StepFaceBound
+StepAxis2Placement2D
+StepAxis2Placement3D
+StepOffsetCurve2D
+StepOffsetCurve3D
+StepRepresentation
