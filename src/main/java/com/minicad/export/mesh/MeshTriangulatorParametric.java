@@ -1216,26 +1216,54 @@ final class MeshTriangulatorParametric {
 
     // --- Curve2 sampling ---
 
+    /**
+     * Curve2 sampling rules keyed by concrete type, replacing the former
+     * 5-branch if/else-if chain (first match wins, mirrors the original
+     * sequential ifs). Every branch casts the curve to its concrete type and
+     * delegates to the matching sampler, so a type wired to the wrong handler
+     * throws ClassCastException rather than compiling silently. All 5 types are
+     * final direct Curve2 implementations (no subtype relation today), so the
+     * order is behaviour neutral but frozen by
+     * mesh-sample-curve2-dispatch-order.txt. A curve matching no rule returns
+     * an empty list, as the old trailing statement did. This is a separate
+     * table from StepCadGeometryOps.sampleCurve2 on purpose -- different
+     * component, different sampler set.
+     */
+    @FunctionalInterface
+    private interface MeshCurve2SampleHandler {
+        List<UvPoint> sample(Curve2 curve, UvPoint start, UvPoint end);
+    }
+
+    private record MeshCurve2SampleRule(
+            Class<? extends Curve2> type, MeshCurve2SampleHandler handler) {
+        boolean matches(Curve2 curve) {
+            return type.isInstance(curve);
+        }
+    }
+
+    private static MeshCurve2SampleRule meshCurve2SampleRule(
+            Class<? extends Curve2> type, MeshCurve2SampleHandler handler) {
+        return new MeshCurve2SampleRule(type, handler);
+    }
+
+    private static final List<MeshCurve2SampleRule> MESH_SAMPLE_CURVE2_RULES = List.of(
+            meshCurve2SampleRule(Line2.class, (curve, start, end) ->
+                    sampleLinePcurve((Line2) curve, start, end)),
+            meshCurve2SampleRule(Circle2.class, (curve, start, end) ->
+                    sampleCirclePcurve((Circle2) curve, start, end)),
+            meshCurve2SampleRule(Ellipse2.class, (curve, start, end) ->
+                    sampleEllipsePcurve((Ellipse2) curve, start, end)),
+            meshCurve2SampleRule(BSplineCurve2.class, (curve, start, end) ->
+                    sampleSplinePcurve((BSplineCurve2) curve, start, end)),
+            meshCurve2SampleRule(TrimmedCurve2.class, (curve, start, end) ->
+                    sampleTrimmedPcurve((TrimmedCurve2) curve, start, end))
+    );
+
     private static List<UvPoint> sampleCurve2(Curve2 curve, UvPoint start, UvPoint end) {
-        if (curve instanceof Line2) {
-            Line2 line = (Line2) curve;
-            return sampleLinePcurve(line, start, end);
-        }
-        if (curve instanceof Circle2) {
-            Circle2 circle = (Circle2) curve;
-            return sampleCirclePcurve(circle, start, end);
-        }
-        if (curve instanceof Ellipse2) {
-            Ellipse2 ellipse = (Ellipse2) curve;
-            return sampleEllipsePcurve(ellipse, start, end);
-        }
-        if (curve instanceof BSplineCurve2) {
-            BSplineCurve2 spline = (BSplineCurve2) curve;
-            return sampleSplinePcurve(spline, start, end);
-        }
-        if (curve instanceof TrimmedCurve2) {
-            TrimmedCurve2 trimmed = (TrimmedCurve2) curve;
-            return sampleTrimmedPcurve(trimmed, start, end);
+        for (MeshCurve2SampleRule rule : MESH_SAMPLE_CURVE2_RULES) {
+            if (rule.matches(curve)) {
+                return rule.handler().sample(curve, start, end);
+            }
         }
         return List.of();
     }
