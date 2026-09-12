@@ -1,0 +1,15 @@
+# Branch order of PreviewGeometryCollector.collectMappedAnnotationCarrierEdges,
+# captured from the original 5-branch `if (item instanceof X)` chain before it
+# was folded into MAPPED_ANNOTATION_CARRIER_RULES. Every branch returns, so this
+# is first-match-wins dispatch: instanceof also matches subtypes, so a dropped,
+# duplicated or reordered rule silently changes which carrier is collected how.
+# An item matching no rule falls through to the terminal `return false`. All 5
+# types are final classes implementing StepEntity directly (no subtype relation
+# today), so the order is currently behaviour neutral -- the frozen file turns
+# any future reordering into a test failure rather than a silent behaviour
+# change.
+StepAnnotationSymbol
+StepAnnotationText
+StepAnnotationTextCharacter
+StepAnnotationSymbolOccurrence
+StepAnnotationSubfigureOccurrence

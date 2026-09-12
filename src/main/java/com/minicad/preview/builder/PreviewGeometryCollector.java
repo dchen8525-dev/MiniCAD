@@ -895,61 +895,63 @@ public final class PreviewGeometryCollector {
         }
     }
 
-    private static boolean collectMappedAnnotationCarrierEdges(
-            int mappedOwnerId,
-            String sourceType,
-            Integer sourceStepId,
-            StepEntity item,
-            Map<Integer, EdgePayload> edges,
-            Map<Integer, StepEntity> resolved,
-            StepCadBuilder builder
-    ) {
-        if (item instanceof StepAnnotationSymbol) {
-            StepAnnotationSymbol annotationSymbol = (StepAnnotationSymbol) item;
-            collectMappedAnnotationEdges(
-                    mappedOwnerId,
-                    annotationSymbol.mappingSource().mappedRepresentation(),
-                    annotationSymbol.mappingSource().mappedOrigin(),
-                    annotationSymbol.mappingTarget(),
-                    sourceType,
-                    sourceStepId,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return true;
-        }
-        if (item instanceof StepAnnotationText) {
-            StepAnnotationText annotationText = (StepAnnotationText) item;
-            collectMappedAnnotationEdges(
-                    mappedOwnerId,
-                    annotationText.mappingSource().mappedRepresentation(),
-                    annotationText.mappingSource().mappedOrigin(),
-                    annotationText.mappingTarget(),
-                    sourceType,
-                    sourceStepId,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return true;
-        }
-        if (item instanceof StepAnnotationTextCharacter) {
-            StepAnnotationTextCharacter annotationTextCharacter = (StepAnnotationTextCharacter) item;
-            collectMappedAnnotationEdges(
-                    mappedOwnerId,
-                    annotationTextCharacter.mappingSource().mappedRepresentation(),
-                    annotationTextCharacter.mappingSource().mappedOrigin(),
-                    annotationTextCharacter.mappingTarget(),
-                    sourceType,
-                    sourceStepId,
-                    edges,
-                    resolved,
-                    builder
-            );
-            return true;
-        }
-        if (item instanceof StepAnnotationSymbolOccurrence) {
+    // Shared by the three symbol/text carrier rules: unwrap a mappingSource
+    // triple and hand it to collectMappedAnnotationEdges, reporting a hit.
+    private static boolean collectMappedAnnotationEdgesFrom(
+            int mappedOwnerId, String sourceType, Integer sourceStepId,
+            StepRepresentation mappedRepresentation, StepEntity mappedOrigin, StepEntity mappingTarget,
+            Map<Integer, EdgePayload> edges, Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
+        collectMappedAnnotationEdges(mappedOwnerId, mappedRepresentation, mappedOrigin, mappingTarget,
+                sourceType, sourceStepId, edges, resolved, builder);
+        return true;
+    }
+
+    // collectMappedAnnotationCarrierEdges dispatch table (first match wins,
+    // mirrors the original sequential ifs). Each rule matches an annotation
+    // carrier type and delegates: the three symbol/text carriers call
+    // collectMappedAnnotationEdges with their mappingSource pair + mappingTarget
+    // and report true; the two occurrence carriers recurse into this entry
+    // method on their wrapped item and propagate its result. An item no rule
+    // matches returns false, as the old trailing statement did. All 5 types are
+    // final direct StepEntity implementations (no subtype relation today), so
+    // the order is behaviour neutral but frozen by
+    // mapped-annotation-carrier-dispatch-order.txt. This is a separate table
+    // from the adjacent PREVIEW_EDGE_COLLECT_RULES on purpose -- different
+    // return contract (boolean vs void) and different context (mapped-owner /
+    // source metadata vs plain edges).
+    private record MappedAnnotationCarrierRule(
+            Class<? extends StepEntity> type, MappedAnnotationCarrierHandler handler) {}
+
+    private interface MappedAnnotationCarrierHandler {
+        boolean collect(int mappedOwnerId, String sourceType, Integer sourceStepId, StepEntity item,
+                Map<Integer, EdgePayload> edges, Map<Integer, StepEntity> resolved, StepCadBuilder builder);
+    }
+
+    private static MappedAnnotationCarrierRule mappedAnnotationCarrierRule(
+            Class<? extends StepEntity> type, MappedAnnotationCarrierHandler handler) {
+        return new MappedAnnotationCarrierRule(type, handler);
+    }
+
+    private static final List<MappedAnnotationCarrierRule> MAPPED_ANNOTATION_CARRIER_RULES = List.of(
+        mappedAnnotationCarrierRule(StepAnnotationSymbol.class, (mappedOwnerId, sourceType, sourceStepId, item, edges, resolved, builder) -> {
+            StepAnnotationSymbol symbol = (StepAnnotationSymbol) item;
+            return collectMappedAnnotationEdgesFrom(mappedOwnerId, sourceType, sourceStepId,
+                    symbol.mappingSource().mappedRepresentation(), symbol.mappingSource().mappedOrigin(),
+                    symbol.mappingTarget(), edges, resolved, builder);
+        }),
+        mappedAnnotationCarrierRule(StepAnnotationText.class, (mappedOwnerId, sourceType, sourceStepId, item, edges, resolved, builder) -> {
+            StepAnnotationText text = (StepAnnotationText) item;
+            return collectMappedAnnotationEdgesFrom(mappedOwnerId, sourceType, sourceStepId,
+                    text.mappingSource().mappedRepresentation(), text.mappingSource().mappedOrigin(),
+                    text.mappingTarget(), edges, resolved, builder);
+        }),
+        mappedAnnotationCarrierRule(StepAnnotationTextCharacter.class, (mappedOwnerId, sourceType, sourceStepId, item, edges, resolved, builder) -> {
+            StepAnnotationTextCharacter character = (StepAnnotationTextCharacter) item;
+            return collectMappedAnnotationEdgesFrom(mappedOwnerId, sourceType, sourceStepId,
+                    character.mappingSource().mappedRepresentation(), character.mappingSource().mappedOrigin(),
+                    character.mappingTarget(), edges, resolved, builder);
+        }),
+        mappedAnnotationCarrierRule(StepAnnotationSymbolOccurrence.class, (mappedOwnerId, sourceType, sourceStepId, item, edges, resolved, builder) -> {
             StepAnnotationSymbolOccurrence symbolOccurrence = (StepAnnotationSymbolOccurrence) item;
             return collectMappedAnnotationCarrierEdges(
                     mappedOwnerId,
@@ -960,8 +962,8 @@ public final class PreviewGeometryCollector {
                     resolved,
                     builder
             );
-        }
-        if (item instanceof StepAnnotationSubfigureOccurrence) {
+        }),
+        mappedAnnotationCarrierRule(StepAnnotationSubfigureOccurrence.class, (mappedOwnerId, sourceType, sourceStepId, item, edges, resolved, builder) -> {
             StepAnnotationSubfigureOccurrence subfigureOccurrence = (StepAnnotationSubfigureOccurrence) item;
             return collectMappedAnnotationCarrierEdges(
                     mappedOwnerId,
@@ -972,6 +974,23 @@ public final class PreviewGeometryCollector {
                     resolved,
                     builder
             );
+        })
+    );
+
+    private static boolean collectMappedAnnotationCarrierEdges(
+            int mappedOwnerId,
+            String sourceType,
+            Integer sourceStepId,
+            StepEntity item,
+            Map<Integer, EdgePayload> edges,
+            Map<Integer, StepEntity> resolved,
+            StepCadBuilder builder
+    ) {
+        for (MappedAnnotationCarrierRule rule : MAPPED_ANNOTATION_CARRIER_RULES) {
+            if (rule.type().isInstance(item)) {
+                return rule.handler().collect(
+                        mappedOwnerId, sourceType, sourceStepId, item, edges, resolved, builder);
+            }
         }
         return false;
     }
