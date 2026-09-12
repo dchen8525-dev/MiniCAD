@@ -1,0 +1,12 @@
+# Branch order of MeshTriangulatorParametric's shared surface-descent table
+# (SURFACE_UNWRAP_RULES), captured from the original if/else-if chains in
+# mapPointIntoFaceGeometry and acceptablePcurveBasisSurfaceIds. An entity no
+# rule matches -- or a StepGeometricReplica whose entityName is not
+# SURFACE_REPLICA -- stops the descent. The table is ordered data, not control
+# flow: instanceof matches subtypes and the first match wins, so any reordering
+# must be an explicit, reviewed change.
+StepRectangularTrimmedSurface
+StepCurveBoundedSurface
+StepOrientedSurface
+StepOffsetSurface
+StepGeometricReplica

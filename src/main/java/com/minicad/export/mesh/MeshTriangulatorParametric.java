@@ -15,6 +15,7 @@ import com.minicad.topology.*;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -915,6 +916,65 @@ final class MeshTriangulatorParametric {
         return List.copyOf(uvPoints);
     }
 
+    /**
+     * One step of the surface-descent chain, shared by
+     * {@link #mapPointIntoFaceGeometry} and
+     * {@link #acceptablePcurveBasisSurfaceIds}. Each rule matches a wrapper
+     * surface type and returns the surface it wraps; a SURFACE_REPLICA only
+     * descends when its entityName is exactly "SURFACE_REPLICA". An entity no
+     * rule matches (or a non-matching replica) returns null, which the callers
+     * read as "stop descending". Order mirrors the original if/else-if chains
+     * (first match wins); all 5 types are final direct StepEntity
+     * implementations, so the order is behaviour neutral today but frozen by
+     * surface-unwrap-dispatch-order.txt.
+     */
+    @FunctionalInterface
+    private interface SurfaceUnwrapHandler {
+        StepEntity next(StepEntity surface);
+    }
+
+    private record SurfaceUnwrapRule(
+            Class<? extends StepEntity> type,
+            Predicate<StepEntity> guard,
+            SurfaceUnwrapHandler handler) {
+        boolean matches(StepEntity surface) {
+            return type.isInstance(surface) && (guard == null || guard.test(surface));
+        }
+    }
+
+    private static SurfaceUnwrapRule surfaceUnwrapRule(
+            Class<? extends StepEntity> type, SurfaceUnwrapHandler handler) {
+        return new SurfaceUnwrapRule(type, null, handler);
+    }
+
+    private static final List<SurfaceUnwrapRule> SURFACE_UNWRAP_RULES = List.of(
+            surfaceUnwrapRule(com.minicad.step.model.StepRectangularTrimmedSurface.class,
+                    (surface) -> ((com.minicad.step.model.StepRectangularTrimmedSurface) surface).basisSurface()),
+            surfaceUnwrapRule(com.minicad.step.model.StepCurveBoundedSurface.class,
+                    (surface) -> ((com.minicad.step.model.StepCurveBoundedSurface) surface).basisSurface()),
+            surfaceUnwrapRule(com.minicad.step.model.StepOrientedSurface.class,
+                    (surface) -> ((com.minicad.step.model.StepOrientedSurface) surface).surfaceElement()),
+            surfaceUnwrapRule(com.minicad.step.model.StepOffsetSurface.class,
+                    (surface) -> ((com.minicad.step.model.StepOffsetSurface) surface).basisSurface()),
+            new SurfaceUnwrapRule(com.minicad.step.model.StepGeometricReplica.class,
+                    MeshTriangulatorParametric::isSurfaceReplica,
+                    (surface) -> ((com.minicad.step.model.StepGeometricReplica) surface).parent())
+    );
+
+    private static boolean isSurfaceReplica(StepEntity surface) {
+        return surface instanceof com.minicad.step.model.StepGeometricReplica replica
+                && "SURFACE_REPLICA".equals(replica.entityName());
+    }
+
+    private static StepEntity unwrapSurfaceOnce(StepEntity surface) {
+        for (SurfaceUnwrapRule rule : SURFACE_UNWRAP_RULES) {
+            if (rule.matches(surface)) {
+                return rule.handler().next(surface);
+            }
+        }
+        return null;
+    }
+
     private static CartesianPoint mapPointIntoFaceGeometry(
             CartesianPoint point,
             StepEntity faceGeometry,
@@ -923,35 +983,16 @@ final class MeshTriangulatorParametric {
         StepEntity current = faceGeometry;
         CartesianPoint mapped = point;
         for (int depth = 0; depth < 16 && current != null; depth++) {
-            if (current instanceof com.minicad.step.model.StepRectangularTrimmedSurface) {
-                com.minicad.step.model.StepRectangularTrimmedSurface trimmedSurface = (com.minicad.step.model.StepRectangularTrimmedSurface) current;
-                current = trimmedSurface.basisSurface();
-                continue;
+            StepEntity next = unwrapSurfaceOnce(current);
+            if (isSurfaceReplica(current)) {
+                com.minicad.step.model.StepGeometricReplica replica =
+                        (com.minicad.step.model.StepGeometricReplica) current;
+                mapped = StepMeshExporter.transformPoint3(mapped, replica.transformation(), builder);
             }
-            if (current instanceof com.minicad.step.model.StepCurveBoundedSurface) {
-                com.minicad.step.model.StepCurveBoundedSurface boundedSurface = (com.minicad.step.model.StepCurveBoundedSurface) current;
-                current = boundedSurface.basisSurface();
-                continue;
+            if (next == null) {
+                break;
             }
-            if (current instanceof com.minicad.step.model.StepOrientedSurface) {
-                com.minicad.step.model.StepOrientedSurface orientedSurface = (com.minicad.step.model.StepOrientedSurface) current;
-                current = orientedSurface.surfaceElement();
-                continue;
-            }
-            if (current instanceof com.minicad.step.model.StepOffsetSurface) {
-                com.minicad.step.model.StepOffsetSurface offsetSurface = (com.minicad.step.model.StepOffsetSurface) current;
-                current = offsetSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof com.minicad.step.model.StepGeometricReplica) {
-                com.minicad.step.model.StepGeometricReplica replica = (com.minicad.step.model.StepGeometricReplica) current;
-                if ("SURFACE_REPLICA".equals(replica.entityName())) {
-                    mapped = StepMeshExporter.transformPoint3(mapped, replica.transformation(), builder);
-                    current = replica.parent();
-                    continue;
-                }
-            }
-            break;
+            current = next;
         }
         return mapped;
     }
@@ -1012,34 +1053,11 @@ final class MeshTriangulatorParametric {
         StepEntity current = faceGeometry;
         for (int depth = 0; depth < 16 && current != null; depth++) {
             ids.add(current.id());
-            if (current instanceof com.minicad.step.model.StepRectangularTrimmedSurface) {
-                com.minicad.step.model.StepRectangularTrimmedSurface trimmedSurface = (com.minicad.step.model.StepRectangularTrimmedSurface) current;
-                current = trimmedSurface.basisSurface();
-                continue;
+            StepEntity next = unwrapSurfaceOnce(current);
+            if (next == null) {
+                break;
             }
-            if (current instanceof com.minicad.step.model.StepCurveBoundedSurface) {
-                com.minicad.step.model.StepCurveBoundedSurface boundedSurface = (com.minicad.step.model.StepCurveBoundedSurface) current;
-                current = boundedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof com.minicad.step.model.StepOrientedSurface) {
-                com.minicad.step.model.StepOrientedSurface orientedSurface = (com.minicad.step.model.StepOrientedSurface) current;
-                current = orientedSurface.surfaceElement();
-                continue;
-            }
-            if (current instanceof com.minicad.step.model.StepOffsetSurface) {
-                com.minicad.step.model.StepOffsetSurface offsetSurface = (com.minicad.step.model.StepOffsetSurface) current;
-                current = offsetSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof com.minicad.step.model.StepGeometricReplica) {
-                com.minicad.step.model.StepGeometricReplica replica = (com.minicad.step.model.StepGeometricReplica) current;
-                if ("SURFACE_REPLICA".equals(replica.entityName())) {
-                    current = replica.parent();
-                    continue;
-                }
-            }
-            break;
+            current = next;
         }
         return Set.copyOf(ids);
     }
