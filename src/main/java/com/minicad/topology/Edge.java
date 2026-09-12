@@ -18,6 +18,7 @@ import com.minicad.geometry.TrimmedCurve3;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Minimal topological edge backed by a supported 3D curve.
@@ -63,45 +64,61 @@ public final class Edge {
     }
 
     /**
+     * One closed-curve family: matched by concrete type, decided by its
+     * handler. All seven curve types involved are {@code final} classes
+     * directly implementing {@link Curve3}, so they are mutually exclusive --
+     * first-match-wins dispatch over the table is equivalent to the original
+     * if-chain, including the branches that used to fall through on an empty
+     * or too-short geometry (no later rule matched them either).
+     */
+    private record ClosedCurveRule(Class<? extends Curve3> type, Predicate<Curve3> handler) {
+    }
+
+    private static final List<ClosedCurveRule> CLOSED_CURVE_RULES = List.of(
+            new ClosedCurveRule(Circle.class, curve -> true),
+            new ClosedCurveRule(Ellipse3.class, curve -> true),
+            new ClosedCurveRule(BSplineCurve3.class, curve -> isClosedBSpline((BSplineCurve3) curve)),
+            new ClosedCurveRule(RationalBSplineCurve3.class,
+                    curve -> isClosedRationalBSpline((RationalBSplineCurve3) curve)),
+            new ClosedCurveRule(CompositeCurve3.class, curve -> isClosedComposite((CompositeCurve3) curve)),
+            new ClosedCurveRule(TrimmedCurve3.class, curve -> isClosedCurve(((TrimmedCurve3) curve).getBasisCurve())));
+
+    /**
      * Checks if a curve is closed (start and end points coincide by construction).
      * Closed curves include Circle, Ellipse, and closed B-Splines.
      */
     public static boolean isClosedCurve(Curve3 curve) {
-        if (curve instanceof Circle || curve instanceof Ellipse3) {
-            return true;  // Circles and ellipses are always closed
-        }
-        if (curve instanceof BSplineCurve3) {
-            BSplineCurve3 bspline = (BSplineCurve3) curve;
-            // A B-Spline is closed if first and last control points coincide
-            if (bspline.getControlPoints().size() >= 2) {
-                CartesianPoint first = bspline.getControlPoints().get(0);
-                CartesianPoint last = bspline.getControlPoints().get(bspline.getControlPoints().size() - 1);
-                return first.distanceTo(last) <= Epsilon.EPS;
+        for (ClosedCurveRule rule : CLOSED_CURVE_RULES) {
+            if (rule.type().isInstance(curve)) {
+                return rule.handler().test(curve);
             }
-        }
-        if (curve instanceof RationalBSplineCurve3) {
-            RationalBSplineCurve3 rational = (RationalBSplineCurve3) curve;
-            // A rational B-Spline is closed if first and last control points coincide
-            if (rational.getControlPoints().size() >= 2) {
-                CartesianPoint first = rational.getControlPoints().get(0);
-                CartesianPoint last = rational.getControlPoints().get(rational.getControlPoints().size() - 1);
-                return first.distanceTo(last) <= Epsilon.EPS;
-            }
-        }
-        if (curve instanceof CompositeCurve3) {
-            // Composite curve is closed if its segments form a closed loop
-            CompositeCurve3 composite = (CompositeCurve3) curve;
-            if (composite.getSegments().size() > 0) {
-                // Check if the composite curve forms a closed loop
-                return isClosedCompositeCurve(composite);
-            }
-        }
-        if (curve instanceof TrimmedCurve3) {
-            // Trimmed curve is closed if its basis curve is closed and trim spans full circle
-            TrimmedCurve3 trimmed = (TrimmedCurve3) curve;
-            return isClosedCurve(trimmed.getBasisCurve());
         }
         return false;  // Line3, Polyline3, SurfaceCurve3 are not closed
+    }
+
+    private static boolean isClosedBSpline(BSplineCurve3 bspline) {
+        // A B-Spline is closed if first and last control points coincide
+        if (bspline.getControlPoints().size() >= 2) {
+            CartesianPoint first = bspline.getControlPoints().get(0);
+            CartesianPoint last = bspline.getControlPoints().get(bspline.getControlPoints().size() - 1);
+            return first.distanceTo(last) <= Epsilon.EPS;
+        }
+        return false;
+    }
+
+    private static boolean isClosedRationalBSpline(RationalBSplineCurve3 rational) {
+        // A rational B-Spline is closed if first and last control points coincide
+        if (rational.getControlPoints().size() >= 2) {
+            CartesianPoint first = rational.getControlPoints().get(0);
+            CartesianPoint last = rational.getControlPoints().get(rational.getControlPoints().size() - 1);
+            return first.distanceTo(last) <= Epsilon.EPS;
+        }
+        return false;
+    }
+
+    private static boolean isClosedComposite(CompositeCurve3 composite) {
+        // Composite curve is closed if its segments form a closed loop
+        return composite.getSegments().size() > 0 && isClosedCompositeCurve(composite);
     }
 
     /**

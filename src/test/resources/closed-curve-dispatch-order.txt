@@ -1,0 +1,21 @@
+# Frozen type order of Edge.isClosedCurve, captured from the original
+# if-chain before it was folded into CLOSED_CURVE_RULES.
+#
+# The original chain was: (Circle || Ellipse3) -> true; BSplineCurve3,
+# RationalBSplineCurve3 and CompositeCurve3 with per-type closedness checks
+# (falling through to false on degenerate inputs); TrimmedCurve3 recursing on
+# its basis curve; then a false tail for Line3 / Polyline3 / SurfaceCurve3.
+#
+# Every involved type is a final class directly implementing Curve3, so the
+# types are mutually exclusive and first-match-wins dispatch over this table
+# reproduces the original semantics exactly, fall-through cases included.
+#
+# Order is not load bearing today (no type shadows another), but it is frozen
+# anyway: the table is ordered data, and silent reordering or branch insertion
+# should be a conscious, reviewed change.
+Circle
+Ellipse3
+BSplineCurve3
+RationalBSplineCurve3
+CompositeCurve3
+TrimmedCurve3
