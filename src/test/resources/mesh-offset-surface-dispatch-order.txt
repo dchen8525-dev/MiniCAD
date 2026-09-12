@@ -1,0 +1,15 @@
+# Branch order of StepMeshExporter.offsetSemanticSurfaceGeometry, captured from
+# the original 5-branch `if (base instanceof X)` chain before it was folded into
+# OFFSET_SEMANTIC_SURFACE_RULES. Every branch returns, so this is
+# first-match-wins dispatch: instanceof also matches subtypes, so a dropped,
+# duplicated or reordered rule silently changes which surface is offset how. A
+# base matching no rule (and a null base) returns null, as the old trailing
+# statement did. All 5 types are final classes implementing SurfaceGeometry
+# directly (no subtype relation today), so the order is currently behaviour
+# neutral -- the frozen file turns any future reordering into a test failure
+# rather than a silent behaviour change.
+Plane
+CylindricalSurface
+SphericalSurface
+ConicalSurface
+ToroidalSurface

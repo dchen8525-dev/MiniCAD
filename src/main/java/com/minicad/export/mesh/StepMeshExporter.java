@@ -204,38 +204,64 @@ public final class StepMeshExporter {
         return null;
     }
 
-    private static SurfaceGeometry offsetSemanticSurfaceGeometry(SurfaceGeometry base, double distance) {
-        if (base == null) {
-            return null;
-        }
-        if (base instanceof Plane) {
-            Plane plane = (Plane) base;
+    // offsetSemanticSurfaceGeometry dispatch table (first match wins, mirrors
+    // the original sequential ifs; an unsupported base returns null, as the old
+    // trailing statement did). Kept separate from StepCadBuilder's
+    // OFFSET_SURFACE_RULES on purpose -- different component, and the two
+    // differ: this one has no OffsetSurface3 branch and returns null instead of
+    // wrapping, and it uses the record-style accessors. All 5 types are final
+    // direct SurfaceGeometry implementations, so the order is behaviour neutral
+    // today but frozen by mesh-offset-surface-dispatch-order.txt.
+    private record OffsetSemanticSurfaceRule(
+            Class<? extends SurfaceGeometry> type, OffsetSemanticSurfaceHandler handler) {}
+
+    private interface OffsetSemanticSurfaceHandler {
+        SurfaceGeometry offset(SurfaceGeometry surface, double distance);
+    }
+
+    private static OffsetSemanticSurfaceRule offsetSemanticSurfaceRule(
+            Class<? extends SurfaceGeometry> type, OffsetSemanticSurfaceHandler handler) {
+        return new OffsetSemanticSurfaceRule(type, handler);
+    }
+
+    private static final List<OffsetSemanticSurfaceRule> OFFSET_SEMANTIC_SURFACE_RULES = List.of(
+        offsetSemanticSurfaceRule(Plane.class, (surface, distance) -> {
+            Plane plane = (Plane) surface;
             return new Plane(
                     plane.origin().add(plane.normal().asVector().scale(distance)),
                     plane.normal());
-        }
-        if (base instanceof CylindricalSurface) {
-            CylindricalSurface cylindricalSurface = (CylindricalSurface) base;
+        }),
+        offsetSemanticSurfaceRule(CylindricalSurface.class, (surface, distance) -> {
+            CylindricalSurface cylindricalSurface = (CylindricalSurface) surface;
             return new CylindricalSurface(
                     cylindricalSurface.position(),
                     cylindricalSurface.radius() + distance);
-        }
-        if (base instanceof SphericalSurface) {
-            SphericalSurface sphericalSurface = (SphericalSurface) base;
+        }),
+        offsetSemanticSurfaceRule(SphericalSurface.class, (surface, distance) -> {
+            SphericalSurface sphericalSurface = (SphericalSurface) surface;
             return new SphericalSurface(
                     sphericalSurface.position(),
                     sphericalSurface.radius() + distance);
-        }
-        if (base instanceof ConicalSurface) {
-            ConicalSurface conicalSurface = (ConicalSurface) base;
-            return offsetConicalSurface(conicalSurface, distance);
-        }
-        if (base instanceof ToroidalSurface) {
-            ToroidalSurface toroidalSurface = (ToroidalSurface) base;
+        }),
+        offsetSemanticSurfaceRule(ConicalSurface.class, (surface, distance) ->
+                offsetConicalSurface((ConicalSurface) surface, distance)),
+        offsetSemanticSurfaceRule(ToroidalSurface.class, (surface, distance) -> {
+            ToroidalSurface toroidalSurface = (ToroidalSurface) surface;
             return new ToroidalSurface(
                     toroidalSurface.position(),
                     toroidalSurface.majorRadius(),
                     toroidalSurface.minorRadius() + distance);
+        })
+    );
+
+    private static SurfaceGeometry offsetSemanticSurfaceGeometry(SurfaceGeometry base, double distance) {
+        if (base == null) {
+            return null;
+        }
+        for (OffsetSemanticSurfaceRule rule : OFFSET_SEMANTIC_SURFACE_RULES) {
+            if (rule.type().isInstance(base)) {
+                return rule.handler().offset(base, distance);
+            }
         }
         return null;
     }
