@@ -464,51 +464,96 @@ public final class PreviewSerializers {
 
     // ─── JSON value writer ───────────────────────────────────────────────
 
+    /**
+     * Writes one JSON value.
+     *
+     * <p>Dispatch is an ordered {@code (type, writer)} table rather than a chain
+     * of {@code if (value instanceof ...)} branches; the first rule whose type
+     * matches wins, and an unmatched non-null value falls through to the
+     * {@link IllegalArgumentException} at the end (the original chain's tail).
+     *
+     * @param json the target builder
+     * @param value the value to write; {@code null} is written as {@code null}
+     */
     public static void appendJsonValue(StringBuilder json, Object value) {
         if (value == null) {
             json.append("null");
             return;
         }
-        if (value instanceof String) {
-            String text = (String) value;
-            json.append(quote(text));
-            return;
-        }
-        if (value instanceof Boolean || value instanceof Integer || value instanceof Long) {
-            json.append(value);
-            return;
-        }
-        if (value instanceof Float || value instanceof Double) {
-            json.append(format(((Number) value).doubleValue()));
-            return;
-        }
-        if (value instanceof Map<?, ?>) {
-            json.append('{');
-            boolean first = true;
-            for (Map.Entry<?, ?> entry : stableEntries((Map<?, ?>) value)) {
-                if (!first) {
-                    json.append(',');
-                }
-                first = false;
-                json.append(quote(String.valueOf(entry.getKey()))).append(':');
-                appendJsonValue(json, entry.getValue());
+        for (JsonValueRule rule : JSON_VALUE_RULES) {
+            if (rule.matches(value)) {
+                rule.writer().write(json, value);
+                return;
             }
-            json.append('}');
-            return;
-        }
-        if (value instanceof List<?>) {
-            List<?> list = (List<?>) value;
-            json.append('[');
-            for (int i = 0; i < list.size(); i++) {
-                if (i > 0) {
-                    json.append(',');
-                }
-                appendJsonValue(json, list.get(i));
-            }
-            json.append(']');
-            return;
         }
         throw new IllegalArgumentException("unsupported json value: " + value.getClass().getName());
+    }
+
+    /**
+     * Appends a JSON object for a {@link Map} value, writing entries in a stable
+     * order (see {@link #stableEntries}).
+     */
+    private static void appendJsonObject(StringBuilder json, Object value) {
+        json.append('{');
+        boolean first = true;
+        for (Map.Entry<?, ?> entry : stableEntries((Map<?, ?>) value)) {
+            if (!first) {
+                json.append(',');
+            }
+            first = false;
+            json.append(quote(String.valueOf(entry.getKey()))).append(':');
+            appendJsonValue(json, entry.getValue());
+        }
+        json.append('}');
+    }
+
+    /**
+     * Appends a JSON array for a {@link List} value.
+     */
+    private static void appendJsonArray(StringBuilder json, Object value) {
+        List<?> list = (List<?>) value;
+        json.append('[');
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) {
+                json.append(',');
+            }
+            appendJsonValue(json, list.get(i));
+        }
+        json.append(']');
+    }
+
+    /**
+     * Ordered JSON value dispatch table. First match wins; the type order is
+     * frozen by {@code PreviewSerializersJsonValueDispatchTableTest}.
+     *
+     * <p>The original chain used two OR-ed branches ({@code Boolean || Integer ||
+     * Long} and {@code Float || Double}); each is split here into one rule per
+     * type because the types are mutually exclusive and share a writer, so the
+     * split is behaviour neutral.
+     */
+    private static final List<JsonValueRule> JSON_VALUE_RULES = List.of(
+            jsonValueRule(String.class, (json, value) -> json.append(quote((String) value))),
+            jsonValueRule(Boolean.class, (json, value) -> json.append(value)),
+            jsonValueRule(Integer.class, (json, value) -> json.append(value)),
+            jsonValueRule(Long.class, (json, value) -> json.append(value)),
+            jsonValueRule(Float.class, (json, value) -> json.append(format(((Number) value).doubleValue()))),
+            jsonValueRule(Double.class, (json, value) -> json.append(format(((Number) value).doubleValue()))),
+            jsonValueRule(Map.class, PreviewSerializers::appendJsonObject),
+            jsonValueRule(List.class, PreviewSerializers::appendJsonArray));
+
+    private static JsonValueRule jsonValueRule(Class<?> type, JsonValueWriter writer) {
+        return new JsonValueRule(type, writer);
+    }
+
+    @FunctionalInterface
+    private interface JsonValueWriter {
+        void write(StringBuilder json, Object value);
+    }
+
+    private record JsonValueRule(Class<?> type, JsonValueWriter writer) {
+        boolean matches(Object value) {
+            return type.isInstance(value);
+        }
     }
 
     /**
