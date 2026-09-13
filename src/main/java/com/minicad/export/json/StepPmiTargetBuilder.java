@@ -12417,21 +12417,33 @@ public final class StepPmiTargetBuilder {
 
 
 
+    /**
+     * Shared body for the two representation-map carriers: both expose a mapped
+     * origin and a mapped representation, so their overloads differ only in the
+     * concrete parameter type.
+     */
+    private static void appendRepresentationMapDefinitionTargets(
+            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
+            StepEntity identifiedItem,
+            StepEntity mappedOrigin,
+            StepEntity mappedRepresentation,
+            Map<Integer, List<String>> instanceIdsByTargetId
+    ) {
+        appendPlacementDefinitionTargets(targetsByUsageId, identifiedItem, mappedOrigin, instanceIdsByTargetId);
+        appendExistingRepresentationDefinitionTargets(
+                targetsByUsageId, identifiedItem, mappedRepresentation, instanceIdsByTargetId);
+    }
+
     static void appendRepresentationMapDefinitionTargets(
             Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
             StepEntity identifiedItem,
             StepRepresentationMap representationMap,
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
-        appendPlacementDefinitionTargets(
+        appendRepresentationMapDefinitionTargets(
                 targetsByUsageId,
                 identifiedItem,
                 representationMap.mappedOrigin(),
-                instanceIdsByTargetId
-        );
-        appendExistingRepresentationDefinitionTargets(
-                targetsByUsageId,
-                identifiedItem,
                 representationMap.mappedRepresentation(),
                 instanceIdsByTargetId
         );
@@ -12686,15 +12698,10 @@ public final class StepPmiTargetBuilder {
             StepSymbolRepresentationMap representationMap,
             Map<Integer, List<String>> instanceIdsByTargetId
     ) {
-        appendPlacementDefinitionTargets(
+        appendRepresentationMapDefinitionTargets(
                 targetsByUsageId,
                 identifiedItem,
                 representationMap.mappedOrigin(),
-                instanceIdsByTargetId
-        );
-        appendExistingRepresentationDefinitionTargets(
-                targetsByUsageId,
-                identifiedItem,
                 representationMap.mappedRepresentation(),
                 instanceIdsByTargetId
         );

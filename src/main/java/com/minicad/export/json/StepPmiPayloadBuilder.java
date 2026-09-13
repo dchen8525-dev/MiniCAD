@@ -249,19 +249,48 @@ public final class StepPmiPayloadBuilder {
         }
     }
 
+    /**
+     * Shared body for the geometric-tolerance carriers: they differ only in the
+     * concrete entity type and, for {@code WithMaximumTolerance}, an optional
+     * extra label suffix.
+     */
+    private static void appendToleranceFeaturePmi(
+            StepEntity tolerancedFeature,
+            int id,
+            String name,
+            String toleranceType,
+            Double magnitude,
+            String extraLabel,
+            List<PmiPayload> pmi,
+            StepCadBuilder builder
+    ) {
+        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(tolerancedFeature, builder);
+        if (position != null) {
+            String label = name != null ? name : toleranceType;
+            if (magnitude != null && magnitude != 0.0) {
+                label += ": " + String.format("%.3f", magnitude);
+            }
+            if (extraLabel != null) {
+                label += " / " + extraLabel;
+            }
+            pmi.add(toStandalonePointPmi(id, label, position));
+        }
+    }
+
     private static void appendGeometricToleranceWithDatumPmi(
             StepGeometricToleranceWithDatumReference tolerance,
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
-        if (position != null) {
-            String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
-            if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
-                label += ": " + String.format("%.3f", tolerance.magnitude());
-            }
-            pmi.add(toStandalonePointPmi(tolerance.id(), label, position));
-        }
+        appendToleranceFeaturePmi(
+                tolerance.tolerancedFeature(),
+                tolerance.id(),
+                tolerance.name(),
+                tolerance.toleranceType(),
+                tolerance.magnitude(),
+                null,
+                pmi,
+                builder);
     }
 
     private static void appendGeometricToleranceWithAreaUnitPmi(
@@ -269,14 +298,15 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
-        if (position != null) {
-            String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
-            if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
-                label += ": " + String.format("%.3f", tolerance.magnitude());
-            }
-            pmi.add(toStandalonePointPmi(tolerance.id(), label, position));
-        }
+        appendToleranceFeaturePmi(
+                tolerance.tolerancedFeature(),
+                tolerance.id(),
+                tolerance.name(),
+                tolerance.toleranceType(),
+                tolerance.magnitude(),
+                null,
+                pmi,
+                builder);
     }
 
     private static void appendGeometricToleranceWithMaxPmi(
@@ -284,17 +314,15 @@ public final class StepPmiPayloadBuilder {
             List<PmiPayload> pmi,
             StepCadBuilder builder
     ) {
-        CartesianPoint position = StepPmiPayloadBuilder.pointFromAnnotationPoint(tolerance.tolerancedFeature(), builder);
-        if (position != null) {
-            String label = tolerance.name() != null ? tolerance.name() : tolerance.toleranceType();
-            if (tolerance.magnitude() != null && tolerance.magnitude() != 0.0) {
-                label += ": " + String.format("%.3f", tolerance.magnitude());
-            }
-            if (tolerance.maximumTolerance() != null) {
-                label += " / " + String.format("%.3f", tolerance.maximumTolerance());
-            }
-            pmi.add(toStandalonePointPmi(tolerance.id(), label, position));
-        }
+        appendToleranceFeaturePmi(
+                tolerance.tolerancedFeature(),
+                tolerance.id(),
+                tolerance.name(),
+                tolerance.toleranceType(),
+                tolerance.magnitude(),
+                tolerance.maximumTolerance() != null ? String.format("%.3f", tolerance.maximumTolerance()) : null,
+                pmi,
+                builder);
     }
 
     private static void appendDimensionalLocationPmi(
