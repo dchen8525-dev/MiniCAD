@@ -164,34 +164,6 @@ public final class RationalBSplineCurve3 implements Curve3 {
         return BSplineMath.evaluateRational(controlPoints, weights, degree, parameter, expanded);
     }
 
-    @Override
-    public boolean contains(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        java.util.List<CartesianPoint> samples = sample(64);
-        for (CartesianPoint sample : samples) {
-            if (point.distanceTo(sample) < Epsilon.get()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public CartesianPoint closestPointTo(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        java.util.List<CartesianPoint> samples = sample(256);
-        CartesianPoint closest = samples.get(0);
-        double minDist = point.distanceTo(closest);
-        for (int i = 1; i < samples.size(); i++) {
-            double dist = point.distanceTo(samples.get(i));
-            if (dist < minDist) {
-                minDist = dist;
-                closest = samples.get(i);
-            }
-        }
-        return closest;
-    }
-
     /**
      * Returns the curve parameter whose point is closest to the given point,
      * over the curve's natural knot domain. Mirrors BSplineCurve3.parameterAt:

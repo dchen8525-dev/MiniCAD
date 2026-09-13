@@ -81,4 +81,53 @@ class Curve3DefaultMethodTest {
         java.util.List<CartesianPoint> samples = spline.sample(10);
         assertEquals(11, samples.size());
     }
+
+    @Test
+    void containsAndClosestPointToAreInterfaceDefaults() throws Exception {
+        assertTrue(Curve3.class.getMethod("contains", CartesianPoint.class).isDefault());
+        assertTrue(Curve3.class.getMethod("closestPointTo", CartesianPoint.class).isDefault());
+    }
+
+    @Test
+    void samplingCurveTypesDoNotRedeclareMembershipDefaults() {
+        java.util.List<Class<? extends Curve3>> types = java.util.List.of(
+                BSplineCurve3.class,
+                Clothoid3.class,
+                Ellipse3.class,
+                Hyperbola3.class,
+                Parabola3.class,
+                RationalBSplineCurve3.class);
+        for (Class<? extends Curve3> type : types) {
+            assertThrows(
+                    NoSuchMethodException.class,
+                    () -> type.getDeclaredMethod("contains", CartesianPoint.class),
+                    type.getSimpleName() + " should inherit Curve3.contains");
+            assertThrows(
+                    NoSuchMethodException.class,
+                    () -> type.getDeclaredMethod("closestPointTo", CartesianPoint.class),
+                    type.getSimpleName() + " should inherit Curve3.closestPointTo");
+        }
+    }
+
+    @Test
+    void inheritedMembershipFallsBackToSamples() {
+        Axis2Placement3D position = new Axis2Placement3D(
+                new CartesianPoint(0, 0, 0),
+                new Direction3(0, 0, 1),
+                new Direction3(1, 0, 0));
+        java.util.List<Curve3> curves = java.util.List.of(
+                new Ellipse3(position, 4.0, 2.0),
+                new Hyperbola3(position, 4.0, 2.0),
+                new Parabola3(position, 2.0),
+                new Clothoid3(position, 1.0, 0.1));
+        for (Curve3 curve : curves) {
+            CartesianPoint onCurve = curve.sample(64).get(0);
+            assertTrue(curve.contains(onCurve),
+                    curve.getClass().getSimpleName() + " should contain its own sample");
+            assertEquals(0.0, curve.closestPointTo(onCurve).distanceTo(onCurve), 1e-12,
+                    curve.getClass().getSimpleName() + " closest point should be the sample itself");
+            assertFalse(curve.contains(new CartesianPoint(1.0e6, -1.0e6, 1.0e6)),
+                    curve.getClass().getSimpleName() + " should not contain a far point");
+        }
+    }
 }

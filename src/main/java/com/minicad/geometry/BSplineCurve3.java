@@ -206,34 +206,6 @@ public final class BSplineCurve3 implements Curve3 {
     }
 
     @Override
-    public boolean contains(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        java.util.List<CartesianPoint> samples = sample(64);
-        for (CartesianPoint sample : samples) {
-            if (point.distanceTo(sample) < Epsilon.get()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public CartesianPoint closestPointTo(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        java.util.List<CartesianPoint> samples = sample(256);
-        CartesianPoint closest = samples.get(0);
-        double minDist = point.distanceTo(closest);
-        for (int i = 1; i < samples.size(); i++) {
-            double dist = point.distanceTo(samples.get(i));
-            if (dist < minDist) {
-                minDist = dist;
-                closest = samples.get(i);
-            }
-        }
-        return closest;
-    }
-
-    @Override
     public double parameterAt(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
         int samples = 1024;

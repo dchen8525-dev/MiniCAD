@@ -11,10 +11,23 @@ public interface Curve3 {
     /**
      * Returns whether a point lies on the curve within epsilon.
      *
+     * <p>Default implementation samples the curve and checks proximity. Curve
+     * types with an analytic membership test override this (for example
+     * {@link Line3}, {@link Circle} and {@link TrimmedCurve3}).
+     *
      * @param point queried point
      * @return whether the point lies on the curve
      */
-    boolean contains(CartesianPoint point);
+    default boolean contains(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        java.util.List<CartesianPoint> samples = sample(64);
+        for (CartesianPoint sample : samples) {
+            if (point.distanceTo(sample) < Epsilon.get()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Returns the approximate bounding box of the curve by sampling.
@@ -70,10 +83,26 @@ public interface Curve3 {
     /**
      * Returns the closest point on this curve to the given point.
      *
+     * <p>Default implementation samples the curve and returns the nearest
+     * sample. Curve types with an analytic projection override this.
+     *
      * @param point query point
      * @return closest point on the curve
      */
-    CartesianPoint closestPointTo(CartesianPoint point);
+    default CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        java.util.List<CartesianPoint> samples = sample(256);
+        CartesianPoint closest = samples.get(0);
+        double minDist = point.distanceTo(closest);
+        for (int i = 1; i < samples.size(); i++) {
+            double dist = point.distanceTo(samples.get(i));
+            if (dist < minDist) {
+                minDist = dist;
+                closest = samples.get(i);
+            }
+        }
+        return closest;
+    }
 
     /**
      * Returns the curve parameter corresponding to the given point.
