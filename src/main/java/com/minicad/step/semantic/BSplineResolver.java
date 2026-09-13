@@ -340,42 +340,4 @@ final class BSplineResolver {
         resolver.booleanValue(instance, base, 6));
   }
 
-  // === 2D B-Spline Curves ===
-
-  StepBSplineCurve2D resolveBSplineCurve2D(StepEntityInstance instance) {
-    StepEntityDefinition definition = resolver.definition(instance, "B_SPLINE_CURVE_2D");
-    StepEntityResolver.requireParameterCountIn(instance, definition, 4, 5);
-    boolean hasName = definition.parameters().size() == 5;
-    return new StepBSplineCurve2D(
-        instance.id(),
-        hasName ? resolver.stringValue(instance, definition, 0) : "",
-        resolver.integerValue(instance, definition, hasName ? 1 : 0),
-        resolver.referenceList(
-            instance,
-            definition,
-            hasName ? 2 : 1,
-            StepCartesianPoint.class,
-            "B_SPLINE_CURVE_2D control points must reference CARTESIAN_POINT"),
-        resolver.enumValue(instance, definition, hasName ? 3 : 2));
-  }
-
-  StepRationalBSplineCurve2D resolveRationalBSplineCurve2D(StepEntityInstance instance) {
-    StepEntityDefinition rational = resolver.definition(instance, "RATIONAL_B_SPLINE_CURVE_2D");
-    StepEntityResolver.requireParameterCount(instance, rational, 1);
-    StepEntityDefinition base = resolver.definition(instance, "B_SPLINE_CURVE_2D");
-    StepEntityResolver.requireParameterCountIn(instance, base, 4, 5);
-    boolean hasName = base.parameters().size() == 5;
-    return new StepRationalBSplineCurve2D(
-        instance.id(),
-        hasName ? resolver.stringValue(instance, base, 0) : "",
-        resolver.integerValue(instance, base, hasName ? 1 : 0),
-        resolver.referenceList(
-            instance,
-            base,
-            hasName ? 2 : 1,
-            StepCartesianPoint.class,
-            "RATIONAL_B_SPLINE_CURVE_2D control points must reference CARTESIAN_POINT"),
-        resolver.numberList(instance, rational, 0),
-        resolver.enumValue(instance, base, hasName ? 3 : 2));
-  }
 }
