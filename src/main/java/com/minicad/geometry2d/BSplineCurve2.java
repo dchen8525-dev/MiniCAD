@@ -1,6 +1,5 @@
 package com.minicad.geometry2d;
 
-import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
@@ -158,19 +157,6 @@ public final class BSplineCurve2 implements Curve2 {
     @Override
     public String toString() {
         return "BSplineCurve2{" + "degree=" + degree + "controlPoints=" + controlPoints + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "}";
-    }
-
-    @Override
-    public boolean contains(Point2 point) {
-        Preconditions.requireNonNull(point, "point");
-        // Check if point is close to any control point segment (approximation)
-        List<Point2> samples = sample(64);
-        for (Point2 sample : samples) {
-            if (point.distanceTo(sample) < Epsilon.get()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

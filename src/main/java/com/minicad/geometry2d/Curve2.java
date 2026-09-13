@@ -22,10 +22,23 @@ public interface Curve2 {
     /**
      * Returns whether a point lies on the curve within epsilon.
      *
+     * <p>Default implementation samples the curve and checks proximity. Curve
+     * types with an analytic membership test override this (for example
+     * {@link Line2}, {@link Circle2} and {@link Ellipse2}).
+     *
      * @param point queried point
      * @return whether the point lies on the curve
      */
-    boolean contains(Point2 point);
+    default boolean contains(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        List<Point2> samples = sample(64);
+        for (Point2 sample : samples) {
+            if (point.distanceTo(sample) < Epsilon.get()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Returns the approximate bounding box of the curve by sampling.
