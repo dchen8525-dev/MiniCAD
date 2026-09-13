@@ -1,4 +1,4 @@
-package com.minicad.preview.mapper;
+package com.minicad.helper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -13,11 +13,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Covers PreviewUvCoords: cylindrical / conical / spherical / toroidal coordinate math.
+ * Covers SurfaceGeometryHelper: cylindrical / conical / spherical / toroidal coordinate math.
  * All cases use an axis-aligned placement at the origin (axis=Z, refDirection=X) so that
  * xDirection=(1,0,0) and yDirection=(0,1,0), making expected values deterministic.
  */
-class PreviewUvCoordsTest {
+class SurfaceGeometryHelperTest {
 
     private static final double EPS = 1e-9;
 
@@ -56,26 +56,26 @@ class PreviewUvCoordsTest {
     @Test
     void cylindricalAngleMeasuresFromXAxis() {
         CylindricalSurface surface = new CylindricalSurface(origin(), 2.0);
-        assertEquals(0.0, PreviewUvCoords.cylindricalAngle(surface, pt(2.0, 0.0, 0.0)), EPS);
-        assertEquals(Math.PI / 2.0, PreviewUvCoords.cylindricalAngle(surface, pt(0.0, 2.0, 0.0)), EPS);
+        assertEquals(0.0, SurfaceGeometryHelper.cylindricalAngle(surface, pt(2.0, 0.0, 0.0)), EPS);
+        assertEquals(Math.PI / 2.0, SurfaceGeometryHelper.cylindricalAngle(surface, pt(0.0, 2.0, 0.0)), EPS);
         // placement overload must agree with the surface overload
-        assertEquals(PreviewUvCoords.cylindricalAngle(surface, pt(0.0, 2.0, 3.0)),
-                PreviewUvCoords.cylindricalAngle(origin(), pt(0.0, 2.0, 3.0)), EPS);
+        assertEquals(SurfaceGeometryHelper.cylindricalAngle(surface, pt(0.0, 2.0, 3.0)),
+                SurfaceGeometryHelper.cylindricalAngle(origin(), pt(0.0, 2.0, 3.0)), EPS);
     }
 
     @Test
     void axialHeightIsProjectionOnAxis() {
         CylindricalSurface surface = new CylindricalSurface(origin(), 2.0);
-        assertEquals(3.0, PreviewUvCoords.axialHeight(surface, pt(0.0, 0.0, 3.0)), EPS);
-        assertEquals(3.0, PreviewUvCoords.axialHeight(origin(), pt(0.0, 0.0, 3.0)), EPS);
+        assertEquals(3.0, SurfaceGeometryHelper.axialHeight(surface, pt(0.0, 0.0, 3.0)), EPS);
+        assertEquals(3.0, SurfaceGeometryHelper.axialHeight(origin(), pt(0.0, 0.0, 3.0)), EPS);
     }
 
     @Test
     void averageAxialHeightAveragesProjection() {
         CylindricalSurface surface = new CylindricalSurface(origin(), 2.0);
         List<CartesianPoint> points = List.of(pt(0.0, 0.0, 2.0), pt(0.0, 0.0, 4.0));
-        assertEquals(3.0, PreviewUvCoords.averageAxialHeight(surface, points), EPS);
-        assertEquals(3.0, PreviewUvCoords.averageAxialHeight(origin(), points), EPS);
+        assertEquals(3.0, SurfaceGeometryHelper.averageAxialHeight(surface, points), EPS);
+        assertEquals(3.0, SurfaceGeometryHelper.averageAxialHeight(origin(), points), EPS);
     }
 
     @Test
@@ -83,24 +83,24 @@ class PreviewUvCoordsTest {
         CylindricalSurface surface = new CylindricalSurface(origin(), 2.0);
         // raw angles are +3.0 and -3.0; the -2pi/+2pi unwrapping must make the step continuous
         List<CartesianPoint> points = List.of(atAngle(2.0, 3.0), atAngle(2.0, -3.0));
-        List<Double> angles = PreviewUvCoords.unwrapAngles(surface, points);
+        List<Double> angles = SurfaceGeometryHelper.unwrapAngles(surface, points);
 
         assertEquals(2, angles.size());
         assertEquals(3.0, angles.get(0), EPS);
         // -3.0 - 3.0 = -6.0 < -pi  ->  add 2*pi
         assertEquals(-3.0 + 2.0 * Math.PI, angles.get(1), EPS);
-        assertEquals(angles, PreviewUvCoords.unwrapAngles(origin(), points));
+        assertEquals(angles, SurfaceGeometryHelper.unwrapAngles(origin(), points));
     }
 
     @Test
     void cylindricalSurfacePointAndNormal() {
         CylindricalSurface surface = new CylindricalSurface(origin(), 2.0);
-        assertPoint(pt(2.0, 0.0, 0.0), PreviewUvCoords.surfacePoint(surface, 0.0, 0.0));
-        assertPoint(pt(2.0, 0.0, 5.0), PreviewUvCoords.surfacePoint(surface, 0.0, 5.0));
+        assertPoint(pt(2.0, 0.0, 0.0), SurfaceGeometryHelper.surfacePoint(surface, 0.0, 0.0));
+        assertPoint(pt(2.0, 0.0, 5.0), SurfaceGeometryHelper.surfacePoint(surface, 0.0, 5.0));
 
-        assertVector(new Vector3(1.0, 0.0, 0.0), PreviewUvCoords.cylindricalNormal(surface, 0.0, true));
-        assertVector(new Vector3(-1.0, 0.0, 0.0), PreviewUvCoords.cylindricalNormal(surface, 0.0, false));
-        assertVector(new Vector3(0.0, 1.0, 0.0), PreviewUvCoords.cylindricalNormal(surface, Math.PI / 2.0, true));
+        assertVector(new Vector3(1.0, 0.0, 0.0), SurfaceGeometryHelper.cylindricalNormal(surface, 0.0, true));
+        assertVector(new Vector3(-1.0, 0.0, 0.0), SurfaceGeometryHelper.cylindricalNormal(surface, 0.0, false));
+        assertVector(new Vector3(0.0, 1.0, 0.0), SurfaceGeometryHelper.cylindricalNormal(surface, Math.PI / 2.0, true));
     }
 
     // ── Conical ────────────────────────────────────────────────────────────
@@ -109,8 +109,8 @@ class PreviewUvCoordsTest {
     void conicalSurfacePointGrowsWithHeight() {
         // radius 1, semi-angle 45deg -> tan = 1, so radius at height h is 1 + h
         ConicalSurface cone = new ConicalSurface(origin(), 1.0, Math.PI / 4.0);
-        assertPoint(pt(3.0, 0.0, 2.0), PreviewUvCoords.conicalSurfacePoint(cone, 0.0, 2.0));
-        assertPoint(pt(1.0, 0.0, 0.0), PreviewUvCoords.conicalSurfacePoint(cone, 0.0, 0.0));
+        assertPoint(pt(3.0, 0.0, 2.0), SurfaceGeometryHelper.conicalSurfacePoint(cone, 0.0, 2.0));
+        assertPoint(pt(1.0, 0.0, 0.0), SurfaceGeometryHelper.conicalSurfacePoint(cone, 0.0, 0.0));
     }
 
     @Test
@@ -118,9 +118,9 @@ class PreviewUvCoordsTest {
         ConicalSurface cone = new ConicalSurface(origin(), 1.0, Math.PI / 4.0);
         // radial (1,0,0) minus axis*tan(45) = (1,0,-1), normalised
         assertVector(new Vector3(1.0 / ROOT2, 0.0, -1.0 / ROOT2),
-                PreviewUvCoords.conicalNormal(cone, 0.0, true));
+                SurfaceGeometryHelper.conicalNormal(cone, 0.0, true));
         assertVector(new Vector3(-1.0 / ROOT2, 0.0, 1.0 / ROOT2),
-                PreviewUvCoords.conicalNormal(cone, 0.0, false));
+                SurfaceGeometryHelper.conicalNormal(cone, 0.0, false));
     }
 
     // ── Spherical ──────────────────────────────────────────────────────────
@@ -128,30 +128,30 @@ class PreviewUvCoordsTest {
     @Test
     void sphericalUAndV() {
         Axis2Placement3D placement = origin();
-        assertEquals(0.0, PreviewUvCoords.sphericalU(placement, pt(1.0, 0.0, 0.0)), EPS);
-        assertEquals(Math.PI / 2.0, PreviewUvCoords.sphericalU(placement, pt(0.0, 1.0, 0.0)), EPS);
+        assertEquals(0.0, SurfaceGeometryHelper.sphericalU(placement, pt(1.0, 0.0, 0.0)), EPS);
+        assertEquals(Math.PI / 2.0, SurfaceGeometryHelper.sphericalU(placement, pt(0.0, 1.0, 0.0)), EPS);
 
         // top of the sphere -> +pi/2
-        assertEquals(Math.PI / 2.0, PreviewUvCoords.sphericalV(placement, pt(0.0, 0.0, 5.0), 5.0), EPS);
+        assertEquals(Math.PI / 2.0, SurfaceGeometryHelper.sphericalV(placement, pt(0.0, 0.0, 5.0), 5.0), EPS);
         // equator -> 0
-        assertEquals(0.0, PreviewUvCoords.sphericalV(placement, pt(5.0, 0.0, 0.0), 5.0), EPS);
+        assertEquals(0.0, SurfaceGeometryHelper.sphericalV(placement, pt(5.0, 0.0, 0.0), 5.0), EPS);
         // degenerate radius is guarded -> 0 instead of NaN
-        assertEquals(0.0, PreviewUvCoords.sphericalV(placement, pt(0.0, 0.0, 5.0), 0.0), EPS);
+        assertEquals(0.0, SurfaceGeometryHelper.sphericalV(placement, pt(0.0, 0.0, 5.0), 0.0), EPS);
     }
 
     @Test
     void sphericalSurfacePointAndNormal() {
         Axis2Placement3D placement = origin();
         assertPoint(pt(3.0, 0.0, 0.0),
-                PreviewUvCoords.sphericalSurfacePoint(placement, 3.0, 0.0, 0.0));
+                SurfaceGeometryHelper.sphericalSurfacePoint(placement, 3.0, 0.0, 0.0));
         // v = +pi/2 puts the point on the +Z pole
         assertPoint(pt(0.0, 0.0, 2.0),
-                PreviewUvCoords.sphericalSurfacePoint(placement, 2.0, 0.0, Math.PI / 2.0));
+                SurfaceGeometryHelper.sphericalSurfacePoint(placement, 2.0, 0.0, Math.PI / 2.0));
 
         assertVector(new Vector3(1.0, 0.0, 0.0),
-                PreviewUvCoords.sphericalNormal(placement, 0.0, 0.0, true));
+                SurfaceGeometryHelper.sphericalNormal(placement, 0.0, 0.0, true));
         assertVector(new Vector3(-1.0, 0.0, 0.0),
-                PreviewUvCoords.sphericalNormal(placement, 0.0, 0.0, false));
+                SurfaceGeometryHelper.sphericalNormal(placement, 0.0, 0.0, false));
     }
 
     // ── Toroidal ───────────────────────────────────────────────────────────
@@ -170,47 +170,47 @@ class PreviewUvCoordsTest {
     void toroidalSurfacePointUsesMajorPlusMinor() {
         ToroidalSurface surface = torus();
         // u=0, v=0 -> radius 5 + 1 = 6 on the +X side
-        assertPoint(pt(6.0, 0.0, 0.0), PreviewUvCoords.toroidalSurfacePoint(surface, 0.0, 0.0));
+        assertPoint(pt(6.0, 0.0, 0.0), SurfaceGeometryHelper.toroidalSurfacePoint(surface, 0.0, 0.0));
         // explicit-argument overload must match
         assertPoint(pt(6.0, 0.0, 0.0),
-                PreviewUvCoords.toroidalSurfacePoint(origin(), 5.0, 1.0, 0.0, 0.0));
+                SurfaceGeometryHelper.toroidalSurfacePoint(origin(), 5.0, 1.0, 0.0, 0.0));
     }
 
     @Test
     void toroidalNormalRespectsSense() {
-        assertVector(new Vector3(1.0, 0.0, 0.0), PreviewUvCoords.toroidalNormal(torus(), 0.0, 0.0, true));
-        assertVector(new Vector3(-1.0, 0.0, 0.0), PreviewUvCoords.toroidalNormal(torus(), 0.0, 0.0, false));
-        assertEquals(PreviewUvCoords.toroidalNormal(torus(), 0.5, 0.25, true),
-                PreviewUvCoords.toroidalNormal(origin(), 0.5, 0.25, true));
+        assertVector(new Vector3(1.0, 0.0, 0.0), SurfaceGeometryHelper.toroidalNormal(torus(), 0.0, 0.0, true));
+        assertVector(new Vector3(-1.0, 0.0, 0.0), SurfaceGeometryHelper.toroidalNormal(torus(), 0.0, 0.0, false));
+        assertEquals(SurfaceGeometryHelper.toroidalNormal(torus(), 0.5, 0.25, true),
+                SurfaceGeometryHelper.toroidalNormal(origin(), 0.5, 0.25, true));
     }
 
     @Test
     void toroidalUAndVRecoverParameters() {
         Axis2Placement3D placement = origin();
-        assertEquals(0.0, PreviewUvCoords.toroidalU(placement, pt(6.0, 0.0, 0.0)), EPS);
-        assertEquals(Math.PI / 2.0, PreviewUvCoords.toroidalU(placement, pt(0.0, 6.0, 0.0)), EPS);
+        assertEquals(0.0, SurfaceGeometryHelper.toroidalU(placement, pt(6.0, 0.0, 0.0)), EPS);
+        assertEquals(Math.PI / 2.0, SurfaceGeometryHelper.toroidalU(placement, pt(0.0, 6.0, 0.0)), EPS);
 
         // point 1 above the tube centre: rho = 0 -> atan2(1, 0 - 5)
         assertEquals(Math.atan2(1.0, -5.0),
-                PreviewUvCoords.toroidalV(placement, 5.0, pt(0.0, 0.0, 1.0)), EPS);
-        assertEquals(PreviewUvCoords.toroidalV(placement, 5.0, pt(0.0, 0.0, 1.0)),
-                PreviewUvCoords.toroidalV(torus(), pt(0.0, 0.0, 1.0)), EPS);
+                SurfaceGeometryHelper.toroidalV(placement, 5.0, pt(0.0, 0.0, 1.0)), EPS);
+        assertEquals(SurfaceGeometryHelper.toroidalV(placement, 5.0, pt(0.0, 0.0, 1.0)),
+                SurfaceGeometryHelper.toroidalV(torus(), pt(0.0, 0.0, 1.0)), EPS);
 
         // v is recovered from the generated surface point
-        assertEquals(1.5, PreviewUvCoords.toroidalV(torus(), torusPoint(0.0, 1.5)), EPS);
+        assertEquals(1.5, SurfaceGeometryHelper.toroidalV(torus(), torusPoint(0.0, 1.5)), EPS);
     }
 
     @Test
     void unwrapToroidalUAndVRemoveBranchCutJumps() {
         ToroidalSurface surface = torus();
         List<CartesianPoint> uPoints = List.of(torusPoint(3.0, 0.0), torusPoint(-3.0, 0.0));
-        List<Double> us = PreviewUvCoords.unwrapToroidalU(surface, uPoints);
+        List<Double> us = SurfaceGeometryHelper.unwrapToroidalU(surface, uPoints);
         assertEquals(3.0, us.get(0), EPS);
         assertEquals(-3.0 + 2.0 * Math.PI, us.get(1), EPS);
 
         // v jump of 3.5 rad exceeds PI, so the second value is unwrapped upward by 2*PI
         List<CartesianPoint> vPoints = List.of(torusPoint(0.0, 1.5), torusPoint(0.0, -2.0));
-        List<Double> vs = PreviewUvCoords.unwrapToroidalV(surface, vPoints);
+        List<Double> vs = SurfaceGeometryHelper.unwrapToroidalV(surface, vPoints);
         assertEquals(1.5, vs.get(0), EPS);
         assertEquals(-2.0 + 2.0 * Math.PI, vs.get(1), EPS);
     }
@@ -219,6 +219,6 @@ class PreviewUvCoordsTest {
     void averageToroidalVAveragesMinorAngle() {
         ToroidalSurface surface = torus();
         List<CartesianPoint> points = List.of(torusPoint(0.0, 1.5), torusPoint(0.0, -1.5));
-        assertEquals(0.0, PreviewUvCoords.averageToroidalV(surface, points), EPS);
+        assertEquals(0.0, SurfaceGeometryHelper.averageToroidalV(surface, points), EPS);
     }
 }
