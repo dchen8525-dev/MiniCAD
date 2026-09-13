@@ -419,7 +419,7 @@ public final class PreviewGlbBuilder {
         extras.put("sameSense", face.sameSense());
         if (face.surface() != null) {
             parametricFaceCount += 1;
-            extras.put("surface", faceSurfaceValue(face.surface()));
+            extras.put("surface", PreviewSerializers.previewFaceSurfaceMap(face.surface()));
             if ("plane_face".equals(face.surface().type())) {
                 extras.put("surfaceLoops", loopValues(face.loops()));
             }
@@ -521,89 +521,6 @@ public final class PreviewGlbBuilder {
             ));
         }
         return values;
-    }
-
-    private Map<String, Object> faceSurfaceValue(FaceSurfacePayload surface) {
-        Map<String, Object> value = new LinkedHashMap<>();
-        value.put("type", surface.type());
-        if (surface.sourceType() != null) {
-            value.put("sourceType", surface.sourceType());
-        }
-        if (surface.sourceStepId() != null) {
-            value.put("sourceStepId", surface.sourceStepId());
-        }
-        if (surface.basisType() != null) {
-            value.put("basisType", surface.basisType());
-        }
-        if (surface.basisStepId() != null) {
-            value.put("basisStepId", surface.basisStepId());
-        }
-        if (surface.orientation() != null) {
-            value.put("orientation", surface.orientation());
-        }
-        if (surface.offsetDistance() != null) {
-            value.put("offsetDistance", surface.offsetDistance());
-        }
-        if (surface.trimU1() != null) {
-            value.put("trimU1", surface.trimU1());
-        }
-        if (surface.trimU2() != null) {
-            value.put("trimU2", surface.trimU2());
-        }
-        if (surface.trimV1() != null) {
-            value.put("trimV1", surface.trimV1());
-        }
-        if (surface.trimV2() != null) {
-            value.put("trimV2", surface.trimV2());
-        }
-        if (surface.implicitOuter() != null) {
-            value.put("implicitOuter", surface.implicitOuter());
-        }
-        if (surface.transformScale() != null) {
-            value.put("transformScale", surface.transformScale());
-        }
-        if (surface.center() != null) {
-            value.put("center", surface.center());
-        }
-        if (surface.axis() != null) {
-            value.put("axis", surface.axis());
-        }
-        if (surface.xDirection() != null) {
-            value.put("xDirection", surface.xDirection());
-        }
-        value.put("radius", surface.radius());
-        if (surface.minorRadius() != null) {
-            value.put("minorRadius", surface.minorRadius());
-        }
-        if (surface.semiAngle() != null) {
-            value.put("semiAngle", surface.semiAngle());
-        }
-        value.put("lowerHeight", surface.lowerHeight());
-        value.put("upperHeight", surface.upperHeight());
-        value.put("startAngle", surface.startAngle());
-        value.put("sweepAngle", surface.sweepAngle());
-        if (surface.uDegree() != null) {
-            value.put("uDegree", surface.uDegree());
-        }
-        if (surface.vDegree() != null) {
-            value.put("vDegree", surface.vDegree());
-        }
-        if (surface.controlPoints() != null) {
-            value.put("controlPoints", surface.controlPoints());
-        }
-        if (surface.uMultiplicities() != null) {
-            value.put("uMultiplicities", surface.uMultiplicities());
-        }
-        if (surface.vMultiplicities() != null) {
-            value.put("vMultiplicities", surface.vMultiplicities());
-        }
-        if (surface.uKnots() != null) {
-            value.put("uKnots", surface.uKnots());
-        }
-        if (surface.vKnots() != null) {
-            value.put("vKnots", surface.vKnots());
-        }
-        return value;
     }
 
     private List<Map<String, Object>> uvLoopValues(List<ParametricLoopPayload> loops) {
