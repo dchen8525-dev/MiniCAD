@@ -1323,7 +1323,7 @@ public final class StepFacePayloadBuilder {
                             loops.size());
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "missing outer bound"));
         }
-        UvBounds uvBounds = boundsOf(loops);
+        UvBounds uvBounds = PreviewMeshExporter.boundsOf(loops);
         if (uvBounds == null || uvBounds.uSpan() <= Epsilon.EPS || uvBounds.vSpan() <= Epsilon.EPS) {
             return new PreviewFaceResult(null, StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, "degenerate parametric bounds"));
         }
@@ -1355,7 +1355,7 @@ public final class StepFacePayloadBuilder {
             baseUSegments = Math.max(baseUSegments, 28);
             baseVSegments = Math.max(baseVSegments, 16);
         }
-        List<PointPayload> triangles = triangulateParametricFaceAdaptive(
+        List<PointPayload> triangles = PreviewMeshExporter.triangulateParametricFaceAdaptive(
                 mapper,
                 loops,
                 uvBounds,
@@ -1394,7 +1394,7 @@ public final class StepFacePayloadBuilder {
                         metadata.transparency(),
                         PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                         metadata.layers(),
-                        toParametricLoopPayloads(loops, mapper),
+                        PreviewMeshExporter.toParametricLoopPayloads(loops, mapper),
                         triangles,
                         faceSurfacePayload(geometry, uvBounds, builder),
                         loops
@@ -1431,7 +1431,7 @@ public final class StepFacePayloadBuilder {
                 uvPoints.add(uv);
                 previous = uv;
             }
-            uvPoints = normalizePeriodicLoop(uvPoints, mapper);
+            uvPoints = PreviewMeshExporter.normalizePeriodicLoop(uvPoints, mapper);
             uvPoints.set(0, uvPoints.get(0));
             uvPoints.set(uvPoints.size() - 1, uvPoints.get(0));
             loops.add(new ParametricLoopPayload(bound.outer(), List.copyOf(uvPoints)));
@@ -1481,71 +1481,13 @@ public final class StepFacePayloadBuilder {
             if (!bound.orientation()) {
                 loopPoints = StepPayloadBuilder.reverseClosedLoop(loopPoints);
             }
-            loopPoints = normalizePeriodicLoop(loopPoints, mapper);
+            loopPoints = PreviewMeshExporter.normalizePeriodicLoop(loopPoints, mapper);
             if (!PcurveSamplingHelper.sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
                 loopPoints.add(loopPoints.get(0));
             }
             loops.add(new ParametricLoopPayload(bound.outer() || promoteSingleOuter, List.copyOf(loopPoints)));
         }
         return List.copyOf(loops);
-    }
-
-    private static List<UvPoint> normalizePeriodicLoop(List<UvPoint> points, ParametricSurfaceMapper mapper) {
-        if (points.size() < 2) {
-            return points;
-        }
-        Double uPeriod = mapper.uPeriod();
-        Double vPeriod = mapper.vPeriod();
-        List<UvPoint> normalized = new ArrayList<>(points.size());
-        UvPoint previous = null;
-        for (UvPoint point : points) {
-            double u = point.u();
-            double v = point.v();
-            if (previous != null) {
-                if (uPeriod != null) {
-                    u = MathUtilityHelper.unwrapPeriodic(u, previous.u(), uPeriod);
-                }
-                if (vPeriod != null) {
-                    v = MathUtilityHelper.unwrapPeriodic(v, previous.v(), vPeriod);
-                }
-            }
-            UvPoint normalizedPoint = new UvPoint(u, v);
-            normalized.add(normalizedPoint);
-            previous = normalizedPoint;
-        }
-        if (normalized.size() >= 2) {
-            UvPoint first = normalized.get(0);
-            UvPoint last = normalized.get(normalized.size() - 1);
-            double u = last.u();
-            double v = last.v();
-            if (uPeriod != null) {
-                u = MathUtilityHelper.unwrapPeriodic(u, first.u(), uPeriod);
-            }
-            if (vPeriod != null) {
-                v = MathUtilityHelper.unwrapPeriodic(v, first.v(), vPeriod);
-            }
-            normalized.set(normalized.size() - 1, new UvPoint(u, v));
-        }
-        return normalized;
-    }
-
-    private static UvBounds boundsOf(List<ParametricLoopPayload> loops) {
-        double minU = Double.POSITIVE_INFINITY;
-        double minV = Double.POSITIVE_INFINITY;
-        double maxU = Double.NEGATIVE_INFINITY;
-        double maxV = Double.NEGATIVE_INFINITY;
-        for (ParametricLoopPayload loop : loops) {
-            for (UvPoint point : loop.points()) {
-                minU = Math.min(minU, point.u());
-                minV = Math.min(minV, point.v());
-                maxU = Math.max(maxU, point.u());
-                maxV = Math.max(maxV, point.v());
-            }
-        }
-        if (!Double.isFinite(minU) || !Double.isFinite(minV) || !Double.isFinite(maxU) || !Double.isFinite(maxV)) {
-            return null;
-        }
-        return new UvBounds(minU, minV, maxU, maxV);
     }
 
     // faceSurfacePayload dispatch table.
@@ -1578,7 +1520,7 @@ public final class StepFacePayloadBuilder {
                     "plane_face",
                     List.of(plane.origin().x(), plane.origin().y(), plane.origin().z()),
                     List.of(normal.x(), normal.y(), normal.z()),
-                    basisDirectionForNormal(normal),
+                    PreviewMeshExporter.basisDirectionForNormal(normal),
                     0.0,
                     null,
                     null,
@@ -1895,15 +1837,6 @@ public final class StepFacePayloadBuilder {
         );
     }
 
-    private static List<Double> basisDirectionForNormal(Direction3 normal) {
-        Vector3 axis = normal.asVector();
-        Vector3 reference = Math.abs(axis.x()) < 0.9
-                ? new Vector3(1.0, 0.0, 0.0)
-                : new Vector3(0.0, 1.0, 0.0);
-        Direction3 xDirection = reference.subtract(axis.scale(reference.dot(axis))).normalize().asDirection();
-        return List.of(xDirection.x(), xDirection.y(), xDirection.z());
-    }
-
     private static List<UvPoint> sampleParametricOrientedEdge(
             com.minicad.step.model.StepOrientedEdge orientedEdge,
             StepEntity faceGeometry,
@@ -2139,67 +2072,6 @@ public final class StepFacePayloadBuilder {
         return Set.copyOf(ids);
     }
 
-    private static List<LoopPayload> toParametricLoopPayloads(List<ParametricLoopPayload> loops, ParametricSurfaceMapper mapper) {
-        List<LoopPayload> payloads = new ArrayList<>(loops.size());
-        for (ParametricLoopPayload loop : loops) {
-            List<PointPayload> points = new ArrayList<>(loop.points().size());
-            for (UvPoint point : loop.points()) {
-                points.add(PayloadConversionHelper.toPointPayload(mapper.pointAt(point.u(), point.v())));
-            }
-            payloads.add(new LoopPayload(loop.outer(), List.copyOf(points)));
-        }
-        return List.copyOf(payloads);
-    }
-
-    private static List<PointPayload> triangulateParametricFace(
-            ParametricSurfaceMapper mapper,
-            List<ParametricLoopPayload> loops,
-            UvBounds bounds,
-            int uSegments,
-            int vSegments,
-            boolean sameSense
-    ) {
-        ParametricLoopPayload outer = loops.stream().filter(ParametricLoopPayload::outer).findFirst().orElse(null);
-        if (outer == null) {
-            return List.of();
-        }
-        List<ParametricLoopPayload> holes = loops.stream().filter(loop -> !loop.outer()).collect(Collectors.toList());
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int ui = 0; ui < uSegments; ui++) {
-            double u0 = bounds.minU() + bounds.uSpan() * ui / uSegments;
-            double u1 = bounds.minU() + bounds.uSpan() * (ui + 1) / uSegments;
-            for (int vi = 0; vi < vSegments; vi++) {
-                double v0 = bounds.minV() + bounds.vSpan() * vi / vSegments;
-                double v1 = bounds.minV() + bounds.vSpan() * (vi + 1) / vSegments;
-                UvPoint center = new UvPoint((u0 + u1) * 0.5, (v0 + v1) * 0.5);
-                if (!TriangulationHelper.contains(outer.points(), center)) {
-                    continue;
-                }
-                boolean insideHole = false;
-                for (ParametricLoopPayload hole : holes) {
-                    if (TriangulationHelper.contains(hole.points(), center)) {
-                        insideHole = true;
-                        break;
-                    }
-                }
-                if (insideHole) {
-                    continue;
-                }
-                CartesianPoint p00 = mapper.pointAt(u0, v0);
-                CartesianPoint p10 = mapper.pointAt(u1, v0);
-                CartesianPoint p01 = mapper.pointAt(u0, v1);
-                CartesianPoint p11 = mapper.pointAt(u1, v1);
-                Vector3 normal = mapper.normalAt(center.u(), center.v());
-                if (!sameSense) {
-                    normal = normal.scale(-1.0);
-                }
-                TriangulationHelper.appendOrientedTriangle(triangles, p00, p10, p11, normal);
-                TriangulationHelper.appendOrientedTriangle(triangles, p00, p11, p01, normal);
-            }
-        }
-        return List.copyOf(triangles);
-    }
-
     private static List<ParametricLoopPayload> normalizeLoopRoles(
             StepFaceEntity stepFace,
             StepEntity geometry,
@@ -2227,30 +2099,6 @@ public final class StepFacePayloadBuilder {
             normalized.add(new ParametricLoopPayload(index == outerIndex, loops.get(index).points()));
         }
         return List.copyOf(normalized);
-    }
-
-    private static List<PointPayload> triangulateParametricFaceAdaptive(
-            ParametricSurfaceMapper mapper,
-            List<ParametricLoopPayload> loops,
-            UvBounds bounds,
-            int baseUSegments,
-            int baseVSegments,
-            boolean sameSense
-    ) {
-        int uSegments = baseUSegments;
-        int vSegments = baseVSegments;
-        for (int attempt = 0; attempt < 4; attempt++) {
-            List<PointPayload> triangles = triangulateParametricFace(mapper, loops, bounds, uSegments, vSegments, sameSense);
-            if (!triangles.isEmpty()) {
-                return triangles;
-            }
-            if (uSegments >= 512 && vSegments >= 256) {
-                break;
-            }
-            uSegments = Math.min(uSegments * 2, 512);
-            vSegments = Math.min(vSegments * 2, 256);
-        }
-        return List.of();
     }
 
     private static StepEntity faceGeometry(StepFaceEntity stepFace) {

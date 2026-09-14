@@ -765,7 +765,7 @@ public final class PreviewMeshExporter {
         return loops;
     }
 
-    private static List<Double> basisDirectionForNormal(Direction3 normal) {
+    public static List<Double> basisDirectionForNormal(Direction3 normal) {
         Vector3 axis = normal.asVector();
         Vector3 reference = Math.abs(axis.x()) < 0.9
                 ? new Vector3(1.0, 0.0, 0.0)
