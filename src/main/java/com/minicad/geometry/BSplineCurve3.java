@@ -1,10 +1,8 @@
 package com.minicad.geometry;
 
-import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -116,10 +114,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return start parameter
      */
     public double startParameter() {
-        if (knots == null || knots.isEmpty()) {
-            return 0.0;
-        }
-        return knots.get(0);
+        return BSplineCurveHelper.startParameter(knots);
     }
 
     /**
@@ -128,10 +123,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return end parameter
      */
     public double endParameter() {
-        if (knots == null || knots.isEmpty()) {
-            return 1.0;
-        }
-        return knots.get(knots.size() - 1);
+        return BSplineCurveHelper.endParameter(knots);
     }
 
     /**
@@ -143,25 +135,10 @@ public final class BSplineCurve3 implements Curve3 {
     public List<Double> expandedKnots() {
         List<Double> local = expandedKnotsCache;
         if (local == null) {
-            local = computeExpandedKnots();
+            local = BSplineCurveHelper.expandedKnots(knots, knotMultiplicities);
             expandedKnotsCache = local;
         }
         return local;
-    }
-
-    private List<Double> computeExpandedKnots() {
-        if (knots == null || knotMultiplicities == null) {
-            return java.util.List.of();
-        }
-        List<Double> expanded = new ArrayList<>();
-        for (int i = 0; i < knots.size(); i++) {
-            int multiplicity = knotMultiplicities.get(i);
-            double knotValue = knots.get(i);
-            for (int j = 0; j < multiplicity; j++) {
-                expanded.add(knotValue);
-            }
-        }
-        return java.util.List.copyOf(expanded);
     }
 
     /**
@@ -207,31 +184,7 @@ public final class BSplineCurve3 implements Curve3 {
 
     @Override
     public double parameterAt(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        int samples = 1024;
-        double start = startParameter();
-        double end = endParameter();
-        double bestParameter = start;
-        double bestDistance = Double.POSITIVE_INFINITY;
-        for (int i = 0; i <= samples; i++) {
-            double parameter = start + (end - start) * i / samples;
-            double distance = point.distanceTo(pointAt(parameter));
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                bestParameter = parameter;
-            }
-        }
-        // The coarse scan quantizes to domain/1024; polish the winner locally
-        // so Edge sampling lands its endpoint parameters on the true vertices.
-        // Keep the coarse winner when refinement does not improve on it - the
-        // minimum may sit exactly on a bracket boundary (e.g. an endpoint hit).
-        double step = (end - start) / samples;
-        double refined = BSplineMath.refineLocalMinimum(
-                p -> point.distanceTo(pointAt(p)),
-                Math.max(start, bestParameter - step),
-                Math.min(end, bestParameter + step),
-                40);
-        return point.distanceTo(pointAt(refined)) <= bestDistance ? refined : bestParameter;
+        return BSplineCurveHelper.parameterAt(point, knots, this::pointAt);
     }
 
     @Override
