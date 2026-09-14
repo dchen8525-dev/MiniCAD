@@ -2,15 +2,16 @@ package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
-import com.minicad.common.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Minimal rational tensor-product B-spline surface.
  * Expanded knot vectors are cached after first use to avoid repeated allocations.
+ * Domain sampling, bounds and nearest-point search are shared with
+ * {@link BSplineSurface3} through {@link BSplineSurfaceHelper}; only the weighted
+ * point evaluation and the weight-grid validation are specific to this class.
  */
 public final class RationalBSplineSurface3 implements SurfaceGeometry {
 
@@ -67,8 +68,8 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
         if (this.uMultiplicities.size() != this.uKnots.size() || this.vMultiplicities.size() != this.vKnots.size()) {
             throw new GeometryException("knot multiplicities and knot values must have matching sizes");
         }
-        validateKnots(uDegree, this.controlPoints.size(), this.uKnots, this.uMultiplicities);
-        validateKnots(vDegree, vCount, this.vKnots, this.vMultiplicities);
+        BSplineSurfaceHelper.validateKnots(uDegree, this.controlPoints.size(), this.uKnots, this.uMultiplicities);
+        BSplineSurfaceHelper.validateKnots(vDegree, vCount, this.vKnots, this.vMultiplicities);
         this.uDegree = uDegree;
         this.vDegree = vDegree;
     }
@@ -95,7 +96,7 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     private List<Double> uExpanded() {
         List<Double> local = uExpandedKnots;
         if (local == null) {
-            local = expandedKnots(uKnots, uMultiplicities);
+            local = BSplineSurfaceHelper.expandedKnots(uKnots, uMultiplicities);
             uExpandedKnots = local;
         }
         return local;
@@ -104,7 +105,7 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     private List<Double> vExpanded() {
         List<Double> local = vExpandedKnots;
         if (local == null) {
-            local = expandedKnots(vKnots, vMultiplicities);
+            local = BSplineSurfaceHelper.expandedKnots(vKnots, vMultiplicities);
             vExpandedKnots = local;
         }
         return local;
@@ -129,8 +130,8 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     public CartesianPoint pointAt(double u, double v) {
         List<Double> uExp = uExpanded();
         List<Double> vExp = vExpanded();
-        double clampedU = clamp(u, uExp.get(uDegree), uExp.get(controlPoints.size()));
-        double clampedV = clamp(v, vExp.get(vDegree), vExp.get(controlPoints.get(0).size()));
+        double clampedU = BSplineSurfaceHelper.clamp(u, uExp.get(uDegree), uExp.get(controlPoints.size()));
+        double clampedV = BSplineSurfaceHelper.clamp(v, vExp.get(vDegree), vExp.get(controlPoints.get(0).size()));
 
         int uCount = controlPoints.size();
         int vCount = controlPoints.get(0).size();
@@ -167,8 +168,8 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     public Vector3 normalAt(double u, double v) {
         List<Double> uExp = uExpanded();
         List<Double> vExp = vExpanded();
-        double clampedU = clamp(u, uStart(), uEnd());
-        double clampedV = clamp(v, vStart(), vEnd());
+        double clampedU = BSplineSurfaceHelper.clamp(u, uStart(), uEnd());
+        double clampedV = BSplineSurfaceHelper.clamp(v, vStart(), vEnd());
 
         int uCount = controlPoints.size();
         int vCount = controlPoints.get(0).size();
@@ -220,111 +221,23 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     }
 
     public List<List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        int uCount = Math.max(uSegments, 1);
-        int vCount = Math.max(vSegments, 1);
-        List<List<CartesianPoint>> rows = new ArrayList<>(uCount + 1);
-        double uRange = uEnd() - uStart();
-        double vRange = vEnd() - vStart();
-        for (int ui = 0; ui <= uCount; ui++) {
-            double u = uStart() + uRange * ui / uCount;
-            List<CartesianPoint> row = new ArrayList<>(vCount + 1);
-            for (int vi = 0; vi <= vCount; vi++) {
-                double v = vStart() + vRange * vi / vCount;
-                row.add(pointAt(u, v));
-            }
-            rows.add(List.copyOf(row));
-        }
-        return List.copyOf(rows);
+        return BSplineSurfaceHelper.sampleGrid(
+                uSegments, vSegments, uStart(), uEnd(), vStart(), vEnd(), this::pointAt);
     }
 
     public BoundingBox3 boundingBox() {
-        BoundingBox3 box = BoundingBox3.empty();
-        for (List<CartesianPoint> row : controlPoints) {
-            for (CartesianPoint point : row) {
-                box = box.union(point);
-            }
-        }
-        return box;
+        return BSplineSurfaceHelper.boundingBoxOf(controlPoints);
     }
 
     public BoundingBox3 boundingBox(int uSegments, int vSegments) {
-        BoundingBox3 box = BoundingBox3.empty();
-        List<List<CartesianPoint>> samples = sampleGrid(uSegments, vSegments);
-        for (List<CartesianPoint> row : samples) {
-            for (CartesianPoint point : row) {
-                box = box.union(point);
-            }
-        }
-        return box;
-    }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(value, max));
-    }
-
-    private static List<Double> expandedKnots(List<Double> knots, List<Integer> multiplicities) {
-        List<Double> expanded = new ArrayList<>();
-        for (int index = 0; index < knots.size(); index++) {
-            int m = multiplicities.get(index);
-            double k = knots.get(index);
-            for (int repeat = 0; repeat < m; repeat++) {
-                expanded.add(k);
-            }
-        }
-        return List.copyOf(expanded);
-    }
-
-    private static void validateKnots(
-            int degree,
-            int controlPointCount,
-            List<Double> knots,
-            List<Integer> multiplicities
-    ) {
-        int expandedCount = 0;
-        double previous = Double.NEGATIVE_INFINITY;
-        for (int index = 0; index < knots.size(); index++) {
-            double knot = knots.get(index);
-            if (!Double.isFinite(knot)) {
-                throw new GeometryException("knot values must be finite");
-            }
-            if (knot < previous) {
-                throw new GeometryException("knot values must be nondecreasing");
-            }
-            int multiplicity = multiplicities.get(index);
-            if (multiplicity < 1) {
-                throw new GeometryException("knot multiplicities must be positive");
-            }
-            expandedCount += multiplicity;
-            previous = knot;
-        }
-        int expected = controlPointCount + degree + 1;
-        if (expandedCount != expected) {
-            throw new GeometryException("expanded knot count must equal control point count + degree + 1");
-        }
+        return BSplineSurfaceHelper.boundingBoxOf(sampleGrid(uSegments, vSegments));
     }
 
     public CartesianPoint closestPointTo(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        CartesianPoint closest = null;
-        double minDistance = Double.POSITIVE_INFINITY;
-
-        for (int resolution : new int[]{16, 32, 64}) {
-            List<List<CartesianPoint>> grid = sampleGrid(resolution, resolution);
-            for (List<CartesianPoint> row : grid) {
-                for (CartesianPoint sample : row) {
-                    double distance = point.distanceTo(sample);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        closest = sample;
-                    }
-                }
-            }
-        }
-        return closest != null ? closest : pointAt(uStart(), vStart());
+        return BSplineSurfaceHelper.closestPointTo(point, uStart(), uEnd(), vStart(), vEnd(), this::pointAt);
     }
 
     public double distanceTo(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        return point.distanceTo(closestPointTo(point));
+        return BSplineSurfaceHelper.distanceTo(point, uStart(), uEnd(), vStart(), vEnd(), this::pointAt);
     }
 }
