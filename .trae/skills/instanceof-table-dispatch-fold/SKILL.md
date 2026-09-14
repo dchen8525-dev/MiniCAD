@@ -243,3 +243,16 @@ agent 手工折叠时容易只改宿主、漏掉后两者 —— 那样的树**�
 **清理**：删掉谓词/分支体后，原文件可能留下失效的显式 import（`javac` 不报，
 spotless 若未开 `removeUnusedImports` 也不会清），要自己 grep 一遍删掉；
 若有 `import x.*;` 通配兜底则删除更安全。
+
+**"非理性/理性"孪生类对（同包、互为镜像）→ 静态 helper + 一行委托**（2026-09-14，
+`BSplineSurface3` ↔ `RationalBSplineSurface3`，commit `2ba27c8b`）：两型共享的
+`expandedKnots`/`validateKnots`/`clamp`/`sampleGrid`/`boundingBox`×2/`closestPointTo`/
+`distanceTo` 逐字相同，抽包内 `XxxHelper` 后各入口改一行委托；helper 用函数接口
+（如 `PointEvaluator { R at(u,v); }`）解耦"求值方式"，从而同时服务两种求值。要点：
+- **优先 helper、慎用抽象基类**：基类构造函数必须 `super()` 先行，只能把公共校验收进
+  基类，子类专有校验（如权重网格）被迫挪后 ⇒ 会改变"同一输入同时违反公共规则与专有
+  规则时抛哪条消息"的顺序，与"逐字保留"相冲。委托方案**构造函数原封不动**、零行为风险。
+- 触碰 per-class 字段的缓存访问器（`uExpanded` 等）**无法**被静态 helper 吸收，留在各类内
+  —— 这是有意保留的 boilerplate，别为消掉它去上继承。
+- 测试三件套：反射断言"两型不再声明共享 kernel 名 + 公开入口方法仍在"（防再复制）；
+  "中性参数下理性 ≡ 非理性"（钉住接线）；"非中性参数下仍偏离"（钉住专有逻辑没被顺手统一）。
