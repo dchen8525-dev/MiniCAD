@@ -107,11 +107,7 @@ final class StepCadGeometryBuilder {
   }
 
   private StepEntity requireExistingEntity(int id) {
-    StepEntity entity = entitiesById.get(id);
-    if (entity == null) {
-      throw new StepResolutionException("missing resolved entity #" + id);
-    }
-    return entity;
+    return StepCadEntityLookup.requireExisting(entitiesById, id);
   }
 
   /**
@@ -124,11 +120,7 @@ final class StepCadGeometryBuilder {
    * @throws StepResolutionException if entity not found or wrong type
    */
   private <T extends StepEntity> T requireEntity(int id, Class<T> type, String expectedName) {
-    StepEntity entity = requireExistingEntity(id);
-    if (!type.isInstance(entity)) {
-      throw new StepResolutionException("entity #" + id + " is not a " + expectedName);
-    }
-    return type.cast(entity);
+    return StepCadEntityLookup.require(entitiesById, id, type, expectedName);
   }
 
   /**
