@@ -49,7 +49,6 @@ import com.minicad.geometry2d.BSplineCurve2;
 import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.CompositeCurve2;
 import com.minicad.geometry2d.Curve2;
-import com.minicad.geometry2d.DegenerateCurve2;
 import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Hyperbola2;
 import com.minicad.geometry2d.Line2;
@@ -477,11 +476,11 @@ public final class StepCadBuilder {
             }),
             curve3Rule(StepCompositeCurve2D.class, (curve) -> {
                 StepCompositeCurve2D composite2D = (StepCompositeCurve2D) curve;
-                return liftCurve2(buildCompositeCurve2D(composite2D));
+                return liftCurve2(curveBuilder.buildCompositeCurve2D(composite2D));
             }),
             curve3Rule(StepTrimmedCurve2D.class, (curve) -> {
                 StepTrimmedCurve2D trimmed2D = (StepTrimmedCurve2D) curve;
-                return liftCurve2(buildTrimmedCurve2D(trimmed2D));
+                return liftCurve2(curveBuilder.buildTrimmedCurve2D(trimmed2D));
             }),
             curve3Rule(StepBSplineCurve2D.class, (curve) -> {
                 StepBSplineCurve2D spline2D = (StepBSplineCurve2D) curve;
@@ -509,35 +508,35 @@ public final class StepCadBuilder {
             }),
             curve3Rule(StepIndexedPolyCurve2D.class, (curve) -> {
                 StepIndexedPolyCurve2D polyCurve2D = (StepIndexedPolyCurve2D) curve;
-                return liftCurve2(buildIndexedPolyCurve2D(polyCurve2D));
+                return liftCurve2(curveBuilder.buildIndexedPolyCurve2D(polyCurve2D));
             }),
             curve3Rule(StepDegenerateCurve2D.class, (curve) -> {
                 StepDegenerateCurve2D degenerate2D = (StepDegenerateCurve2D) curve;
-                return liftCurve2(buildDegenerateCurve2D(degenerate2D));
+                return liftCurve2(curveBuilder.buildDegenerateCurve2D(degenerate2D));
             }),
             curve3Rule(StepCircle2D.class, (curve) -> {
                 StepCircle2D circle2D = (StepCircle2D) curve;
-                return liftCurve2(buildCircle2D(circle2D));
+                return liftCurve2(curveBuilder.buildCircle2D(circle2D));
             }),
             curve3Rule(StepEllipse2D.class, (curve) -> {
                 StepEllipse2D ellipse2D = (StepEllipse2D) curve;
-                return liftCurve2(buildEllipse2D(ellipse2D));
+                return liftCurve2(curveBuilder.buildEllipse2D(ellipse2D));
             }),
             curve3Rule(StepLine2D.class, (curve) -> {
                 StepLine2D line2D = (StepLine2D) curve;
-                return liftCurve2(buildLine2D(line2D));
+                return liftCurve2(curveBuilder.buildLine2D(line2D));
             }),
             curve3Rule(StepPolyline2D.class, (curve) -> {
                 StepPolyline2D polyline2D = (StepPolyline2D) curve;
-                return liftCurve2(buildPolyline2D(polyline2D));
+                return liftCurve2(curveBuilder.buildPolyline2D(polyline2D));
             }),
             curve3Rule(StepHyperbola2D.class, (curve) -> {
                 StepHyperbola2D hyperbola2D = (StepHyperbola2D) curve;
-                return liftCurve2(buildHyperbola2D(hyperbola2D));
+                return liftCurve2(curveBuilder.buildHyperbola2D(hyperbola2D));
             }),
             curve3Rule(StepParabola2D.class, (curve) -> {
                 StepParabola2D parabola2D = (StepParabola2D) curve;
-                return liftCurve2(buildParabola2D(parabola2D));
+                return liftCurve2(curveBuilder.buildParabola2D(parabola2D));
             })
         );
 
@@ -765,116 +764,8 @@ public final class StepCadBuilder {
         return curveBuilder.buildCompositeCurve2(id);
     }
 
-    private CompositeCurve2 buildCompositeCurve2D(StepCompositeCurve2D compositeCurve2D) {
-        CompositeCurve2 existing = compositeCurves2d.get(compositeCurve2D.id());
-        if (existing != null) {
-            return existing;
-        }
-        List<Curve2> curves = new ArrayList<>(compositeCurve2D.getSegments().size());
-        for (StepCompositeCurveSegment segment : compositeCurve2D.getSegments()) {
-            Object built = buildCurve2(segment.parentCurve());
-            if (!(built instanceof Curve2)) {
-                throw new UnsupportedGeometryException("COMPOSITE_CURVE_2D segment is not a supported 2D curve");
-            }
-            Curve2 curve = (Curve2) built;
-            curves.add(curve);
-        }
-        CompositeCurve2 built = new CompositeCurve2(curves);
-        compositeCurves2d.put(compositeCurve2D.id(), built);
-        return built;
-    }
-
     Object buildCurve2(StepEntity item) {
         return curveBuilder.buildCurve2(item);
-    }
-
-    // Build methods for 2D-specific curve types
-
-    private Polyline2 buildPolyline2D(StepPolyline2D polyline2D) {
-        List<Point2> points = polyline2D.getPoints().stream()
-                .map(p -> buildPoint2(p.id()))
-                .collect(Collectors.toList());
-        return new Polyline2(points);
-    }
-
-    private TrimmedCurve2 buildTrimmedCurve2D(StepTrimmedCurve2D trimmedCurve2D) {
-        Curve2 basisCurve = (Curve2) buildCurve2(trimmedCurve2D.getBasisCurve());
-        // Use trim parameters directly on the basis curve
-        double trim1 = trimmedCurve2D.trim1();
-        double trim2 = trimmedCurve2D.trim2();
-        return new TrimmedCurve2(basisCurve, trim1, trim2, trimmedCurve2D.isSenseAgreement());
-    }
-
-    private Polyline2 buildIndexedPolyCurve2D(StepIndexedPolyCurve2D polyCurve2D) {
-        List<StepCartesianPoint> stepPoints = polyCurve2D.getPoints();
-        List<Integer> indices = polyCurve2D.indices();
-        List<Point2> points = indices.stream()
-                .map(index -> buildPoint2(stepPoints.get(index).id()))
-                .collect(Collectors.toList());
-        return new Polyline2(points);
-    }
-
-    private DegenerateCurve2 buildDegenerateCurve2D(StepDegenerateCurve2D degenerateCurve2D) {
-        Point2 point = buildPoint2(degenerateCurve2D.point().id());
-        return new DegenerateCurve2(point);
-    }
-
-    private Hyperbola2 buildHyperbola2D(StepHyperbola2D hyperbola2D) {
-        Hyperbola2 existing = hyperbolas2d.get(hyperbola2D.id());
-        if (existing != null) {
-            return existing;
-        }
-        StepAxis2Placement2D position = hyperbola2D.getPosition();
-        Point2 center = buildPoint2(position.getLocation().id());
-        Direction2 xDir = buildDirection2(position.getRefDirection().id());
-        Hyperbola2 built = new Hyperbola2(center, xDir, hyperbola2D.getSemiAxis1(), hyperbola2D.getSemiAxis2());
-        hyperbolas2d.put(hyperbola2D.id(), built);
-        return built;
-    }
-
-    private Parabola2 buildParabola2D(StepParabola2D parabola2D) {
-        Parabola2 existing = parabolas2d.get(parabola2D.id());
-        if (existing != null) {
-            return existing;
-        }
-        StepAxis2Placement2D position = parabola2D.getPosition();
-        Point2 center = buildPoint2(position.getLocation().id());
-        Direction2 xDir = buildDirection2(position.getRefDirection().id());
-        Parabola2 built = new Parabola2(center, xDir, parabola2D.focalDist());
-        parabolas2d.put(parabola2D.id(), built);
-        return built;
-    }
-
-    private Line2 buildLine2D(StepLine2D line2D) {
-        Point2 point = buildPoint2(line2D.point2d().id());
-        com.minicad.geometry2d.Direction2 dir = buildDirection2(line2D.direction2d().id());
-        return new Line2(point, dir);
-    }
-
-    private Circle2 buildCircle2D(StepCircle2D circle2D) {
-        Circle2 existing = circles2d.get(circle2D.id());
-        if (existing != null) {
-            return existing;
-        }
-        StepAxis2Placement2D position = circle2D.getPosition();
-        Point2 center = buildPoint2(position.getLocation().id());
-        Direction2 xDir = buildDirection2(position.getRefDirection().id());
-        Circle2 built = new Circle2(center, xDir, circle2D.getRadius());
-        circles2d.put(circle2D.id(), built);
-        return built;
-    }
-
-    private Ellipse2 buildEllipse2D(StepEllipse2D ellipse2D) {
-        Ellipse2 existing = ellipses2d.get(ellipse2D.id());
-        if (existing != null) {
-            return existing;
-        }
-        StepAxis2Placement2D position = ellipse2D.getPosition();
-        Point2 center = buildPoint2(position.getLocation().id());
-        Direction2 xDir = buildDirection2(position.getRefDirection().id());
-        Ellipse2 built = new Ellipse2(center, xDir, ellipse2D.getSemiAxis1(), ellipse2D.getSemiAxis2());
-        ellipses2d.put(ellipse2D.id(), built);
-        return built;
     }
 
     public TrimmedCurve2 buildTrimmedCurve2(int id) {

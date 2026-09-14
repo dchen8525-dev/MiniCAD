@@ -795,7 +795,7 @@ final class StepCadCurveBuilder {
 
     // ==================== Private 2D Curve Builders ====================
 
-    private CompositeCurve2 buildCompositeCurve2D(StepCompositeCurve2D compositeCurve2D) {
+    CompositeCurve2 buildCompositeCurve2D(StepCompositeCurve2D compositeCurve2D) {
         CompositeCurve2 existing = compositeCurves2d.get(compositeCurve2D.id());
         if (existing != null) {
             return existing;
@@ -987,14 +987,14 @@ final class StepCadCurveBuilder {
 
     // 2D-specific curve types
 
-    private Polyline2 buildPolyline2D(StepPolyline2D polyline2D) {
+    Polyline2 buildPolyline2D(StepPolyline2D polyline2D) {
         List<Point2> points = polyline2D.getPoints().stream()
                 .map(p -> buildPoint2(p.id()))
                 .collect(Collectors.toList());
         return new Polyline2(points);
     }
 
-    private TrimmedCurve2 buildTrimmedCurve2D(StepTrimmedCurve2D trimmedCurve2D) {
+    TrimmedCurve2 buildTrimmedCurve2D(StepTrimmedCurve2D trimmedCurve2D) {
         Curve2 basisCurve = (Curve2) buildCurve2(trimmedCurve2D.getBasisCurve());
         double trim1 = trimmedCurve2D.trim1();
         double trim2 = trimmedCurve2D.trim2();
@@ -1085,7 +1085,7 @@ final class StepCadCurveBuilder {
         return built;
     }
 
-    private Polyline2 buildIndexedPolyCurve2D(StepIndexedPolyCurve2D polyCurve2D) {
+    Polyline2 buildIndexedPolyCurve2D(StepIndexedPolyCurve2D polyCurve2D) {
         List<StepCartesianPoint> stepPoints = polyCurve2D.getPoints();
         List<Integer> indices = polyCurve2D.indices();
         List<Point2> points = indices.stream()
@@ -1094,12 +1094,12 @@ final class StepCadCurveBuilder {
         return new Polyline2(points);
     }
 
-    private DegenerateCurve2 buildDegenerateCurve2D(StepDegenerateCurve2D degenerateCurve2D) {
+    DegenerateCurve2 buildDegenerateCurve2D(StepDegenerateCurve2D degenerateCurve2D) {
         Point2 point = buildPoint2(degenerateCurve2D.point().id());
         return new DegenerateCurve2(point);
     }
 
-    private Hyperbola2 buildHyperbola2D(StepHyperbola2D hyperbola2D) {
+    Hyperbola2 buildHyperbola2D(StepHyperbola2D hyperbola2D) {
         Hyperbola2 existing = hyperbolas2d.get(hyperbola2D.id());
         if (existing != null) {
             return existing;
@@ -1112,7 +1112,7 @@ final class StepCadCurveBuilder {
         return built;
     }
 
-    private Parabola2 buildParabola2D(StepParabola2D parabola2D) {
+    Parabola2 buildParabola2D(StepParabola2D parabola2D) {
         Parabola2 existing = parabolas2d.get(parabola2D.id());
         if (existing != null) {
             return existing;
@@ -1125,13 +1125,13 @@ final class StepCadCurveBuilder {
         return built;
     }
 
-    private Line2 buildLine2D(StepLine2D line2D) {
+    Line2 buildLine2D(StepLine2D line2D) {
         Point2 point = buildPoint2(line2D.point2d().id());
         Direction2 dir = buildDirection2(line2D.direction2d().id());
         return new Line2(point, dir);
     }
 
-    private Circle2 buildCircle2D(StepCircle2D circle2D) {
+    Circle2 buildCircle2D(StepCircle2D circle2D) {
         Circle2 existing = circles2d.get(circle2D.id());
         if (existing != null) {
             return existing;
@@ -1144,7 +1144,7 @@ final class StepCadCurveBuilder {
         return built;
     }
 
-    private Ellipse2 buildEllipse2D(StepEllipse2D ellipse2D) {
+    Ellipse2 buildEllipse2D(StepEllipse2D ellipse2D) {
         Ellipse2 existing = ellipses2d.get(ellipse2D.id());
         if (existing != null) {
             return existing;
