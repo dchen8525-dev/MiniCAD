@@ -88,7 +88,6 @@ import com.minicad.step.model.StepCompositeCurveOnSurface;
 import com.minicad.step.model.StepCompositeCurveSegment;
 import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepConicCurve;
-import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDimensionCurve;
@@ -227,7 +226,6 @@ import com.minicad.step.model.StepDegenerateCurve2D;
 import com.minicad.step.model.StepCircle2D;
 import com.minicad.step.model.StepBoundedCurve2D;
 import com.minicad.step.model.StepCompositeCurve2D;
-import com.minicad.step.model.StepCurve2D;
 import com.minicad.step.model.StepEllipse2D;
 import com.minicad.step.model.StepBSplineSurfaceWithKnotsAndBreakpoints;
 import com.minicad.step.model.StepOffsetSurface2;
@@ -788,195 +786,6 @@ public final class StepCadBuilder {
 
     Object buildCurve2(StepEntity item) {
         return curveBuilder.buildCurve2(item);
-    }
-
-    /**
-     * Builds a PCURVE or DEGENERATE_PCURVE as a 2D curve.
-     * PCURVE wraps a representation item containing the actual 2D curve.
-     */
-    private Object buildPcurveCurve2(StepEntity entity) {
-        StepEntity item;
-        if (entity instanceof StepPcurve) {
-            StepPcurve pcurve = (StepPcurve) entity;
-            item = pcurve.referenceToCurve().items().get(0);
-        } else if (entity instanceof StepDegeneratePcurve) {
-            StepDegeneratePcurve pcurve = (StepDegeneratePcurve) entity;
-            item = pcurve.referenceToCurve().items().get(0);
-        } else {
-            throw new StepResolutionException(stepEntityTypeName(entity) + " is not a PCURVE or DEGENERATE_PCURVE");
-        }
-        return buildCurve2(item);
-    }
-
-    /**
-     * Builds a parametric CURVE_2D as a polyline by sampling the polynomial equation.
-     * The equation coefficients are split evenly: first half for x(t), second half for y(t).
-     * Samples t in [0, 1] range.
-     */
-    private com.minicad.geometry2d.Polyline2 buildCurve2DParametric(StepCurve2D curve2D) {
-        double[] eq = curve2D.equation();
-        if (eq.length < 2) {
-            throw new UnsupportedGeometryException("CURVE_2D equation must have at least 2 coefficients");
-        }
-        int half = eq.length / 2;
-        double[] xCoeffs = java.util.Arrays.copyOfRange(eq, 0, half);
-        double[] yCoeffs = java.util.Arrays.copyOfRange(eq, half, eq.length);
-
-        // Build placement transformation
-        com.minicad.geometry.Axis2Placement3D placement = null;
-        if (curve2D.getPosition() instanceof StepAxis2Placement2D) {
-            StepAxis2Placement2D pos2D = (StepAxis2Placement2D) curve2D.getPosition();
-            CartesianPoint origin = buildPoint(pos2D.getLocation().id());
-            Direction3 xDir = new Direction3(1, 0, 0);
-            if (pos2D.getRefDirection() != null) {
-                StepDirection dir = pos2D.getRefDirection();
-                List<Double> dirs = dir.directionRatios();
-                if (dirs != null && dirs.size() >= 2) {
-                    xDir = Direction3.from(new com.minicad.geometry.Vector3(dirs.get(0), dirs.get(1), 0));
-                }
-            }
-            Direction3 axis = Direction3.zAxis();
-            placement = new com.minicad.geometry.Axis2Placement3D(origin, axis, xDir);
-        }
-
-        int samples = Math.max(64, eq.length * 16);
-        List<Point2> points = new ArrayList<>(samples + 1);
-        for (int i = 0; i <= samples; i++) {
-            double t = (double) i / samples;
-            double x = evaluatePolynomial(xCoeffs, t);
-            double y = evaluatePolynomial(yCoeffs, t);
-            if (placement != null) {
-                // Transform from local to global coordinates
-                com.minicad.geometry.Axis2Placement3D p = placement;
-                double gx = p.getLocation().getX() + x * p.xDirection().getX() + y * p.yDirection().getX();
-                double gy = p.getLocation().getY() + x * p.xDirection().getY() + y * p.yDirection().getY();
-                points.add(new Point2(gx, gy));
-            } else {
-                points.add(new Point2(x, y));
-            }
-        }
-        return new com.minicad.geometry2d.Polyline2(points);
-    }
-
-    private static double evaluatePolynomial(double[] coeffs, double t) {
-        double result = 0.0;
-        double tPower = 1.0;
-        for (double coeff : coeffs) {
-            result += coeff * tPower;
-            tPower *= t;
-        }
-        return result;
-    }
-
-    private Polyline2 buildIndexedPolyCurve2(StepIndexedPolyCurve polyCurve) {
-        List<StepCartesianPoint> stepPoints = polyCurve.getPoints();
-        List<Integer> indices = polyCurve.indices();
-        List<Point2> points = indices.stream()
-                .map(index -> {
-                    StepCartesianPoint stepPoint = stepPoints.get(index);
-                    CartesianPoint point3D = buildPoint(stepPoint.id());
-                    return new Point2(point3D.getX(), point3D.getY());
-                })
-                .collect(Collectors.toList());
-        if (polyCurve.isClosed() && !points.isEmpty()) {
-            points = new ArrayList<>(points);
-            points.add(points.get(0));
-            points = List.copyOf(points);
-        }
-        return new Polyline2(points);
-    }
-
-    private Polyline2 buildDegenerateCurve2(StepDegenerateCurve degenerateCurve) {
-        // Degenerate curve in 2D is a single point or empty curve
-        // Return a minimal polyline (single point repeated)
-        StepEntity basisEntity = degenerateCurve.getBasisCurve();
-        if (basisEntity instanceof StepCartesianPoint) {
-            StepCartesianPoint point = (StepCartesianPoint) basisEntity;
-            List<Double> coords = point.coordinates();
-            Point2 pt = coords.size() >= 2
-                ? new Point2(coords.get(0), coords.get(1))
-                : new Point2(0, 0);
-            return new Polyline2(List.of(pt, pt));
-        }
-        // Fallback: try to sample the basis curve and get a point
-        try {
-            Curve3 basisCurve = buildCurve3(basisEntity);
-            List<CartesianPoint> samples = basisCurve.sample(2);
-            if (!samples.isEmpty()) {
-                CartesianPoint first = samples.get(0);
-                Point2 pt = new Point2(first.getX(), first.getY());
-                return new Polyline2(List.of(pt, pt));
-            }
-        } catch (Exception e) {
-            // Recoverable degradation: fall back to a degenerate default polyline.
-            log.warn("2D curve projection failed; using degenerate default polyline", e);
-        }
-        return new Polyline2(List.of(new Point2(0, 0), new Point2(0, 0)));
-    }
-
-    private Polyline2 buildClothoid2(StepClothoid clothoid) {
-        // Clothoid (Euler spiral) in 2D - approximate with polyline sampling
-        StepEntity positionEntity = clothoid.getPosition();
-        Point2 origin;
-        Direction2 xDir;
-        if (positionEntity instanceof StepAxis2Placement2D) {
-            StepAxis2Placement2D placement2D = (StepAxis2Placement2D) positionEntity;
-            origin = buildPoint2(placement2D.getLocation().id());
-            xDir = buildDirection2(placement2D.getRefDirection().id());
-        } else {
-            origin = new Point2(0, 0);
-            xDir = new Direction2(1, 0);
-        }
-        double xAxisIntercept = clothoid.xAxisIntercept();
-        double curvature = clothoid.curvature();
-
-        if (!Double.isFinite(xAxisIntercept) || !Double.isFinite(curvature) || curvature == 0) {
-            return new Polyline2(List.of(origin, origin));
-        }
-
-        // Sample clothoid curve
-        int segments = 64;
-        List<Point2> points = new ArrayList<>(segments + 1);
-        Direction2 yDir = new Direction2(-xDir.getY(), xDir.getX());
-
-        // Clothoid parametric: x(t) = A * integral(cos(u^2), u=0..t), y(t) = A * integral(sin(u^2), u=0..t)
-        // where A = xAxisIntercept / sqrt(pi/2)
-        double A = xAxisIntercept / Math.sqrt(Math.PI / 2);
-        double maxT = Math.sqrt(Math.abs(curvature) * Math.PI);
-
-        for (int i = 0; i <= segments; i++) {
-            double t = (maxT * i) / segments;
-            // Fresnel integrals approximation
-            double fresnelC = fresnelCos(t);
-            double fresnelS = fresnelSin(t);
-            double x = A * fresnelC;
-            double y = A * fresnelS;
-            Point2 pt = origin.add(xDir.asVector().scale(x).add(yDir.asVector().scale(y)));
-            points.add(pt);
-        }
-        return new Polyline2(points);
-    }
-
-    // Fresnel integral approximations
-    private double fresnelCos(double t) {
-        // C(t) ≈ t - (t^5)/10 + (t^9)/216 - ... for small t
-        // For larger t, use asymptotic approximation
-        if (t < 0.5) {
-            return t - t*t*t*t*t/10.0 + t*t*t*t*t*t*t*t*t/216.0;
-        }
-        // Asymptotic: C(t) ≈ 0.5 + sin(t^2)/(2*pi*t) - cos(t^2)/(2*pi*t^3)
-        double t2 = t * t;
-        return 0.5 + Math.sin(t2) / (2 * Math.PI * t);
-    }
-
-    private double fresnelSin(double t) {
-        // S(t) ≈ (t^3)/3 - (t^7)/42 + (t^11)/1320 - ... for small t
-        if (t < 0.5) {
-            return t*t*t/3.0 - t*t*t*t*t*t*t/42.0;
-        }
-        // Asymptotic: S(t) ≈ 0.5 - cos(t^2)/(2*pi*t) - sin(t^2)/(2*pi*t^3)
-        double t2 = t * t;
-        return 0.5 - Math.cos(t2) / (2 * Math.PI * t);
     }
 
     // Build methods for 2D-specific curve types
@@ -2871,15 +2680,6 @@ public final class StepCadBuilder {
         return transformCurve3(parent, replica.transformation());
     }
 
-    private Curve2 buildReplicaCurve2(StepGeometricReplica replica) {
-        Object built = buildCurve2(replica.parent());
-        if (!(built instanceof Curve2)) {
-            throw new UnsupportedGeometryException(replica.entityName() + " parent is not a supported 2D curve");
-        }
-        Curve2 parent = (Curve2) built;
-        return transformCurve2(parent, replica.transformation());
-    }
-
     private Curve3 buildConicCurve3(StepConicCurve conic) {
         if (!(conic.getPosition() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("3D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_3D");
@@ -2904,58 +2704,6 @@ public final class StepCadBuilder {
             default:
                 throw new UnsupportedGeometryException("surface directrix for " + conic.entityName() + " is unsupported");
         }
-    }
-
-    private Curve2 buildConicCurve2(StepConicCurve conic) {
-        if (!(conic.getPosition() instanceof StepAxis2Placement2D)) {
-            throw new UnsupportedGeometryException("2D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_2D");
-        }
-        StepAxis2Placement2D placement2D = (StepAxis2Placement2D) conic.getPosition();
-        Point2 origin = buildPoint2(placement2D.getLocation().id());
-        Direction2 xDirection = buildDirection2(placement2D.getRefDirection().id());
-        String entityName = conic.entityName();
-        switch (entityName) {
-            case "PARABOLA":
-                return buildParabola2(origin, xDirection, conic.parameters());
-            case "HYPERBOLA":
-                return buildHyperbola2(origin, xDirection, conic.parameters());
-            case "DEGENERATE_CONIC":
-                return new Polyline2(List.of(origin, origin));
-            case "CONIC_CURVE":
-                try {
-                    return buildParabola2(origin, xDirection, conic.parameters());
-                } catch (UnsupportedGeometryException e) {
-                    return buildHyperbola2(origin, xDirection, conic.parameters());
-                }
-            default:
-                throw new UnsupportedGeometryException("PCURVE 2D item for " + conic.entityName() + " is unsupported");
-        }
-    }
-
-    private Parabola2 buildParabola2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
-        if (parameters.isEmpty()) {
-            throw new UnsupportedGeometryException("PARABOLA requires focal distance");
-        }
-        double focalDistance = parameters.get(0);
-        if (!Double.isFinite(focalDistance) || focalDistance <= Epsilon.EPS) {
-            throw new UnsupportedGeometryException("PARABOLA focal distance must be positive");
-        }
-        // Parabola vertex is at origin, axis direction is yDirection (perpendicular to x)
-        Direction2 yDirection = new Direction2(-xDirection.getY(), xDirection.getX());
-        return new Parabola2(origin, yDirection, focalDistance);
-    }
-
-    private Hyperbola2 buildHyperbola2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
-        if (parameters.size() < 2) {
-            throw new UnsupportedGeometryException("HYPERBOLA requires semi-axis and semi-imaginary-axis");
-        }
-        double semiAxisA = parameters.get(0);
-        double semiAxisB = parameters.get(1);
-        if (!Double.isFinite(semiAxisA) || !Double.isFinite(semiAxisB)
-                || semiAxisA <= Epsilon.EPS || semiAxisB <= Epsilon.EPS) {
-            throw new UnsupportedGeometryException("HYPERBOLA axes must be positive");
-        }
-        return new Hyperbola2(origin, xDirection, semiAxisA, semiAxisB);
     }
 
     private List<CartesianPoint> sampleParabolaPoints3(Axis2Placement3D placement, List<Double> parameters) {
