@@ -98,25 +98,10 @@ public final class RationalBSplineCurve2 implements Curve2 {
     public List<Double> expandedKnots() {
         List<Double> local = expandedKnotsCache;
         if (local == null) {
-            local = computeExpandedKnots();
+            local = BSplineCurveHelper.expandedKnots(knots, knotMultiplicities);
             expandedKnotsCache = local;
         }
         return local;
-    }
-
-    private List<Double> computeExpandedKnots() {
-        if (knots == null || knotMultiplicities == null) {
-            return List.of();
-        }
-        List<Double> expanded = new ArrayList<>();
-        for (int i = 0; i < knots.size(); i++) {
-            int multiplicity = knotMultiplicities.get(i);
-            double knotValue = knots.get(i);
-            for (int j = 0; j < multiplicity; j++) {
-                expanded.add(knotValue);
-            }
-        }
-        return List.copyOf(expanded);
     }
 
     /**
@@ -125,10 +110,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
      * @return start parameter
      */
     public double startParameter() {
-        if (knots == null || knots.isEmpty()) {
-            return 0.0;
-        }
-        return knots.get(0);
+        return BSplineCurveHelper.startParameter(knots);
     }
 
     /**
@@ -137,10 +119,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
      * @return end parameter
      */
     public double endParameter() {
-        if (knots == null || knots.isEmpty()) {
-            return 1.0;
-        }
-        return knots.get(knots.size() - 1);
+        return BSplineCurveHelper.endParameter(knots);
     }
 
     @Override
