@@ -167,18 +167,6 @@ public final class CylindricalSurface implements SurfaceGeometry {
         return origin.add(axis.scale(v)).add(radialDir.asVector().scale(radius));
     }
 
-    /**
-     * Returns the distance from a point to the cylinder surface.
-     *
-     * @param point target point
-     * @return distance to surface
-     */
-    public double distanceTo(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        CartesianPoint closest = closestPointTo(point);
-        return point.distanceTo(closest);
-    }
-
     @Override
     public Vector3 normalAt(double u, double v) {
         return normalAt(u);

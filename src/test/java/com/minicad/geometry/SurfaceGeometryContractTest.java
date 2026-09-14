@@ -93,6 +93,37 @@ class SurfaceGeometryContractTest {
         }
     }
 
+    /**
+     * The surfaces that rely on the {@link SurfaceGeometry#closestPointTo} default
+     * must return the best of their own {@code 32 x 32} sampled grid, and
+     * {@code distanceTo} must measure to exactly that point.
+     */
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("samplingClosestPointSurfaces")
+    void closestPointIsTheBestGridSample(SurfaceGeometry surface) {
+        CartesianPoint probe = new CartesianPoint(0.7, -0.4, 1.3);
+
+        double best = Double.POSITIVE_INFINITY;
+        for (List<CartesianPoint> row : surface.sampleGrid(32, 32)) {
+            for (CartesianPoint sample : row) {
+                best = Math.min(best, probe.distanceTo(sample));
+            }
+        }
+
+        CartesianPoint closest = surface.closestPointTo(probe);
+        double distance = probe.distanceTo(closest);
+        assertEquals(best, distance, 1e-12, () -> surface.getClass().getSimpleName() + ": not the best grid sample");
+        assertEquals(distance, surface.distanceTo(probe), 1e-12,
+                () -> surface.getClass().getSimpleName() + ": distanceTo must measure to closestPointTo");
+    }
+
+    static Stream<Arguments> samplingClosestPointSurfaces() {
+        return allSurfaces().stream()
+                .filter(s -> s instanceof ConicalSurface || s instanceof RuledSurface3
+                        || s instanceof SurfaceOfLinearExtrusion3 || s instanceof ToroidalSurface)
+                .map(s -> Arguments.of(Named.of(s.getClass().getSimpleName(), s)));
+    }
+
     static Stream<Arguments> surfaces() {
         return allSurfaces().stream()
                 .map(s -> Arguments.of(Named.of(s.getClass().getSimpleName(), s)));

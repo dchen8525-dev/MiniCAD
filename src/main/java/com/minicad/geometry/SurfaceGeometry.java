@@ -55,6 +55,47 @@ public interface SurfaceGeometry {
     }
 
     /**
+     * Returns the sampled surface point closest to the given point.
+     *
+     * <p>Implementations with a closed-form projection override this; the
+     * default searches a {@code 32 x 32} sampled grid, the same resolution
+     * {@link #boundingBox()} uses. It assumes {@link #sampleGrid} returns a
+     * non-empty grid, as the interface default does not.</p>
+     *
+     * @param point the point to find the closest surface point to
+     * @return closest sampled point on the surface
+     */
+    default CartesianPoint closestPointTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        // Sample grid and find closest point
+        java.util.List<java.util.List<CartesianPoint>> grid = sampleGrid(32, 32);
+        CartesianPoint closest = grid.get(0).get(0);
+        double minDist = point.distanceTo(closest);
+        for (java.util.List<CartesianPoint> row : grid) {
+            for (CartesianPoint p : row) {
+                double dist = point.distanceTo(p);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = p;
+                }
+            }
+        }
+        return closest;
+    }
+
+    /**
+     * Returns the distance from the given point to this surface, measured to
+     * its {@link #closestPointTo} point.
+     *
+     * @param point the point to measure the distance from
+     * @return distance to the closest point on the surface
+     */
+    default double distanceTo(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        return point.distanceTo(closestPointTo(point));
+    }
+
+    /**
      * Returns the unit surface normal at natural-domain parameters {@code (u, v)}.
      *
      * <p><b>Contract.</b> The normal is the normalized cross product of the two

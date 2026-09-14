@@ -128,19 +128,6 @@ public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
         return base.add(direction.normalize().scale(radius));
     }
 
-    /**
-     * Returns the distance from a point to the surface.
-     * Approximate implementation.
-     *
-     * @param point target point
-     * @return distance to surface (approximate)
-     */
-    public double distanceTo(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        CartesianPoint closest = closestPointTo(point);
-        return point.distanceTo(closest);
-    }
-
     @Override
     public Vector3 normalAt(double u, double v) {
         Preconditions.requireFinite(u, "u");
