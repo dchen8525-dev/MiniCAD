@@ -1,7 +1,6 @@
 package com.minicad.preview.sampling;
 
-import com.minicad.common.Epsilon;
-import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.export.json.StepGeometryHelper;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
 import com.minicad.preview.payload.PointPayload;
@@ -11,7 +10,6 @@ import com.minicad.step.model.*;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.topology.EdgeLoop;
 
-import java.util.ArrayList;
 import java.util.List;
 import com.minicad.export.json.StepEdgePayloadBuilder;
 import com.minicad.export.glb.PreviewMeshExporter;
@@ -45,39 +43,7 @@ public final class PreviewSurfaceSampler {
     }
 
     public static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
-        int uCount = surface.controlPoints().size();
-        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().get(0).size();
-        if (uCount < 2 || vCount < 2) {
-            throw new UnsupportedGeometryException("FREE_FORM_SURFACE requires at least 2x2 control points");
-        }
-        List<List<CartesianPoint>> controlPoints = new ArrayList<>(uCount);
-        for (List<StepEntity> row : surface.controlPoints()) {
-            List<CartesianPoint> pointRow = new ArrayList<>(row.size());
-            for (StepEntity pt : row) {
-                if (pt instanceof StepCartesianPoint) {
-            StepCartesianPoint cartesianPoint = (StepCartesianPoint) pt;
-                    pointRow.add(builder.buildPoint(cartesianPoint.id()));
-                } else {
-                    throw new UnsupportedGeometryException("FREE_FORM_SURFACE control points must be Cartesian points");
-                }
-            }
-            controlPoints.add(List.copyOf(pointRow));
-        }
-        int uDegree = surface.degreeU();
-        int vDegree = surface.degreeV();
-        int uKnotCount = uCount + uDegree + 1;
-        int vKnotCount = vCount + vDegree + 1;
-        List<Double> uKnots = new ArrayList<>();
-        for (int i = 0; i < uKnotCount; i++) {
-            uKnots.add((double) i / (uKnotCount - 1));
-        }
-        List<Double> vKnots = new ArrayList<>();
-        for (int i = 0; i < vKnotCount; i++) {
-            vKnots.add((double) i / (vKnotCount - 1));
-        }
-        List<Integer> uMults = List.of(1);
-        List<Integer> vMults = List.of(1);
-        return new BSplineSurface3(uDegree, vDegree, controlPoints, uMults, vMults, uKnots, vKnots);
+        return PreviewMeshExporter.buildFreeFormSurface(surface, builder);
     }
 
     // ─── Triangulation ───────────────────────────────────────────────────
@@ -132,60 +98,16 @@ public final class PreviewSurfaceSampler {
     }
 
     private static List<CartesianPoint> reversed(List<CartesianPoint> points) {
-        List<CartesianPoint> copy = new ArrayList<>(points);
-        java.util.Collections.reverse(copy);
-        return List.copyOf(copy);
+        return StepGeometryHelper.reversed(points);
     }
 
     private static List<CartesianPoint> resamplePolyline(List<CartesianPoint> points, int segments) {
-        if (points.size() < 2) {
-            return List.of(points.get(0));
-        }
-        List<Double> lengths = new ArrayList<>(points.size());
-        lengths.add(0.0);
-        for (int i = 1; i < points.size(); i++) {
-            lengths.add(lengths.get(i - 1) + points.get(i - 1).distanceTo(points.get(i)));
-        }
-        double total = lengths.get(lengths.size() - 1);
-        if (total <= Epsilon.EPS) {
-            return java.util.Collections.nCopies(segments + 1, points.get(0));
-        }
-        List<CartesianPoint> result = new ArrayList<>(segments + 1);
-        for (int i = 0; i <= segments; i++) {
-            double target = total * i / segments;
-            result.add(pointAtDistance(points, lengths, target));
-        }
-        result.set(0, points.get(0));
-        result.set(result.size() - 1, points.get(points.size() - 1));
-        return List.copyOf(result);
+        return StepGeometryHelper.resamplePolyline(points, segments);
     }
 
-    private static CartesianPoint pointAtDistance(List<CartesianPoint> points, List<Double> lengths, double target) {
-        for (int i = 1; i < lengths.size(); i++) {
-            if (target <= lengths.get(i)) {
-                double start = lengths.get(i - 1);
-                double segment = lengths.get(i) - start;
-                double alpha = segment <= Epsilon.EPS ? 0.0 : (target - start) / segment;
-                return interpolate(points.get(i - 1), points.get(i), alpha);
-            }
-        }
-        return points.get(points.size() - 1);
-    }
-
-    private static CartesianPoint interpolate(CartesianPoint a, CartesianPoint b, double alpha) {
-        return new CartesianPoint(
-                a.x() * (1.0 - alpha) + b.x() * alpha,
-                a.y() * (1.0 - alpha) + b.y() * alpha,
-                a.z() * (1.0 - alpha) + b.z() * alpha
-        );
-    }
-
-    // ─── Delegate methods needed from StepPreviewJsonExporter ────────────
-    // These are called by the methods above and must remain accessible.
-    // They will be updated to delegate once the facade is finalized.
+    // ─── Facade for StepEdgePayloadBuilder's edge sampling ──────────────
 
     private static List<CartesianPoint> sampleOrientedEdge(com.minicad.topology.OrientedEdge edge) {
-        // Temporary: delegate to StepPreviewJsonExporter
         return StepEdgePayloadBuilder.sampleOrientedEdge(edge);
     }
 

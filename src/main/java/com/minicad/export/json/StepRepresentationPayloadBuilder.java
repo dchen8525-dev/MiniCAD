@@ -376,40 +376,7 @@ public final class StepRepresentationPayloadBuilder {
 
 
     public static BSplineSurface3 buildFreeFormSurface(StepFreeFormSurface surface, StepCadBuilder builder) {
-        int uCount = surface.controlPoints().size();
-        int vCount = surface.controlPoints().isEmpty() ? 0 : surface.controlPoints().get(0).size();
-        if (uCount < 2 || vCount < 2) {
-            throw new UnsupportedGeometryException("FREE_FORM_SURFACE requires at least 2x2 control points");
-        }
-        List<List<CartesianPoint>> controlPoints = new ArrayList<>(uCount);
-        for (List<StepEntity> row : surface.controlPoints()) {
-            List<CartesianPoint> pointRow = new ArrayList<>(row.size());
-            for (StepEntity pt : row) {
-                if (pt instanceof com.minicad.step.model.StepCartesianPoint) {
-                    com.minicad.step.model.StepCartesianPoint cartesianPoint = (com.minicad.step.model.StepCartesianPoint) pt;
-                    pointRow.add(builder.buildPoint(cartesianPoint.id()));
-                } else {
-                    throw new UnsupportedGeometryException("FREE_FORM_SURFACE control points must be Cartesian points");
-                }
-            }
-            controlPoints.add(List.copyOf(pointRow));
-        }
-        int uDegree = surface.degreeU();
-        int vDegree = surface.degreeV();
-        // Generate uniform knot vectors
-        int uKnotCount = uCount + uDegree + 1;
-        int vKnotCount = vCount + vDegree + 1;
-        List<Double> uKnots = new ArrayList<>();
-        for (int i = 0; i < uKnotCount; i++) {
-            uKnots.add((double) i / (uKnotCount - 1));
-        }
-        List<Double> vKnots = new ArrayList<>();
-        for (int i = 0; i < vKnotCount; i++) {
-            vKnots.add((double) i / (vKnotCount - 1));
-        }
-        List<Integer> uMults = List.of(1);
-        List<Integer> vMults = List.of(1);
-        return new BSplineSurface3(uDegree, vDegree, controlPoints, uMults, vMults, uKnots, vKnots);
+        return PreviewMeshExporter.buildFreeFormSurface(surface, builder);
     }
 
 
