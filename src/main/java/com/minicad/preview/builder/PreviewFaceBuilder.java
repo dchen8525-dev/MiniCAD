@@ -1117,40 +1117,12 @@ public final class PreviewFaceBuilder {
         return null;
     }
 
-    // ─── Geometry collection orchestration (delegates to PreviewGeometryCollector) ───
-
-    public static GeometryCollection buildLegacyGeometry(
-            Map<Integer, StepEntity> resolved,
-            StepCadBuilder builder,
-            StepMetadataExtractor metadata
-    ) {
-        return PreviewGeometryCollector.buildLegacyGeometry(resolved, builder, metadata);
-    }
-
-    public static GeometryCollection buildGeometryForShells(
-            Set<Integer> shellIds,
-            Map<Integer, StepEntity> resolved,
-            StepCadBuilder builder,
-            StepMetadataExtractor metadata,
-            Map<Integer, StepMetadataExtractor.DisplayMetadata> inheritedShellMetadata
-    ) {
-        return PreviewGeometryCollector.buildGeometryForShells(shellIds, resolved, builder, metadata, inheritedShellMetadata);
-    }
-
-    public static GeometryCollection buildGeometryForSolids(
-            Set<Integer> solidIds,
-            Map<Integer, StepEntity> resolved,
-            StepCadBuilder builder,
-            StepMetadataExtractor metadata,
-            Map<Integer, StepMetadataExtractor.DisplayMetadata> inheritedSolidMetadata
-    ) {
-        return PreviewGeometryCollector.buildGeometryForSolids(solidIds, resolved, builder, metadata, inheritedSolidMetadata);
-    }
-
-    public static GeometryCollection mergeGeometry(GeometryCollection left, GeometryCollection right) {
-        return PreviewGeometryCollector.mergeGeometry(left, right);
-    }
-
+    // The four legacy-geometry facades that used to sit here -- buildLegacyGeometry,
+    // buildGeometryForShells, buildGeometryForSolids and mergeGeometry -- are gone.
+    // They forwarded to PreviewGeometryCollector, and nothing called any of them:
+    // the live entry is StepLegacyGeometryBuilder, which StepPreviewJsonExporter and
+    // StepRepresentationPayloadBuilder name directly. Keeping them would have pinned
+    // a second copy of the orchestration in place, which is what had drifted.
     public static void collectShellLikeIds(StepEntity item, Set<Integer> shellIds) {
         PreviewGeometryCollector.collectShellLikeIds(item, shellIds);
     }

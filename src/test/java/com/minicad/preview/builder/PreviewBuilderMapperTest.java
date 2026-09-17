@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.minicad.export.json.StepLegacyGeometryBuilder;
 import com.minicad.export.json.StepPayloadBuilder;
 import com.minicad.preview.payload.EdgePayload;
 import com.minicad.preview.payload.FacePayload;
@@ -25,7 +26,7 @@ class PreviewBuilderMapperTest {
         GeometryCollection left = new GeometryCollection(List.of(e1), List.of(f1), List.of());
         GeometryCollection right = new GeometryCollection(List.of(e2), List.of(), List.of());
 
-        GeometryCollection merged = PreviewGeometryCollector.mergeGeometry(left, right);
+        GeometryCollection merged = StepLegacyGeometryBuilder.mergeGeometry(left, right);
 
         assertEquals(2, merged.getEdges().size());
         assertEquals(1, merged.getFaces().size());

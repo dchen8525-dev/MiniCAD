@@ -1,5 +1,6 @@
 package com.minicad.preview.builder;
 
+import com.minicad.export.json.StepLegacyGeometryBuilder;
 import com.minicad.helper.StepMetadataExtractor;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.helper.StepTextReader;
@@ -29,10 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Pipeline-level tests for the preview building trio the coverage gate calls
- * out (PreviewCurveEvaluator / PreviewFaceBuilder / PreviewGeometryCollector):
- * real sample faces and edges are driven through the public entries and the
- * produced geometry is asserted, not just executed.
+ * Pipeline-level tests for the preview builders the coverage gate calls out
+ * (PreviewCurveEvaluator / PreviewFaceBuilder): real sample faces and edges are
+ * driven through the public entries and the produced geometry is asserted, not
+ * just executed. The legacy-geometry leg drives StepLegacyGeometryBuilder, which
+ * is now the single home of that orchestration.
  */
 class PreviewPipelineTest {
 
@@ -51,7 +53,7 @@ class PreviewPipelineTest {
     @Test
     void legacyGeometryCollectorBuildsFacesAndEdgesFromTheSample() {
         com.minicad.preview.payload.GeometryCollection geometry =
-                PreviewGeometryCollector.buildLegacyGeometry(
+                StepLegacyGeometryBuilder.buildLegacyGeometry(
                         resolved, builder, StepMetadataExtractor.fromResolved(resolved));
 
         // plate-with-round-hole: the legacy collector emits the shell-backed
@@ -66,7 +68,7 @@ class PreviewPipelineTest {
         }
 
         com.minicad.preview.payload.GeometryCollection merged =
-                PreviewGeometryCollector.mergeGeometry(geometry, geometry);
+                StepLegacyGeometryBuilder.mergeGeometry(geometry, geometry);
         assertEquals(geometry.faces().size() * 2, merged.faces().size());
         assertEquals(geometry.edges().size() * 2, merged.edges().size());
     }

@@ -32,7 +32,20 @@ public final class StepLegacyGeometryBuilder {
     private StepLegacyGeometryBuilder() {}
 
 
-    static GeometryCollection buildLegacyGeometry(
+    /**
+     * Builds the legacy geometry collection: shell-backed faces, solids and
+     * standalone edges, each bucketed by its own classifier.
+     *
+     * <p>This method and its three helpers ({@code buildGeometryForShells},
+     * {@code buildGeometryForSolids}, {@code mergeGeometry}) are the single home
+     * of the legacy-geometry orchestration. The {@code preview} package used to
+     * carry a copy of all four behind a {@code PreviewFaceBuilder} facade that
+     * nothing called, and the copy had already drifted: it never received the
+     * {@code StepFacetedBrepAndBrepWithVoids} bucket entry below, so the two
+     * copies answered differently for that entity. The copy and its facade are
+     * gone rather than re-synchronised, because a second copy is what drifts.
+     */
+    public static GeometryCollection buildLegacyGeometry(
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder,
             StepMetadataExtractor metadata
@@ -42,45 +55,7 @@ public final class StepLegacyGeometryBuilder {
         Map<Integer, EdgePayload> standaloneEdges = new LinkedHashMap<>();
         for (StepEntity entity : resolved.values()) {
             collectShellLikeIds(entity, shellIds);
-            if (entity instanceof StepSweptAreaSolid
-                    || entity instanceof StepSolidReplica
-                    || entity instanceof StepCsgSolid
-                    || entity instanceof StepCsgPrimitive
-                    || entity instanceof StepBooleanClippingResult
-                    || entity instanceof StepBooleanResult
-                    || entity instanceof StepSweptDiskSolid
-                    || entity instanceof StepExtrudedAreaSolidTapered
-                    || entity instanceof StepRevolvedAreaSolidTapered
-                    || entity instanceof StepSurfaceCurveSweptAreaSolid
-                    || entity instanceof StepPolygonalBoundedHalfSpace
-                    || entity instanceof StepComplexClippingResult
-                    || entity instanceof StepHalfSpaceSolid
-                    || entity instanceof StepCsgVolume
-                    || entity instanceof StepBlockVolume
-                    || entity instanceof StepFiniteElementMesh
-                    || entity instanceof StepFlatPattern
-                    || entity instanceof StepBrepWithVoids
-                    || entity instanceof StepFacetedBrepAndBrepWithVoids
-                    || entity instanceof StepManifoldSolidBrep
-                    || entity instanceof StepFacettedBrep
-                    || entity instanceof StepNonManifoldSolidBrep
-                    || entity instanceof StepAdvancedBrep
-                    || entity instanceof StepMappedItem
-                    || entity instanceof StepSolidModel
-                    || entity instanceof StepSurfacePatch
-                    || entity instanceof StepExtrudedFaceSolid
-                    || entity instanceof StepRevolvedFaceSolid
-                    || entity instanceof StepSweptFaceSolid
-                    || entity instanceof StepCylinderVolume
-                    || entity instanceof StepSphereVolume
-                    || entity instanceof StepTorusVolume
-                    || entity instanceof StepPrismVolume
-                    || entity instanceof StepRightCircularConeVolume
-                    || entity instanceof StepTessellatedFace
-                    || entity instanceof StepTessellatedFaceSet
-                    || entity instanceof StepTriangulatedFace
-                    || entity instanceof StepComplexTriangulatedFace
-                    || entity instanceof StepCubicBezierTriangulatedFace) {
+            if (isLegacyGeometrySolidItem(entity)) {
                 solidIds.add(entity.id());
             }
             if (StepValidationHelper.isStandaloneEdgeSource(entity)) {
@@ -239,7 +214,12 @@ public final class StepLegacyGeometryBuilder {
     }
 
 
-    static GeometryCollection mergeGeometry(GeometryCollection left, GeometryCollection right) {
+    /**
+     * Concatenates the three payload lists of two collections. Public because the
+     * legacy-geometry merge is also driven directly from tests; it is the merge
+     * helper {@link #buildLegacyGeometry} composes its three buckets with.
+     */
+    public static GeometryCollection mergeGeometry(GeometryCollection left, GeometryCollection right) {
         List<EdgePayload> edges = new ArrayList<>(left.edges());
         edges.addAll(right.edges());
         List<FacePayload> faces = new ArrayList<>(left.faces());
@@ -313,6 +293,80 @@ public final class StepLegacyGeometryBuilder {
             }
         })
     );
+
+    /**
+     * Decides whether an entity goes into the <em>solid</em> bucket of
+     * {@link #buildLegacyGeometry}, as opposed to the shell bucket or the
+     * standalone-edge bucket.
+     *
+     * <p>This was an inline {@code instanceof} chain of 39 alternatives until it
+     * was given a name, for two reasons. First, it is a rule, and a rule that
+     * only exists as a 39-line expression inside a loop cannot be asserted
+     * directly -- there was no way to ask "is this entity a solid?" without
+     * driving a whole file through the orchestrator. Second, naming it makes the
+     * relationship to {@link StepValidationHelper#isRepresentationSolidItem}
+     * legible: that classifier is <em>narrower</em> (27 types) and this one is a
+     * strict superset of it. The two are deliberately separate questions --
+     * "would a representation list this as a solid item?" versus "does the legacy
+     * geometry pipeline have a builder for it?" -- so the extra 12 types below
+     * are enumerated rather than folded into the narrower list, and neither
+     * method may be replaced by the other.
+     *
+     * <p>The 12 types this rule adds over {@code isRepresentationSolidItem} are
+     * the face-backed solids ({@code StepExtrudedFaceSolid},
+     * {@code StepRevolvedFaceSolid}, {@code StepSweptFaceSolid}), the primitive
+     * volumes ({@code StepCylinderVolume}, {@code StepSphereVolume},
+     * {@code StepTorusVolume}, {@code StepPrismVolume},
+     * {@code StepRightCircularConeVolume}), the triangulated faces
+     * ({@code StepTriangulatedFace}, {@code StepComplexTriangulatedFace},
+     * {@code StepCubicBezierTriangulatedFace}) and
+     * {@code StepFacetedBrepAndBrepWithVoids} -- the last of which is exactly the
+     * type the deleted preview copy was missing.
+     *
+     * @param entity the STEP entity to bucket
+     * @return true if the entity is built as solid geometry by the legacy pipeline
+     */
+    static boolean isLegacyGeometrySolidItem(StepEntity entity) {
+        return entity instanceof StepSweptAreaSolid
+                || entity instanceof StepSolidReplica
+                || entity instanceof StepCsgSolid
+                || entity instanceof StepCsgPrimitive
+                || entity instanceof StepBooleanClippingResult
+                || entity instanceof StepBooleanResult
+                || entity instanceof StepSweptDiskSolid
+                || entity instanceof StepExtrudedAreaSolidTapered
+                || entity instanceof StepRevolvedAreaSolidTapered
+                || entity instanceof StepSurfaceCurveSweptAreaSolid
+                || entity instanceof StepPolygonalBoundedHalfSpace
+                || entity instanceof StepComplexClippingResult
+                || entity instanceof StepHalfSpaceSolid
+                || entity instanceof StepCsgVolume
+                || entity instanceof StepBlockVolume
+                || entity instanceof StepFiniteElementMesh
+                || entity instanceof StepFlatPattern
+                || entity instanceof StepBrepWithVoids
+                || entity instanceof StepFacetedBrepAndBrepWithVoids
+                || entity instanceof StepManifoldSolidBrep
+                || entity instanceof StepFacettedBrep
+                || entity instanceof StepNonManifoldSolidBrep
+                || entity instanceof StepAdvancedBrep
+                || entity instanceof StepMappedItem
+                || entity instanceof StepSolidModel
+                || entity instanceof StepSurfacePatch
+                || entity instanceof StepExtrudedFaceSolid
+                || entity instanceof StepRevolvedFaceSolid
+                || entity instanceof StepSweptFaceSolid
+                || entity instanceof StepCylinderVolume
+                || entity instanceof StepSphereVolume
+                || entity instanceof StepTorusVolume
+                || entity instanceof StepPrismVolume
+                || entity instanceof StepRightCircularConeVolume
+                || entity instanceof StepTessellatedFace
+                || entity instanceof StepTessellatedFaceSet
+                || entity instanceof StepTriangulatedFace
+                || entity instanceof StepComplexTriangulatedFace
+                || entity instanceof StepCubicBezierTriangulatedFace;
+    }
 
     private static void removeShellsReferencedBySolids(StepEntity solidEntity, Set<Integer> shellIds) {
         if (solidEntity == null) {
