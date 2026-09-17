@@ -76,6 +76,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * and {@code toPolyLoopEdgePayload} -- went with them. The three facades left
  * here are the ones with real in-file callers.
  *
+ * <p>The round after that took the same rule one layer further out: eleven
+ * {@code toXxxFacePayload} handlers in this file were dead twins of live rules
+ * in {@code StepFacePayloadBuilder}'s table, and ten of them had no caller at
+ * all. The eleventh, {@code toSphericalFacePayload}, was reachable only from
+ * {@code toRectangularCompositeSurfaceFacePayload}, which itself had none -- so
+ * the whole composite-basis rule table, and the frozen order fixture guarding
+ * it, dispatched for nobody. All eleven went, along with the helpers that had
+ * already lost every caller or existed only for these bodies:
+ * {@code triangulateSphericalStrip}, {@code basisDirectionForNormal},
+ * {@code clamp}, and the two private {@code PreviewSurfaceSampler} facades for
+ * triangulation. The guards below check the deletions and, more importantly,
+ * that every surface type those handlers served still has a home -- otherwise a
+ * deletion and a dropped capability would look the same from here.
+ *
  * <p>The guard matters because convergence without one regresses silently: a
  * later edit can paste the body back, and every existing test still passes --
  * both copies agree until they drift. It pins the canonical homes, the facades
@@ -87,6 +101,9 @@ class PreviewFaceBuilderConvergenceTest {
 
     private static final String FACE_BUILDER =
             "src/main/java/com/minicad/preview/builder/PreviewFaceBuilder.java";
+
+    private static final String STEP_FACE_PAYLOAD_BUILDER =
+            "src/main/java/com/minicad/export/json/StepFacePayloadBuilder.java";
 
     /**
      * Facades that must survive, as the exact statement their body must hold.
@@ -132,6 +149,43 @@ class PreviewFaceBuilderConvergenceTest {
             "StepOrientedFace",
             "StepStyledItem",
             "StepOverRidingStyledItem");
+
+    /**
+     * The preview-side surface handlers a later pass deleted, each paired with
+     * the text that proves its surface type still has a home elsewhere. The
+     * pairing is the point of the guard: without it, "delete the dead handler"
+     * and "drop a surface type" look identical from this file.
+     *
+     * <p>None of the eleven had a caller when they went. Ten had none at all;
+     * {@code toSphericalFacePayload} was reachable only from
+     * {@code toRectangularCompositeSurfaceFacePayload}, which itself had none.
+     * Every one of their surface types was already handled on the export side,
+     * which is why deleting rather than re-homing was the right move.
+     */
+    private static final List<List<String>> DROPPED_SURFACE_HANDLERS = List.of(
+            List.of("toSphericalFacePayload", "previewFaceRule(StepSphericalSurface.class"),
+            List.of("toSurfaceOfLinearExtrusionFacePayload", "previewFaceRule(StepSurfaceOfLinearExtrusion.class"),
+            List.of("toSurfaceOfRevolutionFacePayload", "StepSurfaceOfRevolution.class.isInstance("),
+            List.of("toOffsetSurfaceFacePayload", "unwrapRule(StepOffsetSurface2.class"),
+            List.of("toFreeFormSurfaceFacePayload", "previewFaceRule(StepFreeFormSurface.class"),
+            List.of("toConeFacePayload", "StepConicalSurfaceWithEllipticalAxis.class.isInstance("),
+            List.of("toParaboloidFacePayload", "previewFaceRule(StepParaboloidSurface.class"),
+            List.of("toHyperboloidFacePayload", "previewFaceRule(StepHyperboloidSurface.class"),
+            List.of("toSurfaceOfTranslationFacePayload", "previewFaceRule(StepSurfaceOfTranslation.class"),
+            List.of("toSurfaceOfProjectionFacePayload", "previewFaceRule(StepSurfaceOfProjection.class"),
+            List.of("toRectangularCompositeSurfaceFacePayload", "unwrapRule(StepRectangularCompositeSurface.class"));
+
+    /**
+     * Helpers that went with those handlers or had already lost every caller:
+     * {@code basisDirectionForNormal} is live on the export side,
+     * {@code clamp} has one home in the common kernel, and
+     * {@code triangulateSphericalStrip} was called only by the deleted spherical
+     * handler.
+     */
+    private static final List<String> DROPPED_DEAD_HELPERS = List.of(
+            "basisDirectionForNormal",
+            "clamp",
+            "triangulateSphericalStrip");
 
     @Test
     @DisplayName("the export side stays the public static home of the canonical helpers")
@@ -248,6 +302,65 @@ class PreviewFaceBuilderConvergenceTest {
                 PreviewFaceBuilder.reverseClosedLoop(closed));
         assertEquals(List.of(), PreviewFaceBuilder.reverseClosedLoop(List.of()),
                 "a degenerate loop is returned as-is");
+    }
+
+    @Test
+    @DisplayName("the preview-side surface handlers stay gone, each with its export-side home intact")
+    void previewSurfaceHandlersStayGone() throws Exception {
+        String preview = read(Paths.get(FACE_BUILDER));
+        String exportSide = read(Paths.get(STEP_FACE_PAYLOAD_BUILDER));
+
+        List<String> reappeared = new ArrayList<>();
+        for (List<String> pair : DROPPED_SURFACE_HANDLERS) {
+            if (declares(preview, pair.get(0))) {
+                reappeared.add(pair.get(0));
+            }
+        }
+        assertEquals(List.of(), reappeared,
+                "PreviewFaceBuilder re-declared " + reappeared + ". Each of these built a "
+                        + "FacePayload for a surface type the export-side path already "
+                        + "handles, and none had a caller left -- the live entry point is "
+                        + "StepFacePayloadBuilder.buildPreviewFaceResult's rule table.");
+
+        assertFalse(preview.contains("COMPOSITE_BASIS_FACE_RULES"),
+                "the composite-basis rule table is back. Its only entry point, "
+                        + "toRectangularCompositeSurfaceFacePayload, had no caller, so the "
+                        + "table dispatched for nobody: the wrapper surface is unwrapped "
+                        + "first and dispatched on the basis type.");
+
+        List<String> orphaned = new ArrayList<>();
+        for (List<String> pair : DROPPED_SURFACE_HANDLERS) {
+            if (!exportSide.contains(pair.get(1)) && !preview.contains(pair.get(1))) {
+                orphaned.add(pair.get(0) + " -> " + pair.get(1));
+            }
+        }
+        assertEquals(List.of(), orphaned,
+                "these surface types lost their only home: " + orphaned + ". The deletion was "
+                        + "safe because the handler was a copy; if the home moved or vanished, "
+                        + "a surface type was dropped rather than deduplicated.");
+    }
+
+    @Test
+    @DisplayName("the helpers that died with those handlers stay gone")
+    void helperCopiesThatDiedWithTheHandlersStayGone() throws Exception {
+        String text = read(Paths.get(FACE_BUILDER));
+        List<String> reappeared = new ArrayList<>();
+        for (String name : DROPPED_DEAD_HELPERS) {
+            if (declares(text, name)) {
+                reappeared.add(name);
+            }
+        }
+        assertEquals(List.of(), reappeared,
+                "PreviewFaceBuilder re-declared " + reappeared + ". basisDirectionForNormal "
+                        + "is live in export.glb.PreviewMeshExporter / export.json.StepPointExtractor, "
+                        + "clamp has one home in common.BSplineKernel, and triangulateSphericalStrip "
+                        + "was called only by the deleted spherical handler -- all three would be "
+                        + "dead on arrival here.");
+
+        assertFalse(text.contains("TriangulationHelper.appendOrientedTriangle("),
+                "PreviewFaceBuilder emits an oriented triangle again. Its last caller here was "
+                        + "triangulateSphericalStrip, so the call means a spherical-strip copy "
+                        + "came back with it.");
     }
 
     private static void assertPublicStatic(Class<?> owner, String name) {

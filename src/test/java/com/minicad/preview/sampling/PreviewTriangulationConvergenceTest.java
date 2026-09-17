@@ -49,10 +49,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li>the facade and the canonical helper still agree at runtime.</li>
  * </ul>
  *
- * <p>It also pins the deliberate non-convergence: triangulateSphericalStrip has
- * no TriangulationHelper twin (it works off Axis2Placement3D + radius rather
- * than a surface object), so it must stay in PreviewFaceBuilder. A future pass
- * must not "finish the job" by deleting it.
+ * <p>It also used to pin a deliberate non-convergence: triangulateSphericalStrip
+ * has no TriangulationHelper twin (it works off Axis2Placement3D + radius rather
+ * than a surface object), so it could not be sunk into the helper. A later pass
+ * found the other half of that coin -- nothing called it either. Its only caller
+ * was {@code toSphericalFacePayload}, one of the preview-side surface handlers
+ * whose live home is {@code StepFacePayloadBuilder.PREVIEW_FACE_RULES}, so the
+ * strip went with its last caller instead of being moved. Spherical faces are
+ * still handled: the export-side rule builds them through
+ * {@code toParametricTrimmedFaceResult}. The guard is inverted accordingly --
+ * the strip must stay gone, and the export-side rule must keep existing so the
+ * deletion does not quietly drop a surface type.
  */
 class PreviewTriangulationConvergenceTest {
 
@@ -62,6 +69,8 @@ class PreviewTriangulationConvergenceTest {
             "src/main/java/com/minicad/preview/builder/PreviewFaceBuilder.java";
     private static final String SURFACE_SAMPLER =
             "src/main/java/com/minicad/preview/sampling/PreviewSurfaceSampler.java";
+    private static final String STEP_FACE_PAYLOAD_BUILDER =
+            "src/main/java/com/minicad/export/json/StepFacePayloadBuilder.java";
 
     /** The canonical emitters, as they must remain reachable reflectively. */
     private static final List<String> CANONICAL = List.of(
@@ -78,6 +87,19 @@ class PreviewTriangulationConvergenceTest {
             "triangulateConicalStrip",
             "triangulateToroidalStrip",
             "appendOrientedTriangle");
+
+    /**
+     * The subset of {@link #FACE_BUILDER_DROPPED} PreviewFaceBuilder must still
+     * reach through the helper. appendOrientedTriangle is deliberately absent:
+     * the three strips below are the only emitters this class still emits, and
+     * appendOrientedTriangle's last caller here was triangulateSphericalStrip,
+     * which left with its own last caller. The export side and
+     * PreviewSurfaceSampler still call it.
+     */
+    private static final List<String> FACE_BUILDER_CALLS_THROUGH_HELPER = List.of(
+            "triangulateCylindricalStrip",
+            "triangulateConicalStrip",
+            "triangulateToroidalStrip");
 
     /** Copies deleted from PreviewSurfaceSampler by the convergence. */
     private static final List<String> SURFACE_SAMPLER_DROPPED = List.of(
@@ -117,7 +139,7 @@ class PreviewTriangulationConvergenceTest {
         }
 
         List<String> missing = new ArrayList<>();
-        for (String name : FACE_BUILDER_DROPPED) {
+        for (String name : FACE_BUILDER_CALLS_THROUGH_HELPER) {
             if (!text.contains("TriangulationHelper." + name + "(")) {
                 missing.add(name);
             }
@@ -148,12 +170,25 @@ class PreviewTriangulationConvergenceTest {
     }
 
     @Test
-    @DisplayName("triangulateSphericalStrip stays in PreviewFaceBuilder (no helper twin)")
-    void sphericalStripStaysWhereItIs() throws Exception {
-        assertTrue(declares(read(Paths.get(FACE_BUILDER)), "triangulateSphericalStrip"),
-                "triangulateSphericalStrip has no TriangulationHelper twin: it takes "
-                        + "Axis2Placement3D + radius rather than a surface object, so it "
-                        + "is not part of the convergence. Do not delete it.");
+    @DisplayName("triangulateSphericalStrip went with its last caller and spherical faces kept a home")
+    void sphericalStripWentWithItsLastCaller() throws Exception {
+        assertFalse(declares(read(Paths.get(FACE_BUILDER)), "triangulateSphericalStrip"),
+                "triangulateSphericalStrip came back. It had no TriangulationHelper twin, "
+                        + "and -- the other half of that story -- no caller either: its only "
+                        + "caller was toSphericalFacePayload, a preview-side handler whose "
+                        + "live home is the export-side rule table.");
+        assertFalse(declares(read(Paths.get(HELPER)), "triangulateSphericalStrip"),
+                "TriangulationHelper must not grow a spherical-strip twin either; a spherical "
+                        + "face payload is built on the export side.");
+
+        String exportSide = read(Paths.get(STEP_FACE_PAYLOAD_BUILDER));
+        assertTrue(exportSide.contains("previewFaceRule(StepSphericalSurface.class"),
+                "the export-side rule table must keep a StepSphericalSurface rule: it is "
+                        + "where a spherical face payload is built now. Without it the "
+                        + "deletion would have dropped a surface type rather than moved it.");
+        assertTrue(exportSide.contains("toParametricTrimmedFaceResult"),
+                "the spherical rule builds through toParametricTrimmedFaceResult, the body "
+                        + "the deleted preview handler used to own a copy of.");
     }
 
     @Test
