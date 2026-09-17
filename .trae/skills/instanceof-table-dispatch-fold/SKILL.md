@@ -454,3 +454,92 @@ assertTrue(local || delegated, "预览侧入口必须继续存在，两种解法
 
 这样下一轮无论"删本地改委托"还是"保持现状"，守卫都不挡路；同时另一条断言钉住孪生仍在
 （提醒债务存在）。**把"刻意不做"写成测试注释**，比写在 commit message 里更难丢。
+
+### 扫描器对字面量失明：先修工具，再动手（2026-09-17）
+
+`strip_java` 原本把字符串/字符字面量换成 `c * 2`。两个后果都很贵：
+
+1. **对字面量完全失明**，于是"只差异常文案"的两份副本被判为完全相同。本轮 `polygonNormal`
+   就是假阳性：三份里两份写 `"revolved face normal is degenerate"`、一份写
+   `"polygon normal is degenerate"`，扫描器报"1 个不同方法体 / 3 个成员"。**照它折叠会把一处
+   可观察行为（异常文案）悄悄改掉**。动手前先 `grep -n degenerate` 之类的关键字肉眼核一遍文案，
+   别只看扫描器的分组结论。
+2. **偏移并未保留**（尽管 docstring 写着 `keeping offsets`）。任何"拿到 `m['brace']` 就去切原文
+   做原地替换"的脚本都会切错位置——本轮因此把 `StepCadBuilder.buildEllipsoidLike` 的方法体切成
+   碎片，只能 `git checkout` 还原重来。
+
+修法：字面量**原地掩码**，结构性字符 1:1 替换（`{`→`(`、`}`→`)`、`;`→`,`、``→`/`、
+`"`→`'`、`'`→反引号、换行→空格），其余原样保留。长度守恒 → 偏移可安全映射回原文；文案可比对。
+
+改完在**全体主源文件**上断言一次再动手：
+
+```python
+for p in every_java_file:
+    assert len(scan.strip_java(open(p).read())) == len(open(p).read())
+```
+
+再配一个 `--ignore-literals` 视图（字面量视为相等后分组）专门挑"同一份代码、不同文案"的孪生。
+**这个视图是必需的**：字面量敏感分组修好之后，这类孪生会各自落成单成员组并被 `owners < 2`
+过滤掉，等于从报告里彻底消失——不主动捞一次就再也看不见它们了。
+
+### 重复 + 不可达 = 删，不要折表也不要提取（2026-09-17）
+
+扫出重复组后**先数调用点**。如果某一份零调用点，而且它的私有依赖只被它调用，那这是一个
+**级联死代码簇**：
+
+```
+StepCadBuilder.buildEllipsoidLike       0 处调用  -> 删
+  ├─ pointOnPlacement                   仅它调用 -> 删
+  ├─ addTriangleFace                    仅它调用 -> 删
+  ├─ outwardApproximation              仅它调用 -> 删
+  └─ polygonNormal                      仅它调用 -> 删（105 行）
+```
+
+对这类簇，"折成表"或"提取共享 helper"都是错的：那等于给死代码找一个更体面的新家。正确动作是
+**先删零调用点那个，再 grep 它的依赖是否也归零**，逐个收尾。级联判据很干脆——计数从 N 掉到
+`decl + 只在死代码里出现的调用数`。
+
+反例：同一轮里 `StepCadBooleanBuilder` 的那份同名方法有 12 处活跃调用，所以它留下，只是内部
+改去委托 helper。**同一个名字在不同文件里的处置可以完全不同，按调用点定，不要按簇统一。**
+
+### 嵌套类型的上提：用同包 import 保住签名（2026-09-17）
+
+`StepCadBooleanBuilder` 和 `StepCadSweptBuilder` 各声明了一份 `private static class CircularFrame`
+（25 行，逐字相同），而且两边都有 `revolveProfileAtAngle(..., CircularFrame frame, ...)` 这样的
+本地签名引用它。上提到 helper 后，**在同包文件里 `import com.minicad.step.semantic.StepCadShellGeometry.CircularFrame;`
+是合法的**，于是本地签名一行都不用改、调用点零改动。比把每处都写成全限定名省事一个量级。
+
+（注意 `circularFrame` 这类工厂方法本身也要跟着上提，否则构造 `new CircularFrame(x, y)` 还会在
+两个 builder 里各留一处。）
+
+### 文案分歧先确认它是否只存在于"将被删的那份"（2026-09-17）
+
+本轮 `polygonNormal` 的文案分歧（Builder 一份 vs 其余两份）看起来需要给 helper 加
+`degenerateMessage` 参数。但 Builder 那份**整个是死代码**，直接删掉后分歧自然消解——
+Boolean 与 Swept 之间本来就一致（都是 `"revolved ..."`），helper 因此**不需要任何参数**。
+
+**顺序是：先数调用点定处置，再判文案是否需要参数。** 反过来的话会为一个根本不会发生的分歧
+设计接口。只有当两份**都活着**且文案不同时，才把文案作为参数传进去（保行为）或显式统一。
+
+### 括号回退：在"深度归零那一刻"break（2026-09-17）
+
+写"从 `{` 回退到方法声明起始行"的辅助函数（原地删除方法需要它，否则多行签名的 `) {` 行会留下）
+时，判断必须放在递减**之后**：
+
+```python
+i = brace - 1
+depth = 0
+while i >= 0:
+    ch = text[i]
+    if ch == ')':
+        depth += 1
+    elif ch == '(':
+        depth -= 1
+        if depth == 0:
+            break          # 放到上面判定的话 depth 还是 1，永远不 break
+    i -= 1
+```
+
+写错时不会报错，只会一路走回文件开头（贯穿全文的括号恰好配平，实测走了 92442 步到 i = -1），
+然后删掉"方法体但保留签名"，留下光秃秃的方法头。**删除后立刻 `grep -c` 每个被删名字应为 0，
+并 `sed` 看一遍删除处的上下文**，这两步就能当场发现。

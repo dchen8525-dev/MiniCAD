@@ -8,11 +8,18 @@ candidate for "keep one, delegate the rest".
 
 Design notes
 ------------
-* Bodies are compared after comment/string stripping and whitespace collapsing,
-  so formatting differences do not hide a duplicate.
+* Bodies are compared after comment stripping, literal masking and whitespace
+  collapsing, so formatting differences do not hide a duplicate. Literals keep
+  their text: two copies that differ only in an exception message are *not* the
+  same body, and reporting them as one would send you into a fold that silently
+  changes observable behaviour.
 * ``--fuzzy`` additionally erases ``com.minicad.<pkg>.`` qualifiers, which is
   how one copy spelling ``com.minicad.geometry2d.Direction2`` while its twin
   imports ``Direction2`` still lines up.
+* ``--ignore-literals`` goes the other way and treats every literal as equal.
+  That is the view that surfaces "same code, different message" twins, which are
+  real convergence candidates but need the message threaded through as a
+  parameter (or unified on purpose) instead of being folded blind.
 * Trivial bodies (getters, one-line delegations, ``return null;``) are filtered
   by ``--min-lines``; those converge to nothing useful.
 * Constructors, ``toString``/``hashCode``/``equals``, and methods named after an
@@ -20,19 +27,33 @@ Design notes
 * Identical text is not identical code. The scanner prints a risk marker on
   groups that need a type-resolution check before they can be delegated:
 
-    - ``same-name-nested-type:X`` -- the shared body mentions ``X`` and one of
-      the member files declares its own nested type called ``X``. Unqualified
-      ``X`` then resolves to *different* classes in the two files, so the copies
-      cannot simply be merged (this cost a real detour: MeshTriangulatorParametric
-      declared a nested ``UvPoint`` and its pcurve samplers looked identical to
+    - ``nested:X`` -- the shared body mentions ``X`` and one of the member files
+      declares its own nested type called ``X``. Unqualified ``X`` then resolves
+      to *different* classes in the two files, so the copies cannot simply be
+      merged (this cost a real detour: MeshTriangulatorParametric declared a
+      nested ``UvPoint`` and its pcurve samplers looked identical to
       PcurveSamplingHelper's, which speaks com.minicad.preview.payload.UvPoint).
+      Hoisting the nested type into a shared home is the prerequisite, and it
+      also has to be a type nothing else still refers to unqualified.
+    - ``literals-differ`` (``--ignore-literals`` only) -- the members agree once
+      literals are erased but not before, so they differ in a message, a format
+      string or a key. The distinct literal sets are printed underneath.
     - ``cross-package`` -- the members live in different packages, so the
-      unqualified names in the body may resolve through different imports.
+      unqualified names in the body may resolve through different imports. Only
+      counted in the summary: most groups span packages, so inline it was noise.
+
+Offsets
+-------
+``strip_java`` preserves the length of its input, so an index into the stripped
+text is an index into the source. Callers that edit files (rather than just
+count) rely on this to locate a method's braces; it is why a literal is masked
+in place rather than deleted.
 
 Usage
 -----
     python tools/scan_duplicate_methods.py                     # whole main tree
     python tools/scan_duplicate_methods.py --fuzzy --min-lines 4
+    python tools/scan_duplicate_methods.py --fuzzy --ignore-literals
     python tools/scan_duplicate_methods.py --root src/main/java/com/minicad/export
 """
 from __future__ import annotations
@@ -52,10 +73,24 @@ SKIP_NAMES = {"toString", "hashCode", "equals", "compareTo", "main"}
 TYPE_DECL = re.compile(r"\b(?:class|interface|enum|record|@interface)\s+(\w+)")
 METHOD_DECL = re.compile(r"(?<![\w.])(?P<name>\w+)\s*\((?P<args>[^()]*)\)\s*$")
 QUALIFIER = re.compile(r"\bcom\.minicad(?:\.[a-z0-9_]+)*\.")
+LITERAL = re.compile(r"\"[^\"\n]*\"|'[^'\n]*'")
+
+# Applied to the *interior* of a literal so it survives the comparison but stops
+# being a literal as far as the structural scan is concerned: one character in,
+# one character out, so every offset downstream still lines up with the source.
+LITERAL_MASK = str.maketrans({
+    "{": "(", "}": ")", ";": ",", "\\": "/", '"': "'", "'": "`", "\n": " ",
+})
 
 
 def strip_java(src: str) -> str:
-    """Blank out comments, string/char literals and text blocks, keeping offsets."""
+    """Blank out comments and mask literals, preserving every offset.
+
+    Comments become spaces. Literals keep their text -- two method bodies that
+    differ only in an exception message must not come out equal -- but the
+    characters this scanner gives structural meaning to (braces, semicolons,
+    quotes, newlines) are swapped for harmless ones in place.
+    """
     out: list[str] = []
     i, n = 0, len(src)
     while i < n:
@@ -73,7 +108,7 @@ def strip_java(src: str) -> str:
         elif src.startswith('"""', i):
             j = src.find('"""', i + 3)
             j = n if j == -1 else j + 3
-            out.append("".join(ch if ch == "\n" else " " for ch in src[i:j]))
+            out.append(src[i:j].translate(LITERAL_MASK))
             i = j
         elif c in "\"'":
             j = i + 1
@@ -87,7 +122,11 @@ def strip_java(src: str) -> str:
                 if src[j] == "\n":
                     break
                 j += 1
-            out.append(c * 2)
+            raw = src[i:j]
+            if len(raw) >= 2 and raw.endswith(c):
+                out.append(c + raw[1:-1].translate(LITERAL_MASK) + c)
+            else:
+                out.append(c + raw[1:].translate(LITERAL_MASK))
             i = j
         else:
             out.append(c)
@@ -117,6 +156,10 @@ def extract(path: str) -> tuple[list[dict], set[str], str]:
     text" apart from "the same code": a nested type shadows an import, so an
     unqualified name in one member's body can resolve to a class the other
     member has never heard of.
+
+    Every index returned here (``brace``) is an index into the source as well as
+    into the stripped text, because ``strip_java`` preserves length. Callers that
+    rewrite a body in place depend on that.
     """
     src = open(path, encoding="utf-8").read()
     package_match = re.search(r"(?m)^package\s+([\w.]+)\s*;", src)
@@ -161,14 +204,17 @@ def extract(path: str) -> tuple[list[dict], set[str], str]:
     return methods, nested, package
 
 
-def normalise(body: str, fuzzy: bool) -> str:
-    text = re.sub(r"\s+", " ", body).strip()
+def normalise(body: str, fuzzy: bool, ignore_literals: bool = False) -> str:
+    text = body
+    if ignore_literals:
+        text = LITERAL.sub('""', text)
+    text = re.sub(r"\s+", " ", text).strip()
     if fuzzy:
         text = QUALIFIER.sub("", text)
     return text
 
 
-def risk_flags(body: str, members: list[dict]) -> list[str]:
+def risk_flags(body: str, members: list[dict], ignore_literals: bool = False) -> list[str]:
     """Heuristics for groups whose identical text may still be different code."""
     flags: list[str] = []
     nested = sorted({name for m in members for name in m["nested"]})
@@ -176,12 +222,14 @@ def risk_flags(body: str, members: list[dict]) -> list[str]:
                 if re.search(r"\b" + re.escape(name) + r"\b", body)]
     if shadowed:
         flags.append("nested:" + ",".join(shadowed))
+    if ignore_literals and len({m["literals"] for m in members}) > 1:
+        flags.append("literals-differ")
     if len({m["package"] for m in members}) > 1:
         flags.append("cross-package")
     return flags
 
 
-def collect(root: str, min_lines: int, fuzzy: bool):
+def collect(root: str, min_lines: int, fuzzy: bool, ignore_literals: bool = False):
     groups: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for dirpath, _dirnames, filenames in os.walk(root):
         for fn in filenames:
@@ -200,7 +248,7 @@ def collect(root: str, min_lines: int, fuzzy: bool):
                 owner = m["classes"][-1] if m["classes"] else "?"
                 if m["name"] == owner:
                     continue
-                key = (m["name"], normalise(body, fuzzy))
+                key = (m["name"], normalise(body, fuzzy, ignore_literals))
                 groups[key].append({
                     "file": path.replace("\\", "/"),
                     "owner": owner,
@@ -208,6 +256,7 @@ def collect(root: str, min_lines: int, fuzzy: bool):
                     "decl": m["decl"],
                     "lines": len([ln for ln in body.split("\n") if ln.strip()]),
                     "nested": nested,
+                    "literals": tuple(sorted(LITERAL.findall(body))),
                     "package": package,
                 })
     out = []
@@ -215,7 +264,7 @@ def collect(root: str, min_lines: int, fuzzy: bool):
         owners = {(m["owner"], m["file"]) for m in members}
         if len(owners) < 2:
             continue
-        out.append((name, members, risk_flags(body, members)))
+        out.append((name, members, risk_flags(body, members, ignore_literals)))
     out.sort(key=lambda kv: (-max(m["lines"] for m in kv[1]), kv[0]))
     return out
 
@@ -227,28 +276,44 @@ def main() -> int:
                     help="minimum non-blank body lines to be reported")
     ap.add_argument("--fuzzy", action="store_true",
                     help="ignore com.minicad.* package qualifiers")
+    ap.add_argument("--ignore-literals", action="store_true",
+                    help="treat every literal as equal, surfacing the "
+                         "'same code, different message' twins")
     ap.add_argument("--top", type=int, default=40)
     args = ap.parse_args()
 
-    groups = collect(args.root, args.min_lines, args.fuzzy)
+    groups = collect(args.root, args.min_lines, args.fuzzy, args.ignore_literals)
     total_saved = 0
     for name, members, flags in groups[:args.top]:
         owners = sorted({(m["owner"], m["file"]) for m in members})
         lines_each = max(m["lines"] for m in members)
         total_saved += lines_each * (len(owners) - 1)
-        warnings = [flag for flag in flags if flag.startswith("nested:")]
+        warnings = [flag for flag in flags
+                    if flag.startswith("nested:") or flag == "literals-differ"]
         marker = f"  [!] {' '.join(warnings)}" if warnings else ""
         print(f"\n### {name}  x{len(owners)}  (~{lines_each} lines each){marker}")
         for m in members:
             print(f"    {m['file']}:{m['owner']}  <- {m['decl'][:90]}")
+        if "literals-differ" in flags:
+            by_literals = defaultdict(list)
+            for m in members:
+                by_literals[m["literals"]].append(m["owner"])
+            for literals, who in sorted(by_literals.items()):
+                shown = " ".join(literals) if literals else ("<none>",)
+                print(f"      literals {shown}  <- {', '.join(sorted(set(who)))}")
     nested = [g for g in groups if any(f.startswith("nested:") for f in g[2])]
+    literal_diff = [g for g in groups if "literals-differ" in g[2]]
     cross = sum(1 for g in groups if "cross-package" in g[2])
     print(f"\n{len(groups)} duplicate group(s); ~{total_saved} lines reclaimable "
           f"if each group keeps one copy.")
     if nested:
-        print(f"{len(nested)} group(s) marked [!]: one member declares a nested type "
-              f"that shadows a name in the shared body, so the two copies may not even "
-              f"be the same code. Check the types before delegating.")
+        print(f"{len(nested)} group(s) marked [!] nested: one member declares a nested "
+              f"type that shadows a name in the shared body, so the two copies may not "
+              f"even be the same code. Check the types before delegating.")
+    if literal_diff:
+        print(f"{len(literal_diff)} group(s) marked [!] literals-differ: identical once "
+              f"literals are erased, so they differ in a message -- thread it through as "
+              f"a parameter instead of folding blind, or unify it on purpose.")
     if cross:
         print(f"{cross} group(s) span packages: their unqualified names may resolve "
               f"through different imports. Normal for a cross-layer helper, worth a "
