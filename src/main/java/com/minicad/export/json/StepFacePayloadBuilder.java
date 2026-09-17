@@ -105,7 +105,6 @@ import com.minicad.topology.EdgeLoop;
 import com.minicad.topology.FaceBound;
 import com.minicad.topology.OrientedEdge;
 import com.minicad.topology.VertexLoop;
-import com.minicad.topology.PolyLoop;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -665,7 +664,7 @@ public final class StepFacePayloadBuilder {
                 metadata.transparency(),
                 PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "cylindrical_strip",
@@ -751,7 +750,7 @@ public final class StepFacePayloadBuilder {
                 metadata.transparency(),
                 PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "conical_strip",
@@ -847,7 +846,7 @@ public final class StepFacePayloadBuilder {
                 metadata.transparency(),
                 PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "toroidal_strip",
@@ -943,7 +942,7 @@ public final class StepFacePayloadBuilder {
                 metadata.transparency(),
                 PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bounds.get(0))))),
                 triangles,
                 new FaceSurfacePayload(
                         "toroidal_strip",
@@ -1009,7 +1008,7 @@ public final class StepFacePayloadBuilder {
                 metadata.transparency(),
                 PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -1049,51 +1048,7 @@ public final class StepFacePayloadBuilder {
                 metadata.transparency(),
                 PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
-                triangles,
-                null,
-                null
-        );
-    }
-
-    private static FacePayload toFourSidedPatchFacePayload(
-            StepFaceEntity stepFace,
-            StepEntity geometry,
-            StepMetadataExtractor.DisplayMetadata metadata,
-            StepCadBuilder builder
-    ) {
-        List<FaceBound> bounds = StepFacePayloadBuilder.buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.get(0).outer()) {
-            return null;
-        }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
-            return null;
-        }
-        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
-        SurfacePatch patch = StepEdgePayloadBuilder.buildFourSidedPatch(outerLoop);
-        if (patch == null) {
-            return null;
-        }
-        List<PointPayload> triangles = TriangulationHelper.triangulatePatch(patch, StepValidationHelper.faceSameSense(stepFace));
-        if (triangles.isEmpty()) {
-            return null;
-        }
-        Vector3 normal = patch.normalAt(0.5, 0.5);
-        if (!StepValidationHelper.faceSameSense(stepFace)) {
-            normal = normal.scale(-1.0);
-        }
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                StepTypeNameResolver.surfaceTypeName(geometry),
-                PayloadConversionHelper.toPointPayload(patch.pointAt(0.0, 0.0)),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                StepValidationHelper.faceSameSense(stepFace),
-                PayloadConversionHelper.toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                PayloadConversionHelper.toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -1121,7 +1076,7 @@ public final class StepFacePayloadBuilder {
         if (!sameSense) normal = normal.scale(-1.0);
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
+            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bound))));
         }
         return new FacePayload(
                 stepFace.id(),
@@ -1167,7 +1122,7 @@ public final class StepFacePayloadBuilder {
         if (!sameSense) normal = normal.scale(-1.0);
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
+            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bound))));
         }
         return new FacePayload(
                 stepFace.id(),
@@ -1214,7 +1169,7 @@ public final class StepFacePayloadBuilder {
         if (!sameSense) normal = normal.scale(-1.0);
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(sampleLoop(bound))));
+            loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bound))));
         }
         return new FacePayload(
                 stepFace.id(),
@@ -1266,7 +1221,7 @@ public final class StepFacePayloadBuilder {
                 metadata.transparency(),
                 PayloadConversionHelper.toPbrPayload(metadata.pbr()),
                 metadata.layers(),
-                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(sampleLoop(bounds.get(0))))),
+                List.of(new LoopPayload(true, PayloadConversionHelper.toPointPayloads(StepPayloadBuilder.sampleLoop(bounds.get(0))))),
                 triangles,
                 null,
                 null
@@ -1417,7 +1372,7 @@ public final class StepFacePayloadBuilder {
             if (bound.loop() instanceof VertexLoop) {
                 return List.of();
             }
-            List<CartesianPoint> points3d = sampleLoop(bound);
+            List<CartesianPoint> points3d = StepPayloadBuilder.sampleLoop(bound);
             if (points3d.size() < 4) {
                 return List.of();
             }
@@ -2109,38 +2064,6 @@ public final class StepFacePayloadBuilder {
         return StepPayloadBuilder.reverseFacePayload(base);
     }
 
-    private static List<CartesianPoint> sampleLoop(FaceBound bound) {
-        if (bound.loop() instanceof VertexLoop) {
-            VertexLoop vertexLoop = (VertexLoop) bound.loop();
-            return List.of(vertexLoop.vertex().point());
-        }
-        if (bound.loop() instanceof PolyLoop) {
-            PolyLoop polyLoop = (PolyLoop) bound.loop();
-            List<CartesianPoint> sampled = new ArrayList<>(polyLoop.points());
-            if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
-                sampled.add(sampled.get(0));
-            }
-            return bound.orientation() ? sampled : StepPayloadBuilder.reverseClosedLoop(sampled);
-        }
-        if (!(bound.loop() instanceof EdgeLoop)) {
-            throw new UnsupportedGeometryException("preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP");
-        }
-        EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
-        List<CartesianPoint> sampled = new ArrayList<>();
-        boolean firstEdge = true;
-        for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-            List<CartesianPoint> edgePoints = StepEdgePayloadBuilder.sampleOrientedEdge(orientedEdge);
-            int startIndex = firstEdge ? 0 : 1;
-            for (int i = startIndex; i < edgePoints.size(); i++) {
-                sampled.add(edgePoints.get(i));
-            }
-            firstEdge = false;
-        }
-        if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
-            sampled.add(sampled.get(0));
-        }
-        return bound.orientation() ? sampled : StepPayloadBuilder.reverseClosedLoop(sampled);
-    }
     private static String pcurveBasisSurfaceSummary(List<StepEntity> pcurves) {
         return StepSummaryBuilder.pcurveBasisSurfaceSummary(pcurves);
     }

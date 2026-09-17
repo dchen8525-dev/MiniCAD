@@ -3,6 +3,7 @@ package com.minicad.export.glb;
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.UnsupportedGeometryException;
+import com.minicad.export.json.StepPayloadBuilder;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
 import com.minicad.helper.MathUtilityHelper;
@@ -196,7 +197,7 @@ public final class PreviewMeshExporter {
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : face.bounds()) {
             loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(
-                    PreviewFaceBuilder.sampleLoop(bound))));
+                    StepPayloadBuilder.sampleLoop(bound))));
         }
         Direction3 normal = plane.normal();
         if (!sameSense) {
@@ -431,7 +432,7 @@ public final class PreviewMeshExporter {
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : bounds) {
             loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(
-                    PreviewFaceBuilder.sampleLoop(bound))));
+                    StepPayloadBuilder.sampleLoop(bound))));
         }
 
         return new FacePayload(
@@ -760,7 +761,7 @@ public final class PreviewMeshExporter {
         List<LoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : face.bounds()) {
             loops.add(new LoopPayload(bound.outer(), PayloadConversionHelper.toPointPayloads(
-                    PreviewFaceBuilder.sampleLoop(bound))));
+                    StepPayloadBuilder.sampleLoop(bound))));
         }
         return loops;
     }

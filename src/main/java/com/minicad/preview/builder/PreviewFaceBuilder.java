@@ -1,26 +1,18 @@
 package com.minicad.preview.builder;
 
-import com.minicad.common.UnsupportedGeometryException;
-import com.minicad.export.json.StepEdgePayloadBuilder;
-import com.minicad.export.json.StepPayloadBuilder;
 import com.minicad.geometry.*;
 import com.minicad.step.model.*;
-import com.minicad.topology.EdgeLoop;
-import com.minicad.topology.FaceBound;
-import com.minicad.topology.OrientedEdge;
-import com.minicad.topology.PolyLoop;
-import com.minicad.topology.VertexLoop;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * What the preview pipeline still needs from a STEP face, and nothing else:
- * the wrapper-surface unwrap rules, closed-loop sampling, and the geometry
- * surface type names. Extracted from StepPreviewJsonExporter to isolate face
- * and geometry logic.
+ * the wrapper-surface unwrap rules and the geometry surface type names.
+ * Extracted from StepPreviewJsonExporter to isolate face and geometry logic.
+ * Loop sampling used to be a third responsibility here; it now has a single
+ * home on the export side, {@code StepPayloadBuilder.sampleLoop}.
  *
  * <p>Everything else this class used to carry has been removed as dead twins
  * of live export-side code. Twenty-three members went in one pass, each
@@ -35,9 +27,16 @@ import java.util.function.Predicate;
  * {@code computeNormal}, {@code toColorPayload}, {@code toPbrPayload},
  * {@code toPointPayload}, {@code toPointPayloads} and {@code sampleEdge} --
  * was reachable only from them, from each other, or from nothing at all.
- * The class shrank from 860 to 183 lines without losing an entry point: the
- * four live callers (two from {@code PreviewMeshExporter}, two from the
- * export-side payload builders) are all on the members that remain.
+ * The round after that finished the job on loop sampling. {@code sampleLoop}
+ * here was still a byte-identical copy of {@code StepPayloadBuilder.sampleLoop}
+ * -- and {@code reverseClosedLoop} was a one-line delegation whose only caller
+ * <em>was</em> {@code sampleLoop}, which is the same "facade outliving its last
+ * production caller" test the two facades above were held to. Both are gone,
+ * and the sole external caller, {@code PreviewMeshExporter}, now names the home
+ * directly. That left three members with external callers -- {@code
+ * surfaceTypeNameForGeometry} for the mesh exporter, {@code
+ * unwrapParametricPreviewSurface} and {@code unwrapBasisSurfaceOnce} for the
+ * export-side payload builders.
  */
 public final class PreviewFaceBuilder {
 
@@ -119,44 +118,13 @@ public final class PreviewFaceBuilder {
     // file's own facade chain. The shell-like id walk now lives in
     // StepLegacyGeometryBuilder, next to the pipeline that drives it.
 
-    // ─── Edge/loop building ──────────────────────────────────────────────
-
-    public static List<CartesianPoint> sampleLoop(FaceBound bound) {
-        if (bound.loop() instanceof VertexLoop) {
-            VertexLoop vertexLoop = (VertexLoop) bound.loop();
-            return List.of(vertexLoop.vertex().point());
-        }
-        if (bound.loop() instanceof PolyLoop) {
-            PolyLoop polyLoop = (PolyLoop) bound.loop();
-            List<CartesianPoint> sampled = new ArrayList<>(polyLoop.points());
-            if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
-                sampled.add(sampled.get(0));
-            }
-            return bound.orientation() ? sampled : reverseClosedLoop(sampled);
-        }
-        if (!(bound.loop() instanceof EdgeLoop)) {
-            throw new UnsupportedGeometryException("preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP");
-        }
-        EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
-        List<CartesianPoint> sampled = new ArrayList<>();
-        boolean firstEdge = true;
-        for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-            List<CartesianPoint> edgePoints = StepEdgePayloadBuilder.sampleOrientedEdge(orientedEdge);
-            int startIndex = firstEdge ? 0 : 1;
-            for (int i = startIndex; i < edgePoints.size(); i++) {
-                sampled.add(edgePoints.get(i));
-            }
-            firstEdge = false;
-        }
-        if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
-            sampled.add(sampled.get(0));
-        }
-        return bound.orientation() ? sampled : reverseClosedLoop(sampled);
-    }
-
-    public static <T> List<T> reverseClosedLoop(List<T> points) {
-        return StepPayloadBuilder.reverseClosedLoop(points);
-    }
+    // The loop-sampling facades that used to sit here -- sampleLoop and
+    // reverseClosedLoop -- are gone. sampleLoop was a byte-identical copy of
+    // StepPayloadBuilder.sampleLoop, which is now the single home for it (that
+    // copy refused EDGE_LOOP while both live copies carried the branch, so the
+    // home was the one that had drifted); reverseClosedLoop was a one-line
+    // delegation whose only caller was sampleLoop, so it went with it.
+    // PreviewMeshExporter, the only external caller, names the home directly.
 
     private record SurfaceTypeNameEntry(Class<?> type, String name) {
     }

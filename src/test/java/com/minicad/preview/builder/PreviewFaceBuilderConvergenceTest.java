@@ -118,12 +118,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * and that story is guarded from the sampler side in
  * {@code PreviewSurfaceSamplerConvergenceTest}.
  *
+ * <p>The last round repeated the round-one lesson one class over. {@code
+ * sampleLoop} was still declared here as a byte-identical copy of {@code
+ * StepPayloadBuilder.sampleLoop}, and {@code reverseClosedLoop} was a one-line
+ * delegation whose only caller was that copy -- so the copy went, and the
+ * facade outlived its last production caller for the second time. The home was
+ * the copy that had drifted, which is the part worth remembering: {@code
+ * StepPayloadBuilder}'s own {@code sampleLoop} <em>refused EDGE_LOOP</em>
+ * ("handled separately in StepPreviewJsonExporter") and had no caller at all,
+ * while both live copies carried the branch. The class is down to the three
+ * members its callers name: {@code surfaceTypeNameForGeometry}, {@code
+ * unwrapParametricPreviewSurface} and {@code unwrapBasisSurfaceOnce}.
+ *
  * <p>The guard matters because convergence without one regresses silently: a
  * later edit can paste a body back, and every existing test still passes -- both
- * copies agree until they drift. It pins the canonical homes, the facades that
- * must survive, the deletions, the absence of every type that only the deleted
- * bodies named, and runtime agreement between the facades and the canonical
- * helpers.
+ * copies agree until they drift. It pins the canonical homes, the deletions,
+ * the absence of every type that only the deleted bodies named, and runtime
+ * agreement between the entry points and the canonical helpers.
  */
 class PreviewFaceBuilderConvergenceTest {
 
@@ -136,24 +147,48 @@ class PreviewFaceBuilderConvergenceTest {
     private static final String EDGE_PAYLOAD_BUILDER =
             "src/main/java/com/minicad/export/json/StepEdgePayloadBuilder.java";
 
-    /**
-     * Facades that must survive, as the exact statement their body must hold.
-     * A whole-body equality would be brittle; the delegation is the contract.
-     * {@code reverseClosedLoop} is the only one left of the original three:
-     * {@code sampleLoop} is a live production caller, and that is the whole
-     * reason it is a facade at all.
-     */
-    private static final List<String> FACADE_BODIES = List.of(
-            "return StepPayloadBuilder.reverseClosedLoop(points);");
+    private static final String MESH_EXPORTER =
+            "src/main/java/com/minicad/export/glb/PreviewMeshExporter.java";
 
     /**
-     * The production entry points this class still owes its callers. Two come
-     * from {@code PreviewMeshExporter}, two from the export-side payload
-     * builders; anything else in the file has to justify itself locally.
+     * Loop-sampling facades deleted by the convergence that gave {@code
+     * sampleLoop} a single home. Both had lost every caller: {@code sampleLoop}
+     * was a byte-identical copy of {@code StepPayloadBuilder.sampleLoop}, and
+     * {@code reverseClosedLoop} was a one-line delegation whose only caller was
+     * {@code sampleLoop}. That is the same "facade outliving its last production
+     * caller" verdict the two facades above received. The class now has no
+     * facades left: every member that remains is one a caller names directly.
+     */
+    private static final List<String> DROPPED_LOOP_SAMPLING = List.of(
+            "sampleLoop",
+            "reverseClosedLoop");
+
+    /**
+     * Types only the deleted loop-sampling bodies named, reached through a
+     * wildcard import or an import that went with them. Their absence is the
+     * cheap evidence that the bodies stayed deleted, because the compiler would
+     * not notice an unused import coming back.
+     */
+    private static final List<String> DROPPED_WITH_LOOP_SAMPLING = List.of(
+            "VertexLoop",
+            "PolyLoop",
+            "EdgeLoop",
+            "OrientedEdge",
+            "UnsupportedGeometryException",
+            "StepEdgePayloadBuilder",
+            "FaceBound",
+            "StepPayloadBuilder",
+            "ArrayList");
+
+    /**
+     * The production entry points this class still owes its callers, one per
+     * distinct consumer: {@code surfaceTypeNameForGeometry} for {@code
+     * PreviewMeshExporter}, {@code unwrapParametricPreviewSurface} for {@code
+     * StepEntityUnwrapper} and {@code StepFacePayloadBuilder}, and {@code
+     * unwrapBasisSurfaceOnce} for {@code StepFacePayloadBuilder}. Anything else
+     * in the file has to justify itself locally.
      */
     private static final List<String> LIVE_ENTRY_POINTS = List.of(
-            "sampleLoop",
-            "reverseClosedLoop",
             "surfaceTypeNameForGeometry",
             "unwrapParametricPreviewSurface",
             "unwrapBasisSurfaceOnce");
@@ -317,6 +352,11 @@ class PreviewFaceBuilderConvergenceTest {
                 "PreviewFaceBuilder re-declared toFourSidedPatchFacePayload. It was a copy "
                         + "of a rule the export side owns, and its only caller was ... itself: "
                         + "nothing in the tree called it, so no preview-side entry point is needed.");
+        assertFalse(declares(read(Paths.get(STEP_FACE_PAYLOAD_BUILDER)), "toFourSidedPatchFacePayload"),
+                "StepFacePayloadBuilder re-declared toFourSidedPatchFacePayload. It was the last "
+                        + "declaration of that name in the tree and it had no caller: the live "
+                        + "four-sided path is toBSplineSurfaceFacePayload, which samples the "
+                        + "patch grid directly.");
         assertFalse(declares(read(Paths.get("src/main/java/com/minicad/preview/sampling/PreviewSurfaceSampler.java")),
                 "buildFourSidedPatch"),
                 "PreviewSurfaceSampler re-declared buildFourSidedPatch. Its only caller was "
@@ -344,19 +384,36 @@ class PreviewFaceBuilderConvergenceTest {
     }
 
     @Test
-    @DisplayName("PreviewFaceBuilder keeps the facades its own callers rely on")
-    void facadesSurviveWithADelegatingBody() throws Exception {
-        String text = read(Paths.get(FACE_BUILDER));
-        List<String> missing = new ArrayList<>();
-        for (String body : FACADE_BODIES) {
-            if (!text.contains(body)) {
-                missing.add(body);
+    @DisplayName("the loop-sampling facades are gone and the home carries the call")
+    void loopSamplingFacadesStayDeleted() throws Exception {
+        String text = code(read(Paths.get(FACE_BUILDER)));
+        List<String> reappeared = new ArrayList<>();
+        for (String name : DROPPED_LOOP_SAMPLING) {
+            if (declares(text, name)) {
+                reappeared.add(name);
             }
         }
-        assertEquals(List.of(), missing,
-                "these bodies are the delegating facades PreviewFaceBuilder's own call "
-                        + "sites rely on; a missing line means the body was pasted back "
-                        + "locally or routed through a static import.");
+        assertEquals(List.of(), reappeared,
+                "PreviewFaceBuilder re-declared " + reappeared + ". sampleLoop was a copy of "
+                        + "StepPayloadBuilder.sampleLoop and reverseClosedLoop was a delegation "
+                        + "whose only caller was that copy, so both were facades outliving their "
+                        + "last production caller. The single home is StepPayloadBuilder.");
+
+        List<String> leaked = new ArrayList<>();
+        for (String name : DROPPED_WITH_LOOP_SAMPLING) {
+            if (Pattern.compile("(?<![\\w.])" + Pattern.quote(name) + "(?![\\w])").matcher(text).find()) {
+                leaked.add(name);
+            }
+        }
+        assertEquals(List.of(), leaked,
+                "PreviewFaceBuilder names " + leaked + " again. Each was imported or reached "
+                        + "only for the deleted loop-sampling bodies, so a mention means a body "
+                        + "came back -- and an unused import would compile silently.");
+
+        assertTrue(code(read(Paths.get(MESH_EXPORTER))).contains("StepPayloadBuilder.sampleLoop("),
+                "PreviewMeshExporter is the only external caller of that loop sampling and must "
+                        + "name the home directly. Without this the deletions above would be "
+                        + "hiding a lost capability instead of a removed facade.");
     }
 
     @Test
@@ -468,18 +525,25 @@ class PreviewFaceBuilderConvergenceTest {
     }
 
     @Test
-    @DisplayName("the closed-loop facade reverses exactly like the canonical helper")
-    void closedLoopFacadeMatchesTheHelper() {
+    @DisplayName("the closed-loop reversal has one home left, and it still reverses")
+    void closedLoopHomeStillReverses() {
+        assertPublicStatic(StepPayloadBuilder.class, "reverseClosedLoop");
+
         List<CartesianPoint> open = List.of(p(0, 0, 0), p(1, 0, 0), p(0, 1, 0));
-        assertEquals(StepPayloadBuilder.reverseClosedLoop(open),
-                PreviewFaceBuilder.reverseClosedLoop(open));
-        assertFalse(open.equals(PreviewFaceBuilder.reverseClosedLoop(open)),
-                "the reversal must actually reverse, or the comparison above is vacuous");
+        assertFalse(open.equals(StepPayloadBuilder.reverseClosedLoop(open)),
+                "the reversal must actually reverse, or every comparison over it is vacuous");
+        assertEquals(List.of(p(0, 1, 0), p(1, 0, 0), p(0, 0, 0)),
+                StepPayloadBuilder.reverseClosedLoop(open),
+                "an open polyline comes back in the opposite order");
 
         List<CartesianPoint> closed = List.of(p(0, 0, 0), p(1, 0, 0), p(0, 1, 0), p(0, 0, 0));
-        assertEquals(StepPayloadBuilder.reverseClosedLoop(closed),
-                PreviewFaceBuilder.reverseClosedLoop(closed));
-        assertEquals(List.of(), PreviewFaceBuilder.reverseClosedLoop(List.of()),
+        List<CartesianPoint> reversedClosed = StepPayloadBuilder.reverseClosedLoop(closed);
+        assertEquals(reversedClosed.get(0), reversedClosed.get(reversedClosed.size() - 1),
+                "a closed loop stays closed: the start point is re-attached at the end");
+        assertFalse(closed.equals(reversedClosed),
+                "a closed loop still has to actually reverse");
+
+        assertEquals(List.of(), StepPayloadBuilder.reverseClosedLoop(List.of()),
                 "a degenerate loop is returned as-is");
     }
 

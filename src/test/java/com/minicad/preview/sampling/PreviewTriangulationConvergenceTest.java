@@ -79,6 +79,8 @@ class PreviewTriangulationConvergenceTest {
             "src/main/java/com/minicad/preview/sampling/PreviewSurfaceSampler.java";
     private static final String STEP_FACE_PAYLOAD_BUILDER =
             "src/main/java/com/minicad/export/json/StepFacePayloadBuilder.java";
+    private static final String STEP_PAYLOAD_BUILDER =
+            "src/main/java/com/minicad/export/json/StepPayloadBuilder.java";
 
     /** The canonical emitters, as they must remain reachable reflectively. */
     private static final List<String> CANONICAL = List.of(
@@ -149,10 +151,12 @@ class PreviewTriangulationConvergenceTest {
                         + "toroidal handlers -- dead copies of the export-side rule table -- "
                         + "so a call means one of them came back with its body: "
                         + FACE_BUILDER_LAST_STRIP_CALLS + ".");
-        assertTrue(text.contains("StepEdgePayloadBuilder.sampleOrientedEdge("),
-                "the one export-side call sampleLoop genuinely needs is still here. "
-                        + "Without it the absence assertion above would be hiding a lost "
-                        + "capability instead of a removed call site.");
+        assertTrue(read(Paths.get(STEP_PAYLOAD_BUILDER)).contains("StepEdgePayloadBuilder.sampleOrientedEdge("),
+                "the one call loop sampling genuinely needs is still there -- and it moved with "
+                        + "the method. PreviewFaceBuilder no longer samples loops at all, so this "
+                        + "pin is on the single home, StepPayloadBuilder.sampleLoop. Without it "
+                        + "the absence assertion above would be hiding a lost capability instead "
+                        + "of a removed call site.");
     }
 
     @Test

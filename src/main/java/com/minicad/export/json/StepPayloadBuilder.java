@@ -130,7 +130,17 @@ public final class StepPayloadBuilder {
     }
 
     /**
-     * Samples points from a face bound.
+     * Samples points from a face bound: the single home for loop sampling.
+     *
+     * <p>Handles all three loop kinds, including the edge-loop branch, which
+     * samples each oriented edge through {@link StepEdgePayloadBuilder} and
+     * stitches the shared endpoints. That branch is the reason this method was
+     * not already the home: the previous body here refused it ("handled
+     * separately in StepPreviewJsonExporter") while the two live copies --
+     * {@code PreviewFaceBuilder.sampleLoop} and a private copy in
+     * {@code StepFacePayloadBuilder} -- both carried it. The home was the copy
+     * that had drifted, so it was widened to the union its callers relied on.
+     * It had no caller of its own at the time, so nothing changed behaviour.
      *
      * @param bound the face bound
      * @return the sampled points
@@ -149,11 +159,26 @@ public final class StepPayloadBuilder {
             }
             return bound.orientation() ? sampled : reverseClosedLoop(sampled);
         }
-        // For EdgeLoop, need oriented edge sampling which requires more context
-        // This is handled separately in StepPreviewJsonExporter
-        throw new com.minicad.common.UnsupportedGeometryException(
-                "preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP"
-        );
+        if (!(bound.loop() instanceof EdgeLoop)) {
+            throw new com.minicad.common.UnsupportedGeometryException(
+                    "preview export requires EDGE_LOOP, POLY_LOOP or VERTEX_LOOP"
+            );
+        }
+        EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
+        List<CartesianPoint> sampled = new ArrayList<>();
+        boolean firstEdge = true;
+        for (OrientedEdge orientedEdge : edgeLoop.edges()) {
+            List<CartesianPoint> edgePoints = StepEdgePayloadBuilder.sampleOrientedEdge(orientedEdge);
+            int startIndex = firstEdge ? 0 : 1;
+            for (int i = startIndex; i < edgePoints.size(); i++) {
+                sampled.add(edgePoints.get(i));
+            }
+            firstEdge = false;
+        }
+        if (!sampled.isEmpty() && sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) > 1.0e-9) {
+            sampled.add(sampled.get(0));
+        }
+        return bound.orientation() ? sampled : reverseClosedLoop(sampled);
     }
 
     /**
