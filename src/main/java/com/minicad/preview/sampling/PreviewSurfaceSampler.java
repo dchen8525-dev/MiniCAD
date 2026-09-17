@@ -4,7 +4,6 @@ import com.minicad.common.Epsilon;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
-import com.minicad.preview.payload.PayloadConversionHelper;
 import com.minicad.preview.payload.PointPayload;
 import com.minicad.preview.payload.SurfacePatch;
 import com.minicad.step.model.StepEntity;
@@ -84,47 +83,11 @@ public final class PreviewSurfaceSampler {
     // ─── Triangulation ───────────────────────────────────────────────────
 
     public static List<PointPayload> triangulatePatch(SurfacePatch patch, boolean sameSense) {
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int u = 0; u < patch.uSegments(); u++) {
-            for (int v = 0; v < patch.vSegments(); v++) {
-                CartesianPoint p00 = patch.pointAt((double) u / patch.uSegments(), (double) v / patch.vSegments());
-                CartesianPoint p10 = patch.pointAt((double) (u + 1) / patch.uSegments(), (double) v / patch.vSegments());
-                CartesianPoint p01 = patch.pointAt((double) u / patch.uSegments(), (double) (v + 1) / patch.vSegments());
-                CartesianPoint p11 = patch.pointAt((double) (u + 1) / patch.uSegments(), (double) (v + 1) / patch.vSegments());
-                Vector3 targetNormal = patch.normalAt((u + 0.5) / patch.uSegments(), (v + 0.5) / patch.vSegments());
-                if (!sameSense) {
-                    targetNormal = targetNormal.scale(-1.0);
-                }
-                appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
-                appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
-            }
-        }
-        return List.copyOf(triangles);
+        return TriangulationHelper.triangulatePatch(patch, sameSense);
     }
 
     public static List<PointPayload> triangulateSurfaceGrid(List<List<CartesianPoint>> grid, boolean sameSense) {
-        List<PointPayload> triangles = new ArrayList<>();
-        if (grid.size() < 2 || grid.get(0).size() < 2) {
-            return List.of();
-        }
-        for (int u = 0; u + 1 < grid.size(); u++) {
-            for (int v = 0; v + 1 < grid.get(u).size(); v++) {
-                CartesianPoint p00 = grid.get(u).get(v);
-                CartesianPoint p10 = grid.get(u + 1).get(v);
-                CartesianPoint p01 = grid.get(u).get(v + 1);
-                CartesianPoint p11 = grid.get(u + 1).get(v + 1);
-                Vector3 targetNormal = p10.subtract(p00).cross(p01.subtract(p00));
-                if (targetNormal.norm() <= Epsilon.EPS) {
-                    continue;
-                }
-                if (!sameSense) {
-                    targetNormal = targetNormal.scale(-1.0);
-                }
-                appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
-                appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
-            }
-        }
-        return List.copyOf(triangles);
+        return TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
     }
 
     // ─── Four-sided patch construction ───────────────────────────────────
@@ -217,25 +180,6 @@ public final class PreviewSurfaceSampler {
         );
     }
 
-    private static void appendOrientedTriangle(
-            List<PointPayload> triangles,
-            CartesianPoint a,
-            CartesianPoint b,
-            CartesianPoint c,
-            Vector3 targetNormal
-    ) {
-        Vector3 normal = b.subtract(a).cross(c.subtract(a));
-        if (normal.dot(targetNormal) < 0.0) {
-            triangles.add(toPointPayload(a));
-            triangles.add(toPointPayload(c));
-            triangles.add(toPointPayload(b));
-            return;
-        }
-        triangles.add(toPointPayload(a));
-        triangles.add(toPointPayload(b));
-        triangles.add(toPointPayload(c));
-    }
-
     // ─── Delegate methods needed from StepPreviewJsonExporter ────────────
     // These are called by the methods above and must remain accessible.
     // They will be updated to delegate once the facade is finalized.
@@ -245,8 +189,4 @@ public final class PreviewSurfaceSampler {
         return StepEdgePayloadBuilder.sampleOrientedEdge(edge);
     }
 
-    private static PointPayload toPointPayload(CartesianPoint point) {
-        // Temporary: delegate to StepPreviewJsonExporter
-        return PayloadConversionHelper.toPointPayload(point);
-    }
 }

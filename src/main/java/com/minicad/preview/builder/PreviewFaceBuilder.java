@@ -18,6 +18,7 @@ import com.minicad.helper.ShellHelper;
 import com.minicad.helper.SurfaceGeometryHelper;
 import com.minicad.preview.sampling.PreviewCurveEvaluator;
 import com.minicad.preview.sampling.PreviewSurfaceSampler;
+import com.minicad.preview.sampling.TriangulationHelper;
 import com.minicad.step.model.StepAnnotationCurveOccurrence;
 import com.minicad.step.model.StepAnnotationFillArea;
 import com.minicad.step.model.StepAnnotationFillAreaOccurrence;
@@ -319,7 +320,7 @@ public final class PreviewFaceBuilder {
         }
 
         boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = triangulateCylindricalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateCylindricalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
         if (triangles.isEmpty()) {
             return null;
         }
@@ -408,7 +409,7 @@ public final class PreviewFaceBuilder {
         }
 
         boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = triangulateConicalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateConicalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
         if (triangles.isEmpty()) {
             return null;
         }
@@ -577,7 +578,7 @@ public final class PreviewFaceBuilder {
         }
 
         boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = triangulateToroidalStrip(surface, lowerV, upperV, uValues, sameSense);
+        List<PointPayload> triangles = TriangulationHelper.triangulateToroidalStrip(surface, lowerV, upperV, uValues, sameSense);
         if (triangles.isEmpty()) {
             return null;
         }
@@ -1492,60 +1493,6 @@ public final class PreviewFaceBuilder {
         return Math.max(min, Math.min(max, value));
     }
 
-    // ─── Cylindrical strip helpers ────────────────────────────────────────
-
-    private static List<PointPayload> triangulateCylindricalStrip(
-            CylindricalSurface surface,
-            double lowerHeight,
-            double upperHeight,
-            List<Double> angles,
-            boolean sameSense
-    ) {
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int index = 0; index < angles.size() - 1; index++) {
-            double angle0 = angles.get(index);
-            double angle1 = angles.get(index + 1);
-            if (Math.abs(angle1 - angle0) <= Epsilon.EPS) {
-                continue;
-            }
-            CartesianPoint lower0 = SurfaceGeometryHelper.surfacePoint(surface, angle0, lowerHeight);
-            CartesianPoint lower1 = SurfaceGeometryHelper.surfacePoint(surface, angle1, lowerHeight);
-            CartesianPoint upper0 = SurfaceGeometryHelper.surfacePoint(surface, angle0, upperHeight);
-            CartesianPoint upper1 = SurfaceGeometryHelper.surfacePoint(surface, angle1, upperHeight);
-            Vector3 targetNormal = SurfaceGeometryHelper.cylindricalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
-            appendOrientedTriangle(triangles, lower0, lower1, upper1, targetNormal);
-            appendOrientedTriangle(triangles, lower0, upper1, upper0, targetNormal);
-        }
-        return List.copyOf(triangles);
-    }
-
-    // ─── Conical strip triangulation ───────────────────────────────────────
-
-    private static List<PointPayload> triangulateConicalStrip(
-            ConicalSurface surface,
-            double lowerHeight,
-            double upperHeight,
-            List<Double> angles,
-            boolean sameSense
-    ) {
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int index = 0; index < angles.size() - 1; index++) {
-            double angle0 = angles.get(index);
-            double angle1 = angles.get(index + 1);
-            if (Math.abs(angle1 - angle0) <= Epsilon.EPS) {
-                continue;
-            }
-            CartesianPoint lower0 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle0, lowerHeight);
-            CartesianPoint lower1 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle1, lowerHeight);
-            CartesianPoint upper0 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle0, upperHeight);
-            CartesianPoint upper1 = SurfaceGeometryHelper.conicalSurfacePoint(surface, angle1, upperHeight);
-            Vector3 targetNormal = SurfaceGeometryHelper.conicalNormal(surface, (angle0 + angle1) * 0.5, sameSense);
-            appendOrientedTriangle(triangles, lower0, lower1, upper1, targetNormal);
-            appendOrientedTriangle(triangles, lower0, upper1, upper0, targetNormal);
-        }
-        return List.copyOf(triangles);
-    }
-
     // ─── Spherical strip triangulation ────────────────────────────────────
 
     private static List<PointPayload> triangulateSphericalStrip(
@@ -1567,60 +1514,10 @@ public final class PreviewFaceBuilder {
             CartesianPoint p01 = SurfaceGeometryHelper.sphericalSurfacePoint(placement, radius, angle0, upperV);
             CartesianPoint p11 = SurfaceGeometryHelper.sphericalSurfacePoint(placement, radius, angle1, upperV);
             Vector3 targetNormal = SurfaceGeometryHelper.sphericalNormal(placement, (angle0 + angle1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
-            appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
-            appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
+            TriangulationHelper.appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
+            TriangulationHelper.appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
         }
         return List.copyOf(triangles);
-    }
-
-    // ─── Toroidal strip helpers ──────────────────────────────────────────
-
-    private static List<PointPayload> triangulateToroidalStrip(
-            ToroidalSurface surface,
-            double lowerV,
-            double upperV,
-            List<Double> uValues,
-            boolean sameSense
-    ) {
-        List<PointPayload> triangles = new ArrayList<>();
-        for (int index = 0; index < uValues.size() - 1; index++) {
-            double u0 = uValues.get(index);
-            double u1 = uValues.get(index + 1);
-            if (Math.abs(u1 - u0) <= Epsilon.EPS) {
-                continue;
-            }
-            CartesianPoint p00 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u0, lowerV);
-            CartesianPoint p10 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u1, lowerV);
-            CartesianPoint p01 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u0, upperV);
-            CartesianPoint p11 = SurfaceGeometryHelper.toroidalSurfacePoint(surface, u1, upperV);
-            Vector3 targetNormal = SurfaceGeometryHelper.toroidalNormal(surface, (u0 + u1) * 0.5, (lowerV + upperV) * 0.5, sameSense);
-            appendOrientedTriangle(triangles, p00, p10, p11, targetNormal);
-            appendOrientedTriangle(triangles, p00, p11, p01, targetNormal);
-        }
-        return List.copyOf(triangles);
-    }
-
-    // ─── Angle/height helpers ────────────────────────────────────────────
-
-    // ─── Triangle orientation ────────────────────────────────────────────
-
-    private static void appendOrientedTriangle(
-            List<PointPayload> triangles,
-            CartesianPoint a,
-            CartesianPoint b,
-            CartesianPoint c,
-            Vector3 targetNormal
-    ) {
-        Vector3 normal = b.subtract(a).cross(c.subtract(a));
-        if (normal.dot(targetNormal) < 0.0) {
-            triangles.add(PayloadConversionHelper.toPointPayload(a));
-            triangles.add(PayloadConversionHelper.toPointPayload(c));
-            triangles.add(PayloadConversionHelper.toPointPayload(b));
-            return;
-        }
-        triangles.add(PayloadConversionHelper.toPointPayload(a));
-        triangles.add(PayloadConversionHelper.toPointPayload(b));
-        triangles.add(PayloadConversionHelper.toPointPayload(c));
     }
 
     // ─── Sample edge (delegates to PreviewCurveEvaluator) ────────────────
