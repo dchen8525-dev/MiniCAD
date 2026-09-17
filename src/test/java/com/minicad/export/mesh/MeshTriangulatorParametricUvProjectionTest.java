@@ -8,6 +8,7 @@ import com.minicad.geometry.SurfaceGeometry;
 import com.minicad.geometry.SurfaceOfLinearExtrusion3;
 import com.minicad.geometry.SurfaceOfRevolution3;
 import com.minicad.geometry.Vector3;
+import com.minicad.preview.payload.UvPoint;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,7 +36,7 @@ class MeshTriangulatorParametricUvProjectionTest {
     }
 
     private static void assertRoundTrip(MeshTriangulatorParametric.ParametricMapper mapper,
-                                        CartesianPoint point, MeshTriangulatorParametric.UvPoint uv) {
+                                        CartesianPoint point, UvPoint uv) {
         CartesianPoint mapped = mapper.pointAt(uv.u(), uv.v());
         assertTrue(mapped.distanceTo(point) < ROUND_TRIP_TOLERANCE,
                 () -> "round trip distance " + mapped.distanceTo(point) + " for uv " + uv);
@@ -54,7 +55,7 @@ class MeshTriangulatorParametricUvProjectionTest {
             double s = c[0];
             double phi = c[1];
             CartesianPoint point = cylinder.pointAt(s, phi);
-            MeshTriangulatorParametric.UvPoint uv = mapper.project(point, null);
+            UvPoint uv = mapper.project(point, null);
             assertRoundTrip(mapper, point, uv);
             assertEquals(wrap(phi), uv.u(), UV_TOLERANCE, () -> "angle for s=" + s + " phi=" + phi);
             assertEquals(s, uv.v(), UV_TOLERANCE, () -> "generatrix parameter for phi=" + phi);
@@ -71,7 +72,7 @@ class MeshTriangulatorParametricUvProjectionTest {
 
         for (double phi : new double[] {0.0, 1.0, -1.0, 2.5}) {
             CartesianPoint point = cone.pointAt(0.5, phi);
-            MeshTriangulatorParametric.UvPoint uv = mapper.project(point, null);
+            UvPoint uv = mapper.project(point, null);
             assertRoundTrip(mapper, point, uv);
             assertEquals(0.5, uv.v(), UV_TOLERANCE);
             assertEquals(wrap(phi), uv.u(), UV_TOLERANCE);
@@ -92,7 +93,7 @@ class MeshTriangulatorParametricUvProjectionTest {
 
         for (double s : new double[] {0.1, 0.5, 0.9}) {
             CartesianPoint point = surface.pointAt(s, 2.0);
-            MeshTriangulatorParametric.UvPoint uv = mapper.project(point, null);
+            UvPoint uv = mapper.project(point, null);
             assertRoundTrip(mapper, point, uv);
             assertEquals(s, uv.v(), UV_TOLERANCE);
         }
@@ -106,8 +107,8 @@ class MeshTriangulatorParametricUvProjectionTest {
                 new Direction3(0, 0, 1));
         MeshTriangulatorParametric.ParametricMapper mapper = mapperFor(cylinder);
 
-        MeshTriangulatorParametric.UvPoint first = mapper.project(cylinder.pointAt(0.5, 0.01), null);
-        MeshTriangulatorParametric.UvPoint second = mapper.project(cylinder.pointAt(0.5, 2 * Math.PI - 0.01), first);
+        UvPoint first = mapper.project(cylinder.pointAt(0.5, 0.01), null);
+        UvPoint second = mapper.project(cylinder.pointAt(0.5, 2 * Math.PI - 0.01), first);
         assertRoundTrip(mapper, cylinder.pointAt(0.5, 2 * Math.PI - 0.01), second);
         // The second point sits just below the seam: the unwrapped angle must
         // continue negative from the first projection, not jump to +2*pi.
@@ -123,7 +124,7 @@ class MeshTriangulatorParametricUvProjectionTest {
 
         for (double t : new double[] {0.0, 0.3, 1.0}) {
             CartesianPoint point = extrusion.pointAt(0.7, t);
-            MeshTriangulatorParametric.UvPoint uv = mapper.project(point, null);
+            UvPoint uv = mapper.project(point, null);
             assertRoundTrip(mapper, point, uv);
             assertEquals(0.7, uv.u(), UV_TOLERANCE);
             assertEquals(t, uv.v(), 1e-6);
@@ -143,7 +144,7 @@ class MeshTriangulatorParametricUvProjectionTest {
         MeshTriangulatorParametric.ParametricMapper mapper = mapperFor(extrusion);
 
         CartesianPoint point = extrusion.pointAt(0.4, 0.6);
-        MeshTriangulatorParametric.UvPoint uv = mapper.project(point, null);
+        UvPoint uv = mapper.project(point, null);
         assertRoundTrip(mapper, point, uv);
         assertEquals(0.4, uv.u(), UV_TOLERANCE);
         assertEquals(0.6, uv.v(), UV_TOLERANCE);

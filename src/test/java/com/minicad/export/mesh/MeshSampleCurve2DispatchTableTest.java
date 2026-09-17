@@ -1,6 +1,5 @@
 package com.minicad.export.mesh;
 
-import com.minicad.export.mesh.MeshTriangulatorParametric.UvPoint;
 import com.minicad.geometry2d.BSplineCurve2;
 import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.Curve2;
@@ -10,6 +9,7 @@ import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.Polyline2;
 import com.minicad.geometry2d.TrimmedCurve2;
+import com.minicad.preview.payload.UvPoint;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -59,8 +59,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  * src/test/resources/mesh-sample-curve2-dispatch-order.txt freezes the type
  * order. The table and entry method are private, so both are reached through
  * reflection -- the same convention as the other *DispatchTableTest classes.
- * UvPoint is package-private and this test shares the package, so it is used
- * directly.
+ * UvPoint is the shared com.minicad.preview.payload type: the nested copy this
+ * file used to declare was removed once the samplers moved onto
+ * PcurveSamplingHelper, which speaks that type too.
  */
 class MeshSampleCurve2DispatchTableTest {
 

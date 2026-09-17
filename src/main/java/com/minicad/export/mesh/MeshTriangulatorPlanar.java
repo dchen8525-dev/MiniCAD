@@ -88,7 +88,8 @@ final class MeshTriangulatorPlanar {
             EdgeLoop edgeLoop = (EdgeLoop) loop;
             List<CartesianPoint> points = new ArrayList<>();
             for (OrientedEdge oe : edgeLoop.edges()) {
-                List<CartesianPoint> edgePoints = orientSamples(oe, oe.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
+                List<CartesianPoint> edgePoints = MeshSampleOrientationHelper.orientSamples(
+                        oe, oe.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
                 int startIndex = points.isEmpty() ? 0 : 1;
                 for (int i = startIndex; i < edgePoints.size(); i++) {
                     points.add(edgePoints.get(i));
@@ -100,30 +101,6 @@ final class MeshTriangulatorPlanar {
             return points;
         }
         return List.of();
-    }
-
-    private static List<CartesianPoint> orientSamples(OrientedEdge orientedEdge, List<CartesianPoint> samples) {
-        if (samples.isEmpty()) {
-            return List.of(
-                    orientedEdge.startVertex().point(),
-                    orientedEdge.endVertex().point()
-            );
-        }
-        List<CartesianPoint> oriented = new ArrayList<>(samples);
-        CartesianPoint expectedStart = orientedEdge.startVertex().point();
-        CartesianPoint expectedEnd = orientedEdge.endVertex().point();
-        double forward = samples.get(0).distanceTo(expectedStart) + samples.get(samples.size() - 1).distanceTo(expectedEnd);
-        double backward = samples.get(0).distanceTo(expectedEnd) + samples.get(samples.size() - 1).distanceTo(expectedStart);
-        if (backward < forward) {
-            Collections.reverse(oriented);
-        }
-        if (!oriented.get(0).equals(expectedStart)) {
-            oriented.set(0, expectedStart);
-        }
-        if (!oriented.get(oriented.size() - 1).equals(expectedEnd)) {
-            oriented.set(oriented.size() - 1, expectedEnd);
-        }
-        return List.copyOf(oriented);
     }
 
     private static ProjectedLoop projectLoop(List<CartesianPoint> points, PlanarFrame frame, boolean outer) {

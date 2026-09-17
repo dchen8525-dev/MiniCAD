@@ -8,6 +8,8 @@ import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
+import com.minicad.preview.payload.UvPoint;
+import com.minicad.preview.sampling.PcurveSamplingHelper;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.semantic.StepCadBuilder;
@@ -32,24 +34,6 @@ final class MeshTriangulatorParametric {
     }
 
     // --- Inner classes for UV geometry ---
-
-    static final class UvPoint {
-        private final double u;
-        private final double v;
-
-        UvPoint(double u, double v) {
-            this.u = u;
-            this.v = v;
-        }
-        double u() { return u; }
-        double v() { return v; }
-        @Override public boolean equals(Object o) {
-            return this == o || o != null && getClass() == o.getClass()
-                && Double.compare(u, ((UvPoint) o).u) == 0
-                && Double.compare(v, ((UvPoint) o).v) == 0;
-        }
-        @Override public int hashCode() { return Objects.hash(u, v); }
-    }
 
     static final class ParametricLoop {
         private final boolean outer;
@@ -1075,7 +1059,8 @@ final class MeshTriangulatorParametric {
         if (!pcurvePoints.isEmpty()) {
             return pcurvePoints;
         }
-        List<CartesianPoint> points3d = orientSamples(orientedEdge, orientedEdge.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
+        List<CartesianPoint> points3d = MeshSampleOrientationHelper.orientSamples(
+                orientedEdge, orientedEdge.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
         List<UvPoint> uvPoints = new ArrayList<>();
         UvPoint previous = null;
         for (CartesianPoint point : points3d) {
@@ -1087,30 +1072,6 @@ final class MeshTriangulatorParametric {
             previous = uv;
         }
         return uvPoints;
-    }
-
-    private static List<CartesianPoint> orientSamples(OrientedEdge orientedEdge, List<CartesianPoint> samples) {
-        if (samples.isEmpty()) {
-            return List.of(
-                    orientedEdge.startVertex().point(),
-                    orientedEdge.endVertex().point()
-            );
-        }
-        List<CartesianPoint> oriented = new ArrayList<>(samples);
-        CartesianPoint expectedStart = orientedEdge.startVertex().point();
-        CartesianPoint expectedEnd = orientedEdge.endVertex().point();
-        double forward = samples.get(0).distanceTo(expectedStart) + samples.get(samples.size() - 1).distanceTo(expectedEnd);
-        double backward = samples.get(0).distanceTo(expectedEnd) + samples.get(samples.size() - 1).distanceTo(expectedStart);
-        if (backward < forward) {
-            Collections.reverse(oriented);
-        }
-        if (!oriented.get(0).equals(expectedStart)) {
-            oriented.set(0, expectedStart);
-        }
-        if (!oriented.get(oriented.size() - 1).equals(expectedEnd)) {
-            oriented.set(oriented.size() - 1, expectedEnd);
-        }
-        return List.copyOf(oriented);
     }
 
     private static List<UvPoint> extractSurfaceCurveUvPoints(OrientedEdge orientedEdge, ParametricMapper mapper, SurfaceGeometry surface) {
@@ -1248,13 +1209,13 @@ final class MeshTriangulatorParametric {
 
     private static final List<MeshCurve2SampleRule> MESH_SAMPLE_CURVE2_RULES = List.of(
             meshCurve2SampleRule(Line2.class, (curve, start, end) ->
-                    sampleLinePcurve((Line2) curve, start, end)),
+                    PcurveSamplingHelper.sampleLinePcurve((Line2) curve, start, end)),
             meshCurve2SampleRule(Circle2.class, (curve, start, end) ->
-                    sampleCirclePcurve((Circle2) curve, start, end)),
+                    PcurveSamplingHelper.sampleCirclePcurve((Circle2) curve, start, end)),
             meshCurve2SampleRule(Ellipse2.class, (curve, start, end) ->
-                    sampleEllipsePcurve((Ellipse2) curve, start, end)),
+                    PcurveSamplingHelper.sampleEllipsePcurve((Ellipse2) curve, start, end)),
             meshCurve2SampleRule(BSplineCurve2.class, (curve, start, end) ->
-                    sampleSplinePcurve((BSplineCurve2) curve, start, end)),
+                    PcurveSamplingHelper.sampleSplinePcurve((BSplineCurve2) curve, start, end)),
             meshCurve2SampleRule(TrimmedCurve2.class, (curve, start, end) ->
                     sampleTrimmedPcurve((TrimmedCurve2) curve, start, end))
     );
@@ -1268,105 +1229,16 @@ final class MeshTriangulatorParametric {
         return List.of();
     }
 
-    private static List<UvPoint> sampleLinePcurve(Line2 line, UvPoint start, UvPoint end) {
-        Point2 startPoint = new Point2(start.u(), start.v());
-        Point2 endPoint = new Point2(end.u(), end.v());
-        double startParameter = line.parameterOf(startPoint);
-        double endParameter = line.parameterOf(endPoint);
-        int segments = Math.max(12, (int) Math.ceil(Math.abs(endParameter - startParameter) * 6.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double parameter = startParameter + (endParameter - startParameter) * index / segments;
-            Point2 point = line.pointAt(parameter);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
-
-    private static List<UvPoint> sampleSplinePcurve(BSplineCurve2 spline, UvPoint start, UvPoint end) {
-        List<Point2> sampled = spline.sample(48);
-        if (sampled.size() < 2) {
-            return List.of();
-        }
-        int startIndex = closestPointIndex(sampled, start);
-        int endIndex = closestPointIndex(sampled, end);
-        if (startIndex == endIndex) {
-            return List.of(start, end);
-        }
-        List<UvPoint> points = new ArrayList<>();
-        int step = startIndex <= endIndex ? 1 : -1;
-        for (int index = startIndex; index != endIndex + step; index += step) {
-            Point2 point = sampled.get(index);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
-
-    private static int closestPointIndex(List<Point2> points, UvPoint target) {
-        int bestIndex = 0;
-        double bestDistance = Double.POSITIVE_INFINITY;
-        for (int index = 0; index < points.size(); index++) {
-            Point2 point = points.get(index);
-            double du = point.x() - target.u();
-            double dv = point.y() - target.v();
-            double distance = du * du + dv * dv;
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                bestIndex = index;
-            }
-        }
-        return bestIndex;
-    }
-
-    private static List<UvPoint> sampleCirclePcurve(Circle2 circle, UvPoint start, UvPoint end) {
-        Point2 startPoint = new Point2(start.u(), start.v());
-        Point2 endPoint = new Point2(end.u(), end.v());
-        double startAngle = circle.angleOf(startPoint);
-        double endAngle = circle.angleOf(endPoint);
-        double delta = endAngle - startAngle;
-        if (delta > Math.PI) {
-            delta -= Math.PI * 2.0;
-        } else if (delta < -Math.PI) {
-            delta += Math.PI * 2.0;
-        }
-        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) * 18.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double angle = startAngle + delta * index / segments;
-            Point2 point = circle.pointAt(angle);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
-
-    private static List<UvPoint> sampleEllipsePcurve(Ellipse2 ellipse, UvPoint start, UvPoint end) {
-        Point2 startPoint = new Point2(start.u(), start.v());
-        Point2 endPoint = new Point2(end.u(), end.v());
-        double startAngle = ellipse.angleOf(startPoint);
-        double endAngle = ellipse.angleOf(endPoint);
-        double delta = endAngle - startAngle;
-        if (delta > Math.PI) {
-            delta -= Math.PI * 2.0;
-        } else if (delta < -Math.PI) {
-            delta += Math.PI * 2.0;
-        }
-        int segments = Math.max(18, (int) Math.ceil(Math.abs(delta) * 18.0));
-        List<UvPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double angle = startAngle + delta * index / segments;
-            Point2 point = ellipse.pointAt(angle);
-            points.add(new UvPoint(point.x(), point.y()));
-        }
-        points.set(0, start);
-        points.set(points.size() - 1, end);
-        return List.copyOf(points);
-    }
+    // The line / circle / ellipse / spline samplers used to be private copies of
+    // PcurveSamplingHelper's; they were identical line for line, so the table now
+    // delegates to that helper (see the rules above) and the copies are gone.
+    //
+    // sampleTrimmedPcurve, score, alignTrimmedSamples and uvDistance deliberately
+    // stay local: this file's UV distance is null guarded (a null endpoint scores
+    // as +inf) while PcurveSamplingHelper.distanceSquared is not, so routing the
+    // trimmed path through the helper would drop that guard. Converging them means
+    // either weakening the guard or tightening the shared helper -- both are
+    // behaviour changes, so the pair stays split on purpose.
 
     private static List<UvPoint> sampleTrimmedPcurve(TrimmedCurve2 trimmed, UvPoint start, UvPoint end) {
         UvPoint trimStart = new UvPoint(trimmed.trimStart().x(), trimmed.trimStart().y());

@@ -10,6 +10,7 @@ import com.minicad.geometry.Plane;
 import com.minicad.geometry.SphericalSurface;
 import com.minicad.geometry.SurfaceGeometry;
 import com.minicad.geometry.ToroidalSurface;
+import com.minicad.preview.payload.UvPoint;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -115,7 +116,7 @@ class ParametricMapperDispatchTableTest {
 
         for (double[] uv : new double[][] {{0.5, 1.25}, {-1.0, 3.0}, {0.0, -2.0}}) {
             CartesianPoint point = cylinder.pointAt(uv[0], uv[1]);
-            MeshTriangulatorParametric.UvPoint projected = mapper.project(point, null);
+            UvPoint projected = mapper.project(point, null);
             assertRoundTrip(mapper, point, projected);
             assertEquals(uv[0], projected.u(), UV_TOLERANCE);
             assertEquals(uv[1], projected.v(), UV_TOLERANCE);
@@ -135,7 +136,7 @@ class ParametricMapperDispatchTableTest {
 
         for (double[] uv : new double[][] {{0.7, 1.5}, {-2.0, 0.25}, {0.0, -1.0}}) {
             CartesianPoint point = cone.pointAt(uv[0], uv[1]);
-            MeshTriangulatorParametric.UvPoint projected = mapper.project(point, null);
+            UvPoint projected = mapper.project(point, null);
             assertRoundTrip(mapper, point, projected);
             assertEquals(uv[0], projected.u(), UV_TOLERANCE);
             assertEquals(uv[1], projected.v(), UV_TOLERANCE);
@@ -155,7 +156,7 @@ class ParametricMapperDispatchTableTest {
 
         for (double[] uv : new double[][] {{0.6, 1.1}, {-1.4, 2.6}, {0.0, -0.5}}) {
             CartesianPoint point = torus.pointAt(uv[0], uv[1]);
-            MeshTriangulatorParametric.UvPoint projected = mapper.project(point, null);
+            UvPoint projected = mapper.project(point, null);
             assertRoundTrip(mapper, point, projected);
             assertEquals(uv[0], projected.u(), UV_TOLERANCE);
             assertEquals(uv[1], projected.v(), UV_TOLERANCE);
@@ -179,7 +180,7 @@ class ParametricMapperDispatchTableTest {
         // round trip -- and pins that pointAt delegates to the sphere.
         for (double[] uv : new double[][] {{0.4, 0.6}, {-1.2, 0.2}, {0.0, -0.3}}) {
             CartesianPoint point = sphere.pointAt(uv[0], uv[1]);
-            MeshTriangulatorParametric.UvPoint projected = mapper.project(point, null);
+            UvPoint projected = mapper.project(point, null);
             assertEquals(uv[0], projected.u(), UV_TOLERANCE);
             assertEquals(Math.PI / 2.0 - uv[1], projected.v(), UV_TOLERANCE);
             assertEquals(0.0, mapper.pointAt(uv[0], uv[1]).distanceTo(point), ROUND_TRIP_TOLERANCE);
@@ -209,7 +210,7 @@ class ParametricMapperDispatchTableTest {
     // ─── helpers ─────────────────────────────────────────────────────────
 
     private static void assertRoundTrip(ParametricMapper mapper,
-                                        CartesianPoint point, MeshTriangulatorParametric.UvPoint uv) {
+                                        CartesianPoint point, UvPoint uv) {
         assertNotNull(uv, "project returned null for a non-degenerate point");
         CartesianPoint mapped = mapper.pointAt(uv.u(), uv.v());
         assertTrue(mapped.distanceTo(point) < ROUND_TRIP_TOLERANCE,
