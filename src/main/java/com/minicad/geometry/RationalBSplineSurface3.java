@@ -1,6 +1,7 @@
 package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
+import com.minicad.common.BSplineKernel;
 import com.minicad.common.GeometryException;
 
 import java.util.List;
@@ -96,7 +97,7 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     private List<Double> uExpanded() {
         List<Double> local = uExpandedKnots;
         if (local == null) {
-            local = BSplineSurfaceHelper.expandedKnots(uKnots, uMultiplicities);
+            local = BSplineKernel.expandedKnots(uKnots, uMultiplicities);
             uExpandedKnots = local;
         }
         return local;
@@ -105,7 +106,7 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     private List<Double> vExpanded() {
         List<Double> local = vExpandedKnots;
         if (local == null) {
-            local = BSplineSurfaceHelper.expandedKnots(vKnots, vMultiplicities);
+            local = BSplineKernel.expandedKnots(vKnots, vMultiplicities);
             vExpandedKnots = local;
         }
         return local;
@@ -130,15 +131,15 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     public CartesianPoint pointAt(double u, double v) {
         List<Double> uExp = uExpanded();
         List<Double> vExp = vExpanded();
-        double clampedU = BSplineSurfaceHelper.clamp(u, uExp.get(uDegree), uExp.get(controlPoints.size()));
-        double clampedV = BSplineSurfaceHelper.clamp(v, vExp.get(vDegree), vExp.get(controlPoints.get(0).size()));
+        double clampedU = BSplineKernel.clamp(u, uExp.get(uDegree), uExp.get(controlPoints.size()));
+        double clampedV = BSplineKernel.clamp(v, vExp.get(vDegree), vExp.get(controlPoints.get(0).size()));
 
         int uCount = controlPoints.size();
         int vCount = controlPoints.get(0).size();
-        int uSpan = BSplineMath.findSpan(uCount - 1, uDegree, clampedU, uExp);
-        int vSpan = BSplineMath.findSpan(vCount - 1, vDegree, clampedV, vExp);
-        double[] nu = BSplineMath.basisFunctions(uSpan, clampedU, uDegree, uExp);
-        double[] nv = BSplineMath.basisFunctions(vSpan, clampedV, vDegree, vExp);
+        int uSpan = BSplineKernel.findSpan(uCount - 1, uDegree, clampedU, uExp);
+        int vSpan = BSplineKernel.findSpan(vCount - 1, vDegree, clampedV, vExp);
+        double[] nu = BSplineKernel.basisFunctions(uSpan, clampedU, uDegree, uExp);
+        double[] nv = BSplineKernel.basisFunctions(vSpan, clampedV, vDegree, vExp);
 
         double x = 0.0;
         double y = 0.0;
@@ -168,16 +169,16 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     public Vector3 normalAt(double u, double v) {
         List<Double> uExp = uExpanded();
         List<Double> vExp = vExpanded();
-        double clampedU = BSplineSurfaceHelper.clamp(u, uStart(), uEnd());
-        double clampedV = BSplineSurfaceHelper.clamp(v, vStart(), vEnd());
+        double clampedU = BSplineKernel.clamp(u, uStart(), uEnd());
+        double clampedV = BSplineKernel.clamp(v, vStart(), vEnd());
 
         int uCount = controlPoints.size();
         int vCount = controlPoints.get(0).size();
 
-        int uSpan = BSplineMath.findSpan(uCount - 1, uDegree, clampedU, uExp);
-        int vSpan = BSplineMath.findSpan(vCount - 1, vDegree, clampedV, vExp);
-        double[] nu = BSplineMath.basisFunctions(uSpan, clampedU, uDegree, uExp);
-        double[] nv = BSplineMath.basisFunctions(vSpan, clampedV, vDegree, vExp);
+        int uSpan = BSplineKernel.findSpan(uCount - 1, uDegree, clampedU, uExp);
+        int vSpan = BSplineKernel.findSpan(vCount - 1, vDegree, clampedV, vExp);
+        double[] nu = BSplineKernel.basisFunctions(uSpan, clampedU, uDegree, uExp);
+        double[] nv = BSplineKernel.basisFunctions(vSpan, clampedV, vDegree, vExp);
 
         Vector3 A = new Vector3(0.0, 0.0, 0.0);
         Vector3 dAdu = new Vector3(0.0, 0.0, 0.0);
@@ -190,11 +191,11 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
             List<CartesianPoint> row = controlPoints.get(ui);
             List<Double> weightRow = weightsData.get(ui);
             double bu = nu[i];
-            double dBu = BSplineMath.derivativeBasisValue(ui, uDegree, clampedU, uExp);
+            double dBu = BSplineKernel.derivativeBasisValue(ui, uDegree, clampedU, uExp);
             for (int j = 0; j <= vDegree; j++) {
                 int vIndex = vSpan - vDegree + j;
                 double bv = nv[j];
-                double dBv = BSplineMath.derivativeBasisValue(vIndex, vDegree, clampedV, vExp);
+                double dBv = BSplineKernel.derivativeBasisValue(vIndex, vDegree, clampedV, vExp);
                 double w = weightRow.get(vIndex);
                 double weightedBasis = w * bu * bv;
                 CartesianPoint cp = row.get(vIndex);

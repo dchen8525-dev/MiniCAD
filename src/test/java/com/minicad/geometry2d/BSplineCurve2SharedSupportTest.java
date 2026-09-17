@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Pins the knot-domain behaviour the two 2D B-spline curves now share through
- * {@link BSplineCurveHelper}: a {@code [0, 2]} knot domain with the same expanded
- * knot vector on both, and per-instance caching of that vector.
+ * Pins the knot-domain behaviour the two 2D B-spline curves share through
+ * {@link com.minicad.common.BSplineKernel}: a {@code [0, 2]} knot domain with the
+ * same expanded knot vector on both, and per-instance caching of that vector.
  *
  * <p>The fixtures use four control points of degree 3 with knot multiplicities
  * {@code [4, 4]}, so the curve is clamped at both ends.</p>
@@ -79,9 +79,16 @@ class BSplineCurve2SharedSupportTest {
     }
 
     @Test
-    void sharedKernelsLiveInTheHelperOnly() throws Exception {
-        Method expanded = BSplineCurveHelper.class.getDeclaredMethod("expandedKnots", List.class, List.class);
+    void knotExpansionLivesInTheSharedKernelOnly() throws Exception {
+        Method expanded = com.minicad.common.BSplineKernel.class
+                .getDeclaredMethod("expandedKnots", List.class, List.class);
         assertTrue(Modifier.isStatic(expanded.getModifiers()));
+
+        // The 2D helper was a verbatim copy of the 3D one minus the point-typed
+        // inversion; all three of its methods were dimension-free and now live in
+        // the shared kernel. The file must not come back.
+        assertThrows(ClassNotFoundException.class,
+                () -> Class.forName("com.minicad.geometry2d.BSplineCurveHelper"));
 
         for (Class<?> curve : List.of(BSplineCurve2.class, RationalBSplineCurve2.class)) {
             // Entry signatures stay on the curves ...

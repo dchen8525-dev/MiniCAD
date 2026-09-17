@@ -123,12 +123,19 @@ class BSplineSurfaceSharedSupportTest {
 
     @Test
     void sharedHelpersLiveInTheSupportClassOnly() throws Exception {
-        Method expanded = BSplineSurfaceHelper.class.getDeclaredMethod(
-                "expandedKnots", List.class, List.class);
         Method validate = BSplineSurfaceHelper.class.getDeclaredMethod(
                 "validateKnots", int.class, int.class, List.class, List.class);
-        assertTrue(Modifier.isStatic(expanded.getModifiers()));
         assertTrue(Modifier.isStatic(validate.getModifiers()));
+
+        // Knot multiplicity expansion and the domain clamp are dimension-free; both now
+        // live in the shared kernel rather than in this support class.
+        assertThrows(NoSuchMethodException.class,
+                () -> BSplineSurfaceHelper.class.getDeclaredMethod("expandedKnots", List.class, List.class));
+        assertThrows(NoSuchMethodException.class,
+                () -> BSplineSurfaceHelper.class.getDeclaredMethod("clamp", double.class, double.class, double.class));
+        Method kernelExpansion = com.minicad.common.BSplineKernel.class
+                .getDeclaredMethod("expandedKnots", List.class, List.class);
+        assertTrue(Modifier.isStatic(kernelExpansion.getModifiers()));
 
         for (Class<?> surface : List.of(BSplineSurface3.class, RationalBSplineSurface3.class)) {
             // Entry signatures stay on the surfaces ...

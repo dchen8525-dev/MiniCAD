@@ -1,5 +1,6 @@
 package com.minicad.geometry2d;
 
+import com.minicad.common.BSplineKernel;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
@@ -104,7 +105,7 @@ public final class BSplineCurve2 implements Curve2 {
      * @return start parameter
      */
     public double startParameter() {
-        return BSplineCurveHelper.startParameter(knots);
+        return BSplineKernel.knotStart(knots);
     }
 
     /**
@@ -113,7 +114,7 @@ public final class BSplineCurve2 implements Curve2 {
      * @return end parameter
      */
     public double endParameter() {
-        return BSplineCurveHelper.endParameter(knots);
+        return BSplineKernel.knotEnd(knots);
     }
 
     /**
@@ -162,7 +163,7 @@ public final class BSplineCurve2 implements Curve2 {
     public List<Double> expandedKnots() {
         List<Double> local = expandedKnotsCache;
         if (local == null) {
-            local = BSplineCurveHelper.expandedKnots(knots, knotMultiplicities);
+            local = BSplineKernel.expandedKnots(knots, knotMultiplicities);
             expandedKnotsCache = local;
         }
         return local;

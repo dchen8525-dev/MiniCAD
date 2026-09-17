@@ -13,8 +13,13 @@ import java.util.List;
  * <p>The two surfaces differ only in how they evaluate a point (weights or not) and in
  * their validation of the weight grid; everything that is expressed purely in terms of
  * {@code pointAt} and the natural {@code (u, v)} domain is therefore identical in both.
- * Keeping one copy here means a fix to knot expansion, sampling, bounds or nearest-point
+ * Keeping one copy here means a fix to knot validation, sampling, bounds or nearest-point
  * search cannot drift between the non-rational and rational variants.</p>
+ *
+ * <p>Knot multiplicity expansion and the domain clamp are dimension-free and no longer
+ * live here: they belong to {@code com.minicad.common.BSplineKernel}, which the curves
+ * use as well. What is left is surface-specific - the two-parameter domain, the weight
+ * grid validation and the {@code (u, v)} sampling.</p>
  *
  * <p>Bodies are lifted verbatim from the two classes; the delegated methods keep their
  * original entry signatures so no caller is affected.</p>
@@ -31,22 +36,6 @@ final class BSplineSurfaceHelper {
     }
 
     private BSplineSurfaceHelper() {
-    }
-
-    static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(value, max));
-    }
-
-    static List<Double> expandedKnots(List<Double> knots, List<Integer> multiplicities) {
-        List<Double> expanded = new ArrayList<>();
-        for (int index = 0; index < knots.size(); index++) {
-            int multiplicity = multiplicities.get(index);
-            double knot = knots.get(index);
-            for (int repeat = 0; repeat < multiplicity; repeat++) {
-                expanded.add(knot);
-            }
-        }
-        return List.copyOf(expanded);
     }
 
     static void validateKnots(

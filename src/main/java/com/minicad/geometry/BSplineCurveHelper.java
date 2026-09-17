@@ -1,62 +1,33 @@
 package com.minicad.geometry;
 
+import com.minicad.common.BSplineKernel;
 import com.minicad.common.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleFunction;
 
 /**
- * Shared implementation of the {@link BSplineCurve3} / {@link RationalBSplineCurve3}
- * pair: the knot domain, the expanded knot vector and the sampled parameter
- * inversion.
+ * 3D curve-parameter inversion shared by the {@link BSplineCurve3} /
+ * {@link RationalBSplineCurve3} pair.
  *
- * <p>The two curves differ only in how a point is evaluated (weights or not), so
- * everything expressed purely in terms of {@code pointAt} and the knot vector is
- * identical in both and lives here once, instead of being maintained twice.</p>
+ * <p>The two curves differ only in how a point is evaluated (weights or not), so a
+ * nearest-point search expressed purely in terms of {@code pointAt} is identical
+ * in both and lives here once.</p>
  *
- * <p>Bodies are lifted verbatim from the two classes; the delegated methods keep
- * their original entry signatures so no caller is affected.</p>
+ * <p>The knot-domain and multiplicity-expansion helpers that used to sit next to
+ * it were dimension-free and now live in {@link BSplineKernel}, together with the
+ * 2D copies that had been cut from this file.</p>
  */
 final class BSplineCurveHelper {
 
     private BSplineCurveHelper() {
     }
 
-    static double startParameter(List<Double> knots) {
-        if (knots == null || knots.isEmpty()) {
-            return 0.0;
-        }
-        return knots.get(0);
-    }
-
-    static double endParameter(List<Double> knots) {
-        if (knots == null || knots.isEmpty()) {
-            return 1.0;
-        }
-        return knots.get(knots.size() - 1);
-    }
-
-    static List<Double> expandedKnots(List<Double> knots, List<Integer> multiplicities) {
-        if (knots == null || multiplicities == null) {
-            return List.of();
-        }
-        List<Double> expanded = new ArrayList<>();
-        for (int i = 0; i < knots.size(); i++) {
-            int multiplicity = multiplicities.get(i);
-            double knotValue = knots.get(i);
-            for (int j = 0; j < multiplicity; j++) {
-                expanded.add(knotValue);
-            }
-        }
-        return List.copyOf(expanded);
-    }
-
     static double parameterAt(CartesianPoint point, List<Double> knots, DoubleFunction<CartesianPoint> pointAt) {
         Preconditions.requireNonNull(point, "point");
         int samples = 1024;
-        double start = startParameter(knots);
-        double end = endParameter(knots);
+        double start = BSplineKernel.knotStart(knots);
+        double end = BSplineKernel.knotEnd(knots);
         double bestParameter = start;
         double bestDistance = Double.POSITIVE_INFINITY;
         for (int i = 0; i <= samples; i++) {
@@ -72,7 +43,7 @@ final class BSplineCurveHelper {
         // the coarse winner when refinement does not improve on it - the minimum
         // may sit exactly on a bracket boundary (e.g. an endpoint hit).
         double step = (end - start) / samples;
-        double refined = BSplineMath.refineLocalMinimum(
+        double refined = BSplineKernel.refineLocalMinimum(
                 p -> point.distanceTo(pointAt.apply(p)),
                 Math.max(start, bestParameter - step),
                 Math.min(end, bestParameter + step),

@@ -101,12 +101,22 @@ class BSplineCurveSharedSupportTest {
     }
 
     @Test
-    void sharedKernelsLiveInTheHelperOnly() throws Exception {
-        Method expanded = BSplineCurveHelper.class.getDeclaredMethod("expandedKnots", List.class, List.class);
+    void parameterInversionLivesInTheHelperAndKnotsInTheSharedKernel() throws Exception {
         Method parameterAt = BSplineCurveHelper.class.getDeclaredMethod(
                 "parameterAt", CartesianPoint.class, List.class, java.util.function.DoubleFunction.class);
-        assertTrue(Modifier.isStatic(expanded.getModifiers()));
         assertTrue(Modifier.isStatic(parameterAt.getModifiers()));
+
+        // The knot domain and the multiplicity expansion are dimension-free: they moved
+        // into the shared kernel, which is the only place they may be declared.
+        assertThrows(NoSuchMethodException.class,
+                () -> BSplineCurveHelper.class.getDeclaredMethod("expandedKnots", List.class, List.class));
+        assertThrows(NoSuchMethodException.class,
+                () -> BSplineCurveHelper.class.getDeclaredMethod("startParameter", List.class));
+        assertThrows(NoSuchMethodException.class,
+                () -> BSplineCurveHelper.class.getDeclaredMethod("endParameter", List.class));
+        Method kernelExpansion = com.minicad.common.BSplineKernel.class
+                .getDeclaredMethod("expandedKnots", List.class, List.class);
+        assertTrue(Modifier.isStatic(kernelExpansion.getModifiers()));
 
         for (Class<?> curve : List.of(BSplineCurve3.class, RationalBSplineCurve3.class)) {
             // Entry signatures stay on the curves ...
