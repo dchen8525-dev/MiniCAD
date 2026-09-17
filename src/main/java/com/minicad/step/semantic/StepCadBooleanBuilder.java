@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.minicad.step.semantic.StepCadShellGeometry.CircularFrame;
 
 /**
  * Builds CSG (Constructive Solid Geometry) and Boolean operation solids from STEP entities.
@@ -925,30 +926,15 @@ final class StepCadBooleanBuilder {
             double radius,
             int segments
     ) {
-        List<CartesianPoint> points = new ArrayList<>(segments);
-        for (int index = 0; index < segments; index++) {
-            double angle = Math.PI * 2.0 * index / segments;
-            Vector3 offset = xAxis.scale(Math.cos(angle) * radius).add(yAxis.scale(Math.sin(angle) * radius));
-            points.add(center.add(offset));
-        }
-        return List.copyOf(points);
+        return StepCadShellGeometry.sampleCircle3(center, xAxis, yAxis, radius, segments);
     }
 
     private CircularFrame circularFrame(Direction3 axis) {
-        Vector3 z = axis.asVector();
-        Vector3 reference = Math.abs(z.getZ()) < 0.9 ? new Vector3(0.0, 0.0, 1.0) : new Vector3(1.0, 0.0, 0.0);
-        Vector3 x = z.cross(reference);
-        if (x.isZero()) {
-            reference = new Vector3(0.0, 1.0, 0.0);
-            x = z.cross(reference);
-        }
-        x = x.normalize().asVector();
-        Vector3 y = z.cross(x).normalize().asVector();
-        return new CircularFrame(x, y);
+        return StepCadShellGeometry.circularFrame(axis);
     }
 
     private CircularFrame circularFrameAtPoint(CartesianPoint point, Direction3 tangent) {
-        return circularFrame(tangent);
+        return StepCadShellGeometry.circularFrameAtPoint(point, tangent);
     }
 
     private CartesianPoint pointOnPlacement(Axis2Placement3D placement, double x, double y, double z) {
@@ -977,64 +963,11 @@ final class StepCadBooleanBuilder {
     }
 
     private Direction3 polygonNormal(List<CartesianPoint> points, Vector3 fallback) {
-        Vector3 normal = new Vector3(0.0, 0.0, 0.0);
-        for (int index = 0; index < points.size(); index++) {
-            CartesianPoint current = points.get(index);
-            CartesianPoint next = points.get((index + 1) % points.size());
-            normal = normal.add(new Vector3(
-                    (current.getY() - next.getY()) * (current.getZ() + next.getZ()),
-                    (current.getZ() - next.getZ()) * (current.getX() + next.getX()),
-                    (current.getX() - next.getX()) * (current.getY() + next.getY())
-            ));
-        }
-        if (normal.isZero()) {
-            normal = fallback;
-        }
-        if (normal.isZero()) {
-            throw new UnsupportedGeometryException("revolved face normal is degenerate");
-        }
-        if (!fallback.isZero() && normal.dot(fallback) < 0.0) {
-            normal = normal.scale(-1.0);
-        }
-        return Direction3.from(normal.normalize());
+        return StepCadShellGeometry.polygonNormal(points, fallback);
     }
 
     private Direction3 quadNormal(CartesianPoint a, CartesianPoint b, CartesianPoint c, CartesianPoint d) {
-        Vector3 normal = b.subtract(a).cross(c.subtract(a));
-        if (normal.isZero()) {
-            normal = c.subtract(a).cross(d.subtract(a));
-        }
-        if (normal.isZero()) {
-            throw new UnsupportedGeometryException("revolved side face is degenerate");
-        }
-        return Direction3.from(normal.normalize());
+        return StepCadShellGeometry.quadNormal(a, b, c, d);
     }
 
-    /**
-     * Represents a circular frame (local coordinate system for circles/tubes).
-     */
-    private static class CircularFrame {
-        private final Vector3 x;
-        private final Vector3 y;
-
-        CircularFrame(Vector3 x, Vector3 y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        Vector3 x() { return x; }
-        Vector3 y() { return y; }
-        Vector3 getX() { return x; }
-        Vector3 getY() { return y; }
-
-        Direction3 radialAtAngle(double angle) {
-            return Direction3.from(x.scale(Math.cos(angle)).add(y.scale(Math.sin(angle))));
-        }
-        Direction3 z() {
-            return Direction3.from(x.cross(y));
-        }
-        Vector3 getZ() {
-            return x.cross(y);
-        }
-    }
 }
