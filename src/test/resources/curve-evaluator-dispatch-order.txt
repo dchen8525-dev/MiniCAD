@@ -1,6 +1,11 @@
-# Frozen dispatch order for StepRepresentationPayloadBuilder.curveEvaluator.
-# 59 leaf curve types, in first-match-wins order. Edit ONLY by re-running
-# tools/gen_curve_evaluator_dispatch.py after a behaviour-preserving change.
+# Frozen dispatch order for the curve-evaluator table, which now lives only in
+# PreviewCurveEvaluator (a byte-identical copy in StepRepresentationPayloadBuilder
+# was folded into it; that class delegates). StepRepresentationPayloadBuilder
+# .curveEvaluator was the original owner, so it stays named in the history.
+# 59 leaf curve types, in first-match-wins order. Captured from the original
+# if/else-if chain by tools/gen_curve_evaluator_dispatch.py, which is historical
+# now that the chain is gone -- edit ONLY after a behaviour-preserving change and
+# leave the order and the type set alone.
 # The order is load-bearing: subtypes must precede their supertypes
 # (e.g. StepBSplineCurveWithKnots before StepBSplineCurve, StepCircle2D before
 # StepCurve2D, StepCurve/StepBoundedCurve are the trailing catch-alls).

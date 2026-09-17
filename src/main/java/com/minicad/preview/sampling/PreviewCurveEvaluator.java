@@ -39,36 +39,11 @@ public final class PreviewCurveEvaluator {
 
     private PreviewCurveEvaluator() {}
 
-    // ─── CurveEvaluator interface ────────────────────────────────────────
-
-    public interface CurveEvaluator {
-        double start();
-
-        double end();
-
-        CartesianPoint pointAt(double parameter);
-
-        default Vector3 tangentAt(double parameter) {
-            double span = Math.max(end() - start(), 1.0);
-            double step = Math.max(span * 1.0e-4, 1.0e-5);
-            double t0 = Math.max(start(), parameter - step);
-            double t1 = Math.min(end(), parameter + step);
-            if (t1 - t0 <= Epsilon.EPS) {
-                t0 = Math.max(start(), parameter - step * 2.0);
-                t1 = Math.min(end(), parameter + step * 2.0);
-            }
-            return pointAt(t1).subtract(pointAt(t0));
-        }
-
-        default List<CartesianPoint> sample(int segments) {
-            List<CartesianPoint> points = new ArrayList<>(segments + 1);
-            for (int index = 0; index <= segments; index++) {
-                double parameter = start() + (end() - start()) * index / (double) segments;
-                points.add(pointAt(parameter));
-            }
-            return List.copyOf(points);
-        }
-    }
+    // The evaluator abstraction is the sibling top-level type
+    // {@link com.minicad.preview.sampling.CurveEvaluator}. A byte-identical nested
+    // copy used to be declared right here, which shadowed the top-level name inside
+    // this file and kept the json pipeline from sharing one interface; it was folded
+    // into the top-level type so both pipelines now speak the same type.
 
     // ─── CurveEvaluator factory ──────────────────────────────────────────
 

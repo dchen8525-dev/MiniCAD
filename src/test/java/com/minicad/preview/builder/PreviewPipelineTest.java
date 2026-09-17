@@ -4,6 +4,7 @@ import com.minicad.helper.StepMetadataExtractor;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.helper.StepTextReader;
 import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.sampling.CurveEvaluator;
 import com.minicad.preview.sampling.PreviewCurveEvaluator;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.StepEntityResolver;
@@ -81,7 +82,7 @@ class PreviewPipelineTest {
         assertTrue(edgeCurves.size() >= 4, "fixture should contain edge curves");
 
         for (StepEdgeCurve edge : edgeCurves) {
-            PreviewCurveEvaluator.CurveEvaluator evaluator =
+            CurveEvaluator evaluator =
                     PreviewCurveEvaluator.curveEvaluator(edge, builder);
             assertNotNull(evaluator, () -> "no evaluator for edge #" + edge.id());
             assertTrue(evaluator.end() > evaluator.start(), () -> "degenerate domain on edge #" + edge.id());
@@ -107,7 +108,7 @@ class PreviewPipelineTest {
                     if (!(entity instanceof StepEdgeCurve)) {
                         continue;
                     }
-                    PreviewCurveEvaluator.CurveEvaluator evaluator =
+                    CurveEvaluator evaluator =
                             PreviewCurveEvaluator.curveEvaluator((StepEdgeCurve) entity, sampleBuilder);
                     if (evaluator == null) {
                         continue;

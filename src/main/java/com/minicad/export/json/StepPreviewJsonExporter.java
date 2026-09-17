@@ -542,7 +542,6 @@ import com.minicad.preview.payload.ValidationContext;
 import com.minicad.preview.payload.ValidationPayload;
 import com.minicad.preview.payload.ValidationReportPayload;
 import com.minicad.preview.payload.VectorPayload;
-import com.minicad.preview.sampling.CurveEvaluator;
 import com.minicad.preview.mapper.ParametricSurfaceMapper;
 import com.minicad.export.json.PreviewSerializers.BoundsAccumulator;
 import com.minicad.topology.Edge;
