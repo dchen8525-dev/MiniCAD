@@ -1,6 +1,6 @@
 package com.minicad.helper;
 
-import com.minicad.export.json.PreviewSerializers.BoundsAccumulator;
+import com.minicad.preview.statistics.BoundsAccumulator;
 import com.minicad.preview.payload.BoundsPayload;
 import com.minicad.preview.payload.GeometrySummary;
 import com.minicad.preview.payload.PointPayload;

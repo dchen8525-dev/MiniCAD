@@ -5,6 +5,7 @@ import com.minicad.preview.payload.AssemblyData;
 import com.minicad.preview.payload.BoundsPayload;
 import com.minicad.preview.payload.GeometryCollection;
 import com.minicad.preview.payload.*;
+import com.minicad.preview.statistics.BoundsAccumulator;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ public final class StepBoundsAccumulator {
     /**
      * Includes geometry collection bounds into the accumulator.
      */
-    public static void includeGeometry(PreviewSerializers.BoundsAccumulator bounds, GeometryCollection geometry) {
+    public static void includeGeometry(BoundsAccumulator bounds, GeometryCollection geometry) {
         for (FacePayload face : geometry.faces()) {
             for (LoopPayload loop : face.loops()) {
                 for (PointPayload point : loop.points()) {
@@ -41,7 +42,7 @@ public final class StepBoundsAccumulator {
     /**
      * Includes assembly data bounds into the accumulator.
      */
-    public static void includeAssembly(PreviewSerializers.BoundsAccumulator bounds, AssemblyData assembly) {
+    public static void includeAssembly(BoundsAccumulator bounds, AssemblyData assembly) {
         Map<Integer, RepresentationPayload> byId = assembly.representations().stream()
                 .collect(Collectors.toMap(RepresentationPayload::id, representation -> representation, (left, right) -> left, LinkedHashMap::new));
         for (InstancePayload instance : assembly.instances()) {
@@ -69,32 +70,16 @@ public final class StepBoundsAccumulator {
     /**
      * Includes bounds payload into the accumulator.
      */
-    public static void includeBounds(PreviewSerializers.BoundsAccumulator target, BoundsPayload bounds) {
+    public static void includeBounds(BoundsAccumulator target, BoundsPayload bounds) {
         target.include(bounds.min());
         target.include(bounds.max());
-    }
-
-    /**
-     * Creates a copy of the bounds accumulator.
-     */
-    public static PreviewSerializers.BoundsAccumulator copyBounds(PreviewSerializers.BoundsAccumulator source) {
-        PreviewSerializers.BoundsAccumulator copy = new PreviewSerializers.BoundsAccumulator();
-        if (!source.isEmpty()) {
-            copy.minX = source.minX;
-            copy.minY = source.minY;
-            copy.minZ = source.minZ;
-            copy.maxX = source.maxX;
-            copy.maxY = source.maxY;
-            copy.maxZ = source.maxZ;
-        }
-        return copy;
     }
 
     /**
      * Includes representation bounds into the accumulator with transformation matrix.
      */
     public static void includeRepresentationBounds(
-            PreviewSerializers.BoundsAccumulator bounds,
+            BoundsAccumulator bounds,
             RepresentationPayload representation,
             double[] matrix
     ) {

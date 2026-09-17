@@ -23,6 +23,7 @@ import com.minicad.preview.sampling.Curve2SamplingHelper;
 import com.minicad.preview.sampling.Curve3SamplingHelper;
 import com.minicad.preview.sampling.ConicSamplingHelper;
 import com.minicad.preview.mapper.SurfaceMapperHelper;
+import com.minicad.preview.statistics.BoundsAccumulator;
 import com.minicad.preview.statistics.GeometryMeasurementHelper;
 import com.minicad.preview.statistics.PreviewStatisticsHelper;
 import com.minicad.export.glb.PreviewMaterialExporter;
@@ -543,7 +544,6 @@ import com.minicad.preview.payload.ValidationPayload;
 import com.minicad.preview.payload.ValidationReportPayload;
 import com.minicad.preview.payload.VectorPayload;
 import com.minicad.preview.mapper.ParametricSurfaceMapper;
-import com.minicad.export.json.PreviewSerializers.BoundsAccumulator;
 import com.minicad.topology.Edge;
 import com.minicad.topology.EdgeLoop;
 import com.minicad.topology.Face;
@@ -745,7 +745,7 @@ public final class StepPreviewJsonExporter {
             includeGeometry(geometryBounds, legacyGeometry);
         }
         List<PmiPayload> pmi = StepPmiPayloadBuilder.buildPmiPayloads(resolved, assembly, builder);
-        BoundsAccumulator bounds = copyBounds(geometryBounds);
+        BoundsAccumulator bounds = geometryBounds.copy();
         ValidationReportHelper.includePmi(bounds, pmi);
         ValidationPayload validation = buildValidationPayload(legacyGeometry, assembly, geometryBounds, resolved);
         List<UnsupportedFacePayload> unsupportedFaces = assemblyMode
@@ -919,11 +919,6 @@ public final class StepPreviewJsonExporter {
         StepBoundsAccumulator.includeBounds(target, bounds);
     }
 
-    // Delegate to StepBoundsAccumulator - extracted utility class
-    private static BoundsAccumulator copyBounds(BoundsAccumulator source) {
-        return StepBoundsAccumulator.copyBounds(source);
-    }
-
     private static ValidationPayload buildValidationPayload(
             GeometryCollection legacyGeometry,
             AssemblyData assembly,
@@ -936,13 +931,13 @@ public final class StepPreviewJsonExporter {
         PointPayload center = bounds.isEmpty()
                 ? new PointPayload(0.0, 0.0, 0.0)
                 : new PointPayload(
-                        (bounds.minX + bounds.maxX) * 0.5,
-                        (bounds.minY + bounds.maxY) * 0.5,
-                        (bounds.minZ + bounds.maxZ) * 0.5
+                        (bounds.minX() + bounds.maxX()) * 0.5,
+                        (bounds.minY() + bounds.maxY()) * 0.5,
+                        (bounds.minZ() + bounds.maxZ()) * 0.5
                 );
-        double sizeX = bounds.isEmpty() ? 0.0 : bounds.maxX - bounds.minX;
-        double sizeY = bounds.isEmpty() ? 0.0 : bounds.maxY - bounds.minY;
-        double sizeZ = bounds.isEmpty() ? 0.0 : bounds.maxZ - bounds.minZ;
+        double sizeX = bounds.isEmpty() ? 0.0 : bounds.maxX() - bounds.minX();
+        double sizeY = bounds.isEmpty() ? 0.0 : bounds.maxY() - bounds.minY();
+        double sizeZ = bounds.isEmpty() ? 0.0 : bounds.maxZ() - bounds.minZ();
         return new ValidationPayload(
                 assembly.representations().size(),
                 assembly.instances().size(),

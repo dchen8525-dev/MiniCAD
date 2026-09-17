@@ -417,7 +417,7 @@ public final class StepRepresentationPayloadBuilder {
         int edgeCount = 0;
         double area = 0.0;
         double edgeLength = 0.0;
-        PreviewSerializers.BoundsAccumulator bounds = new PreviewSerializers.BoundsAccumulator();
+        BoundsAccumulator bounds = new BoundsAccumulator();
         for (InstancePayload instance : instances) {
             for (Integer representationId : instance.representationIds()) {
                 RepresentationPayload representation = byId.get(representationId);
@@ -449,7 +449,7 @@ public final class StepRepresentationPayloadBuilder {
 
     // Delegate to StepBoundsAccumulator - extracted utility class
     private static void includeRepresentationBounds(
-            PreviewSerializers.BoundsAccumulator bounds,
+            BoundsAccumulator bounds,
             RepresentationPayload representation,
             double[] matrix
     ) {

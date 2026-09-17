@@ -1400,43 +1400,6 @@ public final class PreviewSerializers {
 
     // ─── Inner classes ───────────────────────────────────────────────────
 
-    public static final class BoundsAccumulator {
-        double minX = Double.POSITIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY;
-        double minZ = Double.POSITIVE_INFINITY;
-        double maxX = Double.NEGATIVE_INFINITY;
-        double maxY = Double.NEGATIVE_INFINITY;
-        double maxZ = Double.NEGATIVE_INFINITY;
-
-        public double minX() { return minX; }
-        public double minY() { return minY; }
-        public double minZ() { return minZ; }
-        public double maxX() { return maxX; }
-        public double maxY() { return maxY; }
-        public double maxZ() { return maxZ; }
-
-        public void include(PointPayload point) {
-            minX = Math.min(minX, point.x());
-            minY = Math.min(minY, point.y());
-            minZ = Math.min(minZ, point.z());
-            maxX = Math.max(maxX, point.x());
-            maxY = Math.max(maxY, point.y());
-            maxZ = Math.max(maxZ, point.z());
-        }
-
-        public boolean isEmpty() {
-            return !Double.isFinite(minX);
-        }
-
-        public BoundsPayload toPayload() {
-            if (!Double.isFinite(minX)) {
-                PointPayload zero = new PointPayload(0.0, 0.0, 0.0);
-                return new BoundsPayload(zero, zero);
-            }
-            return new BoundsPayload(new PointPayload(minX, minY, minZ), new PointPayload(maxX, maxY, maxZ));
-        }
-    }
-
     public static final class BinaryGeometryBuffer {
         private final ByteArrayOutputStream output = new ByteArrayOutputStream();
         private int pointCount;
