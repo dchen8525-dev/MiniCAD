@@ -236,7 +236,7 @@ public final class StepRepresentationPayloadBuilder {
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = StepLegacyGeometryBuilder.unwrapStyledItem(item);
-                if (!StepLegacyGeometryBuilder.isRepresentationSolidItem(unwrapped)) {
+                if (!StepValidationHelper.isRepresentationSolidItem(unwrapped)) {
                     StepLegacyGeometryBuilder.collectShellLikeIds(item, shellIds);
                 }
             }
@@ -253,7 +253,7 @@ public final class StepRepresentationPayloadBuilder {
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = StepLegacyGeometryBuilder.unwrapStyledItem(item);
-                if (StepLegacyGeometryBuilder.isRepresentationSolidItem(unwrapped)) {
+                if (StepValidationHelper.isRepresentationSolidItem(unwrapped)) {
                     solidIds.add(unwrapped.id());
                 }
             }
@@ -287,7 +287,7 @@ public final class StepRepresentationPayloadBuilder {
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = StepLegacyGeometryBuilder.unwrapStyledItem(item);
-                if (StepLegacyGeometryBuilder.isRepresentationSolidItem(unwrapped)) {
+                if (StepValidationHelper.isRepresentationSolidItem(unwrapped)) {
                     continue;
                 }
                 StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(item.id());
@@ -311,7 +311,7 @@ public final class StepRepresentationPayloadBuilder {
         for (StepRepresentation candidate : linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = StepLegacyGeometryBuilder.unwrapStyledItem(item);
-                if (StepLegacyGeometryBuilder.isRepresentationSolidItem(unwrapped)) {
+                if (StepValidationHelper.isRepresentationSolidItem(unwrapped)) {
                     StepMetadataExtractor.DisplayMetadata itemMetadata = metadata.forItem(item.id());
                     metadataBySolidId.put(unwrapped.id(), StepMetadataHelper.mergeMetadata(metadataBySolidId.get(unwrapped.id()), itemMetadata));
                 }

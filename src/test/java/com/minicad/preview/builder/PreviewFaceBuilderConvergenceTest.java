@@ -66,6 +66,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *       its last production caller.</li>
  * </ul>
  *
+ * <p>A later round finished what this split left open. Three methods that were
+ * turned into facades here had no caller at all -- {@code isSampledCurveSource},
+ * {@code isStandaloneEdgeSource} and {@code isRepresentationSolidItem} -- which
+ * contradicts the rule applied to the two deletions above, so they are gone and
+ * the call sites now name {@code StepValidationHelper} directly.
+ * {@code isRepresentationSolidItem} was also simply the wrong classifier: the
+ * facade pointed at a 13-type list while both live copies carried 27, so the
+ * export-side home was widened to the 27 the callers actually relied on. That
+ * follow-up is guarded by {@code EntityClassifierConvergenceTest} rather than
+ * here, so each guard stays about one convergence.
+ *
  * <p>The guard matters because convergence without one regresses silently: a
  * later edit can paste the body back, and every existing test still passes --
  * both copies agree until they drift. It pins the canonical homes, the facades

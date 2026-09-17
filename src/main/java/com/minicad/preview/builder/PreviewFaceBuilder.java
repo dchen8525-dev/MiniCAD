@@ -1307,20 +1307,8 @@ public final class PreviewFaceBuilder {
         return new VectorPayload(nx / len, ny / len, nz / len);
     }
 
-    public static boolean isSampledCurveSource(StepEntity item) {
-        return StepValidationHelper.isSampledCurveSource(item);
-    }
-
-    public static boolean isStandaloneEdgeSource(StepEntity item) {
-        return StepValidationHelper.isStandaloneEdgeSource(item);
-    }
-
     public static StepEntity unwrapStyledItem(StepEntity item) {
         return StepEntityUnwrapper.unwrapStyledItem(item);
-    }
-
-    public static boolean isRepresentationSolidItem(StepEntity entity) {
-        return StepValidationHelper.isRepresentationSolidItem(entity);
     }
 
     public static ColorPayload toColorPayload(int[] rgb) {

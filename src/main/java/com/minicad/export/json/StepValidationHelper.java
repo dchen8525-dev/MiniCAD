@@ -188,6 +188,20 @@ public final class StepValidationHelper {
      * Checks if an entity is a representation solid item.
      * These are entities that should be processed as solid geometry.
      *
+     * <p>This list is the de-facto contract of the live callers. The two copies
+     * this method converged from -- {@code StepLegacyGeometryBuilder} and
+     * {@code PreviewGeometryCollector} -- both carried these 27 types and agreed
+     * byte for byte, while this home had been left with only the first 13 and no
+     * caller at all. So the 14 added types (tessellated face sets and faces, FEA
+     * meshes, flat patterns, mapped items, surface patches, the tapered sweeps
+     * and the CSG volumes) are a widening of an unreachable method: no live path
+     * changes behaviour, and the method stops disagreeing with its only callers.
+     *
+     * <p>Several of the added types are not subtypes of any type already listed
+     * -- {@code StepTessellatedFace} and {@code StepTessellatedFaceSet} each
+     * implement {@code StepEntity} directly -- so dropping them would silently
+     * stop those entities being classified as solids.
+     *
      * @param entity the STEP entity to check
      * @return true if the entity is a representation solid item
      */
@@ -203,8 +217,22 @@ public final class StepValidationHelper {
                 || entity instanceof StepCsgPrimitive
                 || entity instanceof StepBooleanClippingResult
                 || entity instanceof StepBooleanResult
+                || entity instanceof StepTessellatedFaceSet
+                || entity instanceof StepTessellatedFace
                 || entity instanceof StepSweptDiskSolid
-                || entity instanceof StepSolidModel;
+                || entity instanceof StepExtrudedAreaSolidTapered
+                || entity instanceof StepRevolvedAreaSolidTapered
+                || entity instanceof StepSurfaceCurveSweptAreaSolid
+                || entity instanceof StepPolygonalBoundedHalfSpace
+                || entity instanceof StepComplexClippingResult
+                || entity instanceof StepHalfSpaceSolid
+                || entity instanceof StepCsgVolume
+                || entity instanceof StepBlockVolume
+                || entity instanceof StepFiniteElementMesh
+                || entity instanceof StepFlatPattern
+                || entity instanceof StepMappedItem
+                || entity instanceof StepSolidModel
+                || entity instanceof StepSurfacePatch;
     }
 
     /**

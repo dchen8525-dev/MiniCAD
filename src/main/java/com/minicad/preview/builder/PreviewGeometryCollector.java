@@ -1,6 +1,7 @@
 package com.minicad.preview.builder;
 
 import com.minicad.export.json.StepMetadataHelper;
+import com.minicad.export.json.StepValidationHelper;
 import com.minicad.builder.StepAssemblyGraphBuilder;
 import com.minicad.export.glb.PreviewMeshExporter;
 import com.minicad.export.glb.TessellatedFaceExporter;
@@ -107,7 +108,7 @@ public final class PreviewGeometryCollector {
                     || entity instanceof StepCubicBezierTriangulatedFace) {
                 solidIds.add(entity.id());
             }
-            if (isStandaloneEdgeSource(entity)) {
+            if (StepValidationHelper.isStandaloneEdgeSource(entity)) {
                 collectStandaloneEdges(entity, standaloneEdges, resolved, builder, metadata);
             }
         }
@@ -668,7 +669,7 @@ public final class PreviewGeometryCollector {
             }
         }
 
-        if (PreviewFaceBuilder.isSampledCurveSource(item)) {
+        if (StepValidationHelper.isSampledCurveSource(item)) {
             EdgePayload sampled = StepEdgePayloadBuilder.sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -777,7 +778,7 @@ public final class PreviewGeometryCollector {
         for (StepRepresentation candidate : StepRepresentationPayloadBuilder.linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = PreviewFaceBuilder.unwrapStyledItem(item);
-                if (!isRepresentationSolidItem(unwrapped)) {
+                if (!StepValidationHelper.isRepresentationSolidItem(unwrapped)) {
                     collectShellLikeIds(item, shellIds);
                 }
             }
@@ -793,76 +794,12 @@ public final class PreviewGeometryCollector {
         for (StepRepresentation candidate : StepRepresentationPayloadBuilder.linkedShapeRepresentations(representation, resolved)) {
             for (StepEntity item : candidate.items()) {
                 StepEntity unwrapped = PreviewFaceBuilder.unwrapStyledItem(item);
-                if (isRepresentationSolidItem(unwrapped)) {
+                if (StepValidationHelper.isRepresentationSolidItem(unwrapped)) {
                     solidIds.add(unwrapped.id());
                 }
             }
         }
         return solidIds;
-    }
-
-    // ─── Helper methods ──────────────────────────────────────────────────
-
-    public static boolean isStandaloneEdgeSource(StepEntity item) {
-        return item instanceof StepPolyline
-                || item instanceof StepGeometricCurveSet
-                || item instanceof StepGeometricSet
-                || item instanceof StepShellBasedWireframeModel
-                || item instanceof StepEdgeBasedWireframeModel
-                || item instanceof StepConnectedEdgeSet
-                || item instanceof StepEdgeWire
-                || item instanceof StepPath
-                || item instanceof StepOpenPath
-                || item instanceof StepSubpath
-                || item instanceof StepOrientedPath
-                || item instanceof StepWireShell
-                || item instanceof StepAnnotationCurveOccurrence
-                || item instanceof StepAnnotationFillArea
-                || item instanceof StepAnnotationFillAreaOccurrence
-                || item instanceof StepAnnotationSymbol
-                || item instanceof StepAnnotationSymbolOccurrence
-                || item instanceof StepAnnotationSubfigureOccurrence
-                || item instanceof StepFilletEdge
-                || item instanceof StepChamferEdge
-                || item instanceof StepSubedge
-                || item instanceof StepAnnotationText
-                || item instanceof StepAnnotationTextCharacter
-                || item instanceof StepDimensionCurve
-                || item instanceof StepLeaderCurve
-                || item instanceof StepProjectionCurve
-                || item instanceof StepDraughtingAnnotationOccurrence
-                || item instanceof StepTerminatorSymbol
-                || item instanceof StepGeometricSurfaceSet;
-    }
-
-    public static boolean isRepresentationSolidItem(StepEntity entity) {
-        return entity instanceof StepManifoldSolidBrep
-                || entity instanceof StepFacettedBrep
-                || entity instanceof StepNonManifoldSolidBrep
-                || entity instanceof StepAdvancedBrep
-                || entity instanceof StepBrepWithVoids
-                || entity instanceof StepSweptAreaSolid
-                || entity instanceof StepSolidReplica
-                || entity instanceof StepCsgSolid
-                || entity instanceof StepCsgPrimitive
-                || entity instanceof StepBooleanClippingResult
-                || entity instanceof StepBooleanResult
-                || entity instanceof StepTessellatedFaceSet
-                || entity instanceof StepTessellatedFace
-                || entity instanceof StepSweptDiskSolid
-                || entity instanceof StepExtrudedAreaSolidTapered
-                || entity instanceof StepRevolvedAreaSolidTapered
-                || entity instanceof StepSurfaceCurveSweptAreaSolid
-                || entity instanceof StepPolygonalBoundedHalfSpace
-                || entity instanceof StepComplexClippingResult
-                || entity instanceof StepHalfSpaceSolid
-                || entity instanceof StepCsgVolume
-                || entity instanceof StepBlockVolume
-                || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern
-                || entity instanceof StepMappedItem
-                || entity instanceof StepSolidModel
-                || entity instanceof StepSurfacePatch;
     }
 
     // ─── Mapped annotation edge collection ───────────────────────────────

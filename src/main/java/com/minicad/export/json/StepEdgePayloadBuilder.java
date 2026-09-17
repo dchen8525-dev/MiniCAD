@@ -1320,7 +1320,7 @@ public final class StepEdgePayloadBuilder {
             }
         }
 
-        if (isSampledCurveSource(item)) {
+        if (StepValidationHelper.isSampledCurveSource(item)) {
             EdgePayload sampled = sampledCurveEdgePayload(item, builder);
             if (sampled != null) {
                 edges.putIfAbsent(sampled.stepId(), sampled);
@@ -1739,10 +1739,6 @@ public final class StepEdgePayloadBuilder {
             }
         }
         return false;
-    }
-
-    private static boolean isSampledCurveSource(StepEntity item) {
-        return StepValidationHelper.isSampledCurveSource(item);
     }
 
 }

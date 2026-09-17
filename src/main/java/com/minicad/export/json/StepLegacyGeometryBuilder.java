@@ -83,7 +83,7 @@ public final class StepLegacyGeometryBuilder {
                     || entity instanceof StepCubicBezierTriangulatedFace) {
                 solidIds.add(entity.id());
             }
-            if (isStandaloneEdgeSource(entity)) {
+            if (StepValidationHelper.isStandaloneEdgeSource(entity)) {
                 StepEdgePayloadBuilder.collectStandaloneEdges(entity, standaloneEdges, resolved, builder, metadata);
             }
         }
@@ -255,46 +255,17 @@ public final class StepLegacyGeometryBuilder {
         PreviewGeometryCollector.collectShellLikeIds(item, shellIds);
     }
 
-    // Delegate to StepValidationHelper - extracted utility class
-    static boolean isStandaloneEdgeSource(StepEntity item) {
-        return StepValidationHelper.isStandaloneEdgeSource(item);
-    }
-
     // Delegate to StepEntityUnwrapper - extracted utility class
     static StepEntity unwrapStyledItem(StepEntity item) {
         return StepEntityUnwrapper.unwrapStyledItem(item);
     }
 
-
-    static boolean isRepresentationSolidItem(StepEntity entity) {
-        return entity instanceof StepManifoldSolidBrep
-                || entity instanceof StepFacettedBrep
-                || entity instanceof StepNonManifoldSolidBrep
-                || entity instanceof StepAdvancedBrep
-                || entity instanceof StepBrepWithVoids
-                || entity instanceof StepSweptAreaSolid
-                || entity instanceof StepSolidReplica
-                || entity instanceof StepCsgSolid
-                || entity instanceof StepCsgPrimitive
-                || entity instanceof StepBooleanClippingResult
-                || entity instanceof StepBooleanResult
-                || entity instanceof StepTessellatedFaceSet
-                || entity instanceof StepTessellatedFace
-                || entity instanceof StepSweptDiskSolid
-                || entity instanceof StepExtrudedAreaSolidTapered
-                || entity instanceof StepRevolvedAreaSolidTapered
-                || entity instanceof StepSurfaceCurveSweptAreaSolid
-                || entity instanceof StepPolygonalBoundedHalfSpace
-                || entity instanceof StepComplexClippingResult
-                || entity instanceof StepHalfSpaceSolid
-                || entity instanceof StepCsgVolume
-                || entity instanceof StepBlockVolume
-                || entity instanceof StepFiniteElementMesh
-                || entity instanceof StepFlatPattern
-                || entity instanceof StepMappedItem
-                || entity instanceof StepSolidModel
-                || entity instanceof StepSurfacePatch;
-    }
+    // The two entity classifiers that used to be declared here are gone:
+    // isStandaloneEdgeSource and isRepresentationSolidItem both live in
+    // StepValidationHelper, and every caller in this package now names it
+    // directly. Keeping a package-private twin here only invited drift --
+    // this file's copy of isRepresentationSolidItem already disagreed with
+    // the StepValidationHelper one by 14 types.
 
     // buildLegacyGeometry B-rep-solid shell-removal rules.
     // Clean first-match else-if chain: the six B-rep types are mutually exclusive (no subtype
