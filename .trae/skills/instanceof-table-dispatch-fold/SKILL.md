@@ -307,6 +307,39 @@ python tools/scan_duplicate_methods.py --fuzzy --min-lines 4     # 忽略 com.mi
 **别把阈值压太低**去找它们，而是在删正典时顺手看它是否变成了孤儿（用 `grep -c` 数符号
 出现次数：只剩 1 次 = 只有 import 行 = 已成死代码）。
 
+### 扫描器会报"逐字相同但不是同一份代码"（2026-09-17）
+
+**text 相同 ≠ code 相同。** 扫出来的每一组都必须再核一遍：**两侧那些未限定的简单名，各自解析到哪个类？**
+
+- **嵌套同名类型遮蔽 import**：`MeshTriangulatorParametric` 自己声明了 `static final class UvPoint`，
+  它的 `sampleLinePcurve`/`sampleCirclePcurve`/`sampleEllipsePcurve`/`sampleSplinePcurve`/
+  `closestPointIndex` 与 `preview/sampling/PcurveSamplingHelper` 的**逐字相同**，但那一侧的 `UvPoint`
+  是 `com.minicad.preview.payload.UvPoint`。文本一样、类型不同 ⇒ 直接委托**编译不过**。
+  出路是先合并类型：本轮把 mesh 侧切到 payload `UvPoint`、删掉嵌套副本，5 个 sampler 才收敛得动。
+  顺带收益是消掉一个重复值类型（两版 equals/hashCode 语义逐字可用，嵌套版 `Objects.hash(u,v)`
+  与 payload 版 `Objects.hash(Double.hashCode(u), Double.hashCode(v))` 同值）。
+- **同类各自持一份嵌套类型**：`StepCadBooleanBuilder` 与 `StepCadSweptBuilder` 各有一个
+  `private static class CircularFrame`，所以 `circularFrame`（以及引用它的 `polygonNormal`）那两组
+  **不能**跨文件合并——两侧的 `CircularFrame` 是两个不同的类。
+- 扫描器已内置该检查：命中就在组标题打 `[!] nested:Xxx`。只有这一类打标——
+  `cross-package` 命中率太高（约 8 成组都跨包），降级成末尾的一行汇总计数，不占行内版面。
+  真阳性验证过两组：`sampledCurveEvaluator`（`PreviewCurveEvaluator` 有嵌套 `interface CurveEvaluator`）、
+  `circularFrame`。
+
+### 收敛前先数调用点：半收敛会留下孤儿副本（2026-09-17）
+
+调用点早已改指向 helper、私有副本却还留在文件里，这种现象比想象中多。本轮 `PreviewCurveEvaluator` 的
+`matrixForMappedPlacement`/`invertMatrix`/`composeMatrices`（:783 起，58 行）与公开的 `closestParameter`
+**全都是 0 调用点**，`StepMeshExporter.Triangulator.orientSamples`（:924）也是——它们只是扫描器眼里的
+"重复实现"。所以顺序应该是：**先 `grep -n <name>` 数调用点**，0 个就是死代码，
+**直接删比改成委托更干净**（少留一层 facade）；删完顺手查一遍死 import。
+
+### 新增文件必须先过 `spotless:apply`（2026-09-17）
+
+门禁里的 spotless 对**新加文件**会开刀（google-java-format 会重排、并掉行），写完新 helper / 新守卫测试后
+先跑 `python tools/mvn.py -o spotless:apply` 再 `verify`。否则 verify 直接挂在 spotless:check 上，
+而且失败输出被截断（"… more lines that didn't fit"）看不到细节，白等一轮 1 分半的构建。
+
 ### 跨文件多站点手术：用一次性脚本 + 计数断言，别连发 Edit
 
 同一文件要改 5+ 处（删 3 个方法体 + 改 3 个调用点 + 加 import）时，**不要**在一条消息里并行

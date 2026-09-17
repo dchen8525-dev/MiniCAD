@@ -17,6 +17,17 @@ Design notes
   by ``--min-lines``; those converge to nothing useful.
 * Constructors, ``toString``/``hashCode``/``equals``, and methods named after an
   enclosing type are skipped -- they are structurally required to repeat.
+* Identical text is not identical code. The scanner prints a risk marker on
+  groups that need a type-resolution check before they can be delegated:
+
+    - ``same-name-nested-type:X`` -- the shared body mentions ``X`` and one of
+      the member files declares its own nested type called ``X``. Unqualified
+      ``X`` then resolves to *different* classes in the two files, so the copies
+      cannot simply be merged (this cost a real detour: MeshTriangulatorParametric
+      declared a nested ``UvPoint`` and its pcurve samplers looked identical to
+      PcurveSamplingHelper's, which speaks com.minicad.preview.payload.UvPoint).
+    - ``cross-package`` -- the members live in different packages, so the
+      unqualified names in the body may resolve through different imports.
 
 Usage
 -----
@@ -99,13 +110,22 @@ def classify(decl: str) -> tuple[str, str]:
     return "method", m.group("name")
 
 
-def extract(path: str) -> list[dict]:
-    """Extract {name, decl, body, classes} for every method declared in `path`."""
+def extract(path: str) -> tuple[list[dict], set[str], str]:
+    """Extract the methods, the nested type names and the package of `path`.
+
+    The nested type names and package are what let ``collect`` tell "the same
+    text" apart from "the same code": a nested type shadows an import, so an
+    unqualified name in one member's body can resolve to a class the other
+    member has never heard of.
+    """
     src = open(path, encoding="utf-8").read()
+    package_match = re.search(r"(?m)^package\s+([\w.]+)\s*;", src)
+    package = package_match.group(1) if package_match else ""
     s = strip_java(src)
     n = len(s)
     stack: list[dict] = []
     classes: list[str] = []
+    nested: set[str] = set()
     pending: list[dict] = []
     methods: list[dict] = []
     boundary = 0
@@ -115,6 +135,8 @@ def extract(path: str) -> list[dict]:
         if ch == "{":
             decl = re.sub(r"\s+", " ", s[boundary:i]).strip()
             kind, name = classify(decl)
+            if kind == "type" and classes:
+                nested.add(name)
             stack.append({"kind": kind, "name": name, "brace": i})
             if kind == "type":
                 classes.append(name)
@@ -136,7 +158,7 @@ def extract(path: str) -> list[dict]:
         elif ch == ";":
             boundary = i + 1
         i += 1
-    return methods
+    return methods, nested, package
 
 
 def normalise(body: str, fuzzy: bool) -> str:
@@ -146,6 +168,19 @@ def normalise(body: str, fuzzy: bool) -> str:
     return text
 
 
+def risk_flags(body: str, members: list[dict]) -> list[str]:
+    """Heuristics for groups whose identical text may still be different code."""
+    flags: list[str] = []
+    nested = sorted({name for m in members for name in m["nested"]})
+    shadowed = [name for name in nested
+                if re.search(r"\b" + re.escape(name) + r"\b", body)]
+    if shadowed:
+        flags.append("nested:" + ",".join(shadowed))
+    if len({m["package"] for m in members}) > 1:
+        flags.append("cross-package")
+    return flags
+
+
 def collect(root: str, min_lines: int, fuzzy: bool):
     groups: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for dirpath, _dirnames, filenames in os.walk(root):
@@ -153,7 +188,8 @@ def collect(root: str, min_lines: int, fuzzy: bool):
             if not fn.endswith(".java"):
                 continue
             path = os.path.join(dirpath, fn)
-            for m in extract(path):
+            methods, nested, package = extract(path)
+            for m in methods:
                 body = m.get("body")
                 if body is None:
                     continue
@@ -171,13 +207,15 @@ def collect(root: str, min_lines: int, fuzzy: bool):
                     "classes": m["classes"],
                     "decl": m["decl"],
                     "lines": len([ln for ln in body.split("\n") if ln.strip()]),
+                    "nested": nested,
+                    "package": package,
                 })
     out = []
-    for (name, _body), members in groups.items():
+    for (name, body), members in groups.items():
         owners = {(m["owner"], m["file"]) for m in members}
         if len(owners) < 2:
             continue
-        out.append((name, members))
+        out.append((name, members, risk_flags(body, members)))
     out.sort(key=lambda kv: (-max(m["lines"] for m in kv[1]), kv[0]))
     return out
 
@@ -194,15 +232,27 @@ def main() -> int:
 
     groups = collect(args.root, args.min_lines, args.fuzzy)
     total_saved = 0
-    for name, members in groups[:args.top]:
+    for name, members, flags in groups[:args.top]:
         owners = sorted({(m["owner"], m["file"]) for m in members})
         lines_each = max(m["lines"] for m in members)
         total_saved += lines_each * (len(owners) - 1)
-        print(f"\n### {name}  x{len(owners)}  (~{lines_each} lines each)")
+        warnings = [flag for flag in flags if flag.startswith("nested:")]
+        marker = f"  [!] {' '.join(warnings)}" if warnings else ""
+        print(f"\n### {name}  x{len(owners)}  (~{lines_each} lines each){marker}")
         for m in members:
             print(f"    {m['file']}:{m['owner']}  <- {m['decl'][:90]}")
+    nested = [g for g in groups if any(f.startswith("nested:") for f in g[2])]
+    cross = sum(1 for g in groups if "cross-package" in g[2])
     print(f"\n{len(groups)} duplicate group(s); ~{total_saved} lines reclaimable "
           f"if each group keeps one copy.")
+    if nested:
+        print(f"{len(nested)} group(s) marked [!]: one member declares a nested type "
+              f"that shadows a name in the shared body, so the two copies may not even "
+              f"be the same code. Check the types before delegating.")
+    if cross:
+        print(f"{cross} group(s) span packages: their unqualified names may resolve "
+              f"through different imports. Normal for a cross-layer helper, worth a "
+              f"glance before merging.")
     return 0
 
 
