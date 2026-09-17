@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /** Curve evaluation, sampling, and preview payload construction.
  *  Extracted from StepPreviewJsonExporter to isolate curve logic. */
@@ -301,46 +300,6 @@ public final class PreviewCurveEvaluator {
                 );
             }
         };
-    }
-
-    // ─── Closest parameter ───────────────────────────────────────────────
-
-    public static double closestParameter(CurveEvaluator curve, CartesianPoint point, Double preferred) {
-        int coarseSegments = 160;
-        double start = curve.start();
-        double end = curve.end();
-        double bestParameter = start;
-        double bestDistance = Double.POSITIVE_INFINITY;
-        for (int index = 0; index <= coarseSegments; index++) {
-            double parameter = start + (end - start) * index / coarseSegments;
-            double distance = curve.pointAt(parameter).distanceTo(point);
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                bestParameter = parameter;
-            }
-        }
-        if (preferred != null && preferred >= start && preferred <= end) {
-            double preferredDistance = curve.pointAt(preferred).distanceTo(point);
-            if (preferredDistance <= bestDistance * 1.25) {
-                bestDistance = preferredDistance;
-                bestParameter = preferred;
-            }
-        }
-        double window = Math.max((end - start) / coarseSegments, 1.0e-6);
-        for (int refinement = 0; refinement < 5; refinement++) {
-            double min = Math.max(start, bestParameter - window);
-            double max = Math.min(end, bestParameter + window);
-            for (int index = 0; index <= 12; index++) {
-                double parameter = min + (max - min) * index / 12.0;
-                double distance = curve.pointAt(parameter).distanceTo(point);
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestParameter = parameter;
-                }
-            }
-            window *= 0.35;
-        }
-        return bestParameter;
     }
 
     // ─── Revolution helpers ──────────────────────────────────────────────
@@ -778,64 +737,6 @@ public final class PreviewCurveEvaluator {
             for (CartesianPoint point : sampled) points.add(MatrixTransformHelper.transformCartesian(point, matrix));
         }
         return points.isEmpty() ? null : List.copyOf(points);
-    }
-
-    private static double[] matrixForMappedPlacement(StepEntity mappedOrigin, StepEntity mappingTarget, StepCadBuilder builder) {
-        StepEntity originPlacement = null;
-        StepEntity targetPlacement = null;
-        if (mappedOrigin instanceof StepAxis2Placement3D || mappedOrigin instanceof StepAxis2Placement2D) {
-            originPlacement = mappedOrigin;
-        }
-        if (mappingTarget instanceof StepAxis2Placement3D || mappingTarget instanceof StepAxis2Placement2D) {
-            targetPlacement = mappingTarget;
-        }
-        if (mappedOrigin instanceof StepRepresentation) {
-            StepRepresentation mappedRep = (StepRepresentation) mappedOrigin;
-            // Check for placement-like items in the representation
-            for (StepEntity repItem : mappedRep.items()) {
-                if (repItem instanceof StepAxis2Placement3D) {
-                    originPlacement = repItem;
-                    break;
-                }
-            }
-        }
-        double[] originMatrix = originPlacement == null ? null : MatrixTransformHelper.matrixForPlacementEntity(originPlacement, builder);
-        double[] targetMatrix = targetPlacement == null ? null : MatrixTransformHelper.matrixForPlacementEntity(targetPlacement, builder);
-        if (originMatrix == null || targetMatrix == null) return null;
-        return composeMatrices(invertMatrix(targetMatrix), originMatrix);
-    }
-
-    private static double[] invertMatrix(double[] m) {
-        double[] inv = new double[16];
-        inv[0] = m[0]; inv[1] = m[4]; inv[2] = m[8];
-        inv[4] = m[1]; inv[5] = m[5]; inv[6] = m[9];
-        inv[8] = m[2]; inv[9] = m[6]; inv[10] = m[10];
-        Vector3 t = new Vector3(m[3], m[7], m[11]);
-        Vector3 col0 = new Vector3(m[0], m[4], m[8]);
-        Vector3 col1 = new Vector3(m[1], m[5], m[9]);
-        Vector3 col2 = new Vector3(m[2], m[6], m[10]);
-        double tx = -t.dot(col0); double ty = -t.dot(col1); double tz = -t.dot(col2);
-        inv[3] = tx; inv[7] = ty; inv[11] = tz;
-        inv[12] = 0.0; inv[13] = 0.0; inv[14] = 0.0; inv[15] = 1.0;
-        return inv;
-    }
-
-    private static double[] composeMatrices(double[] a, double[] b) {
-        double[] c = new double[16];
-        c[0] = a[0]*b[0] + a[1]*b[4] + a[2]*b[8];
-        c[1] = a[0]*b[1] + a[1]*b[5] + a[2]*b[9];
-        c[2] = a[0]*b[2] + a[1]*b[6] + a[2]*b[10];
-        c[3] = a[0]*b[3] + a[1]*b[7] + a[2]*b[11] + a[3];
-        c[4] = a[4]*b[0] + a[5]*b[4] + a[6]*b[8];
-        c[5] = a[4]*b[1] + a[5]*b[5] + a[6]*b[9];
-        c[6] = a[4]*b[2] + a[5]*b[6] + a[6]*b[10];
-        c[7] = a[4]*b[3] + a[5]*b[7] + a[6]*b[11] + a[7];
-        c[8] = a[8]*b[0] + a[9]*b[4] + a[10]*b[8];
-        c[9] = a[8]*b[1] + a[9]*b[5] + a[10]*b[9];
-        c[10] = a[8]*b[2] + a[9]*b[6] + a[10]*b[10];
-        c[11] = a[8]*b[3] + a[9]*b[7] + a[10]*b[11] + a[11];
-        c[12] = 0.0; c[13] = 0.0; c[14] = 0.0; c[15] = 1.0;
-        return c;
     }
 
     private static CartesianPoint transformPoint(
