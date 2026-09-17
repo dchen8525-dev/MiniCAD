@@ -8,7 +8,6 @@ import com.minicad.step.semantic.*;
 import com.minicad.topology.*;
 import com.minicad.geometry.*;
 import com.minicad.common.*;
-import com.minicad.preview.builder.PreviewGeometryCollector;
 import com.minicad.preview.payload.*;
 import com.minicad.preview.statistics.*;
 import com.minicad.export.glb.*;
@@ -230,9 +229,71 @@ public final class StepLegacyGeometryBuilder {
     }
 
 
-    // Delegate to PreviewGeometryCollector - the canonical shell-like id collector.
+    /**
+     * Collects the ids of the shell-like items reachable from {@code item}.
+     *
+     * <p>This is the single home of the rule. The {@code preview} package used to
+     * carry a second copy behind a {@code PreviewFaceBuilder} facade nothing
+     * called, and this side was one line forwarding to it; inlined here so the
+     * walk and its vocabulary sit next to the pipeline that consumes it.
+     *
+     * <p>Styled wrappers are unwrapped rather than skipped, and the entity types
+     * that are known to hold no shell (solids, mapped items, surface patches) are
+     * named explicitly so they do not fall through to the shell/face-set branches.
+     */
     static void collectShellLikeIds(StepEntity item, Set<Integer> shellIds) {
-        PreviewGeometryCollector.collectShellLikeIds(item, shellIds);
+        if (item instanceof StepStyledItem) {
+            StepStyledItem styledItem = (StepStyledItem) item;
+            collectShellLikeIds(styledItem.item(), shellIds);
+            return;
+        }
+        if (item instanceof StepOverRidingStyledItem) {
+            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) item;
+            collectShellLikeIds(styledItem.item(), shellIds);
+            return;
+        }
+        if (ShellHelper.isShellLikeEntity(item)) {
+            shellIds.add(item.id());
+            return;
+        }
+        if (item instanceof StepManifoldSolidBrep
+                || item instanceof StepFacettedBrep
+                || item instanceof StepNonManifoldSolidBrep
+                || item instanceof StepAdvancedBrep
+                || item instanceof StepBrepWithVoids
+                || item instanceof StepMappedItem
+                || item instanceof StepSolidModel
+                || item instanceof StepSurfacePatch) {
+            return;
+        }
+        if (item instanceof StepShellBasedSurfaceModel) {
+            StepShellBasedSurfaceModel surfaceModel = (StepShellBasedSurfaceModel) item;
+            for (StepEntity shell : surfaceModel.shells()) {
+                collectShellLikeIds(shell, shellIds);
+            }
+            return;
+        }
+        if (item instanceof StepTessellatedFaceSet) {
+            shellIds.add(item.id());
+            return;
+        }
+        if (item instanceof StepTessellatedFace) {
+            shellIds.add(item.id());
+            return;
+        }
+        if (item instanceof StepManifoldSurfaceModel) {
+            StepManifoldSurfaceModel manifoldModel = (StepManifoldSurfaceModel) item;
+            for (StepEntity shell : manifoldModel.shells()) {
+                collectShellLikeIds(shell, shellIds);
+            }
+            return;
+        }
+        if (item instanceof StepFaceBasedSurfaceModel) {
+            StepFaceBasedSurfaceModel faceModel = (StepFaceBasedSurfaceModel) item;
+            for (StepEntity faceSet : faceModel.faceSets()) {
+                collectShellLikeIds(faceSet, shellIds);
+            }
+        }
     }
 
     // Delegate to StepEntityUnwrapper - extracted utility class

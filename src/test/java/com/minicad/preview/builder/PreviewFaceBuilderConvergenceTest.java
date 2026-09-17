@@ -6,20 +6,10 @@ import com.minicad.export.json.StepGeometryHelper;
 import com.minicad.export.json.StepPayloadBuilder;
 import com.minicad.export.json.StepValidationHelper;
 import com.minicad.geometry.CartesianPoint;
-import com.minicad.geometry.Direction3;
-import com.minicad.geometry.Line3;
-import com.minicad.geometry.Plane;
-import com.minicad.geometry.Vector3;
 import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepFaceSurface;
 import com.minicad.step.model.StepOrientedFace;
 import com.minicad.step.model.StepStyledItem;
-import com.minicad.topology.Edge;
-import com.minicad.topology.EdgeLoop;
-import com.minicad.topology.Face;
-import com.minicad.topology.FaceBound;
-import com.minicad.topology.OrientedEdge;
-import com.minicad.topology.Vertex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -77,10 +65,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * follow-up is guarded by {@code EntityClassifierConvergenceTest} rather than
  * here, so each guard stays about one convergence.
  *
+ * <p>The last round applied the same rule to this class's neighbours. Seven
+ * facades here forwarded into {@code PreviewGeometryCollector}, and that class's
+ * every member except the shell-like id walk was a dead twin of a live
+ * export-side rule; nothing outside this file's own facade chain called any of
+ * the seven. So the collector was deleted, the shell-like id walk moved to
+ * {@code StepLegacyGeometryBuilder} (its only live caller), and the seven facades
+ * plus the four helpers that existed only to serve them -- {@code
+ * collectTopologyEdges}, {@code unwrapStyledItem}, {@code toPolylineEdgePayload}
+ * and {@code toPolyLoopEdgePayload} -- went with them. The three facades left
+ * here are the ones with real in-file callers.
+ *
  * <p>The guard matters because convergence without one regresses silently: a
  * later edit can paste the body back, and every existing test still passes --
  * both copies agree until they drift. It pins the canonical homes, the facades
- * that must survive, the two deletions, the absence of the copied
+ * that must survive, the deletions, the absence of the copied
  * {@code instanceof} chains, and runtime agreement between the facades and the
  * canonical helpers.
  */
@@ -92,18 +91,35 @@ class PreviewFaceBuilderConvergenceTest {
     /**
      * Facades that must survive, as the exact statement their body must hold.
      * A whole-body equality would be brittle; the delegation is the contract.
+     * Each one has callers in this file, which is why it is still a facade at all.
      */
     private static final List<String> FACADE_BODIES = List.of(
             "return StepGeometryHelper.faceGeometry(stepFace);",
             "return StepValidationHelper.faceSameSense(stepFace);",
-            "StepPayloadBuilder.collectTopologyEdges(face, edges);",
-            "return StepPayloadBuilder.reverseClosedLoop(points);",
-            "return StepEntityUnwrapper.unwrapStyledItem(item);");
+            "return StepPayloadBuilder.reverseClosedLoop(points);");
 
     /** Copies deleted from PreviewFaceBuilder by the convergence. */
     private static final List<String> DROPPED = List.of(
             "reverseFacePayload",
             "pointPayloadFromVertex");
+
+    /**
+     * Entry points that existed only to forward into {@code PreviewGeometryCollector}
+     * or to serve one of the methods that did. None had a caller outside this file's
+     * own facade chain once the collector's dead twins were removed.
+     */
+    private static final List<String> DROPPED_PREVIEW_GEOMETRY_ENTRY_POINTS = List.of(
+            "collectShellLikeIds",
+            "collectStandaloneEdges",
+            "buildMappedRepresentationGeometry",
+            "buildRelatedRepresentationGeometry",
+            "expandMappedItemGeometry",
+            "collectRepresentationShells",
+            "collectRepresentationSolids",
+            "collectTopologyEdges",
+            "unwrapStyledItem",
+            "toPolylineEdgePayload",
+            "toPolyLoopEdgePayload");
 
     /**
      * Types that only the deleted bodies ever mentioned. They are reached
@@ -130,7 +146,7 @@ class PreviewFaceBuilderConvergenceTest {
     }
 
     @Test
-    @DisplayName("PreviewFaceBuilder keeps the five delegating facades")
+    @DisplayName("PreviewFaceBuilder keeps the three delegating facades it still has callers for")
     void facadesSurviveWithADelegatingBody() throws Exception {
         String text = read(Paths.get(FACE_BUILDER));
         List<String> missing = new ArrayList<>();
@@ -140,10 +156,27 @@ class PreviewFaceBuilderConvergenceTest {
             }
         }
         assertEquals(List.of(), missing,
-                "these bodies are the delegating facades PreviewGeometryCollector and "
-                        + "PreviewFaceBuilder's own call sites rely on; a missing line "
-                        + "means the body was pasted back locally or routed through a "
-                        + "static import.");
+                "these bodies are the delegating facades PreviewFaceBuilder's own call "
+                        + "sites rely on; a missing line means the body was pasted back "
+                        + "locally or routed through a static import.");
+    }
+
+    @Test
+    @DisplayName("the entry points into the deleted preview collector stay deleted")
+    void previewGeometryEntryPointsStayDeleted() throws Exception {
+        String text = read(Paths.get(FACE_BUILDER));
+        List<String> reappeared = new ArrayList<>();
+        for (String name : DROPPED_PREVIEW_GEOMETRY_ENTRY_POINTS) {
+            if (declares(text, name)) {
+                reappeared.add(name);
+            }
+        }
+        assertEquals(List.of(), reappeared,
+                "PreviewFaceBuilder re-declared " + reappeared + ". Each one forwarded into "
+                        + "PreviewGeometryCollector, whose members were dead twins of live "
+                        + "export-side rules, or existed only to serve such a forwarder. The "
+                        + "live homes are StepLegacyGeometryBuilder (shell-like ids) and the "
+                        + "export-side payload builders.");
     }
 
     @Test
@@ -202,19 +235,6 @@ class PreviewFaceBuilderConvergenceTest {
     }
 
     @Test
-    @DisplayName("the styled-item facade really unwraps instead of echoing its input")
-    void styledItemFacadeUnwraps() {
-        StepCartesianPoint point = new StepCartesianPoint(7, "p", List.of(0.0, 0.0, 0.0));
-        StepStyledItem styled = new StepStyledItem(1, "styled", null, point);
-
-        assertSame(point, PreviewFaceBuilder.unwrapStyledItem(styled),
-                "unwrapStyledItem must return the wrapped item, not the wrapper");
-        assertSame(point, StepEntityUnwrapper.unwrapStyledItem(styled));
-        assertSame(point, PreviewFaceBuilder.unwrapStyledItem(point),
-                "an unwrapped item passes through unchanged");
-    }
-
-    @Test
     @DisplayName("the closed-loop facade reverses exactly like the canonical helper")
     void closedLoopFacadeMatchesTheHelper() {
         List<CartesianPoint> open = List.of(p(0, 0, 0), p(1, 0, 0), p(0, 1, 0));
@@ -230,25 +250,6 @@ class PreviewFaceBuilderConvergenceTest {
                 "a degenerate loop is returned as-is");
     }
 
-    @Test
-    @DisplayName("the topology-edge facade collects the same edges as the canonical helper")
-    void topologyEdgeFacadeMatchesTheHelper() {
-        Face face = new Face(
-                new Plane(
-                        new CartesianPoint(0.0, 0.0, 0.0),
-                        Direction3.from(new Vector3(0.0, 0.0, 1.0))),
-                List.of(FaceBound.outer(squareLoop(), true)),
-                true);
-
-        Set<Edge> viaFacade = new LinkedHashSet<>();
-        Set<Edge> viaCanonical = new LinkedHashSet<>();
-        PreviewFaceBuilder.collectTopologyEdges(face, viaFacade);
-        StepPayloadBuilder.collectTopologyEdges(face, viaCanonical);
-
-        assertEquals(4, viaFacade.size(), "the square loop contributes four edges");
-        assertEquals(viaCanonical, viaFacade);
-    }
-
     private static void assertPublicStatic(Class<?> owner, String name) {
         Method found = null;
         for (Method candidate : owner.getDeclaredMethods()) {
@@ -262,23 +263,6 @@ class PreviewFaceBuilderConvergenceTest {
                 name + " must stay static -- it is called on the class");
         assertTrue(Modifier.isPublic(found.getModifiers()),
                 name + " must stay public -- the preview side calls it across packages");
-    }
-
-    private static EdgeLoop squareLoop() {
-        Vertex v0 = new Vertex(p(0.0, 0.0, 0.0));
-        Vertex v1 = new Vertex(p(1.0, 0.0, 0.0));
-        Vertex v2 = new Vertex(p(1.0, 1.0, 0.0));
-        Vertex v3 = new Vertex(p(0.0, 1.0, 0.0));
-
-        return new EdgeLoop(List.of(
-                new OrientedEdge(new Edge(v0, v1, line(v0, v1), true), true),
-                new OrientedEdge(new Edge(v1, v2, line(v1, v2), true), true),
-                new OrientedEdge(new Edge(v2, v3, line(v2, v3), true), true),
-                new OrientedEdge(new Edge(v3, v0, line(v3, v0), true), true)));
-    }
-
-    private static Line3 line(Vertex start, Vertex end) {
-        return new Line3(start.getPoint(), Direction3.from(end.getPoint().subtract(start.getPoint())));
     }
 
     private static CartesianPoint p(double x, double y, double z) {

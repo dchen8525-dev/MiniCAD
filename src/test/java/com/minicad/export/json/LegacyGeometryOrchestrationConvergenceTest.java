@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -63,12 +64,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * geometry pipeline bucket this as solid geometry?"), so the 12 types this rule
  * adds are enumerated here. Folding one into the other is the tempting wrong fix
  * and would silently drop the primitive volumes from the solid bucket.
+ *
+ * <p>A later round finished the file off. With the orchestration gone, what
+ * {@code PreviewGeometryCollector} still held was a dead twin of every rule the
+ * export side already owned -- the standalone-edge table, the mapped-annotation
+ * carrier table, the five mapped-representation helpers -- plus the shell-like id
+ * walk, whose only live caller was {@code StepLegacyGeometryBuilder}. So the class
+ * was deleted, the walk was inlined into that caller, and the eleven
+ * {@code PreviewFaceBuilder} entry points that forwarded into it (seven facades and
+ * the four helpers that existed only to serve them) went with it.
  */
 class LegacyGeometryOrchestrationConvergenceTest {
 
+    private static final Path MAIN_SOURCES = Paths.get("src/main/java");
     private static final Path STEP_LEGACY =
             Paths.get("src/main/java/com/minicad/export/json/StepLegacyGeometryBuilder.java");
-    private static final Path PREVIEW_COLLECTOR =
+    /**
+     * The preview-side twin of this orchestration. It is deleted -- every member it still
+     * held was either a dead twin of a live export-side rule or the shell-like id walk --
+     * so the guard asserts the path stays absent instead of reading it.
+     */
+    private static final Path DELETED_PREVIEW_COLLECTOR =
             Paths.get("src/main/java/com/minicad/preview/builder/PreviewGeometryCollector.java");
     private static final Path PREVIEW_FACE_BUILDER =
             Paths.get("src/main/java/com/minicad/preview/builder/PreviewFaceBuilder.java");
@@ -148,15 +164,21 @@ class LegacyGeometryOrchestrationConvergenceTest {
             "StepCubicBezierTriangulatedFace");
 
     @Test
-    @DisplayName("the preview copies of the legacy-geometry orchestration stay deleted")
+    @DisplayName("the preview twin of the legacy-geometry home stays deleted")
     void previewCopiesStayDeleted() throws IOException {
+        assertFalse(Files.exists(DELETED_PREVIEW_COLLECTOR),
+                "PreviewGeometryCollector is back. After the orchestration moved out, what it "
+                        + "still held was the standalone-edge table, the mapped-annotation "
+                        + "carrier table and the five mapped-representation helpers -- all dead "
+                        + "twins of live export-side rules -- plus the shell-like id walk, which "
+                        + "now lives in StepLegacyGeometryBuilder. A second copy is exactly what "
+                        + "drifted the last time.");
+
         List<String> reappeared = new ArrayList<>();
-        for (Path source : List.of(PREVIEW_COLLECTOR, PREVIEW_FACE_BUILDER)) {
-            String text = read(source);
-            for (String method : ORCHESTRATION) {
-                if (declares(text, method)) {
-                    reappeared.add(source.getFileName() + "#" + method);
-                }
+        String text = read(PREVIEW_FACE_BUILDER);
+        for (String method : ORCHESTRATION) {
+            if (declares(text, method)) {
+                reappeared.add(PREVIEW_FACE_BUILDER.getFileName() + "#" + method);
             }
         }
         assertEquals(List.of(), reappeared,
@@ -169,19 +191,37 @@ class LegacyGeometryOrchestrationConvergenceTest {
     }
 
     @Test
-    @DisplayName("the deleted facades are gone rather than left forwarding")
-    void delegatingFacadesStayDeleted() throws IOException {
-        String text = read(PREVIEW_FACE_BUILDER);
-        List<String> surviving = new ArrayList<>();
-        for (String method : ORCHESTRATION) {
-            if (text.contains("return PreviewGeometryCollector." + method + "(")) {
-                surviving.add(method);
+    @DisplayName("the shell-like id walk has exactly one home")
+    void shellLikeIdWalkHasOneHome() throws IOException {
+        List<String> carriers = new ArrayList<>();
+        try (Stream<Path> walk = Files.walk(MAIN_SOURCES)) {
+            for (Path source : walk.filter(path -> path.toString().endsWith(".java"))
+                    .collect(Collectors.toList())) {
+                if (declares(read(source), "collectShellLikeIds")) {
+                    carriers.add(source.getFileName().toString());
+                }
             }
         }
-        assertEquals(List.of(), surviving,
-                "PreviewFaceBuilder still forwards " + surviving + " to PreviewGeometryCollector. "
-                        + "These facades had no caller at all, so they pinned a second copy of the "
-                        + "orchestration in place without serving anyone.");
+        assertEquals(List.of("StepLegacyGeometryBuilder.java"), carriers,
+                "collectShellLikeIds is declared in " + carriers + ". The preview package used "
+                        + "to carry a second copy behind a facade nothing called, and this side "
+                        + "was one line forwarding to it; the body now lives next to the "
+                        + "pipeline that drives it, and a second declaration means the twin is "
+                        + "growing back.");
+        assertTrue(declares(read(STEP_LEGACY), "collectShellLikeIds"),
+                "StepLegacyGeometryBuilder must keep the walk it now owns");
+    }
+
+    @Test
+    @DisplayName("PreviewFaceBuilder no longer forwards into a preview-side collector")
+    void delegatingFacadesStayDeleted() throws IOException {
+        String text = read(PREVIEW_FACE_BUILDER);
+        assertFalse(text.contains("PreviewGeometryCollector."),
+                "PreviewFaceBuilder calls PreviewGeometryCollector again. The seven facades "
+                        + "that did had no caller outside their own chain, so they pinned a "
+                        + "second copy of rules whose homes are on the export side. Route the "
+                        + "call site at StepLegacyGeometryBuilder or "
+                        + "StepRepresentationPayloadBuilder instead.");
     }
 
     @Test

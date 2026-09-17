@@ -1,13 +1,20 @@
-# Branch order of PreviewGeometryCollector.collectMappedAnnotationCarrierEdges,
+# Branch order of StepEdgePayloadBuilder.collectMappedAnnotationCarrierEdges,
 # captured from the original 5-branch `if (item instanceof X)` chain before it
-# was folded into MAPPED_ANNOTATION_CARRIER_RULES. Every branch returns, so this
-# is first-match-wins dispatch: instanceof also matches subtypes, so a dropped,
-# duplicated or reordered rule silently changes which carrier is collected how.
-# An item matching no rule falls through to the terminal `return false`. All 5
-# types are final classes implementing StepEntity directly (no subtype relation
-# today), so the order is currently behaviour neutral -- the frozen file turns
-# any future reordering into a test failure rather than a silent behaviour
-# change.
+# was folded into its tables. The rule is now split across two ordered lists --
+# MAPPED_ANNOTATION_CARRIERS (the three symbol/text carriers, which collect the
+# mapped representation's edges and report true) and
+# MAPPED_CARRIER_OCCURRENCE_RULES (the two occurrence carriers, which recurse on
+# their wrapped item) -- and this file freezes the concatenation, which is the
+# effective dispatch order. Every branch returns, so this is first-match-wins
+# dispatch: instanceof also matches subtypes, so a dropped, duplicated or
+# reordered entry silently changes which carrier is collected how. An item
+# matching nothing falls through to the terminal `return false`. All 5 types are
+# final classes implementing StepEntity directly (no subtype relation today), so
+# the order is currently behaviour neutral -- the frozen file turns any future
+# reordering into a test failure rather than a silent behaviour change.
+#
+# Formerly guarded as PreviewGeometryCollector's copy; that class was a dead twin
+# of this table and was deleted, so the guard now points at the live one.
 StepAnnotationSymbol
 StepAnnotationText
 StepAnnotationTextCharacter

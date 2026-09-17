@@ -3,7 +3,6 @@ package com.minicad.preview.builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.minicad.export.json.StepPointExtractor;
 import com.minicad.export.json.StepMetadataHelper;
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
@@ -43,7 +42,6 @@ import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.topology.Edge;
 import com.minicad.topology.EdgeLoop;
-import com.minicad.topology.Face;
 import com.minicad.topology.FaceBound;
 import com.minicad.topology.OrientedEdge;
 import com.minicad.topology.PolyLoop;
@@ -65,17 +63,11 @@ import com.minicad.preview.payload.UnsupportedFacePayload;
 import com.minicad.preview.payload.VectorPayload;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import com.minicad.export.json.StepEdgePayloadBuilder;
-import com.minicad.export.json.StepEntityUnwrapper;
 import com.minicad.export.json.StepGeometryHelper;
 import com.minicad.export.json.StepPayloadBuilder;
 import com.minicad.export.json.StepPlacementTransformer;
@@ -1117,69 +1109,15 @@ public final class PreviewFaceBuilder {
         return null;
     }
 
-    // The four legacy-geometry facades that used to sit here -- buildLegacyGeometry,
-    // buildGeometryForShells, buildGeometryForSolids and mergeGeometry -- are gone.
-    // They forwarded to PreviewGeometryCollector, and nothing called any of them:
-    // the live entry is StepLegacyGeometryBuilder, which StepPreviewJsonExporter and
-    // StepRepresentationPayloadBuilder name directly. Keeping them would have pinned
-    // a second copy of the orchestration in place, which is what had drifted.
-    public static void collectShellLikeIds(StepEntity item, Set<Integer> shellIds) {
-        PreviewGeometryCollector.collectShellLikeIds(item, shellIds);
-    }
-
-    public static void collectStandaloneEdges(
-            StepEntity item,
-            Map<Integer, EdgePayload> edges,
-            Map<Integer, StepEntity> resolved,
-            StepCadBuilder builder,
-            StepMetadataExtractor metadata
-    ) {
-        PreviewGeometryCollector.collectStandaloneEdges(item, edges, resolved, builder, metadata);
-    }
-
-    public static GeometryCollection buildMappedRepresentationGeometry(
-            StepRepresentation representation,
-            Map<Integer, StepEntity> resolved,
-            StepCadBuilder builder,
-            StepMetadataExtractor metadata,
-            Set<Integer> visitingRepresentations
-    ) {
-        return PreviewGeometryCollector.buildMappedRepresentationGeometry(representation, resolved, builder, metadata, visitingRepresentations);
-    }
-
-    public static GeometryCollection buildRelatedRepresentationGeometry(
-            StepRepresentation representation,
-            Map<Integer, StepEntity> resolved,
-            StepCadBuilder builder,
-            StepMetadataExtractor metadata,
-            Set<Integer> visitingRepresentations
-    ) {
-        return PreviewGeometryCollector.buildRelatedRepresentationGeometry(representation, resolved, builder, metadata, visitingRepresentations);
-    }
-
-    public static GeometryCollection expandMappedItemGeometry(
-            StepMappedItem mappedItem,
-            Map<Integer, StepEntity> resolved,
-            StepCadBuilder builder,
-            StepMetadataExtractor metadata,
-            Set<Integer> visitingRepresentations
-    ) {
-        return PreviewGeometryCollector.expandMappedItemGeometry(mappedItem, resolved, builder, metadata, visitingRepresentations);
-    }
-
-    public static Set<Integer> collectRepresentationShells(
-            StepRepresentation representation,
-            Map<Integer, StepEntity> resolved
-    ) {
-        return PreviewGeometryCollector.collectRepresentationShells(representation, resolved);
-    }
-
-    public static Set<Integer> collectRepresentationSolids(
-            StepRepresentation representation,
-            Map<Integer, StepEntity> resolved
-    ) {
-        return PreviewGeometryCollector.collectRepresentationSolids(representation, resolved);
-    }
+    // The seven facades that used to sit here -- collectShellLikeIds,
+    // collectStandaloneEdges, buildMappedRepresentationGeometry,
+    // buildRelatedRepresentationGeometry, expandMappedItemGeometry,
+    // collectRepresentationShells and collectRepresentationSolids -- are gone
+    // along with PreviewGeometryCollector itself. Each one forwarded into that
+    // class, whose every member except the shell-like id walk was a dead twin of
+    // a live export-side rule, and none of the seven had a caller outside this
+    // file's own facade chain. The shell-like id walk now lives in
+    // StepLegacyGeometryBuilder, next to the pipeline that drives it.
 
     // ─── Edge/loop building ──────────────────────────────────────────────
 
@@ -1216,10 +1154,6 @@ public final class PreviewFaceBuilder {
         return bound.orientation() ? sampled : reverseClosedLoop(sampled);
     }
 
-    public static void collectTopologyEdges(Face face, Set<Edge> edges) {
-        StepPayloadBuilder.collectTopologyEdges(face, edges);
-    }
-
     public static <T> List<T> reverseClosedLoop(List<T> points) {
         return StepPayloadBuilder.reverseClosedLoop(points);
     }
@@ -1236,24 +1170,6 @@ public final class PreviewFaceBuilder {
                 null,
                 null
         );
-    }
-
-    public static EdgePayload toPolylineEdgePayload(StepPolyline polyline) {
-        List<CartesianPoint> points = polyline.points().stream()
-                .map(StepPointExtractor::pointFromStep)
-                .collect(Collectors.toList());
-        return new EdgePayload(polyline.id(), toPointPayloads(points), null, null);
-    }
-
-    public static EdgePayload toPolyLoopEdgePayload(StepPolyLoop polyLoop) {
-        List<CartesianPoint> points = polyLoop.polygon().stream()
-                .map(StepPointExtractor::pointFromStep)
-                .collect(Collectors.toList());
-        List<CartesianPoint> closed = new ArrayList<>(points);
-        if (!closed.isEmpty() && closed.get(0).distanceTo(closed.get(closed.size() - 1)) > 1.0e-9) {
-            closed.add(closed.get(0));
-        }
-        return new EdgePayload(polyLoop.id(), toPointPayloads(List.copyOf(closed)), null, null);
     }
 
     // ─── Shell/vertex utilities ──────────────────────────────────────────
@@ -1277,10 +1193,6 @@ public final class PreviewFaceBuilder {
         double len = Math.sqrt(nx * nx + ny * ny + nz * nz);
         if (len < 1.0e-9) return null;
         return new VectorPayload(nx / len, ny / len, nz / len);
-    }
-
-    public static StepEntity unwrapStyledItem(StepEntity item) {
-        return StepEntityUnwrapper.unwrapStyledItem(item);
     }
 
     public static ColorPayload toColorPayload(int[] rgb) {

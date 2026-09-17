@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -33,13 +34,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * {@link StepMappedAnnotationEdgeCollector} and the two former copies are
  * one-line delegates.
  *
- * <p>The delegates were kept rather than the call sites rewritten on purpose:
+ * <p>The delegate was kept rather than the call sites rewritten on purpose:
  * four of {@code StepEdgePayloadBuilder}'s call sites sit inside the generated,
  * frozen-order {@code EDGE_COLLECT_RULES} table, and the whole point of a
- * delegate is that those lines do not move.
+ * delegate is that those lines do not move. The preview-side delegate and its
+ * whole class are gone -- every member that class still held was a dead twin of
+ * a live export-side rule -- so only the export-side delegate is guarded now.
  *
  * <p>The guard pins the single body, the nine-argument signature, the two
- * delegating bodies, and the absence of the fold step anywhere else -- the last
+ * delegating body, and the absence of the fold step anywhere else -- the last
  * one is what catches a copy growing back, because a re-pasted body would
  * reintroduce that line outside this class.
  */
@@ -48,7 +51,11 @@ class StepMappedAnnotationEdgeCollectorConvergenceTest {
     private static final Path MAIN_SOURCES = Paths.get("src/main/java");
     private static final Path EDGE_BUILDER =
             Paths.get("src/main/java/com/minicad/export/json/StepEdgePayloadBuilder.java");
-    private static final Path COLLECTOR =
+    /**
+     * The preview-side former copy. Its whole class is deleted, so the guard asserts the
+     * path stays absent instead of reading a body out of it.
+     */
+    private static final Path DELETED_COLLECTOR =
             Paths.get("src/main/java/com/minicad/preview/builder/PreviewGeometryCollector.java");
 
     private static final String RULE = "collectMappedAnnotationEdges";
@@ -60,7 +67,7 @@ class StepMappedAnnotationEdgeCollectorConvergenceTest {
      */
     private static final String FOLD_STEP = "edges.putIfAbsent(transformed.stepId(), transformed);";
 
-    /** The delegating statement both former copies must now hold. */
+    /** The delegating statement the surviving former copy must now hold. */
     private static final String DELEGATION =
             "StepMappedAnnotationEdgeCollector.collect(mappedOwnerId, representation, mappedOrigin, mappingTarget,";
 
@@ -109,18 +116,20 @@ class StepMappedAnnotationEdgeCollectorConvergenceTest {
     @Test
     @DisplayName("both former copies delegate instead of rebuilding the body")
     void theFormerCopiesDelegate() throws IOException {
-        for (Path path : List.of(EDGE_BUILDER, COLLECTOR)) {
-            String body = methodBody(read(path), RULE);
-            assertTrue(body.contains(DELEGATION),
-                    path.getFileName() + " must call " + DELEGATION + " -- the rule was moved out, "
-                            + "so a body that does not delegate means a copy came back");
-            assertTrue(!body.contains("matrixForMappedPlacement"),
-                    path.getFileName() + " resolves the placement matrix itself again; that work "
-                            + "belongs to StepMappedAnnotationEdgeCollector");
-            assertTrue(!body.contains("buildRepresentationPayload"),
-                    path.getFileName() + " rebuilds the mapped representation inline again; that "
-                            + "work belongs to StepMappedAnnotationEdgeCollector");
-        }
+        assertFalse(Files.exists(DELETED_COLLECTOR),
+                "PreviewGeometryCollector is back. It held a second copy of this rule, and a "
+                        + "copy is what drifted the last time: " + DELETED_COLLECTOR);
+
+        String body = methodBody(read(EDGE_BUILDER), RULE);
+        assertTrue(body.contains(DELEGATION),
+                EDGE_BUILDER.getFileName() + " must call " + DELEGATION + " -- the rule was moved "
+                        + "out, so a body that does not delegate means a copy came back");
+        assertTrue(!body.contains("matrixForMappedPlacement"),
+                EDGE_BUILDER.getFileName() + " resolves the placement matrix itself again; that "
+                        + "work belongs to StepMappedAnnotationEdgeCollector");
+        assertTrue(!body.contains("buildRepresentationPayload"),
+                EDGE_BUILDER.getFileName() + " rebuilds the mapped representation inline again; "
+                        + "that work belongs to StepMappedAnnotationEdgeCollector");
     }
 
     /** The body of the first declaration of {@code name} in {@code text}. */
