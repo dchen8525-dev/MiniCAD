@@ -1,6 +1,6 @@
 ---
 name: "instanceof-table-dispatch-fold"
-description: "把 MiniCAD 里长的 instanceof 顺序分发链折叠为 (type, guard, handler) 表驱动分发，并补齐冻结顺序守卫测试与门禁。当用户要求继续/执行 instanceof 链折叠、表驱动重构，或提到 scan_instanceof_chains、dispatch table、折叠某方法时使用。"
+description: "把 MiniCAD 里长的 instanceof 顺序分发链折叠为 (type, guard, handler) 表驱动分发，并补齐冻结顺序守卫测试与门禁；同时覆盖「跨类重复实现收敛 + 防回潮守卫」（scan_duplicate_methods、抽取 helper、一行委托）。当用户要求继续/执行 instanceof 链折叠、表驱动重构、重复实现收敛，或提到 scan_instanceof_chains、scan_duplicate_methods、dispatch table、折叠某方法时使用。"
 ---
 
 # instanceof 链表驱动折叠（MiniCAD）
@@ -14,6 +14,8 @@ description: "把 MiniCAD 里长的 instanceof 顺序分发链折叠为 (type, g
 - 用户说"继续执行任务/下一项工作"且上下文是 instanceof 折叠。
 - 用户点名折叠某方法、或提到 scan/dispatch table/表驱动。
 - 扫描器报告某条 ≥5 分支的链值得折。
+- 用户要求"重复实现收敛 / 收敛重复 + 守卫"，或 `scan_instanceof_chains.py --min 5` 已为 0
+  （干净同构链清完，主线转入收敛，见下文「重复实现收敛」章节）。
 
 ## 工作流（严格按序）
 
@@ -283,3 +285,62 @@ spotless 若未开 `removeUnusedImports` 也不会清），要自己 grep 一遍
   —— 这是有意保留的 boilerplate，别为消掉它去上继承。
 - 测试三件套：反射断言"两型不再声明共享 kernel 名 + 公开入口方法仍在"（防再复制）；
   "中性参数下理性 ≡ 非理性"（钉住接线）；"非中性参数下仍偏离"（钉住专有逻辑没被顺手统一）。
+
+### 找候选：`tools/scan_duplicate_methods.py`（2026-09-17，commit `b695c5d3`）
+
+别再靠肉眼翻文件找重复——用扫描器。它按"方法名 + 归一化方法体"分组，报告**跨类**出现的
+同体方法（同名同类不算），并给出每组可回收行数估算：
+
+```
+python tools/scan_duplicate_methods.py --min-lines 6 --top 30    # 严格（空白归一）
+python tools/scan_duplicate_methods.py --fuzzy --min-lines 4     # 忽略 com.minicad.* 限定符
+```
+
+实现要点（改它时别踩）：先 `strip_java` 抹掉注释/字符串/文本块（保留换行与偏移）；用括号
+深度走 `{`/`}` 栈，`{` 前的文本按"类型声明 / 方法声明 / 其它"分类，方法声明要求**方法名前
+不是 `.`**（否则 `list.forEach(x -> {` 会被误判成方法 `forEach`），且拒绝以 `->` 结尾、
+`new `、`if/for/while/catch/...` 开头；构造器、`toString/hashCode/equals` 跳过。
+当前基线：**63 组、约 721 行可回收**——这是下几轮收敛的待办池。
+
+注意 `--min-lines` 之下藏着大量 1〜5 行的短副本（如 `appendOrientedTriangle`、
+`toPointPayload` 这类 shim），它们常常是"删一个正典方法就连带失效"的附属品，所以扫描时
+**别把阈值压太低**去找它们，而是在删正典时顺手看它是否变成了孤儿（用 `grep -c` 数符号
+出现次数：只剩 1 次 = 只有 import 行 = 已成死代码）。
+
+### 跨文件多站点手术：用一次性脚本 + 计数断言，别连发 Edit
+
+同一文件要改 5+ 处（删 3 个方法体 + 改 3 个调用点 + 加 import）时，**不要**在一条消息里并行
+发多个 Edit（会竞态丢改，见上文教训），也**不要**串行发 8 条消息。写一个一次性 Python 脚本：
+
+- 行号锚点删除法：先 `check(lines[N-1], "锚点片段", ...)` 断言，再 `delete_lines` 按
+  **(first, last) 自底向上**删（避免下标漂移）。**锚点行号必须取自替换前的原文件**——
+  如果同一脚本里还有"整段替换"，务必让 `split('\n')` 发生在替换**之前**，否则行号全错
+  （这个坑本轮踩过一次：PSS 的 220/248/252 锚点因先替换而偏移）。
+- 字符串替换一律走 `replace_once(text, old, new)`，内部 `assert count == 1`。这比 Edit 强：
+  Edit 只保证"能匹配"，脚本能保证"**恰好命中一次**"——多点或零点都会当场炸，不会静默半应用。
+- 脚本本身用 `_` 前缀命名并在提交前删除（一次性）；可复用的扫描器才进 `tools/`。
+
+### 收敛的守卫测试该钉什么（`PreviewTriangulationConvergenceTest` 范式）
+
+收敛不留守卫会**静默回潮**：后人重写副本时两份实现一致，所有既有测试照样绿，直到漂移。
+四类断言，缺一不可：
+
+1. **正典可达性**（反射）：canonical helper 仍 `public static` 声明全部被收敛的方法名
+   （用 `getDeclaredMethods()` 找名，断 `Modifier.isStatic/isPublic`）。
+2. **副本不得回潮**（源码解析）：
+   `(?m)^\s*(?:public |private |protected )?(?:static )?[\w<>\[\], .]+\s+NAME\s*\(` 扫宿主源码，
+   断言每个被删的方法名**不再被声明**。
+3. **调用点必须带限定符**：断言 `canonical + "." + name + "("` 出现——只断"名字出现"不够，
+   裸调用意味着本地副本或 static import 又回来了。
+4. **运行时仍一致**：facade 与 canonical 对同一 fixture 结果 `assertEquals`（含边界：
+   退化网格短路、每四边形两三角的计数）。
+5. **额外钉"刻意不收敛"**：本轮 `triangulateSphericalStrip` 无 canonical 孪生（它吃
+   `Axis2Placement3D + radius` 而非 surface 对象），断言它**仍在原位**——防止后人"顺手补完"
+   把它也删了。这与上文"不对称为刻意差异、要显式钉测"是同一原则。
+
+**收敛方向选择**：本轮选 `TriangulationHelper` 当 canonical，因为它已被 `export/glb` 与
+`export/json` 引用（是既有的公共入口），而 `PreviewSurfaceSampler` 只被 `PreviewFaceBuilder`
+使用。让"只被一处使用的类"当 canonical 会把公共 helper 变成私有依赖，方向反了。
+另：**保留一行委托 facade ≠ 重复**（`PreviewSurfaceSampler.triangulatePatch` 保留签名但
+body 只有 `return TriangulationHelper.triangulatePatch(patch, sameSense);`）——外部调用方
+不用改，且守卫只需断"委托存在 + 本地体不存在"。
