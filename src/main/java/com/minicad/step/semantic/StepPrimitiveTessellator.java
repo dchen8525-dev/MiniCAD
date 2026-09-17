@@ -22,40 +22,6 @@ import java.util.List;
  */
 public class StepPrimitiveTessellator {
 
-    /**
-     * Tessellates a sphere centered at origin with given radius.
-     * Generates a mesh of quadrilateral and triangular faces.
-     *
-     * @param radius sphere radius
-     * @param latSteps latitude divisions (vertical)
-     * @param lonSteps longitude divisions (horizontal)
-     * @return list of faces approximating the sphere surface
-     */
-    public static List<Face> tessellateSphere(double radius, int latSteps, int lonSteps) {
-        List<Face> faces = new ArrayList<>();
-        for (int i = 0; i < latSteps; i++) {
-            double phi1 = Math.PI * i / latSteps;
-            double phi2 = Math.PI * (i + 1) / latSteps;
-            for (int j = 0; j < lonSteps; j++) {
-                double theta1 = 2 * Math.PI * j / lonSteps;
-                double theta2 = 2 * Math.PI * (j + 1) / lonSteps;
-                CartesianPoint p00 = spherePoint(radius, phi1, theta1);
-                CartesianPoint p10 = spherePoint(radius, phi2, theta1);
-                CartesianPoint p11 = spherePoint(radius, phi2, theta2);
-                CartesianPoint p01 = spherePoint(radius, phi1, theta2);
-                CartesianPoint midPoint = spherePoint(radius, (phi1 + phi2) / 2, (theta1 + theta2) / 2);
-                Vector3 normal = new Vector3(midPoint.getX(), midPoint.getY(), midPoint.getZ());
-                if (i == 0) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11), Direction3.from(normal)));
-                } else if (i == latSteps - 1) {
-                    faces.add(faceFromPolyLoop(List.of(p00, p01, p10), Direction3.from(normal)));
-                } else {
-                    faces.add(faceFromPolyLoop(List.of(p00, p10, p11, p01), Direction3.from(normal)));
-                }
-            }
-        }
-        return faces;
-    }
 
     /**
      * Tessellates a torus centered at origin.
@@ -203,12 +169,6 @@ public class StepPrimitiveTessellator {
 
     // ===== Helper methods =====
 
-    private static CartesianPoint spherePoint(double radius, double phi, double theta) {
-        return new CartesianPoint(
-                radius * Math.sin(phi) * Math.cos(theta),
-                radius * Math.sin(phi) * Math.sin(theta),
-                radius * Math.cos(phi));
-    }
 
     private static CartesianPoint spherePointAt(CartesianPoint center, double radius, double phi, double theta) {
         return new CartesianPoint(
@@ -233,37 +193,4 @@ public class StepPrimitiveTessellator {
         return reversed;
     }
 
-    /**
-     * Rotates a point around an axis using Rodrigues' rotation formula.
-     *
-     * @param p point to rotate
-     * @param origin origin point on the rotation axis
-     * @param axis rotation axis direction
-     * @param angle rotation angle in radians
-     * @return rotated point
-     */
-    public static CartesianPoint rotatePointAroundAxis(CartesianPoint p, CartesianPoint origin,
-                                                        Vector3 axis, double angle) {
-        // Rodrigues' rotation formula
-        double dx = p.getX() - origin.getX();
-        double dy = p.getY() - origin.getY();
-        double dz = p.getZ() - origin.getZ();
-        Vector3 v = new Vector3(dx, dy, dz);
-        Vector3 k = axis.normalize().asVector();
-
-        // v_rot = v*cos(θ) + (k×v)*sin(θ) + k*(k·v)*(1-cos(θ))
-        Vector3 kCrossV = k.cross(v);
-        double kDotV = k.dot(v);
-        double cosAngle = Math.cos(angle);
-        double sinAngle = Math.sin(angle);
-
-        Vector3 rotated = v.scale(cosAngle)
-                .add(kCrossV.scale(sinAngle))
-                .add(k.scale(kDotV * (1 - cosAngle)));
-
-        return new CartesianPoint(
-                origin.getX() + rotated.getX(),
-                origin.getY() + rotated.getY(),
-                origin.getZ() + rotated.getZ());
-    }
 }

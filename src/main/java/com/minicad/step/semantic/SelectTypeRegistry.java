@@ -224,50 +224,6 @@ public final class SelectTypeRegistry {
     return ALL_SELECT_TYPES.contains(typeName);
   }
 
-  /**
-   * Gets the category for a SELECT type name.
-   *
-   * @param typeName the SELECT type wrapper name
-   * @return the category (e.g., "measure", "action") or null if unknown
-   */
-  public static String getSelectCategory(String typeName) {
-    return SELECT_TYPE_TO_CATEGORY.get(typeName);
-  }
 
-  /**
-   * Gets all allowed type names for a category.
-   *
-   * @param category the category name (e.g., "measure", "action")
-   * @return the set of allowed type names for that category
-   */
-  public static Set<String> getAllowedTypesForCategory(String category) {
-    return CATEGORY_TO_TYPES.getOrDefault(category, Set.of());
-  }
 
-  /**
-   * Validates that the SELECT type name matches one of the allowed types.
-   *
-   * @param typeName the SELECT type wrapper name to validate
-   * @param allowedTypes the set of allowed type names
-   * @return true if the type name is in the allowed set
-   */
-  public static boolean isSelectTypeAllowed(String typeName, Set<String> allowedTypes) {
-    return allowedTypes.contains(typeName);
-  }
-
-  /**
-   * Returns a human-readable description of the SELECT type categories.
-   *
-   * @return formatted description of available categories
-   */
-  public static String getCategoryDescription() {
-    return "Available SELECT type categories:\n"
-        + "  - measure: LENGTH_MEASURE, AREA_MEASURE, VOLUME_MEASURE, etc.\n"
-        + "  - action: action_method, action_request_solution, etc.\n"
-        + "  - definition: characterized_definition, characterized_product_definition\n"
-        + "  - geometric: geometric_model_select, geometric_set_select\n"
-        + "  - representation: representation_item, founded_item_select\n"
-        + "  - organization: organization, person, person_and_organization\n"
-        + "  - datetime: date, date_and_time, calendar_date";
-  }
 }

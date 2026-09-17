@@ -74,70 +74,9 @@ public final class RegistryHelpers {
     }
   }
 
-  /**
-   * Registers shape aspect relationship entity aliases.
-   * Each entity uses resolveShapeAspectRelationship resolver method.
-   */
-  public static void registerShapeAspectRelationshipAliases(
-      Map<String, EntityFactory> registry, String... entityNames) {
-    for (String entityName : entityNames) {
-      registry.put(
-          entityName,
-          (resolver, instance) ->
-              resolver.resolveShapeAspectRelationship(instance, entityName));
-    }
-  }
 
-  /**
-   * Registers representation relationship entity aliases.
-   * Each entity uses resolveRepresentationRelationship resolver method.
-   */
-  public static void registerRepresentationRelationshipAliases(
-      Map<String, EntityFactory> registry, String... entityNames) {
-    for (String entityName : entityNames) {
-      registry.put(
-          entityName,
-          (resolver, instance) ->
-              resolver.resolveRepresentationRelationship(instance, entityName));
-    }
-  }
 
-  /**
-   * Registers a typed measure with unit entity.
-   * Uses resolveTypedMeasureWithUnit resolver method with expected unit kind.
-   */
-  public static void registerTypedMeasureWithUnit(
-      Map<String, EntityFactory> registry, String entityName, String expectedUnitKind) {
-    registry.put(
-        entityName,
-        (resolver, instance) ->
-            resolver.resolveTypedMeasureWithUnit(instance, entityName, expectedUnitKind));
-  }
 
-  /**
-   * Registers typed measure with unit pairs.
-   * For each unit kind, derives measure name and registers pair.
-   */
-  public static void registerTypedMeasureWithUnitPairs(
-      Map<String, EntityFactory> registry, String... unitKinds) {
-    for (String unitKind : unitKinds) {
-      String measureName = unitKind.replace("_UNIT", "_MEASURE_WITH_UNIT");
-      registerTypedMeasureWithUnit(registry, measureName, unitKind);
-    }
-  }
-
-  /**
-   * Registers standalone derived unit kind entities.
-   * Each entity uses resolveStandaloneDerivedUnitKind resolver method.
-   */
-  public static void registerStandaloneDerivedUnitKinds(
-      Map<String, EntityFactory> registry, String... unitKinds) {
-    for (String unitKind : unitKinds) {
-      registry.put(
-          unitKind,
-          (resolver, instance) -> resolver.resolveStandaloneDerivedUnitKind(instance, unitKind));
-    }
-  }
 
   /**
    * Registers kinematic pair entity aliases.
@@ -176,29 +115,5 @@ public final class RegistryHelpers {
     }
   }
 
-  /**
-   * Registers product definition relationship entity aliases.
-   * Each entity uses resolveProductDefinitionRelationship resolver method.
-   */
-  public static void registerProductDefinitionRelationshipAliases(
-      Map<String, EntityFactory> registry, String... entityNames) {
-    for (String entityName : entityNames) {
-      registry.put(entityName,
-          (resolver, instance) ->
-              resolver.resolveProductDefinitionRelationship(instance, entityName));
-    }
-  }
 
-  /**
-   * Registers product definition relationship relationship entity aliases.
-   * Each entity uses resolveProductDefinitionRelationshipRelationship resolver method.
-   */
-  public static void registerProductDefinitionRelationshipRelationshipAliases(
-      Map<String, EntityFactory> registry, String... entityNames) {
-    for (String entityName : entityNames) {
-      registry.put(entityName,
-          (resolver, instance) ->
-              resolver.resolveProductDefinitionRelationshipRelationship(instance, entityName));
-    }
-  }
 }

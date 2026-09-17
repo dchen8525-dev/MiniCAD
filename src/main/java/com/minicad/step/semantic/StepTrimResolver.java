@@ -126,16 +126,6 @@ final class StepTrimResolver {
         throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
     }
 
-    Point2 requireTrimPoint2(List<StepEntity> trims, String slot) {
-        if (trims.isEmpty() || !(trims.get(0) instanceof StepCartesianPoint)) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports CARTESIAN_POINT trims");
-        }
-        StepCartesianPoint point = (StepCartesianPoint) trims.get(0);
-        if (point.coordinates().size() != 2) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must be 2D for PCURVE");
-        }
-        return buildPoint2.apply(point.id());
-    }
 
     /**
      * Resolves a 2D trim value to a Point2.

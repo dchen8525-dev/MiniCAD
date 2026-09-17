@@ -563,9 +563,7 @@ import com.minicad.step.model.StepAttributeClassification;
 import com.minicad.step.model.StepStructuralAnalysisRepresentation;
 import com.minicad.step.model.StepStructuralAnalysisRepresentationParameters;
 import com.minicad.step.model.StepValueReasonPair;
-import com.minicad.step.model.StepBoundingBox;
 import com.minicad.step.model.StepFillAreaShapeUse;
-import com.minicad.step.model.StepPointOnFace;
 import com.minicad.step.model.StepTessellatedCoordinateSet;
 import com.minicad.step.model.StepUncertaintyMeasure;
 import com.minicad.step.model.StepStructAnalysisModel;
@@ -1693,30 +1691,11 @@ public final class StepEntityResolver {
         stringValue(instance, definition, 2));
   }
 
-  StepBoundingBox resolveBoundingBox(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "BOUNDING_BOX");
-    requireParameterCount(instance, definition, 3);
-    return new StepBoundingBox(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        resolve(referenceId(instance, definition, 2)));
-  }
 
   StepFillAreaShapeUse resolveFillAreaShapeUse(StepEntityInstance instance) {
     return materialResolver.resolveFillAreaShapeUse(instance);
   }
 
-  StepPointOnFace resolvePointOnFace(StepEntityInstance instance) {
-    StepEntityDefinition definition = definition(instance, "POINT_ON_FACE");
-    requireParameterCount(instance, definition, 4);
-    return new StepPointOnFace(
-        instance.id(),
-        stringValue(instance, definition, 0),
-        resolve(referenceId(instance, definition, 1)),
-        numberValue(instance, definition, 2),
-        numberValue(instance, definition, 3));
-  }
 
   StepTessellatedCoordinateSet resolveTessellatedCoordinateSet(StepEntityInstance instance) {
     return tessellationResolver.resolveTessellatedCoordinateSet(instance);
@@ -4062,35 +4041,7 @@ public final class StepEntityResolver {
     return List.copyOf(result);
   }
 
-  static void registerProductDefinitionRelationshipAliases(
-      Map<String, EntityFactory> registry, String... entityNames) {
-    for (String entityName : entityNames) {
-      registry.put(
-          entityName,
-          (resolver, instance) ->
-              resolver.resolveProductDefinitionRelationship(instance, entityName));
-    }
-  }
 
-  static void registerProductDefinitionRelationshipRelationshipAliases(
-      Map<String, EntityFactory> registry, String... entityNames) {
-    for (String entityName : entityNames) {
-      registry.put(
-          entityName,
-          (resolver, instance) ->
-              resolver.resolveProductDefinitionRelationshipRelationship(instance, entityName));
-    }
-  }
-
-  static void registerRepresentationAliases(
-      Map<String, EntityFactory> registry, boolean shapeRepresentation, String... entityNames) {
-    for (String entityName : entityNames) {
-      registry.put(
-          entityName,
-          (resolver, instance) ->
-              resolver.resolveRepresentation(instance, entityName, shapeRepresentation));
-    }
-  }
 
   private static Map<String, EntityFactory> createRegistry() {
     // Resolution order matters for complex entities such as

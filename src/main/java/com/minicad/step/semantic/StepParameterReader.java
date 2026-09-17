@@ -550,28 +550,7 @@ public final class StepParameterReader {
             + valueType(value));
   }
 
-  /**
-   * Resolves a required reference parameter to a StepEntity.
-   */
-  public static StepEntity resolveReference(
-      StepEntityDefinition definition, int index, String entityName,
-      Function<Integer, StepEntity> resolver) {
-    int refId = referenceId(definition, index, entityName);
-    return resolver.apply(refId);
-  }
 
-  /**
-   * Resolves an optional reference parameter; returns null if omitted.
-   */
-  public static StepEntity optionalResolveReference(
-      StepEntityDefinition definition, int index, String entityName,
-      Function<Integer, StepEntity> resolver) {
-    StepValue value = definition.parameters().get(index);
-    if (isUnset(value)) {
-      return null;
-    }
-    return resolveReference(definition, index, entityName, resolver);
-  }
 
   /**
    * Reads a required reference and casts it to the expected type.
@@ -587,24 +566,6 @@ public final class StepParameterReader {
     return type.cast(entity);
   }
 
-  /**
-   * Reads an optional reference and casts it to the expected type;
-   * returns null if omitted.
-   */
-  public static <T extends StepEntity> T optionalRequireEntity(
-      StepEntityDefinition definition, int index, String entityName,
-      Class<T> type, String message, Function<Integer, StepEntity> resolver) {
-    StepValue value = definition.parameters().get(index);
-    if (isUnset(value)) {
-      return null;
-    }
-    int refId = referenceId(definition, index, entityName);
-    StepEntity entity = resolver.apply(refId);
-    if (!type.isInstance(entity)) {
-      throw new StepResolutionException(message + " but got " + entity.getClass().getSimpleName());
-    }
-    return type.cast(entity);
-  }
 
   /**
    * Reads a required reference that must be a vertex-like entity
@@ -814,18 +775,6 @@ public final class StepParameterReader {
     return List.copyOf(result);
   }
 
-  /**
-   * Reads a list of parameter values as raw StepValue elements (for trim curves etc.).
-   */
-  public static List<StepValue> listElements(
-      StepEntityDefinition definition, int index, String entityName) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw parameterTypeMismatch(definition, index, entityName, "list");
-    }
-    StepValue.ListValue listValue = (StepValue.ListValue) value;
-    return List.copyOf(listValue.elements());
-  }
 
   /**
    * Reads a list of literals, converting each element to its STEP text form.
@@ -941,38 +890,4 @@ public final class StepParameterReader {
     return List.copyOf(grid);
   }
 
-  /**
-   * Reads a nested list of references and resolves them without type checking.
-   */
-  public static List<List<StepEntity>> entityReferenceGrid(
-      StepEntityDefinition definition, int index, String message,
-      Function<Integer, StepEntity> resolver) {
-    StepValue value = unwrapTyped(definition.parameters().get(index));
-    if (!(value instanceof StepValue.ListValue)) {
-      throw new StepResolutionException(
-          definition.name() + " parameter " + index + " must be a nested list");
-    }
-    StepValue.ListValue outerList = (StepValue.ListValue) value;
-    List<List<StepEntity>> result = new ArrayList<>();
-    for (StepValue outerElement : outerList.elements()) {
-      StepValue unwrappedOuter = unwrapTyped(outerElement);
-      if (!(unwrappedOuter instanceof StepValue.ListValue)) {
-        throw new StepResolutionException(
-            definition.name() + " parameter " + index + " must contain nested lists");
-      }
-      StepValue.ListValue innerList = (StepValue.ListValue) unwrappedOuter;
-      List<StepEntity> row = new ArrayList<>();
-      for (StepValue innerElement : innerList.elements()) {
-        StepValue unwrappedInner = unwrapTyped(innerElement);
-        if (!(unwrappedInner instanceof StepValue.ReferenceValue)) {
-          throw new StepResolutionException(
-              definition.name() + " parameter " + index + " inner elements must be references");
-        }
-        StepValue.ReferenceValue referenceValue = (StepValue.ReferenceValue) unwrappedInner;
-        row.add(resolver.apply(referenceValue.id()));
-      }
-      result.add(List.copyOf(row));
-    }
-    return List.copyOf(result);
-  }
 }
