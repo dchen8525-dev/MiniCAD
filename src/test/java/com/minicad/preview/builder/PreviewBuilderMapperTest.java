@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.minicad.export.json.StepPayloadBuilder;
 import com.minicad.preview.payload.EdgePayload;
 import com.minicad.preview.payload.FacePayload;
 import com.minicad.preview.payload.GeometryCollection;
@@ -48,7 +49,7 @@ class PreviewBuilderMapperTest {
                         new PointPayload(0, 1, 0)),
                 null, List.of());
 
-        FacePayload rev = PreviewFaceBuilder.reverseFacePayload(base);
+        FacePayload rev = StepPayloadBuilder.reverseFacePayload(base);
 
         // 法线取反
         assertEquals(0.0, rev.getNormal().x(), 1e-9);

@@ -29,8 +29,6 @@ import com.minicad.step.model.StepAnnotationText;
 import com.minicad.step.model.StepAnnotationTextCharacter;
 import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
 import com.minicad.step.model.StepLeaderCurve;
-import com.minicad.step.model.StepOverRidingStyledItem;
-import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.model.StepTerminatorSymbol;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepFaceEntity;
@@ -77,6 +75,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import com.minicad.export.json.StepEdgePayloadBuilder;
+import com.minicad.export.json.StepEntityUnwrapper;
+import com.minicad.export.json.StepGeometryHelper;
+import com.minicad.export.json.StepPayloadBuilder;
 import com.minicad.export.json.StepPlacementTransformer;
 import com.minicad.export.json.StepTypeNameResolver;
 
@@ -104,61 +105,11 @@ public final class PreviewFaceBuilder {
     }
 
     public static StepEntity faceGeometry(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace) {
-            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
-            return advancedFace.faceGeometry();
-        }
-        if (stepFace instanceof StepFaceSurface) {
-            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
-            return faceSurface.faceGeometry();
-        }
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            return faceGeometry(orientedFace.faceElement());
-        }
-        return null;
+        return StepGeometryHelper.faceGeometry(stepFace);
     }
 
     public static boolean faceSameSense(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace) {
-            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
-            return advancedFace.sameSense();
-        }
-        if (stepFace instanceof StepFaceSurface) {
-            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
-            return faceSurface.sameSense();
-        }
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            boolean base = faceSameSense(orientedFace.faceElement());
-            return orientedFace.orientation() ? base : !base;
-        }
-        return true;
-    }
-
-    public static FacePayload reverseFacePayload(FacePayload base) {
-        List<PointPayload> reversedTriangles = new ArrayList<>(base.triangles().size());
-        for (int index = 0; index + 2 < base.triangles().size(); index += 3) {
-            reversedTriangles.add(base.triangles().get(index));
-            reversedTriangles.add(base.triangles().get(index + 2));
-            reversedTriangles.add(base.triangles().get(index + 1));
-        }
-        return new FacePayload(
-                base.stepId(),
-                base.name(),
-                base.surfaceType(),
-                base.origin(),
-                new VectorPayload(-base.normal().x(), -base.normal().y(), -base.normal().z()),
-                !base.sameSense(),
-                base.color(),
-                base.transparency(),
-                base.pbr(),
-                base.layers(),
-                base.loops(),
-                List.copyOf(reversedTriangles),
-                base.surface(),
-                base.uvLoops()
-        );
+        return StepValidationHelper.faceSameSense(stepFace);
     }
 
     public static UnsupportedFacePayload toUnsupportedFacePayload(StepFaceEntity stepFace, String reason) {
@@ -1294,31 +1245,11 @@ public final class PreviewFaceBuilder {
     }
 
     public static void collectTopologyEdges(Face face, Set<Edge> edges) {
-        for (FaceBound bound : face.bounds()) {
-            if (bound.loop() instanceof EdgeLoop) {
-                EdgeLoop edgeLoop = (EdgeLoop) bound.loop();
-                for (OrientedEdge orientedEdge : edgeLoop.edges()) {
-                    edges.add(orientedEdge.edge());
-                }
-            }
-        }
+        StepPayloadBuilder.collectTopologyEdges(face, edges);
     }
 
     public static <T> List<T> reverseClosedLoop(List<T> points) {
-        if (points.size() < 2) {
-            return points;
-        }
-        List<T> reversed = new ArrayList<>(points);
-        if (reversed.get(0).equals(reversed.get(reversed.size() - 1))) {
-            T start = reversed.remove(reversed.size() - 1);
-            java.util.Collections.reverse(reversed);
-            reversed.add(reversed.get(0));
-            reversed.set(0, start);
-            reversed.set(reversed.size() - 1, start);
-            return reversed;
-        }
-        java.util.Collections.reverse(reversed);
-        return reversed;
+        return StepPayloadBuilder.reverseClosedLoop(points);
     }
 
     public static ColorPayload resolveEdgeColor(int edgeId, StepMetadataExtractor metadata) {
@@ -1367,17 +1298,6 @@ public final class PreviewFaceBuilder {
         return ShellHelper.isShellLikeEntity(entity);
     }
 
-    public static PointPayload pointPayloadFromVertex(StepEntity vertex) {
-        if (vertex instanceof StepCartesianPoint) {
-            StepCartesianPoint cp = (StepCartesianPoint) vertex;
-            double cx = cp.coordinates().get(0);
-            double cy = cp.coordinates().size() > 1 ? cp.coordinates().get(1) : 0.0;
-            double cz = cp.coordinates().size() > 2 ? cp.coordinates().get(2) : 0.0;
-            return new PointPayload(cx, cy, cz);
-        }
-        return null;
-    }
-
     public static VectorPayload computeNormal(PointPayload p1, PointPayload p2, PointPayload p3) {
         double nx = (p2.y() - p1.y()) * (p3.z() - p1.z()) - (p2.z() - p1.z()) * (p3.y() - p1.y());
         double ny = (p2.z() - p1.z()) * (p3.x() - p1.x()) - (p2.x() - p1.x()) * (p3.z() - p1.z());
@@ -1396,20 +1316,7 @@ public final class PreviewFaceBuilder {
     }
 
     public static StepEntity unwrapStyledItem(StepEntity item) {
-        StepEntity current = item;
-        while (true) {
-            if (current instanceof StepStyledItem) {
-            StepStyledItem styledItem = (StepStyledItem) current;
-                current = styledItem.item();
-                continue;
-            }
-            if (current instanceof StepOverRidingStyledItem) {
-            StepOverRidingStyledItem styledItem = (StepOverRidingStyledItem) current;
-                current = styledItem.item();
-                continue;
-            }
-            return current;
-        }
+        return StepEntityUnwrapper.unwrapStyledItem(item);
     }
 
     public static boolean isRepresentationSolidItem(StepEntity entity) {
