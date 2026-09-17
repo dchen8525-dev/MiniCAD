@@ -37,13 +37,6 @@ FOLDS = [
         "entity",
     ),
     (
-        "fold 6  StepSolidBuilder.buildSolid",
-        "ee223634",
-        "src/main/java/com/minicad/step/semantic/StepSolidBuilder.java",
-        "    Solid buildSolid(",
-        "entity",
-    ),
-    (
         "fold 7  StepShellBuilder.buildShell",
         "e009dbfb",
         "src/main/java/com/minicad/step/semantic/StepShellBuilder.java",
