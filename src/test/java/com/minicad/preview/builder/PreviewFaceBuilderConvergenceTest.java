@@ -1,6 +1,7 @@
 package com.minicad.preview.builder;
 
 import com.minicad.export.glb.TessellatedFaceExporter;
+import com.minicad.export.json.StepEdgePayloadBuilder;
 import com.minicad.export.json.StepEntityUnwrapper;
 import com.minicad.export.json.StepGeometryHelper;
 import com.minicad.export.json.StepPayloadBuilder;
@@ -65,7 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * follow-up is guarded by {@code EntityClassifierConvergenceTest} rather than
  * here, so each guard stays about one convergence.
  *
- * <p>The last round applied the same rule to this class's neighbours. Seven
+ * <p>The next round applied the same rule to this class's neighbours. Seven
  * facades here forwarded into {@code PreviewGeometryCollector}, and that class's
  * every member except the shell-like id walk was a dead twin of a live
  * export-side rule; nothing outside this file's own facade chain called any of
@@ -73,8 +74,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * {@code StepLegacyGeometryBuilder} (its only live caller), and the seven facades
  * plus the four helpers that existed only to serve them -- {@code
  * collectTopologyEdges}, {@code unwrapStyledItem}, {@code toPolylineEdgePayload}
- * and {@code toPolyLoopEdgePayload} -- went with them. The three facades left
- * here are the ones with real in-file callers.
+ * and {@code toPolyLoopEdgePayload} -- went with them.
  *
  * <p>The round after that took the same rule one layer further out: eleven
  * {@code toXxxFacePayload} handlers in this file were dead twins of live rules
@@ -83,19 +83,47 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * {@code toRectangularCompositeSurfaceFacePayload}, which itself had none -- so
  * the whole composite-basis rule table, and the frozen order fixture guarding
  * it, dispatched for nobody. All eleven went, along with the helpers that had
- * already lost every caller or existed only for these bodies:
+ * already lost every caller or existed only for those bodies:
  * {@code triangulateSphericalStrip}, {@code basisDirectionForNormal},
  * {@code clamp}, and the two private {@code PreviewSurfaceSampler} facades for
- * triangulation. The guards below check the deletions and, more importantly,
- * that every surface type those handlers served still has a home -- otherwise a
- * deletion and a dropped capability would look the same from here.
+ * triangulation.
+ *
+ * <p>This round finished the family. Nine handlers were still here -- cylindrical,
+ * conical, toroidal, rational b-spline, ruled, four-sided patch, parametric,
+ * sampled and unsupported -- and every one of them was in the same position as
+ * the eleven before them: eight had no caller anywhere, and
+ * {@code toCylindricalFacePayload}'s only reference was a corpus test. Deleting
+ * them pulled out the rest of the file by the roots. {@code buildFaceBounds},
+ * {@code toColorPayload}, {@code toPbrPayload}, {@code toPointPayloads},
+ * {@code toPointPayload} and {@code sampleEdge} were called only by this family;
+ * {@code faceGeometry} and {@code faceSameSense} were the two delegating facades
+ * whose "real in-file callers" <em>were</em> the family -- with it gone they had
+ * none left, which is the same test the two deletions above were held to; and
+ * {@code describeUnsupportedPreviewSurface} (both overloads),
+ * {@code toUnsupportedFacePayload}, {@code resolveEdgeColor},
+ * {@code buildTopologyEdgePayload}, {@code shellFaces}, {@code isShellEntity},
+ * {@code isShellLikeEntity} and {@code computeNormal} had no caller at all even
+ * before this round. The class is 860 lines down to 196, and the four live
+ * callers it still serves -- two from {@code PreviewMeshExporter}, two from the
+ * export-side payload builders -- are all on surviving members.
+ *
+ * <p>The four-sided patch deserved the care the earlier round gave it. That
+ * round deferred the preview copy rather than converge it, because the export
+ * twin was being edited by a parallel session and because the preview entry
+ * point was assumed reachable. Both halves of that assumption turned out to be
+ * about the wrong things: the export builder is live (reached from
+ * {@code StepFacePayloadBuilder.toBSplineSurfaceFacePayload}), and the preview
+ * copy's only caller, {@code toFourSidedPatchFacePayload}, had no caller itself.
+ * So no facade was needed -- the copy and its whole local family were deleted,
+ * and that story is guarded from the sampler side in
+ * {@code PreviewSurfaceSamplerConvergenceTest}.
  *
  * <p>The guard matters because convergence without one regresses silently: a
- * later edit can paste the body back, and every existing test still passes --
- * both copies agree until they drift. It pins the canonical homes, the facades
- * that must survive, the deletions, the absence of the copied
- * {@code instanceof} chains, and runtime agreement between the facades and the
- * canonical helpers.
+ * later edit can paste a body back, and every existing test still passes -- both
+ * copies agree until they drift. It pins the canonical homes, the facades that
+ * must survive, the deletions, the absence of every type that only the deleted
+ * bodies named, and runtime agreement between the facades and the canonical
+ * helpers.
  */
 class PreviewFaceBuilderConvergenceTest {
 
@@ -105,17 +133,32 @@ class PreviewFaceBuilderConvergenceTest {
     private static final String STEP_FACE_PAYLOAD_BUILDER =
             "src/main/java/com/minicad/export/json/StepFacePayloadBuilder.java";
 
+    private static final String EDGE_PAYLOAD_BUILDER =
+            "src/main/java/com/minicad/export/json/StepEdgePayloadBuilder.java";
+
     /**
      * Facades that must survive, as the exact statement their body must hold.
      * A whole-body equality would be brittle; the delegation is the contract.
-     * Each one has callers in this file, which is why it is still a facade at all.
+     * {@code reverseClosedLoop} is the only one left of the original three:
+     * {@code sampleLoop} is a live production caller, and that is the whole
+     * reason it is a facade at all.
      */
     private static final List<String> FACADE_BODIES = List.of(
-            "return StepGeometryHelper.faceGeometry(stepFace);",
-            "return StepValidationHelper.faceSameSense(stepFace);",
             "return StepPayloadBuilder.reverseClosedLoop(points);");
 
-    /** Copies deleted from PreviewFaceBuilder by the convergence. */
+    /**
+     * The production entry points this class still owes its callers. Two come
+     * from {@code PreviewMeshExporter}, two from the export-side payload
+     * builders; anything else in the file has to justify itself locally.
+     */
+    private static final List<String> LIVE_ENTRY_POINTS = List.of(
+            "sampleLoop",
+            "reverseClosedLoop",
+            "surfaceTypeNameForGeometry",
+            "unwrapParametricPreviewSurface",
+            "unwrapBasisSurfaceOnce");
+
+    /** Copies deleted from PreviewFaceBuilder by the first convergence. */
     private static final List<String> DROPPED = List.of(
             "reverseFacePayload",
             "pointPayloadFromVertex");
@@ -151,18 +194,60 @@ class PreviewFaceBuilderConvergenceTest {
             "StepOverRidingStyledItem");
 
     /**
-     * The preview-side surface handlers a later pass deleted, each paired with
-     * the text that proves its surface type still has a home elsewhere. The
-     * pairing is the point of the guard: without it, "delete the dead handler"
-     * and "drop a surface type" look identical from this file.
+     * Types that only the deleted surface handlers and their helpers named. Each
+     * one's import went with them, so a mention means a body came back.
+     */
+    private static final List<String> DROPPED_ONLY_TYPES = List.of(
+            "StepMetadataHelper",
+            "StepMetadataExtractor",
+            "StepTypeNameResolver",
+            "StepPlacementTransformer",
+            "StepValidationHelper",
+            "StepCadBuilder",
+            "ShellHelper",
+            "MathUtilityHelper",
+            "PreviewSurfaceSampler",
+            "TriangulationHelper",
+            "PreviewCurveEvaluator",
+            "FacePayload",
+            "FaceSurfacePayload",
+            "LoopPayload",
+            "PointPayload",
+            "VectorPayload",
+            "ColorPayload",
+            "PbrPayload",
+            "EdgePayload",
+            "UnsupportedFacePayload",
+            "GeometryCollection",
+            "SurfacePatch",
+            "Collectors");
+
+    /**
+     * The preview-side surface handlers deleted by the last two passes, each
+     * paired with the text that proves its surface type still has a home
+     * elsewhere. The pairing is the point of the guard: without it, "delete the
+     * dead handler" and "drop a surface type" look identical from this file.
      *
-     * <p>None of the eleven had a caller when they went. Ten had none at all;
-     * {@code toSphericalFacePayload} was reachable only from
-     * {@code toRectangularCompositeSurfaceFacePayload}, which itself had none.
-     * Every one of their surface types was already handled on the export side,
-     * which is why deleting rather than re-homing was the right move.
+     * <p>The first eleven went with the composite-basis rule table, covered by
+     * {@code DROPPED_COMPOSITE_HANDLERS} below. The nine here were the rest of
+     * the family: eight had no caller anywhere, and
+     * {@code toCylindricalFacePayload}'s only reference was
+     * {@code PreviewPipelineTest}, which now drives
+     * {@code StepFacePayloadBuilder.buildPreviewFaceResult} instead.
      */
     private static final List<List<String>> DROPPED_SURFACE_HANDLERS = List.of(
+            List.of("toCylindricalFacePayload", "previewFaceRule(StepCylindricalSurface.class"),
+            List.of("toConicalFacePayload", "previewFaceRule(StepConicalSurface.class"),
+            List.of("toToroidalFacePayload", "previewFaceRule(StepToroidalSurface.class"),
+            List.of("toRationalBSplineSurfaceFacePayload", "previewFaceRule(StepRationalBSplineSurface.class"),
+            List.of("toRuledSurfaceFacePayload", "previewFaceRule(StepRuledSurface.class"),
+            List.of("toParametricSurfaceFacePayload", "previewFaceRule(StepParaboloidSurface.class"),
+            List.of("toSampledSurfaceFacePayload", "toSampledSurfaceFacePayload(stepFace, surface, \"FREE_FORM_SURFACE\""),
+            List.of("toUnsupportedFacePayload", "UnsupportedFacePayload toUnsupportedFacePayload("),
+            List.of("toFourSidedPatchFacePayload", "StepEdgePayloadBuilder.buildFourSidedPatch("));
+
+    /** The eleven handlers an earlier round deleted, with their export-side homes. */
+    private static final List<List<String>> DROPPED_COMPOSITE_HANDLERS = List.of(
             List.of("toSphericalFacePayload", "previewFaceRule(StepSphericalSurface.class"),
             List.of("toSurfaceOfLinearExtrusionFacePayload", "previewFaceRule(StepSurfaceOfLinearExtrusion.class"),
             List.of("toSurfaceOfRevolutionFacePayload", "StepSurfaceOfRevolution.class.isInstance("),
@@ -176,16 +261,42 @@ class PreviewFaceBuilderConvergenceTest {
             List.of("toRectangularCompositeSurfaceFacePayload", "unwrapRule(StepRectangularCompositeSurface.class"));
 
     /**
+     * The facades that lost their last caller when the handler family went.
+     * Both were kept by the first convergence precisely because their in-file
+     * callers were real -- and those callers were the handlers. The export-side
+     * helpers they delegated to are the homes now, and
+     * {@code PreviewPipelineTest} calls them directly.
+     */
+    private static final List<String> DROPPED_FACADES = List.of(
+            "faceGeometry",
+            "faceSameSense");
+
+    /**
      * Helpers that went with those handlers or had already lost every caller:
      * {@code basisDirectionForNormal} is live on the export side,
-     * {@code clamp} has one home in the common kernel, and
+     * {@code clamp} has one home in the common kernel,
      * {@code triangulateSphericalStrip} was called only by the deleted spherical
-     * handler.
+     * handler, and the rest of the list was reachable only from the nine
+     * handlers, from each other, or from nothing at all.
      */
     private static final List<String> DROPPED_DEAD_HELPERS = List.of(
             "basisDirectionForNormal",
             "clamp",
-            "triangulateSphericalStrip");
+            "triangulateSphericalStrip",
+            "buildFaceBounds",
+            "describeUnsupportedPreviewSurface",
+            "toUnsupportedFacePayload",
+            "resolveEdgeColor",
+            "buildTopologyEdgePayload",
+            "shellFaces",
+            "isShellEntity",
+            "isShellLikeEntity",
+            "computeNormal",
+            "toColorPayload",
+            "toPbrPayload",
+            "toPointPayload",
+            "toPointPayloads",
+            "sampleEdge");
 
     @Test
     @DisplayName("the export side stays the public static home of the canonical helpers")
@@ -200,7 +311,40 @@ class PreviewFaceBuilderConvergenceTest {
     }
 
     @Test
-    @DisplayName("PreviewFaceBuilder keeps the three delegating facades it still has callers for")
+    @DisplayName("the four-sided patch builder keeps its one live home")
+    void fourSidedPatchBuilderStaysOnTheExportSide() throws Exception {
+        assertFalse(declares(read(Paths.get(FACE_BUILDER)), "toFourSidedPatchFacePayload"),
+                "PreviewFaceBuilder re-declared toFourSidedPatchFacePayload. It was a copy "
+                        + "of a rule the export side owns, and its only caller was ... itself: "
+                        + "nothing in the tree called it, so no preview-side entry point is needed.");
+        assertFalse(declares(read(Paths.get("src/main/java/com/minicad/preview/sampling/PreviewSurfaceSampler.java")),
+                "buildFourSidedPatch"),
+                "PreviewSurfaceSampler re-declared buildFourSidedPatch. Its only caller was "
+                        + "toFourSidedPatchFacePayload, which had none; the live copy is on the "
+                        + "export side and this one is not a facade anyone reaches.");
+
+        Method builder = declared(StepEdgePayloadBuilder.class, "buildFourSidedPatch");
+        assertNotNull(builder,
+                "StepEdgePayloadBuilder must keep buildFourSidedPatch: it is the live copy.");
+        assertTrue(Modifier.isStatic(builder.getModifiers()),
+                "buildFourSidedPatch must stay static -- it is called on the class.");
+        assertFalse(Modifier.isPrivate(builder.getModifiers()),
+                "buildFourSidedPatch must stay visible to StepFacePayloadBuilder, the only "
+                        + "caller it has.");
+
+        String exportSide = read(Paths.get(STEP_FACE_PAYLOAD_BUILDER));
+        assertTrue(exportSide.contains("StepEdgePayloadBuilder.buildFourSidedPatch("),
+                "the export-side call is the reason the builder has a home at all. Without it "
+                        + "the preview deletion would have dropped a capability rather than "
+                        + "deduplicated one.");
+        assertTrue(exportSide.contains("toBSplineSurfaceFacePayload"),
+                "the live caller is toBSplineSurfaceFacePayload: a four-sided b-spline face "
+                        + "loop becomes a patch, and the patch is projected onto the built "
+                        + "surface. If that method is gone the call above is orphaned.");
+    }
+
+    @Test
+    @DisplayName("PreviewFaceBuilder keeps the facades its own callers rely on")
     void facadesSurviveWithADelegatingBody() throws Exception {
         String text = read(Paths.get(FACE_BUILDER));
         List<String> missing = new ArrayList<>();
@@ -213,6 +357,14 @@ class PreviewFaceBuilderConvergenceTest {
                 "these bodies are the delegating facades PreviewFaceBuilder's own call "
                         + "sites rely on; a missing line means the body was pasted back "
                         + "locally or routed through a static import.");
+    }
+
+    @Test
+    @DisplayName("the production entry points stay public and static")
+    void liveEntryPointsStayPublicStatic() {
+        for (String name : LIVE_ENTRY_POINTS) {
+            assertPublicStatic(PreviewFaceBuilder.class, name);
+        }
     }
 
     @Test
@@ -265,27 +417,54 @@ class PreviewFaceBuilderConvergenceTest {
     }
 
     @Test
-    @DisplayName("the face facades agree with the canonical helpers at runtime")
-    void faceFacadesMatchTheHelpers() {
+    @DisplayName("the type names only the deleted bodies used stay absent")
+    void droppedOnlyTypesStayAbsent() throws Exception {
+        String text = code(read(Paths.get(FACE_BUILDER)));
+        List<String> reappeared = new ArrayList<>();
+        for (String type : DROPPED_ONLY_TYPES) {
+            if (Pattern.compile("(?<![\\w.])" + Pattern.quote(type) + "(?![\\w])").matcher(text).find()) {
+                reappeared.add(type);
+            }
+        }
+        assertEquals(List.of(), reappeared,
+                "PreviewFaceBuilder names " + reappeared + " again. Every one of these is "
+                        + "reached through a wildcard import, so the compiler would not "
+                        + "notice the import coming back; their absence is the only cheap "
+                        + "evidence that the deleted handler bodies stayed deleted. The live "
+                        + "homes are StepFacePayloadBuilder's rule table and "
+                        + "PayloadConversionHelper.");
+    }
+
+    @Test
+    @DisplayName("the face facades are gone and the export-side homes still answer")
+    void deletedFacadesStayDeleted() throws Exception {
+        String text = read(Paths.get(FACE_BUILDER));
+        List<String> reappeared = new ArrayList<>();
+        for (String name : DROPPED_FACADES) {
+            if (declares(text, name)) {
+                reappeared.add(name);
+            }
+        }
+        assertEquals(List.of(), reappeared,
+                "PreviewFaceBuilder re-declared " + reappeared + ". Both were one-line "
+                        + "delegating facades kept for their in-file callers -- and those "
+                        + "callers were the deleted surface handlers, so keeping them would "
+                        + "be a facade outliving its last production caller. Call "
+                        + "StepGeometryHelper / StepValidationHelper directly.");
+
         StepCartesianPoint geometry = new StepCartesianPoint(7, "p", List.of(0.0, 0.0, 0.0));
         StepFaceSurface surface = new StepFaceSurface(42, "face", null, geometry, false);
         StepOrientedFace oriented = new StepOrientedFace(43, "oriented", surface, false);
 
-        assertFalse(PreviewFaceBuilder.faceSameSense(surface),
-                "a StepFaceSurface reports its own sameSense flag");
-        assertEquals(StepValidationHelper.faceSameSense(surface),
-                PreviewFaceBuilder.faceSameSense(surface));
-        assertTrue(PreviewFaceBuilder.faceSameSense(oriented),
-                "an inverted oriented face flips the base flag, so the recursion "
+        assertFalse(StepValidationHelper.faceSameSense(surface),
+                "the home of faceSameSense must keep reporting a face surface's own flag");
+        assertTrue(StepValidationHelper.faceSameSense(oriented),
+                "an inverted oriented face flips the base flag, so the home's recursion "
                         + "must still reach the element face");
-        assertEquals(StepValidationHelper.faceSameSense(oriented),
-                PreviewFaceBuilder.faceSameSense(oriented));
-
-        assertSame(geometry, PreviewFaceBuilder.faceGeometry(surface));
-        assertSame(geometry, PreviewFaceBuilder.faceGeometry(oriented));
-        assertEquals(StepGeometryHelper.faceGeometry(oriented),
-                PreviewFaceBuilder.faceGeometry(oriented));
-        assertNull(PreviewFaceBuilder.faceGeometry(null));
+        assertSame(geometry, StepGeometryHelper.faceGeometry(surface));
+        assertEquals(geometry, StepGeometryHelper.faceGeometry(oriented));
+        assertNull(StepGeometryHelper.faceGeometry(null),
+                "the deleted facade passed null straight through; the home must too");
     }
 
     @Test
@@ -316,6 +495,11 @@ class PreviewFaceBuilderConvergenceTest {
                 reappeared.add(pair.get(0));
             }
         }
+        for (List<String> pair : DROPPED_COMPOSITE_HANDLERS) {
+            if (declares(preview, pair.get(0))) {
+                reappeared.add(pair.get(0));
+            }
+        }
         assertEquals(List.of(), reappeared,
                 "PreviewFaceBuilder re-declared " + reappeared + ". Each of these built a "
                         + "FacePayload for a surface type the export-side path already "
@@ -334,6 +518,11 @@ class PreviewFaceBuilderConvergenceTest {
                 orphaned.add(pair.get(0) + " -> " + pair.get(1));
             }
         }
+        for (List<String> pair : DROPPED_COMPOSITE_HANDLERS) {
+            if (!exportSide.contains(pair.get(1)) && !preview.contains(pair.get(1))) {
+                orphaned.add(pair.get(0) + " -> " + pair.get(1));
+            }
+        }
         assertEquals(List.of(), orphaned,
                 "these surface types lost their only home: " + orphaned + ". The deletion was "
                         + "safe because the handler was a copy; if the home moved or vanished, "
@@ -343,7 +532,7 @@ class PreviewFaceBuilderConvergenceTest {
     @Test
     @DisplayName("the helpers that died with those handlers stay gone")
     void helperCopiesThatDiedWithTheHandlersStayGone() throws Exception {
-        String text = read(Paths.get(FACE_BUILDER));
+        String text = code(read(Paths.get(FACE_BUILDER)));
         List<String> reappeared = new ArrayList<>();
         for (String name : DROPPED_DEAD_HELPERS) {
             if (declares(text, name)) {
@@ -352,30 +541,44 @@ class PreviewFaceBuilderConvergenceTest {
         }
         assertEquals(List.of(), reappeared,
                 "PreviewFaceBuilder re-declared " + reappeared + ". basisDirectionForNormal "
-                        + "is live in export.glb.PreviewMeshExporter / export.json.StepPointExtractor, "
-                        + "clamp has one home in common.BSplineKernel, and triangulateSphericalStrip "
-                        + "was called only by the deleted spherical handler -- all three would be "
-                        + "dead on arrival here.");
+                        + "is live in export.glb.PreviewMeshExporter / export.json.StepPointExtractor "
+                        + "and clamp has one home in common.BSplineKernel; every other name in "
+                        + "this list lost its last caller when the surface-handler family was "
+                        + "deleted, so it would be dead on arrival here.");
 
-        assertFalse(text.contains("TriangulationHelper.appendOrientedTriangle("),
-                "PreviewFaceBuilder emits an oriented triangle again. Its last caller here was "
-                        + "triangulateSphericalStrip, so the call means a spherical-strip copy "
-                        + "came back with it.");
+        assertFalse(text.contains("TriangulationHelper"),
+                "PreviewFaceBuilder reaches into TriangulationHelper again. Its last calls "
+                        + "here were the three strip emitters inside the cylindrical, conical "
+                        + "and toroidal handlers, all of which are gone; a call means one of "
+                        + "them came back with its body.");
     }
 
+    /**
+     * The file with comments blanked out. A guard that asks "is this name gone"
+     * has to read code: the class javadoc here names every member that was
+     * deleted, and that prose is the point of the file, not a regression.
+     */
+    private static String code(String text) {
+        return Pattern.compile("/\\*.*?\\*/|//[^\\r\\n]*", Pattern.DOTALL)
+                .matcher(text)
+                .replaceAll(" ");
+    }
     private static void assertPublicStatic(Class<?> owner, String name) {
-        Method found = null;
-        for (Method candidate : owner.getDeclaredMethods()) {
-            if (candidate.getName().equals(name)) {
-                found = candidate;
-                break;
-            }
-        }
+        Method found = declared(owner, name);
         assertNotNull(found, owner.getSimpleName() + " must still declare " + name);
         assertTrue(Modifier.isStatic(found.getModifiers()),
                 name + " must stay static -- it is called on the class");
         assertTrue(Modifier.isPublic(found.getModifiers()),
                 name + " must stay public -- the preview side calls it across packages");
+    }
+
+    private static Method declared(Class<?> owner, String name) {
+        for (Method candidate : owner.getDeclaredMethods()) {
+            if (candidate.getName().equals(name)) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     private static CartesianPoint p(double x, double y, double z) {

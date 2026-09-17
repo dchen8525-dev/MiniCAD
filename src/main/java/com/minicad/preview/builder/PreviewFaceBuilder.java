@@ -1,118 +1,47 @@
 package com.minicad.preview.builder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.minicad.export.json.StepMetadataHelper;
-import com.minicad.common.Epsilon;
-import com.minicad.common.GeometryException;
-import com.minicad.common.StepResolutionException;
-import com.minicad.common.TopologyException;
 import com.minicad.common.UnsupportedGeometryException;
-import com.minicad.export.json.StepPreviewJsonExporter;
-import com.minicad.export.json.StepValidationHelper;
+import com.minicad.export.json.StepEdgePayloadBuilder;
+import com.minicad.export.json.StepPayloadBuilder;
 import com.minicad.geometry.*;
-import com.minicad.helper.MathUtilityHelper;
-import com.minicad.helper.ShellHelper;
-import com.minicad.helper.SurfaceGeometryHelper;
-import com.minicad.preview.sampling.PreviewCurveEvaluator;
-import com.minicad.preview.sampling.PreviewSurfaceSampler;
-import com.minicad.preview.sampling.TriangulationHelper;
-import com.minicad.step.model.StepAnnotationCurveOccurrence;
-import com.minicad.step.model.StepAnnotationFillArea;
-import com.minicad.step.model.StepAnnotationFillAreaOccurrence;
-import com.minicad.step.model.StepAnnotationSymbol;
-import com.minicad.step.model.StepAnnotationSymbolOccurrence;
-import com.minicad.step.model.StepAnnotationSubfigureOccurrence;
-import com.minicad.step.model.StepAnnotationText;
-import com.minicad.step.model.StepAnnotationTextCharacter;
-import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
-import com.minicad.step.model.StepLeaderCurve;
-import com.minicad.step.model.StepTerminatorSymbol;
-import com.minicad.step.model.StepEntity;
-import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.model.*;
-import com.minicad.step.model.StepChamferEdge;
-import com.minicad.step.model.StepFilletEdge;
-import com.minicad.step.model.StepMachinedSurface;
-import com.minicad.step.model.*;
-import com.minicad.step.model.StepDimensionCurve;
-import com.minicad.step.model.*;
-import com.minicad.step.model.StepRepresentation;
-import com.minicad.step.semantic.StepCadBuilder;
-import com.minicad.topology.Edge;
 import com.minicad.topology.EdgeLoop;
 import com.minicad.topology.FaceBound;
 import com.minicad.topology.OrientedEdge;
 import com.minicad.topology.PolyLoop;
-import com.minicad.topology.Shell;
-import com.minicad.topology.Solid;
 import com.minicad.topology.VertexLoop;
-import com.minicad.helper.StepMetadataExtractor;
-import com.minicad.preview.payload.ColorPayload;
-import com.minicad.preview.payload.FaceSurfacePayload;
-import com.minicad.preview.payload.LoopPayload;
-import com.minicad.preview.payload.PayloadConversionHelper;
-import com.minicad.preview.payload.EdgePayload;
-import com.minicad.preview.payload.FacePayload;
-import com.minicad.preview.payload.GeometryCollection;
-import com.minicad.preview.payload.PbrPayload;
-import com.minicad.preview.payload.PointPayload;
-import com.minicad.preview.payload.SurfacePatch;
-import com.minicad.preview.payload.UnsupportedFacePayload;
-import com.minicad.preview.payload.VectorPayload;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import com.minicad.export.json.StepEdgePayloadBuilder;
-import com.minicad.export.json.StepGeometryHelper;
-import com.minicad.export.json.StepPayloadBuilder;
-import com.minicad.export.json.StepPlacementTransformer;
-import com.minicad.export.json.StepTypeNameResolver;
 
 /**
- * Face building and geometry collection orchestration for STEP preview export.
- * Extracted from StepPreviewJsonExporter to isolate face and geometry logic.
+ * What the preview pipeline still needs from a STEP face, and nothing else:
+ * the wrapper-surface unwrap rules, closed-loop sampling, and the geometry
+ * surface type names. Extracted from StepPreviewJsonExporter to isolate face
+ * and geometry logic.
+ *
+ * <p>Everything else this class used to carry has been removed as dead twins
+ * of live export-side code. Twenty-three members went in one pass, each
+ * because its last production caller was one of the others: the nine
+ * {@code toXxxFacePayload} handlers were byte-identical copies of the private
+ * handlers {@code StepFacePayloadBuilder.PREVIEW_FACE_RULES} dispatches, and
+ * the rest -- {@code buildFaceBounds}, the two
+ * {@code describeUnsupportedPreviewSurface} overloads, {@code faceGeometry},
+ * {@code faceSameSense}, {@code toUnsupportedFacePayload},
+ * {@code resolveEdgeColor}, {@code buildTopologyEdgePayload},
+ * {@code shellFaces}, {@code isShellEntity}, {@code isShellLikeEntity},
+ * {@code computeNormal}, {@code toColorPayload}, {@code toPbrPayload},
+ * {@code toPointPayload}, {@code toPointPayloads} and {@code sampleEdge} --
+ * was reachable only from them, from each other, or from nothing at all.
+ * The class shrank from 860 to 183 lines without losing an entry point: the
+ * four live callers (two from {@code PreviewMeshExporter}, two from the
+ * export-side payload builders) are all on the members that remain.
  */
 public final class PreviewFaceBuilder {
 
-    private static final Logger log = LoggerFactory.getLogger(PreviewFaceBuilder.class);
-
-    private static final int TOPOLOGY_SURFACE_GRID_SEGMENTS = 16;
-
     private PreviewFaceBuilder() {}
-
-    // ─── Core face building ──────────────────────────────────────────────
-
-    public static List<FaceBound> buildFaceBounds(StepFaceEntity stepFace, StepCadBuilder builder) {
-        List<FaceBound> bounds = stepFace.bounds().stream().map(bound -> builder.buildFaceBound(bound.id())).collect(Collectors.toList());
-        if (bounds.stream().noneMatch(FaceBound::outer) && bounds.size() == 1) {
-            FaceBound bound = bounds.get(0);
-            return List.of(FaceBound.outer(bound.loop(), bound.orientation()));
-        }
-        return bounds;
-    }
-
-    public static StepEntity faceGeometry(StepFaceEntity stepFace) {
-        return StepGeometryHelper.faceGeometry(stepFace);
-    }
-
-    public static boolean faceSameSense(StepFaceEntity stepFace) {
-        return StepValidationHelper.faceSameSense(stepFace);
-    }
-
-    public static UnsupportedFacePayload toUnsupportedFacePayload(StepFaceEntity stepFace, String reason) {
-        StepEntity geometry = faceGeometry(stepFace);
-        return new UnsupportedFacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                StepTypeNameResolver.surfaceTypeName(geometry),
-                reason == null ? "preview export returned no mesh" : reason
-        );
-    }
 
     // ─── Surface unwrapping ──────────────────────────────────────────────
 
@@ -131,9 +60,11 @@ public final class PreviewFaceBuilder {
     }
 
     /**
-     * Wrapper-surface types unwrapped to the surface they reference. Shared by
-     * unwrapParametricPreviewSurface and describeUnsupportedPreviewSurface;
-     * replaces their two former 11-branch if/else-if chains.
+     * Wrapper-surface types unwrapped to the surface they reference. The two
+     * former 11-branch if/else-if chains that walked them -- one here for
+     * unwrapParametricPreviewSurface, one on the export side in
+     * describeUnsupportedPreviewSurface -- are both replaced by this table,
+     * which the surviving callers share.
      */
     private static final List<SurfaceUnwrapRule> SURFACE_UNWRAP_RULES = List.of(
             unwrapRule(StepRectangularTrimmedSurface.class, surface -> ((StepRectangularTrimmedSurface) surface).basisSurface()),
@@ -176,450 +107,6 @@ public final class PreviewFaceBuilder {
             current = basis;
         }
         return current;
-    }
-
-    public static String describeUnsupportedPreviewSurface(StepEntity surface) {
-        return describeUnsupportedPreviewSurface(surface, null);
-    }
-
-    public static String describeUnsupportedPreviewSurface(StepEntity surface, StepCadBuilder builder) {
-        if (surface == null) {
-            return null;
-        }
-        if (surface instanceof StepGeometricReplica
-                && "SURFACE_REPLICA".equals(((StepGeometricReplica) surface).entityName())) {
-            StepGeometricReplica replica = (StepGeometricReplica) surface;
-            if (replica.transformation() instanceof com.minicad.step.model.StepCartesianTransformationOperator) { com.minicad.step.model.StepCartesianTransformationOperator transformation = (com.minicad.step.model.StepCartesianTransformationOperator) replica.transformation();
-                double scale = transformation.scale() == null ? 1.0 : transformation.scale();
-                if (Math.abs(scale) <= 1.0e-9) {
-                    return "SURFACE_REPLICA zero scale preview is unsupported";
-                }
-                if (builder != null) {
-                    double[] matrix = StepPlacementTransformer.matrixForTransformationOperator(transformation, builder);
-                    if (MathUtilityHelper.inverseUniformScaleTransform(matrix) == null) {
-                        return "SURFACE_REPLICA non-uniform scale preview is unsupported";
-                    }
-                }
-            }
-            return describeUnsupportedPreviewSurface(replica.parent(), builder);
-        }
-        StepEntity basis = unwrapBasisSurface(surface);
-        if (basis != null) {
-            return describeUnsupportedPreviewSurface(basis, builder);
-        }
-        return StepTypeNameResolver.surfaceTypeName(surface);
-    }
-
-    // ─── Surface-specific face payload builders ──────────────────────────
-
-    public static FacePayload toCylindricalFacePayload(
-            StepFaceEntity stepFace,
-            StepCylindricalSurface stepSurface,
-            StepCadBuilder builder,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.get(0).outer()) {
-            return null;
-        }
-
-        if (!(bounds.get(0).loop() instanceof EdgeLoop)) {
-            return null;
-        }
-        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
-        if (outerLoop.edges().size() != 4) {
-            return null;
-        }
-
-        List<OrientedEdge> circleEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof Circle)
-                .collect(Collectors.toList());
-        List<OrientedEdge> lineEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof Line3)
-                .collect(Collectors.toList());
-        if (circleEdges.size() != 2 || lineEdges.size() != 2) {
-            return null;
-        }
-
-        CylindricalSurface surface = builder.buildCylindricalSurface(stepSurface.id());
-        OrientedEdge lowerArc = circleEdges.get(0);
-        OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (SurfaceGeometryHelper.averageAxialHeight(surface, StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperArc))) {
-            lowerArc = circleEdges.get(circleEdges.size() - 1);
-            upperArc = circleEdges.get(0);
-        }
-
-        List<CartesianPoint> lowerArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc);
-        List<CartesianPoint> upperArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(upperArc);
-        double lowerHeight = SurfaceGeometryHelper.averageAxialHeight(surface, lowerArcPoints);
-        double upperHeight = SurfaceGeometryHelper.averageAxialHeight(surface, upperArcPoints);
-        if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
-            return null;
-        }
-
-        List<Double> angles = SurfaceGeometryHelper.unwrapAngles(surface, lowerArcPoints);
-        if (angles.size() < 2) {
-            return null;
-        }
-
-        boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = TriangulationHelper.triangulateCylindricalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
-        if (triangles.isEmpty()) {
-            return null;
-        }
-
-        Vector3 startNormal = SurfaceGeometryHelper.cylindricalNormal(surface, angles.get(0), sameSense);
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                "CYLINDRICAL_SURFACE",
-                PayloadConversionHelper.toPointPayload(SurfaceGeometryHelper.surfacePoint(surface, angles.get(0), lowerHeight)),
-                new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
-                sameSense,
-                toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
-                triangles,
-                new FaceSurfacePayload(
-                        "cylindrical_strip",
-                        List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
-                        List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
-                        List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
-                        surface.radius(),
-                        null,
-                        null,
-                        lowerHeight,
-                        upperHeight,
-                        angles.get(0),
-                        angles.get(angles.size() - 1) - angles.get(0),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                ),
-                null
-        );
-    }
-
-    public static FacePayload toConicalFacePayload(
-            StepFaceEntity stepFace,
-            StepConicalSurface stepSurface,
-            StepCadBuilder builder,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.get(0).outer()) {
-            return null;
-        }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
-            return null;
-        }
-        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
-
-        List<OrientedEdge> circleEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof Circle)
-                .collect(Collectors.toList());
-        List<OrientedEdge> lineEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof Line3)
-                .collect(Collectors.toList());
-        if (circleEdges.size() != 2 || lineEdges.size() != 2) {
-            return null;
-        }
-
-        ConicalSurface surface = builder.buildConicalSurface(stepSurface.id());
-        OrientedEdge lowerArc = circleEdges.get(0);
-        OrientedEdge upperArc = circleEdges.get(circleEdges.size() - 1);
-        if (SurfaceGeometryHelper.averageAxialHeight(surface.position(), StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc)) > SurfaceGeometryHelper.averageAxialHeight(surface.position(), StepEdgePayloadBuilder.sampleOrientedEdge(upperArc))) {
-            lowerArc = circleEdges.get(circleEdges.size() - 1);
-            upperArc = circleEdges.get(0);
-        }
-
-        List<CartesianPoint> lowerArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerArc);
-        List<CartesianPoint> upperArcPoints = StepEdgePayloadBuilder.sampleOrientedEdge(upperArc);
-        double lowerHeight = SurfaceGeometryHelper.averageAxialHeight(surface.position(), lowerArcPoints);
-        double upperHeight = SurfaceGeometryHelper.averageAxialHeight(surface.position(), upperArcPoints);
-        if (Math.abs(upperHeight - lowerHeight) <= Epsilon.EPS) {
-            return null;
-        }
-
-        List<Double> angles = SurfaceGeometryHelper.unwrapAngles(surface.position(), lowerArcPoints);
-        if (angles.size() < 2) {
-            return null;
-        }
-
-        boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = TriangulationHelper.triangulateConicalStrip(surface, lowerHeight, upperHeight, angles, sameSense);
-        if (triangles.isEmpty()) {
-            return null;
-        }
-
-        Vector3 startNormal = SurfaceGeometryHelper.conicalNormal(surface, angles.get(0), sameSense);
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                "CONICAL_SURFACE",
-                PayloadConversionHelper.toPointPayload(SurfaceGeometryHelper.conicalSurfacePoint(surface, angles.get(0), lowerHeight)),
-                new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
-                sameSense,
-                toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
-                triangles,
-                new FaceSurfacePayload(
-                        "conical_strip",
-                        List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
-                        List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
-                        List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
-                        surface.radius(),
-                        null,
-                        surface.semiAngle(),
-                        lowerHeight,
-                        upperHeight,
-                        angles.get(0),
-                        angles.get(angles.size() - 1) - angles.get(0),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                ),
-                null
-        );
-    }
-
-    public static FacePayload toToroidalFacePayload(
-            StepFaceEntity stepFace,
-            StepToroidalSurface stepSurface,
-            StepCadBuilder builder,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.get(0).outer()) {
-            return null;
-        }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
-            return null;
-        }
-        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
-
-        List<OrientedEdge> circleEdges = outerLoop.edges().stream()
-                .filter(edge -> edge.edge().curve() instanceof Circle)
-                .collect(Collectors.toList());
-        if (circleEdges.size() != 4) {
-            return null;
-        }
-
-        ToroidalSurface surface = builder.buildToroidalSurface(stepSurface.id());
-        List<OrientedEdge> varyingUEdges = new ArrayList<>();
-        List<OrientedEdge> varyingVEdges = new ArrayList<>();
-        for (OrientedEdge edge : circleEdges) {
-            List<CartesianPoint> points = StepEdgePayloadBuilder.sampleOrientedEdge(edge);
-            List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, points);
-            List<Double> vValues = SurfaceGeometryHelper.unwrapToroidalV(surface, points);
-            double uRange = Math.abs(uValues.get(uValues.size() - 1) - uValues.get(0));
-            double vRange = Math.abs(vValues.get(vValues.size() - 1) - vValues.get(0));
-            if (uRange >= vRange) {
-                varyingUEdges.add(edge);
-            } else {
-                varyingVEdges.add(edge);
-            }
-        }
-        if (varyingUEdges.size() != 2 || varyingVEdges.size() != 2) {
-            return null;
-        }
-
-        OrientedEdge lowerVEdge = varyingUEdges.get(0);
-        OrientedEdge upperVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
-        if (SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(lowerVEdge)) > SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperVEdge))) {
-            lowerVEdge = varyingUEdges.get(varyingUEdges.size() - 1);
-            upperVEdge = varyingUEdges.get(0);
-        }
-
-        List<CartesianPoint> lowerPoints = StepEdgePayloadBuilder.sampleOrientedEdge(lowerVEdge);
-        List<Double> uValues = SurfaceGeometryHelper.unwrapToroidalU(surface, lowerPoints);
-        double lowerV = SurfaceGeometryHelper.averageToroidalV(surface, lowerPoints);
-        double upperV = SurfaceGeometryHelper.averageToroidalV(surface, StepEdgePayloadBuilder.sampleOrientedEdge(upperVEdge));
-        if (Math.abs(upperV - lowerV) <= Epsilon.EPS || uValues.size() < 2) {
-            return null;
-        }
-
-        boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = TriangulationHelper.triangulateToroidalStrip(surface, lowerV, upperV, uValues, sameSense);
-        if (triangles.isEmpty()) {
-            return null;
-        }
-
-        Vector3 startNormal = SurfaceGeometryHelper.toroidalNormal(surface, uValues.get(0), lowerV, sameSense);
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                "TOROIDAL_SURFACE",
-                PayloadConversionHelper.toPointPayload(SurfaceGeometryHelper.toroidalSurfacePoint(surface, uValues.get(0), lowerV)),
-                new VectorPayload(startNormal.x(), startNormal.y(), startNormal.z()),
-                sameSense,
-                toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
-                triangles,
-                new FaceSurfacePayload(
-                        "toroidal_strip",
-                        List.of(surface.position().location().x(), surface.position().location().y(), surface.position().location().z()),
-                        List.of(surface.position().axis().x(), surface.position().axis().y(), surface.position().axis().z()),
-                        List.of(surface.position().xDirection().x(), surface.position().xDirection().y(), surface.position().xDirection().z()),
-                        surface.majorRadius(),
-                        surface.minorRadius(),
-                        null,
-                        lowerV,
-                        upperV,
-                        uValues.get(0),
-                        uValues.get(uValues.size() - 1) - uValues.get(0),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
-                ),
-                null
-        );
-    }
-
-    public static FacePayload toRationalBSplineSurfaceFacePayload(
-            StepFaceEntity stepFace,
-            StepRationalBSplineSurface stepSurface,
-            StepCadBuilder builder,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.get(0).outer()) {
-            return null;
-        }
-        RationalBSplineSurface3 surface = builder.buildRationalBSplineSurface(stepSurface.id());
-        List<PointPayload> triangles = PreviewSurfaceSampler.triangulateSurfaceGrid(
-                PreviewSurfaceSampler.sampleSurfaceGrid(surface, 16, 16),
-                faceSameSense(stepFace)
-        );
-        if (triangles.isEmpty()) {
-            return null;
-        }
-        Vector3 normal = surface.normalAt((surface.uStart() + surface.uEnd()) * 0.5, (surface.vStart() + surface.vEnd()) * 0.5);
-        if (!faceSameSense(stepFace)) {
-            normal = normal.scale(-1.0);
-        }
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                "RATIONAL_B_SPLINE_SURFACE",
-                PayloadConversionHelper.toPointPayload(surface.pointAt(surface.uStart(), surface.vStart())),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                faceSameSense(stepFace),
-                toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
-                triangles,
-                null,
-                null
-        );
-    }
-
-    public static FacePayload toRuledSurfaceFacePayload(
-            StepFaceEntity stepFace,
-            StepRuledSurface stepSurface,
-            StepCadBuilder builder,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) throws TopologyException, StepResolutionException, UnsupportedGeometryException, GeometryException {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.isEmpty()) {
-            return null;
-        }
-        RuledSurface3 surface = builder.buildRuledSurface(stepSurface.id());
-        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
-        List<PointPayload> triangles = PreviewSurfaceSampler.triangulateSurfaceGrid(grid, faceSameSense(stepFace));
-        if (triangles.isEmpty()) {
-            return null;
-        }
-        boolean sameSense = faceSameSense(stepFace);
-        Vector3 normal = surface.normalAt(0.5, 0.5);
-        if (!sameSense) normal = normal.scale(-1.0);
-        List<LoopPayload> loops = new ArrayList<>();
-        for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
-        }
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                "RULED_SURFACE",
-                triangles.get(0),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                sameSense,
-                toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                loops,
-                triangles,
-                new FaceSurfacePayload(
-                        "ruled_surface", null, null, null, 0.0, null, null,
-                        0.0, 0.0, 0.0, 0.0,
-                        null, null, null, null, null, null
-                ),
-                null
-        );
-    }
-
-    public static FacePayload toFourSidedPatchFacePayload(
-            StepFaceEntity stepFace,
-            StepEntity geometry,
-            StepMetadataExtractor.DisplayMetadata metadata,
-            StepCadBuilder builder
-    ) {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.size() != 1 || !bounds.get(0).outer()) {
-            return null;
-        }
-        if (!(bounds.get(0).loop() instanceof EdgeLoop) || ((EdgeLoop) bounds.get(0).loop()).edges().size() != 4) {
-            return null;
-        }
-        EdgeLoop outerLoop = (EdgeLoop) bounds.get(0).loop();
-        SurfacePatch patch = PreviewSurfaceSampler.buildFourSidedPatch(outerLoop);
-        if (patch == null) {
-            return null;
-        }
-        List<PointPayload> triangles = PreviewSurfaceSampler.triangulatePatch(patch, faceSameSense(stepFace));
-        if (triangles.isEmpty()) {
-            return null;
-        }
-        Vector3 normal = patch.normalAt(0.5, 0.5);
-        if (!faceSameSense(stepFace)) {
-            normal = normal.scale(-1.0);
-        }
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                StepTypeNameResolver.surfaceTypeName(geometry),
-                PayloadConversionHelper.toPointPayload(patch.pointAt(0.0, 0.0)),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                faceSameSense(stepFace),
-                toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
-                triangles,
-                null,
-                null
-        );
     }
 
     // The seven facades that used to sit here -- collectShellLikeIds,
@@ -671,51 +158,6 @@ public final class PreviewFaceBuilder {
         return StepPayloadBuilder.reverseClosedLoop(points);
     }
 
-    public static ColorPayload resolveEdgeColor(int edgeId, StepMetadataExtractor metadata) {
-        StepMetadataExtractor.DisplayMetadata meta = metadata.forItem(edgeId);
-        return meta.rgb() != null ? toColorPayload(meta.rgb()) : null;
-    }
-
-    public static EdgePayload buildTopologyEdgePayload(int edgeId, Edge edge) {
-        return new EdgePayload(
-                edgeId,
-                toPointPayloads(sampleEdge(edge.start().point(), edge.end().point(), edge.curve(), edge.sameSense())),
-                null,
-                null
-        );
-    }
-
-    // ─── Shell/vertex utilities ──────────────────────────────────────────
-
-    public static List<StepFaceEntity> shellFaces(StepEntity entity) {
-        return ShellHelper.shellFaces(entity);
-    }
-
-    public static boolean isShellEntity(StepEntity entity) {
-        return ShellHelper.isShellEntity(entity);
-    }
-
-    public static boolean isShellLikeEntity(StepEntity entity) {
-        return ShellHelper.isShellLikeEntity(entity);
-    }
-
-    public static VectorPayload computeNormal(PointPayload p1, PointPayload p2, PointPayload p3) {
-        double nx = (p2.y() - p1.y()) * (p3.z() - p1.z()) - (p2.z() - p1.z()) * (p3.y() - p1.y());
-        double ny = (p2.z() - p1.z()) * (p3.x() - p1.x()) - (p2.x() - p1.x()) * (p3.z() - p1.z());
-        double nz = (p2.x() - p1.x()) * (p3.y() - p1.y()) - (p2.y() - p1.y()) * (p3.x() - p1.x());
-        double len = Math.sqrt(nx * nx + ny * ny + nz * nz);
-        if (len < 1.0e-9) return null;
-        return new VectorPayload(nx / len, ny / len, nz / len);
-    }
-
-    public static ColorPayload toColorPayload(int[] rgb) {
-        return PayloadConversionHelper.toColorPayload(rgb);
-    }
-
-    public static PbrPayload toPbrPayload(StepMetadataExtractor.PbrMetadata metadata) {
-        return PayloadConversionHelper.toPbrPayload(metadata);
-    }
-
     private record SurfaceTypeNameEntry(Class<?> type, String name) {
     }
 
@@ -750,111 +192,5 @@ public final class PreviewFaceBuilder {
             }
         }
         throw new IllegalArgumentException("Unknown value type: " + surface);
-    }
-
-    // ─── Local helper methods (copied from StepPreviewJsonExporter) ──────
-    // These are private in StepPreviewJsonExporter and cannot be accessed.
-    // Duplicated here to keep StepPreviewJsonExporter unchanged.
-
-    private static PointPayload toPointPayload(CartesianPoint point) {
-        return new PointPayload(point.x(), point.y(), point.z());
-    }
-
-    private static List<PointPayload> toPointPayloads(List<CartesianPoint> points) {
-        return points.stream().map(PreviewFaceBuilder::toPointPayload).collect(Collectors.toList());
-    }
-
-    // ─── Sample edge (delegates to PreviewCurveEvaluator) ────────────────
-
-    private static List<CartesianPoint> sampleEdge(
-            CartesianPoint start,
-            CartesianPoint end,
-            Curve3 curve,
-            boolean sameSense
-    ) {
-        return PreviewCurveEvaluator.sampleEdge(start, end, curve, sameSense);
-    }
-
-    // ─── Generic parametric/sampled face payload helpers ─────────────────
-
-    public static FacePayload toParametricSurfaceFacePayload(
-            StepFaceEntity stepFace,
-            StepEntity stepSurface,
-            String surfaceTypeName,
-            StepCadBuilder builder,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) throws TopologyException, StepResolutionException, UnsupportedGeometryException, GeometryException {
-        List<FaceBound> bounds = buildFaceBounds(stepFace, builder);
-        if (bounds.isEmpty()) {
-            return null;
-        }
-        SurfaceGeometry surface = builder.buildSurfaceGeometry(stepSurface.id());
-        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(32, 32);
-        List<PointPayload> triangles = PreviewSurfaceSampler.triangulateSurfaceGrid(grid, faceSameSense(stepFace));
-        if (triangles.isEmpty()) {
-            return null;
-        }
-        boolean sameSense = faceSameSense(stepFace);
-        Vector3 normal = surface.normalAt(0.5, 0.5);
-        if (!sameSense) normal = normal.scale(-1.0);
-        List<LoopPayload> loops = new ArrayList<>();
-        for (FaceBound bound : bounds) {
-            loops.add(new LoopPayload(bound.outer(), toPointPayloads(sampleLoop(bound))));
-        }
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                surfaceTypeName,
-                triangles.get(0),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                sameSense,
-                toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                loops,
-                triangles,
-                null,
-                null
-        );
-    }
-
-    public static FacePayload toSampledSurfaceFacePayload(
-            StepFaceEntity stepFace,
-            SurfaceGeometry surface,
-            String surfaceType,
-            List<FaceBound> bounds,
-            StepMetadataExtractor.DisplayMetadata metadata
-    ) {
-        int segments = 32;
-        java.util.List<java.util.List<CartesianPoint>> grid = surface.sampleGrid(segments, segments);
-        if (grid.isEmpty()) {
-            return null;
-        }
-        boolean sameSense = faceSameSense(stepFace);
-        List<PointPayload> triangles = PreviewSurfaceSampler.triangulateSurfaceGrid(grid, sameSense);
-        if (triangles.isEmpty()) {
-            return null;
-        }
-        Vector3 normal = surface.normalAt(0.5, 0.5);
-        if (!sameSense) {
-            normal = normal.scale(-1.0);
-        }
-        return new FacePayload(
-                stepFace.id(),
-                StepMetadataHelper.faceDisplayName(stepFace),
-                surfaceType,
-                triangles.get(0),
-                new VectorPayload(normal.x(), normal.y(), normal.z()),
-                sameSense,
-                toColorPayload(metadata.rgb()),
-                metadata.transparency(),
-                toPbrPayload(metadata.pbr()),
-                metadata.layers(),
-                List.of(new LoopPayload(true, toPointPayloads(sampleLoop(bounds.get(0))))),
-                triangles,
-                null,
-                null
-        );
     }
 }

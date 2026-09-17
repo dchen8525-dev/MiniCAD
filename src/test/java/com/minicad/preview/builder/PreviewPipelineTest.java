@@ -1,5 +1,7 @@
 package com.minicad.preview.builder;
 
+import com.minicad.export.json.StepFacePayloadBuilder;
+import com.minicad.export.json.StepGeometryHelper;
 import com.minicad.export.json.StepLegacyGeometryBuilder;
 import com.minicad.helper.StepMetadataExtractor;
 import com.minicad.geometry.CartesianPoint;
@@ -132,7 +134,12 @@ class PreviewPipelineTest {
     void cylindricalFacePayloadIsBuiltAcrossTheSampleCorpus() throws Exception {
         // The payload builder guards on exact loop shapes (one outer 4-edge
         // EdgeLoop); instead of betting on one fixture, assert that the corpus
-        // contains at least one cylindrical face the builder accepts.
+        // contains at least one cylindrical face the builder accepts. The
+        // builder is the export-side rule table: PreviewFaceBuilder carried a
+        // copy of this handler for a while, but its only caller was itself, and
+        // it went with the rest of that dead handler family. Driving
+        // buildPreviewFaceResult here keeps the corpus assertion pointed at the
+        // path the app actually uses.
         int cylindersSeen = 0;
         try (var walk = Files.walk(Path.of("samples"))) {
             for (Path sample : walk.filter(Files::isRegularFile)
@@ -149,12 +156,11 @@ class PreviewPipelineTest {
                     cylindersSeen++;
                     for (StepEntity entity : sampleResolved.values()) {
                         if (entity instanceof StepAdvancedFace
-                                && PreviewFaceBuilder.faceGeometry((StepFaceEntity) entity).id() == surface.id()) {
-                            FacePayload payload = PreviewFaceBuilder.toCylindricalFacePayload(
+                                && StepGeometryHelper.faceGeometry((StepFaceEntity) entity).id() == surface.id()) {
+                            FacePayload payload = StepFacePayloadBuilder.buildPreviewFaceResult(
                                     (StepFaceEntity) entity,
-                                    (StepCylindricalSurface) surface,
                                     sampleBuilder,
-                                    StepMetadataExtractor.DisplayMetadata.EMPTY);
+                                    StepMetadataExtractor.DisplayMetadata.EMPTY).face();
                             if (payload != null) {
                                 assertNotNull(payload.surface());
                                 assertTrue(payload.surface().type().toLowerCase().contains("cylindr"),

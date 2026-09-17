@@ -40,14 +40,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li>TriangulationHelper still exposes the canonical emitters as public
  *       static methods;</li>
  *   <li>PreviewFaceBuilder re-declares none of the three strips nor
- *       appendOrientedTriangle, and routes its calls through the
- *       TriangulationHelper qualifier;</li>
+ *       appendOrientedTriangle, and no longer names TriangulationHelper at
+ *       all: its three strip calls lived inside the cylindrical, conical and
+ *       toroidal handlers, which turned out to be dead copies of the
+ *       export-side rule table and went with the rest of that family;</li>
  *   <li>PreviewSurfaceSampler keeps triangulatePatch/triangulateSurfaceGrid as
  *       delegating facade methods (external callers keep working) but re-declares
  *       neither the bodies nor the now-dead appendOrientedTriangle/toPointPayload
  *       shims;</li>
  *   <li>the facade and the canonical helper still agree at runtime.</li>
  * </ul>
+ *
+ * <p>The guard is the only place that can tell "the calls went with their
+ * callers" from "the emitters were dropped": the strips themselves are still
+ * public static on the helper, and the export side still calls all three from
+ * {@code StepFacePayloadBuilder} and {@code PreviewMeshExporter}, so the
+ * assertions below check both halves.
  *
  * <p>It also used to pin a deliberate non-convergence: triangulateSphericalStrip
  * has no TriangulationHelper twin (it works off Axis2Placement3D + radius rather
@@ -89,14 +97,11 @@ class PreviewTriangulationConvergenceTest {
             "appendOrientedTriangle");
 
     /**
-     * The subset of {@link #FACE_BUILDER_DROPPED} PreviewFaceBuilder must still
-     * reach through the helper. appendOrientedTriangle is deliberately absent:
-     * the three strips below are the only emitters this class still emits, and
-     * appendOrientedTriangle's last caller here was triangulateSphericalStrip,
-     * which left with its own last caller. The export side and
-     * PreviewSurfaceSampler still call it.
+     * The three strips the deleted handlers used to emit through the helper.
+     * They are still the export side's entry points, which is what makes their
+     * absence from PreviewFaceBuilder a deduplication rather than a loss.
      */
-    private static final List<String> FACE_BUILDER_CALLS_THROUGH_HELPER = List.of(
+    private static final List<String> FACE_BUILDER_LAST_STRIP_CALLS = List.of(
             "triangulateCylindricalStrip",
             "triangulateConicalStrip",
             "triangulateToroidalStrip");
@@ -127,7 +132,7 @@ class PreviewTriangulationConvergenceTest {
     }
 
     @Test
-    @DisplayName("PreviewFaceBuilder declares no local copy and calls the shared emitters")
+    @DisplayName("PreviewFaceBuilder declares no local copy and no longer reaches the helper")
     void faceBuilderShouldDelegateToTheHelper() throws Exception {
         String text = read(Paths.get(FACE_BUILDER));
 
@@ -138,16 +143,16 @@ class PreviewTriangulationConvergenceTest {
                             + "Call TriangulationHelper." + name + " instead.");
         }
 
-        List<String> missing = new ArrayList<>();
-        for (String name : FACE_BUILDER_CALLS_THROUGH_HELPER) {
-            if (!text.contains("TriangulationHelper." + name + "(")) {
-                missing.add(name);
-            }
-        }
-        assertEquals(List.of(), missing,
-                "PreviewFaceBuilder must call these through the TriangulationHelper "
-                        + "qualifier; a bare call means a local copy or a static import "
-                        + "re-entered the file.");
+        assertFalse(text.contains("TriangulationHelper"),
+                "PreviewFaceBuilder names TriangulationHelper again. Its last three calls "
+                        + "were the strip emitters inside the cylindrical, conical and "
+                        + "toroidal handlers -- dead copies of the export-side rule table -- "
+                        + "so a call means one of them came back with its body: "
+                        + FACE_BUILDER_LAST_STRIP_CALLS + ".");
+        assertTrue(text.contains("StepEdgePayloadBuilder.sampleOrientedEdge("),
+                "the one export-side call sampleLoop genuinely needs is still here. "
+                        + "Without it the absence assertion above would be hiding a lost "
+                        + "capability instead of a removed call site.");
     }
 
     @Test
