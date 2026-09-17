@@ -57,7 +57,6 @@ import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.Polyline2;
 import com.minicad.geometry2d.RationalBSplineCurve2;
 import com.minicad.geometry2d.TrimmedCurve2;
-import com.minicad.geometry2d.Vector2;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAnnotationCurveOccurrence;
 import com.minicad.step.model.StepAxis1Placement;
@@ -180,7 +179,6 @@ import com.minicad.step.model.StepSurfaceModel;
 import com.minicad.step.model.StepSurfaceOfConstantRadius;
 import com.minicad.step.model.StepSurfacePatch;
 import com.minicad.step.model.StepRectangularCompositeSurface;
-import com.minicad.step.model.StepClothoid;
 import com.minicad.step.model.StepIndexedPolyCurve;
 import com.minicad.step.model.StepPolyline3D;
 import com.minicad.step.model.StepDegenerateCurve;
@@ -1142,30 +1140,7 @@ public final class StepCadBuilder {
     }
 
     public RationalBSplineCurve2 buildRationalBSplineCurve2(int id) {
-        RationalBSplineCurve2 existing = rationalSplineCurves2d.get(id);
-        if (existing != null) {
-            return existing;
-        }
-        StepRationalBSplineCurve spline = requireEntity(id, StepRationalBSplineCurve.class, "RATIONAL_B_SPLINE_CURVE");
-        if (spline.getWeightsData().isEmpty()) {
-            throw new UnsupportedGeometryException("RATIONAL_B_SPLINE_CURVE requires weights");
-        }
-        List<Point2> controlPoints = new ArrayList<>(spline.getControlPoints().size());
-        for (StepCartesianPoint point : spline.getControlPoints()) {
-            if (point.coordinates().size() != 2) {
-                throw new UnsupportedGeometryException("RATIONAL_B_SPLINE_CURVE is not a 2D spline");
-            }
-            controlPoints.add(buildPoint2(point.id()));
-        }
-        RationalBSplineCurve2 built = new RationalBSplineCurve2(
-                spline.getDegree(),
-                controlPoints,
-                spline.getWeightsData(),
-                spline.getKnotMultiplicities(),
-                spline.getKnots()
-        );
-        rationalSplineCurves2d.put(id, built);
-        return built;
+        return curveBuilder.buildRationalBSplineCurve2(id);
     }
 
     public RationalBSplineSurface3 buildRationalBSplineSurface(int id) {
@@ -2287,24 +2262,6 @@ public final class StepCadBuilder {
         return curveBuilder.buildCurve3Internal(curve);
     }
 
-    private Curve3 buildClothoidCurve(StepClothoid clothoid) {
-        // Return proper Clothoid3 geometry object
-        return buildClothoid(clothoid.id());
-    }
-
-
-    private double fresnelC(double x) {
-        // Fresnel cosine integral approximation
-        // C(x) ≈ integral_0^x cos(pi*t^2/2) dt
-        // Simplified approximation for small x
-        return x * Math.cos(Math.PI * x / 2.0) / 2.0;
-    }
-
-    private double fresnelS(double x) {
-        // Fresnel sine integral approximation
-        // S(x) ≈ integral_0^x sin(pi*t^2/2) dt
-        return x * Math.sin(Math.PI * x / 2.0) / 2.0;
-    }
 
     private Curve3 buildIndexedPolyCurve3(StepIndexedPolyCurve polyCurve) {
         // Indexed poly curve is defined by indices into a point list
@@ -2461,11 +2418,6 @@ public final class StepCadBuilder {
         return curveBuilder.buildOffsetCurve3(id);
     }
 
-    private Curve3 buildReplicaCurve3(StepGeometricReplica replica) {
-        Curve3 parent = buildCurve3(replica.parent());
-        return transformCurve3(parent, replica.transformation());
-    }
-
     private Curve3 buildConicCurve3(StepConicCurve conic) {
         if (!(conic.getPosition() instanceof StepAxis2Placement3D)) {
             throw new UnsupportedGeometryException("3D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_3D");
@@ -2490,100 +2442,6 @@ public final class StepCadBuilder {
             default:
                 throw new UnsupportedGeometryException("surface directrix for " + conic.entityName() + " is unsupported");
         }
-    }
-
-    private List<CartesianPoint> sampleParabolaPoints3(Axis2Placement3D placement, List<Double> parameters) {
-        if (parameters.isEmpty()) {
-            throw new UnsupportedGeometryException("PARABOLA requires focal distance");
-        }
-        double focalDistance = parameters.get(0);
-        if (!Double.isFinite(focalDistance) || focalDistance <= Epsilon.EPS) {
-            throw new UnsupportedGeometryException("PARABOLA focal distance must be positive");
-        }
-        double yExtent = Math.max(1.0, focalDistance * 4.0);
-        int segments = 96;
-        List<CartesianPoint> points = new ArrayList<>(segments + 1);
-        Vector3 xAxis = placement.xDirection().asVector();
-        Vector3 yAxis = placement.yDirection().asVector();
-        for (int index = 0; index <= segments; index++) {
-            double t = -yExtent + (2.0 * yExtent * index) / segments;
-            double x = (t * t) / (4.0 * focalDistance);
-            points.add(placement.getLocation().add(xAxis.scale(x).add(yAxis.scale(t))));
-        }
-        return List.copyOf(points);
-    }
-
-    private List<CartesianPoint> sampleHyperbolaPoints3(Axis2Placement3D placement, List<Double> parameters) {
-        if (parameters.size() < 2) {
-            throw new UnsupportedGeometryException("HYPERBOLA requires semi-axis and semi-imaginary-axis");
-        }
-        double semiAxis = parameters.get(0);
-        double semiImaginaryAxis = parameters.get(1);
-        if (!Double.isFinite(semiAxis)
-                || !Double.isFinite(semiImaginaryAxis)
-                || semiAxis <= Epsilon.EPS
-                || semiImaginaryAxis <= Epsilon.EPS) {
-            throw new UnsupportedGeometryException("HYPERBOLA axes must be positive");
-        }
-        double extent = 1.75;
-        int segments = 96;
-        List<CartesianPoint> points = new ArrayList<>(segments + 1);
-        Vector3 xAxis = placement.xDirection().asVector();
-        Vector3 yAxis = placement.yDirection().asVector();
-        for (int index = 0; index <= segments; index++) {
-            double t = -extent + (2.0 * extent * index) / segments;
-            double x = semiAxis * Math.cosh(t);
-            double y = semiImaginaryAxis * Math.sinh(t);
-            points.add(placement.getLocation().add(xAxis.scale(x).add(yAxis.scale(y))));
-        }
-        return List.copyOf(points);
-    }
-
-    private List<Point2> sampleParabolaPoints2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
-        if (parameters.isEmpty()) {
-            throw new UnsupportedGeometryException("PARABOLA requires focal distance");
-        }
-        double focalDistance = parameters.get(0);
-        if (!Double.isFinite(focalDistance) || focalDistance <= Epsilon.EPS) {
-            throw new UnsupportedGeometryException("PARABOLA focal distance must be positive");
-        }
-        double yExtent = Math.max(1.0, focalDistance * 4.0);
-        int segments = 96;
-        List<Point2> points = new ArrayList<>(segments + 1);
-        Vector2 xAxis = xDirection.asVector();
-        Vector2 yAxis = new Vector2(-xAxis.getY(), xAxis.getX());
-        for (int index = 0; index <= segments; index++) {
-            double t = -yExtent + (2.0 * yExtent * index) / segments;
-            double x = (t * t) / (4.0 * focalDistance);
-            points.add(origin.add(xAxis.scale(x).add(yAxis.scale(t))));
-        }
-        return List.copyOf(points);
-    }
-
-    private List<Point2> sampleHyperbolaPoints2(Point2 origin, Direction2 xDirection, List<Double> parameters) {
-        if (parameters.size() < 2) {
-            throw new UnsupportedGeometryException("HYPERBOLA requires semi-axis and semi-imaginary-axis");
-        }
-        double semiAxis = parameters.get(0);
-        double semiImaginaryAxis = parameters.get(1);
-        if (!Double.isFinite(semiAxis)
-                || !Double.isFinite(semiImaginaryAxis)
-                || semiAxis <= Epsilon.EPS
-                || semiImaginaryAxis <= Epsilon.EPS) {
-            throw new UnsupportedGeometryException("HYPERBOLA axes must be positive");
-        }
-        double extent = 1.75;
-        int segments = 96;
-        List<Point2> points = new ArrayList<>(segments + 1);
-        Vector2 xAxis = xDirection.asVector();
-        Vector2 yAxis = new Vector2(-xAxis.getY(), xAxis.getX());
-        for (int index = 0; index <= segments; index++) {
-            double t = -extent + (2.0 * extent * index) / segments;
-            double x = semiAxis * Math.cosh(t);
-            double y = semiImaginaryAxis * Math.sinh(t);
-            points.add(origin.add(xAxis.scale(x).add(yAxis.scale(y))));
-        }
-        return List.copyOf(points);
     }
 
     Plane buildSupportedPlaneGeometry(StepEntity geometry, String faceType) {
