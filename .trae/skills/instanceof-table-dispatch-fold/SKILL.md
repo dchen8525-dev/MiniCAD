@@ -377,3 +377,80 @@ python tools/scan_duplicate_methods.py --fuzzy --min-lines 4     # 忽略 com.mi
 另：**保留一行委托 facade ≠ 重复**（`PreviewSurfaceSampler.triangulatePatch` 保留签名但
 body 只有 `return TriangulationHelper.triangulatePatch(patch, sameSense);`）——外部调用方
 不用改，且守卫只需断"委托存在 + 本地体不存在"。
+
+### 同一簇副本要按调用点数分流：facade 还是删除（2026-09-17）
+
+一个类里"成簇"的副本（本轮 `PreviewFaceBuilder` 一次 7 个）**不要一律处理成同一种形态**，
+按调用点分：
+
+- **有真实调用点 → 留一行委托 facade**（保留签名，body 只有
+  `return Canonical.name(args);`）。理由不只是省改动：`PreviewGeometryCollector` 通过这个类
+  取 styled item / 收拓扑边，`faceSameSense` 在本文件内有约 40 处裸调用——facade 是稳定的
+  preview 侧入口。**并且它让并行会话的活跃文件零改动**（不必去改 `PreviewGeometryCollector`）。
+- **零调用点 → 直接删**（`pointPayloadFromVertex`）。
+- **只有一个调用点且是测试 → 删掉副本、把测试改指向 canonical**（`reverseFacePayload`
+  仅 `PreviewBuilderMapperTest` 调用）。判据：让"唯一调用方是测试"的 facade 活着，等于
+  为测试保留一个假的生产 API。
+
+删除方法体后**必须查它孤立的 import**：本轮的 `StepStyledItem` / `StepOverRidingStyledItem` /
+`TessellatedFaceExporter` 三个显式 import 都只被删掉的方法引用过。查法（几行 Python 就够）：
+
+```python
+body = re.sub(r'^import .*$', '', src, flags=re.M)   # 抹掉 import 行
+for m in re.finditer(r'^import (?!.*\*)(\S+)\.(\w+);$', src, flags=re.M):
+    if not re.search(r'\b' + m.group(2) + r'\b', body):
+        print('UNUSED:', m.group(0))
+```
+
+注意 `import pkg.*;` 通配 import 会让"类型不再出现"这件事变得**更强**的信号而非更弱：
+`PreviewFaceBuilder` 用 `com.minicad.step.model.*`，所以 `StepAdvancedFace` 等包装类型
+"一次都不出现"才真正说明 instanceof 链被删干净了（若只是替换成 helper 调用，类型名也不会再出现）。
+这类"包装类型名必须彻底消失"的断言很值，可以顺手加上。
+
+### 判 canonical 归属：先全仓 grep 该名字，看有没有第三份已委托（2026-09-17）
+
+不要凭"谁看起来更公共"拍脑袋。本轮 `PreviewSurfaceSampler` 的 `resamplePolyline` / `reversed`
+被判给 `StepGeometryHelper`，依据是**`StepEdgePayloadBuilder` 早就把同名的自己那份委托过去了**
+（`return StepGeometryHelper.reversed(points);`）——方向是既成事实，剩下的只是收尾。
+同理 `buildFreeFormSurface` 判给 `PreviewMeshExporter`，因为 `PreviewSurfaceSampler` 自己的
+`buildBsplineSurface` 已经委托给 `PreviewMeshExporter`，且活跃文件 `StepFacePayloadBuilder`
+也直接调它。**grep 一遍名字的调用点，方向往往自己就露出来了。**
+
+### 逐字比对要按 token 而不是按行（2026-09-17）
+
+线级比对会把"仅换行位置不同"报成不一致：`PreviewMeshExporter.buildFreeFormSurface` 与
+`PreviewSurfaceSampler` 的版本只差一处 `throw new UnsupportedGeometryException(` 被折成两行，
+逐行 diff 却报出 20 处"差异"（后续全部错位）。**结论前先看差异形态**：如果是"某行被拆/被并
++ 由此产生的整体错位"，就是同一份代码；真差异是**语义 token 不同**（如
+`instanceof StepCartesianPoint` vs `instanceof com.minicad.step.model.StepCartesianPoint`、
+插入一行 `// Generate uniform knot vectors` 注释）。反过来说：跨文件副本里出现
+**全限定名 / 错位缩进 / 多一行注释**这类"抄写痕迹"，正是副本关系的证据。
+
+### 私有方法的 facade 一致性只能靠反射（2026-09-17）
+
+`private static` 的 facade（`PreviewSurfaceSampler.resamplePolyline` / `reversed`）**同包测试
+也访问不到**。守卫要用 `getDeclaredMethod(name, List.class, int.class)` + `setAccessible(true)`
++ `invoke(null, ...)`，并与 canonical 对同一 fixture 断言相等；**边界用例一起给**（空串、
+单点、零长度折线走 `total <= Epsilon.EPS` 的退化分支），否则只能证明"正常路径没漂移"。
+
+### 可见性别过度约束（2026-09-17）
+
+`assertPublicStatic` 只该用在**跨包调用**的 canonical 上（`StepGeometryHelper.resamplePolyline`
+/ `reversed`、`PreviewMeshExporter.buildFreeFormSurface`）。像 `pointAtDistance` / `interpolate`
+这种被委托后只剩 canonical 类**内部**调用的，断言"仍被声明"就够——要求它们继续 `public`
+会把合理的可见性收紧变成测试失败。
+
+### 半收敛要如实钉住：把"能力还在"而不是"形状不变"写进守卫（2026-09-17）
+
+`buildFourSidedPatch` 本轮**刻意没收敛**：唯一孪生在 `StepEdgePayloadBuilder`（并行会话活跃
+文件），要收敛得先把那份 `static` 改成 `public static`。正确做法不是硬上，也不是假装收尾，而是
+在守卫里钉**能力可达**而非**具体形状**：
+
+```java
+boolean local = declares(text, "buildFourSidedPatch");
+boolean delegated = text.contains("StepEdgePayloadBuilder.buildFourSidedPatch(");
+assertTrue(local || delegated, "预览侧入口必须继续存在，两种解法都算通过");
+```
+
+这样下一轮无论"删本地改委托"还是"保持现状"，守卫都不挡路；同时另一条断言钉住孪生仍在
+（提醒债务存在）。**把"刻意不做"写成测试注释**，比写在 commit message 里更难丢。
