@@ -43,8 +43,8 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import com.minicad.export.json.StepEdgePayloadBuilder;
 import com.minicad.export.json.StepFacePayloadBuilder;
+import com.minicad.export.json.StepMappedAnnotationEdgeCollector;
 import com.minicad.export.json.StepMappedItemTransformer;
-import com.minicad.export.json.StepPlacementTransformer;
 import com.minicad.export.json.StepTypeNameResolver;
 import com.minicad.export.json.StepRepresentationPayloadBuilder;
 
@@ -815,22 +815,8 @@ public final class PreviewGeometryCollector {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
-        double[] matrix = StepPlacementTransformer.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
-        if (matrix == null) {
-            return;
-        }
-        RepresentationBuildResult source = StepRepresentationPayloadBuilder.buildRepresentationPayload(
-                representation,
-                representation.name(),
-                resolved,
-                builder,
-                StepMetadataExtractor.fromResolved(resolved),
-                new LinkedHashSet<>()
-        );
-        for (EdgePayload edge : source.payload().edges()) {
-            EdgePayload transformed = StepMappedItemTransformer.transformMappedEdge(edge, mappedOwnerId, matrix, sourceType, sourceStepId);
-            edges.putIfAbsent(transformed.stepId(), transformed);
-        }
+        StepMappedAnnotationEdgeCollector.collect(mappedOwnerId, representation, mappedOrigin, mappingTarget,
+                sourceType, sourceStepId, edges, resolved, builder);
     }
 
     // Shared by the three symbol/text carrier rules: unwrap a mappingSource

@@ -77,7 +77,6 @@ import com.minicad.geometry.Clothoid3;
 import com.minicad.geometry.DegenerateCurve3;
 import com.minicad.geometry.Hyperbola3;
 import com.minicad.geometry.Parabola3;
-import com.minicad.preview.payload.RepresentationBuildResult;
 
 /**
  * Builds edge payloads from STEP edge entities.
@@ -1339,22 +1338,8 @@ public final class StepEdgePayloadBuilder {
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder
     ) {
-        double[] matrix = StepPlacementTransformer.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
-        if (matrix == null) {
-            return;
-        }
-        RepresentationBuildResult source = StepRepresentationPayloadBuilder.buildRepresentationPayload(
-                representation,
-                representation.name(),
-                resolved,
-                builder,
-                StepMetadataExtractor.fromResolved(resolved),
-                new LinkedHashSet<>()
-        );
-        for (EdgePayload edge : source.payload().edges()) {
-            EdgePayload transformed = StepMappedItemTransformer.transformMappedEdge(edge, mappedOwnerId, matrix, sourceType, sourceStepId);
-            edges.putIfAbsent(transformed.stepId(), transformed);
-        }
+        StepMappedAnnotationEdgeCollector.collect(mappedOwnerId, representation, mappedOrigin, mappingTarget,
+                sourceType, sourceStepId, edges, resolved, builder);
     }
 
     // ================================================================================
