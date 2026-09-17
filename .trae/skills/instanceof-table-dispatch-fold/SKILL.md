@@ -141,10 +141,37 @@ collectMappedAnnotationCarrierEdges · PreviewFaceBuilder.toRectangularComposite
 + "unknown" 回退；冻结文件列 **code 序列**而非类型，守卫反射读 rule 的 `code()`；
 `contains` 顺序敏感——泛化 "SURFACE_REPLICA" 必须排在具体 replica 规则之后)
 `scan_instanceof_chains.py --min 6` 现应为 0 run(s)；`--min 5` 实测 **4 run(s)**
-（1 带守卫 + 2 无守卫）；`--min 4` 为 **7 run(s)**（StepEdgePayloadBuilder:133 是
-分支内含 null 守卫的异构链，不建议折）。剩余 5 分支里
-StepFacePayloadBuilder:1954 与 StepTrimResolver:275 是**异构长链**（各分支体逻辑/长度差异大，
-前者还在 for 循环内需回传可变状态），折叠收益低风险高，优先找同构链。
+（1 带守卫 + 3 无守卫）；`--min 4` 为 **5 run(s)**。**2026-09-17 起干净同构链已全部折完**，
+剩余 5 条逐一核实均为异构链、结论「不折」：
+
+| 位置 | 形态 | 为何不折 |
+|---|---|---|
+| StepFacePayloadBuilder:1887 | 循环内 best-candidate | 跨分支共享可变 `best`/`bestScore`，用 `continue` 非 return |
+| StepFacePayloadBuilder:2045 | 链表遍历 | 每分支重绑定 `current` + `continue`，末分支带复合 guard |
+| PreviewGeometryCollector:321 | 全 return，但三分支共享递归模式 | 文件贴 1000 行上限 |
+| StepTrimResolver:275 | 5 个各异的几何计算 | 仅 Line2 一行，其余差异大 |
+| StepEdgePayloadBuilder:133 | 分支内含 null 守卫 + 落穿 | 异构 |
+
+→ 别再按 `--min N` 数字选目标；**先看形态**。异构链（跨分支共享可变状态 /
+重绑定后 continue / 分支体长度悬殊）折表需引入累加器或遍历抽象，收益低风险高，
+应转向「重复实现收敛」或换轨。
+
+**收敛必须留防回潮守卫**（本轮补的实践）：共享 helper 删除本地副本后，
+若不留守卫，未来有人重写副本或 fork 共享体，**所有既有测试仍会通过**
+（两份实现行为一致，直到漂移）。守卫三件套：
+1. 共享目标上仍存在 public static 方法（`getDeclaredMethods` + `Modifier.isPublic`）；
+2. 副本侧不得本地重声明（正则匹配 `^\s{4}(?:modifiers)?type name\(` 声明形态）；
+3. 调用点走显式限定符（`text.contains("Shared." + name + "(")`）——裸调用意味着
+   本地副本或 static import 又回来了。
+   **注意**：只对「真正直调」的方法加断言——若副本只调 A 而 A 内部调 B，
+   则 B 不应要求在副本侧出现（本轮 6 个 helper 里 json 只直调 5 个）。
+   还要钉住「刻意不共享」的方法及其差异理由（如 `normalizeLoopRoles` 因日志差异
+   保持不共享），防未来顺手合并。
+   **写守卫时会推翻你自己的假设**：核对 modifiers 与实际调用图，别照抄 commit message。
+
+**并行会话协作**：该仓库可能有其它 agent 同时提交（如 CommandCodeBot）。
+开工前先 `git log --oneline` 与上次位置对比；工作树里出现陌生目录（如 `.commandcode/`）
+是对方工具产物，**不要提交**；提交时用显式路径 `git add <file>` 而非 `git add -A`。
 
 **收敛"同名重复链"前先核对 helper 逐字等价**：StepCadCurveBuilder.implicitBSplineCurveData
 是 StepCadBuilder 折叠表的逐字副本，但两类的 `stepEntityTypeName` **不等价**
