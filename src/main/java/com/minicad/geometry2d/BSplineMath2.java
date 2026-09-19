@@ -1,6 +1,6 @@
 package com.minicad.geometry2d;
 
-import com.minicad.common.BSplineKernel;
+import com.minicad.common.BSplineCurveDomain;
 import com.minicad.common.GeometryException;
 
 import java.util.List;
@@ -9,17 +9,21 @@ import java.util.List;
  * 2D B-spline / NURBS curve evaluation.
  *
  * <p>Only the part that is genuinely two-dimensional lives here: turning the
- * {@code (degree + 1)} non-zero basis values into a {@link Point2}. The knot span
- * search, the Cox-de Boor triangle, the domain clamp and the knot multiplicity
- * expansion are dimension-free and live once in {@link BSplineKernel}, which this
- * class and {@code com.minicad.geometry.BSplineMath} both call.</p>
+ * {@code (degree + 1)} non-zero basis values into a {@link Point2}. The window those
+ * values were computed over - the clamp into the natural domain, the knot span
+ * search and the Cox-de Boor triangle - is dimension-free and is asked for once
+ * through {@link BSplineCurveDomain#basisAt(double)}, which
+ * {@code com.minicad.geometry.BSplineMath} consumes as well, as do the four curve
+ * classes. The knot span search, the Cox-de Boor triangle, the domain clamp and the
+ * knot multiplicity expansion it calls are themselves in
+ * {@link com.minicad.common.BSplineKernel}.</p>
  *
- * <p>The kernel deliberately sits in {@code com.minicad.common} rather than in
- * {@code com.minicad.geometry}: this package must not import
+ * <p>The kernel and the domain deliberately sit in {@code com.minicad.common} rather
+ * than in {@code com.minicad.geometry}: this package must not import
  * {@code com.minicad.geometry} at all, because that package depends on this one
- * ({@code SurfaceCurve3} holds a {@code Curve2} p-curve). Reaching "up" for the
- * kernel would close a package cycle; duplicating it in both dimensions is what
- * this class used to do.</p>
+ * ({@code SurfaceCurve3} holds a {@code Curve2}). Reaching "up" for either would
+ * close a package cycle; duplicating them in both dimensions is what this class
+ * used to do.</p>
  */
 public final class BSplineMath2 {
 
@@ -27,27 +31,21 @@ public final class BSplineMath2 {
     }
 
     /**
-     * Evaluates a non-rational 2D B-spline curve point, clamping the parameter
-     * to {@code [knots[degree], knots[controlPoints.size()]]}.
+     * Evaluates a non-rational 2D B-spline curve point from the basis window at the
+     * query parameter.
      *
      * @param controlPoints control points (size {@code n + 1})
-     * @param degree spline degree
-     * @param parameter query parameter
-     * @param expandedKnots expanded knot vector (length {@code n + degree + 2})
+     * @param window the basis values at the query parameter, already clamped into the
+     *     expanded domain {@code [knots[degree], knots[n + 1]]}, so a query outside
+     *     the curve resolves to an endpoint
      * @return point on the curve
      */
-    public static Point2 evaluate(List<Point2> controlPoints, int degree, double parameter, List<Double> expandedKnots) {
-        int n = controlPoints.size() - 1;
-        double clamped = BSplineKernel.clamp(
-                parameter, expandedKnots.get(degree), expandedKnots.get(n + 1));
-        int span = BSplineKernel.findSpan(n, degree, clamped, expandedKnots);
-        double[] basis = BSplineKernel.basisFunctions(span, clamped, degree, expandedKnots);
+    public static Point2 evaluate(List<Point2> controlPoints, BSplineCurveDomain.BasisAt window) {
         double x = 0.0;
         double y = 0.0;
-        for (int i = 0; i <= degree; i++) {
-            int index = span - degree + i;
-            double b = basis[i];
-            Point2 cp = controlPoints.get(index);
+        for (int i = 0; i < window.width(); i++) {
+            double b = window.basis(i);
+            Point2 cp = controlPoints.get(window.index(i));
             x += b * cp.getX();
             y += b * cp.getY();
         }
@@ -55,31 +53,24 @@ public final class BSplineMath2 {
     }
 
     /**
-     * Evaluates a rational 2D B-spline (NURBS) point in homogeneous space so
-     * control-point weights are honoured.
+     * Evaluates a rational 2D B-spline (NURBS) point from the basis window at the
+     * query parameter, in homogeneous space so control-point weights are honoured.
      *
      * @param controlPoints control points (size {@code n + 1})
      * @param weights positive control-point weights (same size as control points)
-     * @param degree spline degree
-     * @param parameter query parameter
-     * @param expandedKnots expanded knot vector (length {@code n + degree + 2})
+     * @param window the basis values at the query parameter, already clamped into the
+     *     expanded domain {@code [knots[degree], knots[n + 1]]}
      * @return point on the rational curve
      */
     public static Point2 evaluateRational(
-            List<Point2> controlPoints, List<Double> weights, int degree, double parameter, List<Double> expandedKnots) {
-        int n = controlPoints.size() - 1;
-        double clamped = BSplineKernel.clamp(
-                parameter, expandedKnots.get(degree), expandedKnots.get(n + 1));
-        int span = BSplineKernel.findSpan(n, degree, clamped, expandedKnots);
-        double[] basis = BSplineKernel.basisFunctions(span, clamped, degree, expandedKnots);
+            List<Point2> controlPoints, List<Double> weights, BSplineCurveDomain.BasisAt window) {
         double x = 0.0;
         double y = 0.0;
         double w = 0.0;
-        for (int i = 0; i <= degree; i++) {
-            int index = span - degree + i;
-            double b = basis[i];
-            double weight = weights.get(index);
-            Point2 cp = controlPoints.get(index);
+        for (int i = 0; i < window.width(); i++) {
+            double b = window.basis(i);
+            double weight = weights.get(window.index(i));
+            Point2 cp = controlPoints.get(window.index(i));
             x += b * weight * cp.getX();
             y += b * weight * cp.getY();
             w += b * weight;

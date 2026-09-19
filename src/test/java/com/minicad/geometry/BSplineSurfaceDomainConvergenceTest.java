@@ -49,14 +49,16 @@ class BSplineSurfaceDomainConvergenceTest {
 
     @Test
     void theTwoParameterBasisIsLookedUpInExactlyOnePlace() throws IOException {
-        // The 1D curve evaluation in BSplineMath / BSplineMath2 is a separate seam and
-        // rightly looks up the basis itself; what must stay at three files is the set,
-        // not the count, so a new home shows up here as an extra entry.
+        // The 1D curve evaluation is a separate seam from the two-parameter one, so it has
+        // its own home - but it is one home, not four: BSplineMath and BSplineMath2 used to
+        // open the same window themselves, once per flavour, until BSplineCurveDomain took
+        // it over (pinned in BSplineCurveDomainConvergenceTest). What stays at two files is
+        // the set, not the count, so a new home shows up here as an extra entry.
         assertEquals(
-                List.of("BSplineMath.java", "BSplineMath2.java", "BSplineSurfaceDomain.java"),
+                List.of("BSplineCurveDomain.java", "BSplineSurfaceDomain.java"),
                 callersOf(FIND_SPAN));
         assertEquals(
-                List.of("BSplineMath.java", "BSplineMath2.java", "BSplineSurfaceDomain.java"),
+                List.of("BSplineCurveDomain.java", "BSplineSurfaceDomain.java"),
                 callersOf(BASIS_FUNCTIONS));
         assertEquals(List.of("BSplineSurfaceDomain.java"), callersOf(BASIS_DERIVATIVE));
     }

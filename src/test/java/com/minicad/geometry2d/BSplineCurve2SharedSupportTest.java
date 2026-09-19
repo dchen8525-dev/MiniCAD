@@ -60,11 +60,15 @@ class BSplineCurve2SharedSupportTest {
     @Test
     void expandedKnotVectorsAreCachedPerCurve() throws Exception {
         for (Object curve : List.of(nonRational(), rational())) {
-            // The knots and their expansion cache now live in one shared KnotVector; the
-            // per-instance caching of that vector is pinned on KnotVector itself.
-            Field field = curve.getClass().getDeclaredField("knotVector");
+            // The knots and their expansion cache live in one shared KnotVector, one
+            // indirection deeper since the two curves handed their degree, count and knots
+            // to BSplineCurveDomain; the per-instance caching is pinned on KnotVector itself.
+            Field domainField = curve.getClass().getDeclaredField("domain");
+            domainField.setAccessible(true);
+            Object domain = domainField.get(curve);
+            Field field = domain.getClass().getDeclaredField("knotVector");
             field.setAccessible(true);
-            KnotVector knotVector = (KnotVector) field.get(curve);
+            KnotVector knotVector = (KnotVector) field.get(domain);
             assertNotNull(knotVector);
             Field cache = KnotVector.class.getDeclaredField("expanded");
             cache.setAccessible(true);

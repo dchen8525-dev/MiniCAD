@@ -1,6 +1,6 @@
 package com.minicad.geometry;
 
-import com.minicad.common.BSplineKernel;
+import com.minicad.common.BSplineCurveDomain;
 import com.minicad.common.GeometryException;
 
 import java.util.List;
@@ -10,11 +10,14 @@ import java.util.List;
  *
  * <p>Only the part that is genuinely three-dimensional lives here: turning the
  * {@code (degree + 1)} non-zero basis values into a {@link CartesianPoint}. The
- * basis values themselves, the knot span search, the domain clamp and the knot
- * multiplicity expansion are dimension-free and live once in
- * {@link BSplineKernel}, which both this class and
- * {@code com.minicad.geometry2d.BSplineMath2} call. Surfaces evaluate through the
- * kernel directly.</p>
+ * window those values were computed over - the clamp into the natural domain, the
+ * knot span search and the Cox-de Boor triangle - is dimension-free and is asked
+ * for once through {@link BSplineCurveDomain#basisAt(double)}, which
+ * {@code com.minicad.geometry2d.BSplineMath2} consumes as well, as do the four curve
+ * classes. Before that the window was opened four times: here, in the 2D evaluator,
+ * and once per flavour again. The knot span search, the Cox-de Boor triangle, the
+ * domain clamp and the knot multiplicity expansion it calls are themselves in
+ * {@link com.minicad.common.BSplineKernel}.</p>
  *
  * <p>Evaluation is offered in two flavours:
  * <ul>
@@ -29,32 +32,22 @@ public final class BSplineMath {
     }
 
     /**
-     * Evaluates a non-rational B-spline curve point at {@code parameter}.
-     *
-     * <p>The parameter is clamped to the valid evaluation domain
-     * {@code [knots[degree], knots[controlPoints.size()]]} (expanded indices), matching the
-     * surface convention, so queries outside the curve always resolve to an endpoint.</p>
+     * Evaluates a non-rational B-spline curve point from the basis window at the
+     * query parameter.
      *
      * @param controlPoints control points (size {@code n + 1})
-     * @param degree spline degree
-     * @param parameter query parameter
-     * @param expandedKnots expanded knot vector (length {@code n + degree + 2})
+     * @param window the basis values at the query parameter, already clamped into the
+     *     expanded domain {@code [knots[degree], knots[n + 1]]}, so a query outside
+     *     the curve resolves to an endpoint
      * @return point on the curve
      */
-    public static CartesianPoint evaluate(List<CartesianPoint> controlPoints, int degree,
-                                         double parameter, List<Double> expandedKnots) {
-        int n = controlPoints.size() - 1;
-        double clamped = BSplineKernel.clamp(
-                parameter, expandedKnots.get(degree), expandedKnots.get(n + 1));
-        int span = BSplineKernel.findSpan(n, degree, clamped, expandedKnots);
-        double[] basis = BSplineKernel.basisFunctions(span, clamped, degree, expandedKnots);
+    public static CartesianPoint evaluate(List<CartesianPoint> controlPoints, BSplineCurveDomain.BasisAt window) {
         double x = 0.0;
         double y = 0.0;
         double z = 0.0;
-        for (int i = 0; i <= degree; i++) {
-            int index = span - degree + i;
-            double b = basis[i];
-            CartesianPoint cp = controlPoints.get(index);
+        for (int i = 0; i < window.width(); i++) {
+            double b = window.basis(i);
+            CartesianPoint cp = controlPoints.get(window.index(i));
             x += b * cp.getX();
             y += b * cp.getY();
             z += b * cp.getZ();
@@ -63,33 +56,26 @@ public final class BSplineMath {
     }
 
     /**
-     * Evaluates a rational B-spline (NURBS) curve point at {@code parameter} in
-     * 4-D homogeneous space and projects back to 3-D by dividing by the accumulated
-     * weight, so control-point weights are honoured.
+     * Evaluates a rational B-spline (NURBS) curve point from the basis window at the
+     * query parameter, in 4-D homogeneous space, and projects back to 3-D by dividing
+     * by the accumulated weight, so control-point weights are honoured.
      *
      * @param controlPoints control points (size {@code n + 1})
      * @param weights positive control-point weights (same size as control points)
-     * @param degree spline degree
-     * @param parameter query parameter
-     * @param expandedKnots expanded knot vector (length {@code n + degree + 2})
+     * @param window the basis values at the query parameter, already clamped into the
+     *     expanded domain {@code [knots[degree], knots[n + 1]]}
      * @return point on the rational curve
      */
     public static CartesianPoint evaluateRational(List<CartesianPoint> controlPoints, List<Double> weights,
-                                                 int degree, double parameter, List<Double> expandedKnots) {
-        int n = controlPoints.size() - 1;
-        double clamped = BSplineKernel.clamp(
-                parameter, expandedKnots.get(degree), expandedKnots.get(n + 1));
-        int span = BSplineKernel.findSpan(n, degree, clamped, expandedKnots);
-        double[] basis = BSplineKernel.basisFunctions(span, clamped, degree, expandedKnots);
+                                                 BSplineCurveDomain.BasisAt window) {
         double x = 0.0;
         double y = 0.0;
         double z = 0.0;
         double w = 0.0;
-        for (int i = 0; i <= degree; i++) {
-            int index = span - degree + i;
-            double b = basis[i];
-            double weight = weights.get(index);
-            CartesianPoint cp = controlPoints.get(index);
+        for (int i = 0; i < window.width(); i++) {
+            double b = window.basis(i);
+            double weight = weights.get(window.index(i));
+            CartesianPoint cp = controlPoints.get(window.index(i));
             x += b * weight * cp.getX();
             y += b * weight * cp.getY();
             z += b * weight * cp.getZ();

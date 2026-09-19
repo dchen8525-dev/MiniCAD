@@ -50,8 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <ul>
  *   <li>the expanded-knot cache exists in exactly one file in main sources;</li>
  *   <li>no shape class keeps a cache field of its own, and each holds its knots in
- *       {@link KnotVector} fields - the curves directly, the surface pair inside its
- *       shared domain object;</li>
+ *       {@link KnotVector} fields - one indirection deep, inside the domain object the
+ *       curve pair and the surface pair each share;</li>
  *   <li>every B-spline curve honours the family floor of 8 segments, and each rational
  *       curve samples exactly like its non-rational twin, in both dimensions;</li>
  *   <li>the two readings of "the natural domain" - first/last unique knot versus the
@@ -108,22 +108,19 @@ class KnotVectorConvergenceTest {
                                 + "KnotVector, and a private copy is free to drift from it");
             }
             boolean surface = BSplineSurface3.class.equals(shape) || RationalBSplineSurface3.class.equals(shape);
-            if (!surface) {
-                assertNotNull(shape.getDeclaredField("knotVector"),
-                        shape.getSimpleName() + " must keep its knots in a KnotVector");
-                continue;
-            }
-            // The surface pair keeps both parameter directions inside the one domain object
-            // rather than in two fields of its own. The KnotVectors are still the only place
-            // the knots live - one indirection deeper, so the assertion follows it there.
-            for (String direction : List.of("uKnotVector", "vKnotVector")) {
-                assertThrows(NoSuchFieldException.class, () -> shape.getDeclaredField(direction),
-                        shape.getSimpleName() + " must not grow back its own per-direction knot fields");
-            }
             Class<?> domain = shape.getDeclaredField("domain").getType();
-            for (String direction : List.of("uKnotVector", "vKnotVector")) {
-                assertEquals(KnotVector.class, domain.getDeclaredField(direction).getType(),
-                        shape.getSimpleName() + " must keep " + direction + " in a KnotVector");
+            for (String field : surface ? List.of("uKnotVector", "vKnotVector") : List.of("knotVector")) {
+                assertEquals(KnotVector.class, domain.getDeclaredField(field).getType(),
+                        shape.getSimpleName() + " must keep " + field + " in a KnotVector");
+            }
+            // Neither pair keeps its knots - or its per-direction fields - in the shape class
+            // itself any more: they sit one indirection deep, inside the one domain object
+            // the pair shares. A shape that grows its own knot field back is free to drift
+            // from the domain's.
+            for (String stale : List.of("knotVector", "uKnotVector", "vKnotVector")) {
+                assertThrows(NoSuchFieldException.class, () -> shape.getDeclaredField(stale),
+                        shape.getSimpleName() + " must not grow back its own " + stale
+                                + " field; the knots belong to the shared domain object");
             }
         }
     }

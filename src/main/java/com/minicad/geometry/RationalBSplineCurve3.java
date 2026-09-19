@@ -1,8 +1,7 @@
 package com.minicad.geometry;
 
+import com.minicad.common.BSplineCurveDomain;
 import com.minicad.common.BSplineKernel;
-import com.minicad.common.GeometryException;
-import com.minicad.common.KnotVector;
 import com.minicad.common.Preconditions;
 
 import java.util.List;
@@ -11,6 +10,12 @@ import java.util.Objects;
 /**
  * Minimal rational B-spline curve with knot multiplicities.
  *
+ * <p>Shares its parameter domain with {@link BSplineCurve3} through
+ * {@link BSplineCurveDomain} - one degree check, one knot check, one natural
+ * domain and one basis lookup for the non-rational and the rational curve alike.
+ * The weights are the whole difference: they are validated against the control
+ * points by the same domain class and then accumulated here.</p>
+ *
  * @param degree spline degree
  * @param controlPoints control points
  * @param weights weights for control points
@@ -18,29 +23,18 @@ import java.util.Objects;
  * @param knots unique knot values
  */
 public final class RationalBSplineCurve3 implements Curve3 {
-    private final int degree;
     private final List<CartesianPoint> controlPoints;
     private final List<Double> weights;
-    private final KnotVector knotVector;
+    private final BSplineCurveDomain domain;
 
     public RationalBSplineCurve3(int degree, List<CartesianPoint> controlPoints, List<Double> weights, List<Integer> knotMultiplicities, List<Double> knots) {
-        BSplineCurve3.validateDefinition(degree, controlPoints, knotMultiplicities, knots);
-        if (weights == null || weights.size() != controlPoints.size()) {
-            throw new GeometryException("weight count must match control point count");
-        }
-        for (double weight : weights) {
-            if (!Double.isFinite(weight) || weight <= 0.0) {
-                throw new GeometryException("weights must be finite and positive");
-            }
-        }
-        this.degree = degree;
-        this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-        this.weights = weights == null ? null : java.util.List.copyOf(weights);
-        this.knotVector = new KnotVector(knots, knotMultiplicities);
+        this.domain = BSplineCurveDomain.of(degree, controlPoints, knotMultiplicities, knots);
+        this.weights = BSplineCurveDomain.validatedWeights(controlPoints, weights);
+        this.controlPoints = List.copyOf(controlPoints);
     }
 
     public int getDegree() {
-        return degree;
+        return domain.degree();
     }
 
     public List<CartesianPoint> getControlPoints() {
@@ -52,36 +46,36 @@ public final class RationalBSplineCurve3 implements Curve3 {
     }
 
     public List<Integer> getKnotMultiplicities() {
-        return knotVector.multiplicities();
+        return domain.multiplicities();
     }
 
     public List<Double> getKnots() {
-        return knotVector.knots();
+        return domain.knots();
     }
 
     // Record-style accessors
-    public int degree() { return degree; }
+    public int degree() { return domain.degree(); }
     public List<CartesianPoint> controlPoints() { return controlPoints; }
     public List<Double> weights() { return weights; }
-    public List<Integer> knotMultiplicities() { return getKnotMultiplicities(); }
-    public List<Double> knots() { return getKnots(); }
+    public List<Integer> knotMultiplicities() { return domain.multiplicities(); }
+    public List<Double> knots() { return domain.knots(); }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RationalBSplineCurve3 that = (RationalBSplineCurve3) o;
-        return degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(weights, that.weights) && Objects.equals(knotVector.multiplicities(), that.knotVector.multiplicities()) && Objects.equals(knotVector.knots(), that.knotVector.knots());
+        return domain.degree() == that.domain.degree() && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(weights, that.weights) && Objects.equals(domain.multiplicities(), that.domain.multiplicities()) && Objects.equals(domain.knots(), that.domain.knots());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(degree, controlPoints, weights, knotVector.multiplicities(), knotVector.knots());
+        return Objects.hash(domain.degree(), controlPoints, weights, domain.multiplicities(), domain.knots());
     }
 
     @Override
     public String toString() {
-        return "RationalBSplineCurve3{" + "degree=" + degree + "controlPoints=" + controlPoints + "weights=" + weights + "knotMultiplicities=" + knotVector.multiplicities() + "knots=" + knotVector.knots() + "}";
+        return "RationalBSplineCurve3{" + "degree=" + domain.degree() + "controlPoints=" + controlPoints + "weights=" + weights + "knotMultiplicities=" + domain.multiplicities() + "knots=" + domain.knots() + "}";
     }
 
     /**
@@ -90,7 +84,7 @@ public final class RationalBSplineCurve3 implements Curve3 {
      * @return start parameter
      */
     public double startParameter() {
-        return knotVector.start();
+        return domain.startParameter();
     }
 
     /**
@@ -99,7 +93,7 @@ public final class RationalBSplineCurve3 implements Curve3 {
      * @return end parameter
      */
     public double endParameter() {
-        return knotVector.end();
+        return domain.endParameter();
     }
 
     /**
@@ -109,20 +103,13 @@ public final class RationalBSplineCurve3 implements Curve3 {
      * @return expanded knot vector
      */
     public List<Double> expandedKnots() {
-        return knotVector.expanded();
+        return domain.expanded();
     }
 
     @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        if (controlPoints == null || controlPoints.isEmpty() || weights == null) {
-            return CartesianPoint.origin();
-        }
-        List<Double> expanded = expandedKnots();
-        if (expanded.size() <= degree + 1) {
-            return CartesianPoint.origin();
-        }
-        return BSplineMath.evaluateRational(controlPoints, weights, degree, parameter, expanded);
+        return BSplineMath.evaluateRational(controlPoints, weights, domain.basisAt(parameter));
     }
 
     /**
@@ -134,7 +121,7 @@ public final class RationalBSplineCurve3 implements Curve3 {
      */
     @Override
     public double parameterAt(CartesianPoint point) {
-        return BSplineCurveHelper.parameterAt(point, knotVector.knots(), this::pointAt);
+        return BSplineCurveHelper.parameterAt(point, domain.knots(), this::pointAt);
     }
 
     @Override

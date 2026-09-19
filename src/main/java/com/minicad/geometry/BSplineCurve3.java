@@ -1,8 +1,7 @@
 package com.minicad.geometry;
 
+import com.minicad.common.BSplineCurveDomain;
 import com.minicad.common.BSplineKernel;
-import com.minicad.common.GeometryException;
-import com.minicad.common.KnotVector;
 import com.minicad.common.Preconditions;
 
 import java.util.List;
@@ -11,55 +10,28 @@ import java.util.Objects;
 /**
  * Minimal non-rational B-spline curve with knot multiplicities.
  *
+ * <p>The parameter domain - degree, control-point count, knot vector, natural domain
+ * and the basis lookup at a parameter - lives in {@link BSplineCurveDomain}, which
+ * this class shares with {@link RationalBSplineCurve3} and with the 2D pair. What
+ * stays here is the control points and the accumulation of basis values into a
+ * point, which is the only part of a B-spline curve that knows its dimension.</p>
+ *
  * @param degree spline degree
  * @param controlPoints control points
  * @param knotMultiplicities multiplicities for unique knots
  * @param knots unique knot values
  */
 public final class BSplineCurve3 implements Curve3 {
-    private final int degree;
     private final List<CartesianPoint> controlPoints;
-    private final KnotVector knotVector;
+    private final BSplineCurveDomain domain;
 
     public BSplineCurve3(int degree, List<CartesianPoint> controlPoints, List<Integer> knotMultiplicities, List<Double> knots) {
-        validateDefinition(degree, controlPoints, knotMultiplicities, knots);
-        this.degree = degree;
-        this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-        this.knotVector = new KnotVector(knots, knotMultiplicities);
-    }
-
-    static void validateDefinition(int degree, List<CartesianPoint> controlPoints,
-                                   List<Integer> knotMultiplicities, List<Double> knots) {
-        if (degree < 1) {
-            throw new GeometryException("B-spline degree must be positive");
-        }
-        if (controlPoints == null || controlPoints.size() <= degree) {
-            throw new GeometryException("B-spline requires more control points than its degree");
-        }
-        if (knots == null || knotMultiplicities == null || knots.size() != knotMultiplicities.size()) {
-            throw new GeometryException("knot values and multiplicities must have equal size");
-        }
-        int expandedCount = 0;
-        double previous = Double.NEGATIVE_INFINITY;
-        for (int i = 0; i < knots.size(); i++) {
-            double knot = knots.get(i);
-            int multiplicity = knotMultiplicities.get(i);
-            if (!Double.isFinite(knot) || knot <= previous) {
-                throw new GeometryException("knot values must be finite and strictly increasing");
-            }
-            if (multiplicity <= 0) {
-                throw new GeometryException("knot multiplicities must be positive");
-            }
-            previous = knot;
-            expandedCount += multiplicity;
-        }
-        if (expandedCount != controlPoints.size() + degree + 1) {
-            throw new GeometryException("expanded knot count does not match control points and degree");
-        }
+        this.domain = BSplineCurveDomain.of(degree, controlPoints, knotMultiplicities, knots);
+        this.controlPoints = List.copyOf(controlPoints);
     }
 
     public int getDegree() {
-        return degree;
+        return domain.degree();
     }
 
     public List<CartesianPoint> getControlPoints() {
@@ -67,35 +39,35 @@ public final class BSplineCurve3 implements Curve3 {
     }
 
     public List<Integer> getKnotMultiplicities() {
-        return knotVector.multiplicities();
+        return domain.multiplicities();
     }
 
     public List<Double> getKnots() {
-        return knotVector.knots();
+        return domain.knots();
     }
 
     // Record-style accessors
-    public int degree() { return degree; }
+    public int degree() { return domain.degree(); }
     public List<CartesianPoint> controlPoints() { return controlPoints; }
-    public List<Integer> knotMultiplicities() { return getKnotMultiplicities(); }
-    public List<Double> knots() { return getKnots(); }
+    public List<Integer> knotMultiplicities() { return domain.multiplicities(); }
+    public List<Double> knots() { return domain.knots(); }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BSplineCurve3 that = (BSplineCurve3) o;
-        return degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(knotVector.multiplicities(), that.knotVector.multiplicities()) && Objects.equals(knotVector.knots(), that.knotVector.knots());
+        return domain.degree() == that.domain.degree() && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(domain.multiplicities(), that.domain.multiplicities()) && Objects.equals(domain.knots(), that.domain.knots());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(degree, controlPoints, knotVector.multiplicities(), knotVector.knots());
+        return Objects.hash(domain.degree(), controlPoints, domain.multiplicities(), domain.knots());
     }
 
     @Override
     public String toString() {
-        return "BSplineCurve3{" + "degree=" + degree + "controlPoints=" + controlPoints + "knotMultiplicities=" + knotVector.multiplicities() + "knots=" + knotVector.knots() + "}";
+        return "BSplineCurve3{" + "degree=" + domain.degree() + "controlPoints=" + controlPoints + "knotMultiplicities=" + domain.multiplicities() + "knots=" + domain.knots() + "}";
     }
 
     /**
@@ -104,7 +76,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return start parameter
      */
     public double startParameter() {
-        return knotVector.start();
+        return domain.startParameter();
     }
 
     /**
@@ -113,7 +85,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return end parameter
      */
     public double endParameter() {
-        return knotVector.end();
+        return domain.endParameter();
     }
 
     /**
@@ -123,7 +95,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return expanded knot vector
      */
     public List<Double> expandedKnots() {
-        return knotVector.expanded();
+        return domain.expanded();
     }
 
     /**
@@ -142,7 +114,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return control point count
      */
     public int controlPointCount() {
-        return controlPoints == null ? 0 : controlPoints.size();
+        return domain.controlPointCount();
     }
 
     /**
@@ -151,25 +123,30 @@ public final class BSplineCurve3 implements Curve3 {
      * @return knot count
      */
     public int knotCount() {
-        return knotVector.knots().size();
+        return domain.knotCount();
     }
 
+    /**
+     * Evaluates the curve at a parameter.
+     *
+     * <p>There is no fallback for an unusable definition here because there can be
+     * none: {@link BSplineCurveDomain#of} has already rejected a control-point count
+     * that does not exceed the degree, a knot vector whose expansion does not match
+     * them, and the null cases of both. The three early returns that used to guard
+     * this method were unreachable for that reason.</p>
+     *
+     * @param parameter query parameter, clamped to the curve's natural domain
+     * @return point on the curve
+     */
     @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        if (controlPoints == null || controlPoints.isEmpty()) {
-            return CartesianPoint.origin();
-        }
-        List<Double> expanded = expandedKnots();
-        if (expanded.size() <= degree + 1) {
-            return CartesianPoint.origin();
-        }
-        return BSplineMath.evaluate(controlPoints, degree, parameter, expanded);
+        return BSplineMath.evaluate(controlPoints, domain.basisAt(parameter));
     }
 
     @Override
     public double parameterAt(CartesianPoint point) {
-        return BSplineCurveHelper.parameterAt(point, knotVector.knots(), this::pointAt);
+        return BSplineCurveHelper.parameterAt(point, domain.knots(), this::pointAt);
     }
 
     @Override

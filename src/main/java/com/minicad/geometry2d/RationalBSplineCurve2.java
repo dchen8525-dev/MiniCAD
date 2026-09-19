@@ -1,8 +1,7 @@
 package com.minicad.geometry2d;
 
+import com.minicad.common.BSplineCurveDomain;
 import com.minicad.common.BSplineKernel;
-import com.minicad.common.GeometryException;
-import com.minicad.common.KnotVector;
 import com.minicad.common.Preconditions;
 
 import java.util.List;
@@ -11,6 +10,12 @@ import java.util.Objects;
 /**
  * Minimal rational 2D B-spline curve with knot multiplicities.
  *
+ * <p>Shares its parameter domain with {@link BSplineCurve2} through
+ * {@link BSplineCurveDomain} - one degree check, one knot check, one natural
+ * domain and one basis lookup for the non-rational and the rational curve alike.
+ * The weights are the whole difference: they are validated against the control
+ * points by the same domain class and then accumulated here.</p>
+ *
  * @param degree spline degree
  * @param controlPoints control points
  * @param weights weights for control points
@@ -18,29 +23,18 @@ import java.util.Objects;
  * @param knots unique knot values
  */
 public final class RationalBSplineCurve2 implements Curve2 {
-    private final int degree;
     private final List<Point2> controlPoints;
     private final List<Double> weights;
-    private final KnotVector knotVector;
+    private final BSplineCurveDomain domain;
 
     public RationalBSplineCurve2(int degree, List<Point2> controlPoints, List<Double> weights, List<Integer> knotMultiplicities, List<Double> knots) {
-        BSplineCurve2.validateDefinition(degree, controlPoints, knotMultiplicities, knots);
-        if (weights == null || weights.size() != controlPoints.size()) {
-            throw new GeometryException("weight count must match control point count");
-        }
-        for (double weight : weights) {
-            if (!Double.isFinite(weight) || weight <= 0.0) {
-                throw new GeometryException("weights must be finite and positive");
-            }
-        }
-        this.degree = degree;
-        this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-        this.weights = weights == null ? null : java.util.List.copyOf(weights);
-        this.knotVector = new KnotVector(knots, knotMultiplicities);
+        this.domain = BSplineCurveDomain.of(degree, controlPoints, knotMultiplicities, knots);
+        this.weights = BSplineCurveDomain.validatedWeights(controlPoints, weights);
+        this.controlPoints = List.copyOf(controlPoints);
     }
 
     public int getDegree() {
-        return degree;
+        return domain.degree();
     }
 
     public List<Point2> getControlPoints() {
@@ -52,31 +46,24 @@ public final class RationalBSplineCurve2 implements Curve2 {
     }
 
     public List<Integer> getKnotMultiplicities() {
-        return knotVector.multiplicities();
+        return domain.multiplicities();
     }
 
     public List<Double> getKnots() {
-        return knotVector.knots();
+        return domain.knots();
     }
 
     // Record-style accessors
-    public int degree() { return getDegree(); }
-    public List<Point2> controlPoints() { return getControlPoints(); }
-    public List<Double> weights() { return getWeights(); }
-    public List<Integer> knotMultiplicities() { return getKnotMultiplicities(); }
-    public List<Double> knots() { return getKnots(); }
+    public int degree() { return domain.degree(); }
+    public List<Point2> controlPoints() { return controlPoints; }
+    public List<Double> weights() { return weights; }
+    public List<Integer> knotMultiplicities() { return domain.multiplicities(); }
+    public List<Double> knots() { return domain.knots(); }
 
     @Override
     public Point2 pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        if (controlPoints == null || controlPoints.isEmpty() || weights == null) {
-            return new Point2(0, 0);
-        }
-        List<Double> expanded = expandedKnots();
-        if (expanded.size() <= degree + 1) {
-            return new Point2(0, 0);
-        }
-        return BSplineMath2.evaluateRational(controlPoints, weights, degree, parameter, expanded);
+        return BSplineMath2.evaluateRational(controlPoints, weights, domain.basisAt(parameter));
     }
 
     /**
@@ -84,7 +71,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
      * Cached after first use to avoid repeated allocation on evaluation hot paths.
      */
     public List<Double> expandedKnots() {
-        return knotVector.expanded();
+        return domain.expanded();
     }
 
     /**
@@ -93,7 +80,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
      * @return start parameter
      */
     public double startParameter() {
-        return knotVector.start();
+        return domain.startParameter();
     }
 
     /**
@@ -102,7 +89,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
      * @return end parameter
      */
     public double endParameter() {
-        return knotVector.end();
+        return domain.endParameter();
     }
 
     @Override
@@ -110,17 +97,17 @@ public final class RationalBSplineCurve2 implements Curve2 {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RationalBSplineCurve2 that = (RationalBSplineCurve2) o;
-        return degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(weights, that.weights) && Objects.equals(knotVector.multiplicities(), that.knotVector.multiplicities()) && Objects.equals(knotVector.knots(), that.knotVector.knots());
+        return domain.degree() == that.domain.degree() && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(weights, that.weights) && Objects.equals(domain.multiplicities(), that.domain.multiplicities()) && Objects.equals(domain.knots(), that.domain.knots());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(degree, controlPoints, weights, knotVector.multiplicities(), knotVector.knots());
+        return Objects.hash(domain.degree(), controlPoints, weights, domain.multiplicities(), domain.knots());
     }
 
     @Override
     public String toString() {
-        return "RationalBSplineCurve2{" + "degree=" + degree + "controlPoints=" + controlPoints + "weights=" + weights + "knotMultiplicities=" + knotVector.multiplicities() + "knots=" + knotVector.knots() + "}";
+        return "RationalBSplineCurve2{" + "degree=" + domain.degree() + "controlPoints=" + controlPoints + "weights=" + weights + "knotMultiplicities=" + domain.multiplicities() + "knots=" + domain.knots() + "}";
     }
 
     @Override
