@@ -60,16 +60,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 final class StepCadGeometryOps {
 
     private final StepCadBuilder builder;
-    // transformBasis3 re-resolves axis directions through the (memoized)
+    // transformBasis3 re-resolves the operator frame through the (memoized)
     // builder and re-validates orthogonality; transformPoint3 calls it once
     // per control point on B-spline transforms, so cache per transformation id.
-    private final Map<Integer, TransformBasis3> transformBasisCache = new HashMap<>();
+    private final Map<Integer, TransformationOperatorBasis> transformBasisCache = new HashMap<>();
 
     /** The 2D metric the shared walk needs; the walk itself is dimension-free. */
     private static final TrimmedWindowWalk.PointDistance<Point2> POINT2_DISTANCE = Point2::distanceTo;
@@ -700,13 +699,11 @@ final class StepCadGeometryOps {
         if (Math.abs(scale) <= 1.0e-9) {
             return "SURFACE_REPLICA zero scale";
         }
-        Vector3 axis1 = transformAxis1_3(transformation);
-        Vector3 axis2 = transformAxis2OrDefault3(transformation, axis1);
-        Vector3 axis3 = transformAxis3OrDefault3(transformation, axis1, axis2);
+        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
         double tolerance = 1.0e-6;
-        if (Math.abs(axis1.dot(axis2)) > tolerance
-                || Math.abs(axis1.dot(axis3)) > tolerance
-                || Math.abs(axis2.dot(axis3)) > tolerance) {
+        if (Math.abs(basis.x().dot(basis.y())) > tolerance
+                || Math.abs(basis.x().dot(basis.z())) > tolerance
+                || Math.abs(basis.y().dot(basis.z())) > tolerance) {
             return "SURFACE_REPLICA non-uniform scale";
         }
         return null;
@@ -853,20 +850,20 @@ final class StepCadGeometryOps {
     }
 
     CartesianPoint transformPoint3(CartesianPoint point, StepCartesianTransformationOperator transformation) {
-        TransformBasis3 basis = transformBasis3(transformation);
+        TransformationOperatorBasis basis = transformBasis3(transformation);
         double scale = transformationScale(transformation);
-        Vector3 offset = basis.getX().scale(point.getX() * scale)
-                .add(basis.getY().scale(point.getY() * scale))
-                .add(basis.getZ().scale(point.getZ() * scale));
+        Vector3 offset = basis.x().scale(point.getX() * scale)
+                .add(basis.y().scale(point.getY() * scale))
+                .add(basis.z().scale(point.getZ() * scale));
         return builder.buildPoint(transformation.localOrigin().id()).add(offset);
     }
 
     Vector3 transformVector3(Vector3 vector, StepCartesianTransformationOperator transformation) {
-        TransformBasis3 basis = transformBasis3(transformation);
+        TransformationOperatorBasis basis = transformBasis3(transformation);
         double scale = transformationScale(transformation);
-        return basis.getX().scale(vector.getX() * scale)
-                .add(basis.getY().scale(vector.getY() * scale))
-                .add(basis.getZ().scale(vector.getZ() * scale));
+        return basis.x().scale(vector.getX() * scale)
+                .add(basis.y().scale(vector.getY() * scale))
+                .add(basis.z().scale(vector.getZ() * scale));
     }
 
     Point2 transformPoint2(Point2 point, StepCartesianTransformationOperator transformation) {
@@ -879,12 +876,12 @@ final class StepCadGeometryOps {
     }
 
     Direction3 transformDirection3(Direction3 direction, StepCartesianTransformationOperator transformation) {
-        TransformBasis3 basis = transformBasis3(transformation);
+        TransformationOperatorBasis basis = transformBasis3(transformation);
         Vector3 source = direction.asVector();
         return Direction3.from(
-                basis.getX().scale(source.getX())
-                        .add(basis.getY().scale(source.getY()))
-                        .add(basis.getZ().scale(source.getZ()))
+                basis.x().scale(source.getX())
+                        .add(basis.y().scale(source.getY()))
+                        .add(basis.z().scale(source.getZ()))
         );
     }
 
@@ -895,22 +892,13 @@ final class StepCadGeometryOps {
         return Direction2.from(basisX.scale(source.getX()).add(basisY.scale(source.getY())));
     }
 
-    private Vector3 transformAxis1_3(StepCartesianTransformationOperator transformation) {
-        return transformation.axis1() == null
-                ? new Vector3(1.0, 0.0, 0.0)
-                : builder.buildDirection(transformation.axis1().id()).asVector();
-    }
-
-    private TransformBasis3 transformBasis3(StepCartesianTransformationOperator transformation) {
-        TransformBasis3 cached = transformBasisCache.get(transformation.id());
+    private TransformationOperatorBasis transformBasis3(StepCartesianTransformationOperator transformation) {
+        TransformationOperatorBasis cached = transformBasisCache.get(transformation.id());
         if (cached != null) {
             return cached;
         }
-        Vector3 axis1 = transformAxis1_3(transformation);
-        Vector3 axis2 = transformAxis2OrDefault3(transformation, axis1);
-        Vector3 axis3 = transformAxis3OrDefault3(transformation, axis1, axis2);
-        validateOrthogonalBasis3(transformation, axis1, axis2, axis3);
-        TransformBasis3 basis = new TransformBasis3(axis1, axis2, axis3);
+        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
+        validateOrthogonalBasis3(transformation, basis.x(), basis.y(), basis.z());
         transformBasisCache.put(transformation.id(), basis);
         return basis;
     }
@@ -928,22 +916,6 @@ final class StepCadGeometryOps {
             throw new UnsupportedGeometryException("CARTESIAN_TRANSFORMATION_OPERATOR_3D #" + transformation.id()
                     + " axes must be orthogonal");
         }
-    }
-
-    private Vector3 transformAxis2OrDefault3(StepCartesianTransformationOperator transformation, Vector3 axis1) {
-        if (transformation.axis2() != null) {
-            return builder.buildDirection(transformation.axis2().id()).asVector();
-        }
-        Vector3 fallback = new Vector3(0.0, 1.0, 0.0);
-        return axis1.cross(fallback).isZero() ? new Vector3(0.0, 0.0, 1.0) : fallback;
-    }
-
-    private Vector3 transformAxis3OrDefault3(StepCartesianTransformationOperator transformation, Vector3 axis1, Vector3 axis2) {
-        if (transformation.axis3() != null) {
-            return builder.buildDirection(transformation.axis3().id()).asVector();
-        }
-        Vector3 cross = axis1.cross(axis2);
-        return cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
     }
 
     private Vector2 transformAxis1_2(StepCartesianTransformationOperator transformation) {
@@ -977,7 +949,7 @@ final class StepCadGeometryOps {
     }
 
     private static double transformationScale(StepCartesianTransformationOperator transformation) {
-        return transformation.scale() == null ? 1.0 : transformation.scale();
+        return TransformationOperatorBasis.scaleOf(transformation);
     }
 
     private static Vector2 tangentAt(List<Point2> points, int index) {
@@ -992,42 +964,5 @@ final class StepCadGeometryOps {
         CartesianPoint next = points.get(Math.min(index + 1, points.size() - 1));
         Vector3 tangent = next.subtract(previous);
         return tangent.isZero() ? new Vector3(1.0, 0.0, 0.0) : tangent;
-    }
-
-    private static final class TransformBasis3 {
-        private final Vector3 x;
-        private final Vector3 y;
-        private final Vector3 z;
-
-        TransformBasis3(Vector3 x, Vector3 y, Vector3 z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        Vector3 x() { return x; }
-        Vector3 y() { return y; }
-        Vector3 z() { return z; }
-        Vector3 getX() { return x; }
-        Vector3 getY() { return y; }
-        Vector3 getZ() { return z; }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            TransformBasis3 that = (TransformBasis3) o;
-            return Objects.equals(x, that.x) && Objects.equals(y, that.y) && Objects.equals(z, that.z);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y, z);
-        }
-
-        @Override
-        public String toString() {
-            return "TransformBasis3{x=" + x + ", y=" + y + ", z=" + z + "}";
-        }
     }
 }

@@ -9,6 +9,7 @@ import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
+import com.minicad.step.semantic.TransformationOperatorBasis;
 import com.minicad.builder.CompiledStepDocument;
 import com.minicad.topology.*;
 import java.io.ByteArrayOutputStream;
@@ -362,7 +363,7 @@ public final class StepMeshExporter {
         if (surface == null) {
             return null;
         }
-        double scale = Math.abs(transformationScale(transformation));
+        double scale = Math.abs(TransformationOperatorBasis.scaleOf(transformation));
         for (TransformSemanticSurfaceRule rule : TRANSFORM_SEMANTIC_SURFACE_RULES) {
             if (rule.type().isInstance(surface)) {
                 return rule.handler().transform(surface, transformation, scale, builder);
@@ -474,7 +475,7 @@ public final class StepMeshExporter {
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        double scale = transformationScale(transformation);
+        double scale = TransformationOperatorBasis.scaleOf(transformation);
         for (TransformSemanticCurve3Rule rule : TRANSFORM_SEMANTIC_CURVE3_RULES) {
             if (rule.type().isInstance(curve)) {
                 return rule.handler().transform(curve, transformation, scale, builder);
@@ -499,13 +500,10 @@ public final class StepMeshExporter {
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        Vector3 basisX = transformAxis1_3(transformation, builder);
-        Vector3 basisY = transformAxis2OrDefault3(transformation, basisX, builder);
-        Vector3 basisZ = transformAxis3OrDefault3(transformation, basisX, basisY, builder);
-        double scale = transformationScale(transformation);
-        Vector3 offset = basisX.scale(point.x() * scale)
-                .add(basisY.scale(point.y() * scale))
-                .add(basisZ.scale(point.z() * scale));
+        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
+        Vector3 offset = basis.x().scale(point.x() * basis.scale())
+                .add(basis.y().scale(point.y() * basis.scale()))
+                .add(basis.z().scale(point.z() * basis.scale()));
         return builder.buildPoint(transformation.localOrigin().id()).add(offset);
     }
 
@@ -514,14 +512,12 @@ public final class StepMeshExporter {
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        Vector3 basisX = transformAxis1_3(transformation, builder);
-        Vector3 basisY = transformAxis2OrDefault3(transformation, basisX, builder);
-        Vector3 basisZ = transformAxis3OrDefault3(transformation, basisX, basisY, builder);
+        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
         Vector3 source = direction.asVector();
         return Direction3.from(
-                basisX.scale(source.x())
-                        .add(basisY.scale(source.y()))
-                        .add(basisZ.scale(source.z())));
+                basis.x().scale(source.x())
+                        .add(basis.y().scale(source.y()))
+                        .add(basis.z().scale(source.z())));
     }
 
     private static Vector3 transformVector3(
@@ -529,51 +525,10 @@ public final class StepMeshExporter {
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        Vector3 basisX = transformAxis1_3(transformation, builder);
-        Vector3 basisY = transformAxis2OrDefault3(transformation, basisX, builder);
-        Vector3 basisZ = transformAxis3OrDefault3(transformation, basisX, basisY, builder);
-        double scale = transformationScale(transformation);
-        return basisX.scale(vector.x() * scale)
-                .add(basisY.scale(vector.y() * scale))
-                .add(basisZ.scale(vector.z() * scale));
-    }
-
-    private static Vector3 transformAxis1_3(
-            com.minicad.step.model.StepCartesianTransformationOperator transformation,
-            StepCadBuilder builder
-    ) {
-        return transformation.axis1() == null
-                ? new Vector3(1.0, 0.0, 0.0)
-                : builder.buildDirection(transformation.axis1().id()).asVector();
-    }
-
-    private static Vector3 transformAxis2OrDefault3(
-            com.minicad.step.model.StepCartesianTransformationOperator transformation,
-            Vector3 axis1,
-            StepCadBuilder builder
-    ) {
-        if (transformation.axis2() != null) {
-            return builder.buildDirection(transformation.axis2().id()).asVector();
-        }
-        Vector3 fallback = new Vector3(0.0, 1.0, 0.0);
-        return axis1.cross(fallback).isZero() ? new Vector3(0.0, 0.0, 1.0) : fallback;
-    }
-
-    private static Vector3 transformAxis3OrDefault3(
-            com.minicad.step.model.StepCartesianTransformationOperator transformation,
-            Vector3 axis1,
-            Vector3 axis2,
-            StepCadBuilder builder
-    ) {
-        if (transformation.axis3() != null) {
-            return builder.buildDirection(transformation.axis3().id()).asVector();
-        }
-        Vector3 cross = axis1.cross(axis2);
-        return cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
-    }
-
-    private static double transformationScale(com.minicad.step.model.StepCartesianTransformationOperator transformation) {
-        return transformation.scale() == null ? 1.0 : transformation.scale();
+        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
+        return basis.x().scale(vector.x() * basis.scale())
+                .add(basis.y().scale(vector.y() * basis.scale()))
+                .add(basis.z().scale(vector.z() * basis.scale()));
     }
 
     /**

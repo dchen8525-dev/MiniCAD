@@ -5,6 +5,7 @@ import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Vector3;
 import com.minicad.step.model.*;
 import com.minicad.step.semantic.StepCadBuilder;
+import com.minicad.step.semantic.TransformationOperatorBasis;
 
 import java.util.List;
 
@@ -136,24 +137,11 @@ public final class StepPlacementTransformer {
             StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        Vector3 axis1 = transformation.axis1() == null
-                ? new Vector3(1.0, 0.0, 0.0)
-                : builder.buildDirection(transformation.axis1().id()).asVector();
-        Vector3 axis2;
-        if (transformation.axis2() != null) {
-            axis2 = builder.buildDirection(transformation.axis2().id()).asVector();
-        } else {
-            Vector3 fallback = new Vector3(0.0, 1.0, 0.0);
-            axis2 = axis1.cross(fallback).isZero() ? new Vector3(0.0, 0.0, 1.0) : fallback;
-        }
-        Vector3 axis3;
-        if (transformation.axis3() != null) {
-            axis3 = builder.buildDirection(transformation.axis3().id()).asVector();
-        } else {
-            Vector3 cross = axis1.cross(axis2);
-            axis3 = cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
-        }
-        double scale = transformation.scale() == null ? 1.0 : transformation.scale();
+        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
+        Vector3 axis1 = basis.x();
+        Vector3 axis2 = basis.y();
+        Vector3 axis3 = basis.z();
+        double scale = basis.scale();
         CartesianPoint origin = builder.buildPoint(transformation.localOrigin().id());
         return new double[]{
                 axis1.x() * scale, axis2.x() * scale, axis3.x() * scale, origin.x(),
