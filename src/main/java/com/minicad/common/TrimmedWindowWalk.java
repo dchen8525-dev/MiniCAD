@@ -1,5 +1,6 @@
 package com.minicad.common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,8 +37,66 @@ public final class TrimmedWindowWalk {
      */
     public static final double DUPLICATE_TOLERANCE = 1.0e-9;
 
+    /**
+     * Largest gap between a sample's first and last point that still means the
+     * basis curve is closed. Matches the literal both trimmed-curve samplers
+     * carried - the 2D one as {@code subtract().norm()}, the 3D one as
+     * {@code distanceTo()}, which are the same bits.
+     */
+    public static final double CLOSURE_TOLERANCE = 1.0e-9;
+
     private TrimmedWindowWalk() {
         // Utility class
+    }
+
+    /**
+     * Samples the stretch of a basis curve between a trimmed window's two ends.
+     *
+     * <p>This is the sequencing the walk's vocabulary was always used in:
+     * detect whether the basis sample is closed, drop its repeated last point if
+     * so, find the two indices nearest the window's ends, anchor the start
+     * point, walk between the indices, and close with the end point unless it
+     * repeats the previous one. It was written out once per dimension - in
+     * {@code preview.sampling.Curve2SamplingHelper.sampleTrimmedCurve2} and
+     * {@code Curve3SamplingHelper.sampleTrimmedCurve3} - verbatim apart from the
+     * point type and that one closure spelling. Which end of the window the walk
+     * starts from is {@code senseAgreement}'s job, not this method's.</p>
+     *
+     * @param start geometric start point of the trimmed window
+     * @param end geometric end point of the trimmed window
+     * @param basisSample loose sample of the whole basis curve
+     * @param senseAgreement whether the walk runs towards increasing indices
+     * @param segments number of segments the caller asked for
+     * @param distance metric of the basis type
+     * @param <T> point type of the dimension being sampled
+     * @return the sampled points of the trimmed stretch, ends included
+     */
+    public static <T> List<T> sampleWindow(
+            T start,
+            T end,
+            List<T> basisSample,
+            boolean senseAgreement,
+            int segments,
+            PointDistance<T> distance) {
+        if (basisSample.size() < 2) {
+            return List.of(start, end);
+        }
+        boolean closed = distance.between(basisSample.get(0), basisSample.get(basisSample.size() - 1))
+                <= CLOSURE_TOLERANCE;
+        List<T> basisPoints =
+                closed ? List.copyOf(basisSample.subList(0, basisSample.size() - 1)) : basisSample;
+        int startIndex = nearestIndex(basisPoints, start, distance);
+        int endIndex = nearestIndex(basisPoints, end, distance);
+
+        List<T> trimmed = new ArrayList<>(Math.max(segments + 1, 2));
+        trimmed.add(start);
+        if (closed) {
+            appendClosed(trimmed, basisPoints, startIndex, endIndex, senseAgreement, distance);
+        } else {
+            appendOpen(trimmed, basisPoints, startIndex, endIndex, distance);
+        }
+        addDistinct(trimmed, end, distance);
+        return List.copyOf(trimmed);
     }
 
     /**

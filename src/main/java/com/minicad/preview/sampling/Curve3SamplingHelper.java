@@ -97,25 +97,13 @@ public final class Curve3SamplingHelper {
     }
 
     public static List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {
-        List<CartesianPoint> sampled = sampleLooseCurve(trimmedCurve.basisCurve());
-        if (sampled.size() < 2) {
-            return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
-        }
-        boolean closed = sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) <= 1.0e-9;
-        List<CartesianPoint> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
-        int startIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimStart(), POINT_DISTANCE);
-        int endIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimEnd(), POINT_DISTANCE);
-
-        List<CartesianPoint> trimmed = new ArrayList<>(Math.max(segments + 1, 2));
-        trimmed.add(trimmedCurve.trimStart());
-        if (closed) {
-            TrimmedWindowWalk.appendClosed(
-                    trimmed, basisPoints, startIndex, endIndex, trimmedCurve.senseAgreement(), POINT_DISTANCE);
-        } else {
-            TrimmedWindowWalk.appendOpen(trimmed, basisPoints, startIndex, endIndex, POINT_DISTANCE);
-        }
-        TrimmedWindowWalk.addDistinct(trimmed, trimmedCurve.trimEnd(), POINT_DISTANCE);
-        return List.copyOf(trimmed);
+        return TrimmedWindowWalk.sampleWindow(
+                trimmedCurve.trimStart(),
+                trimmedCurve.trimEnd(),
+                sampleLooseCurve(trimmedCurve.basisCurve()),
+                trimmedCurve.senseAgreement(),
+                segments,
+                POINT_DISTANCE);
     }
 
     public static List<CartesianPoint> sampleCircleArc(Circle circle, CartesianPoint start, CartesianPoint end, boolean naturalForward) {

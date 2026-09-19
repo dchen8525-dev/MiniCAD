@@ -74,9 +74,14 @@ class TrimmedWindowWalkConvergenceTest {
 
     private static final String HOME = "src/main/java/com/minicad/common/TrimmedWindowWalk.java";
 
-    /** The four operations, as declared on the kernel. */
+    /**
+     * The four operations, as declared on the kernel, plus the sequencing built
+     * out of them. {@code sampleWindow} is the order the two dimensions called
+     * the four in, verbatim, which is why it is the fifth member rather than a
+     * caller's business.
+     */
     private static final List<String> OPERATIONS =
-            List.of("nearestIndex", "appendClosed", "appendOpen", "addDistinct");
+            List.of("nearestIndex", "appendClosed", "appendOpen", "addDistinct", "sampleWindow");
 
     /**
      * Every name the convergence deleted, spelled exactly as it was declared.

@@ -1,9 +1,9 @@
 package com.minicad.geometry;
 
-import com.minicad.common.Epsilon;
-import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
-import java.util.ArrayList;
+import com.minicad.common.TrimmedParamRange;
+import com.minicad.common.TrimmedWindowWalk;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -12,15 +12,12 @@ import java.util.Objects;
  * Trims are stored as parameter values on the basis curve; the geometric
  * trim endpoints are derived by evaluating the basis curve at those parameters.
  *
- * @param basisCurve supported basis curve
- * @param trimParamStart parameter value for the first trim
- * @param trimParamEnd parameter value for the second trim
- * @param senseAgreement trimming orientation agreement
- */
-/**
- * Minimal trimmed-curve wrapper over a supported basis curve.
- * Trims are stored as parameter values on the basis curve; the geometric
- * trim endpoints are derived by evaluating the basis curve at those parameters.
+ * <p>The window - its validation, the {@code [0, 1]} to basis-parameter mapping,
+ * the tangent-reversal rule, the uniform sample and the closest-point search -
+ * lives in {@link TrimmedParamRange}, shared with {@code geometry2d.TrimmedCurve2}.
+ * This class is the 3D half of a pair that is the same object up to the point
+ * type; the dimension enters only as {@link #POINT_DISTANCE} and {@code this::pointAt}.
+ * </p>
  *
  * @param basisCurve supported basis curve
  * @param trimParamStart parameter value for the first trim
@@ -28,20 +25,17 @@ import java.util.Objects;
  * @param senseAgreement trimming orientation agreement
  */
 public final class TrimmedCurve3 implements Curve3 {
+
+    /** The 3D metric the shared window needs; the window itself is dimension-free. */
+    private static final TrimmedWindowWalk.PointDistance<CartesianPoint> POINT_DISTANCE =
+            CartesianPoint::distanceTo;
+
     private final Curve3 basisCurve;
-    private final double trimParamStart;
-    private final double trimParamEnd;
-    private final boolean senseAgreement;
+    private final TrimmedParamRange window;
 
     public TrimmedCurve3(Curve3 basisCurve, double trimParamStart, double trimParamEnd, boolean senseAgreement) {
-        Preconditions.requireNonNull(basisCurve, "basisCurve");
-        if (!Double.isFinite(trimParamStart) || !Double.isFinite(trimParamEnd)) {
-            throw new GeometryException("trim parameters must be finite");
-        }
-        this.basisCurve = basisCurve;
-        this.trimParamStart = trimParamStart;
-        this.trimParamEnd = trimParamEnd;
-        this.senseAgreement = senseAgreement;
+        this.basisCurve = Preconditions.requireNonNull(basisCurve, "basisCurve");
+        this.window = TrimmedParamRange.of(trimParamStart, trimParamEnd, senseAgreement);
     }
 
     public Curve3 getBasisCurve() {
@@ -49,15 +43,15 @@ public final class TrimmedCurve3 implements Curve3 {
     }
 
     public double getTrimParamStart() {
-        return trimParamStart;
+        return window.start();
     }
 
     public double getTrimParamEnd() {
-        return trimParamEnd;
+        return window.end();
     }
 
     public boolean isSenseAgreement() {
-        return senseAgreement;
+        return window.senseAgreement();
     }
 
     // Record-style accessors
@@ -72,7 +66,7 @@ public final class TrimmedCurve3 implements Curve3 {
      * @return trim start point
      */
     public CartesianPoint trimStart() {
-        return basisCurve.pointAt(trimParamStart);
+        return basisCurve.pointAt(window.start());
     }
 
     /**
@@ -81,36 +75,26 @@ public final class TrimmedCurve3 implements Curve3 {
      * @return trim end point
      */
     public CartesianPoint trimEnd() {
-        return basisCurve.pointAt(trimParamEnd);
+        return basisCurve.pointAt(window.end());
     }
 
     @Override
     public CartesianPoint pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        // Map parameter from trim range to basis curve parameter
-        double orientedParameter = senseAgreement ? parameter : 1.0 - parameter;
-        double basisParam = trimParamStart + orientedParameter * (trimParamEnd - trimParamStart);
-        return basisCurve.pointAt(basisParam);
+        return basisCurve.pointAt(window.basisParameter(parameter));
     }
 
     @Override
     public Vector3 tangentAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        double orientedParameter = senseAgreement ? parameter : 1.0 - parameter;
-        double basisParameter = trimParamStart + orientedParameter * (trimParamEnd - trimParamStart);
-        Vector3 tangent = basisCurve.tangentAt(basisParameter);
-        boolean reversed = (trimParamEnd < trimParamStart) ^ !senseAgreement;
-        return reversed ? tangent.scale(-1.0) : tangent;
+        Vector3 tangent = basisCurve.tangentAt(window.basisParameter(parameter));
+        return window.reversesTangents() ? tangent.scale(-1.0) : tangent;
     }
 
     @Override
     public boolean contains(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // Restrict the membership test to the trimmed portion of the basis curve.
-        // closestPointTo already samples this trimmed curve (its pointAt maps the
-        // [0,1] parameter range onto the trim interval), so a point outside the
-        // trim can no longer be reported as lying on the curve.
-        return point.distanceTo(closestPointTo(point)) < Epsilon.get();
+        return window.contains(point, this::pointAt, POINT_DISTANCE);
     }
 
     @Override
@@ -118,73 +102,27 @@ public final class TrimmedCurve3 implements Curve3 {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TrimmedCurve3 that = (TrimmedCurve3) o;
-        return Objects.equals(basisCurve, that.basisCurve) && trimParamStart == that.trimParamStart && trimParamEnd == that.trimParamEnd && senseAgreement == that.senseAgreement;
+        return Objects.equals(basisCurve, that.basisCurve) && trimParamStart() == that.trimParamStart() && trimParamEnd() == that.trimParamEnd() && senseAgreement() == that.senseAgreement();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(basisCurve, trimParamStart, trimParamEnd, senseAgreement);
+        return Objects.hash(basisCurve, trimParamStart(), trimParamEnd(), senseAgreement());
     }
 
     @Override
     public String toString() {
-        return "TrimmedCurve3{" + "basisCurve=" + basisCurve + "trimParamStart=" + trimParamStart + "trimParamEnd=" + trimParamEnd + "senseAgreement=" + senseAgreement + "}";
+        return "TrimmedCurve3{" + "basisCurve=" + basisCurve + "trimParamStart=" + trimParamStart() + "trimParamEnd=" + trimParamEnd() + "senseAgreement=" + senseAgreement() + "}";
     }
 
     @Override
     public CartesianPoint closestPointTo(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
-        // Search only within the trimmed segment. pointAt maps the [0,1] parameter
-        // range onto the trim interval on the basis curve, so the returned point is
-        // always on the trimmed portion. A uniform sample of a curved curve has a
-        // fixed resolution: a point midway between two samples can sit farther away
-        // from every sample than the tolerance, so `contains` would wrongly report
-        // it as off-curve. Instead, coarse-scan the parameter range and then refine
-        // locally around the best parameter, converging toward the true closest point.
-        final int coarseSegments = 64;
-        double bestT = 0.0;
-        double bestDist = Double.POSITIVE_INFINITY;
-        for (int i = 0; i <= coarseSegments; i++) {
-            double t = (double) i / coarseSegments;
-            double d = point.distanceTo(pointAt(t));
-            if (d < bestDist) {
-                bestDist = d;
-                bestT = t;
-            }
-        }
-        // Binary bracket refinement around the best parameter: keep the best of the
-        // left/center/right samples in a shrinking window until the window width is
-        // negligible relative to the parameter range.
-        double halfWidth = 1.0 / coarseSegments;
-        while (halfWidth > 1.0e-12) {
-            double tLeft = Math.max(0.0, bestT - halfWidth);
-            double tRight = Math.min(1.0, bestT + halfWidth);
-            double tMid = (tLeft + tRight) * 0.5;
-            double dLeft = point.distanceTo(pointAt(tLeft));
-            double dMid = point.distanceTo(pointAt(tMid));
-            double dRight = point.distanceTo(pointAt(tRight));
-            if (dLeft <= dMid && dLeft <= dRight) {
-                bestT = tLeft;
-                bestDist = dLeft;
-            } else if (dRight <= dMid && dRight <= dLeft) {
-                bestT = tRight;
-                bestDist = dRight;
-            } else {
-                bestT = tMid;
-                bestDist = dMid;
-            }
-            halfWidth *= 0.5;
-        }
-        return pointAt(bestT);
+        return window.closestPointOf(point, this::pointAt, POINT_DISTANCE);
     }
 
     @Override
-    public java.util.List<CartesianPoint> sample(int segments) {
-        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
-        for (int i = 0; i <= segments; i++) {
-            double t = (double) i / segments;
-            points.add(pointAt(t));
-        }
-        return java.util.List.copyOf(points);
+    public List<CartesianPoint> sample(int segments) {
+        return window.sample(segments, this::pointAt);
     }
 }

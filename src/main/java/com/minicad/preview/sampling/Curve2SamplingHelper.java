@@ -125,25 +125,13 @@ public final class Curve2SamplingHelper {
     }
 
     public static List<Point2> sampleTrimmedCurve2(TrimmedCurve2 trimmedCurve, int segments) {
-        List<Point2> sampled = sampleLooseCurve2(trimmedCurve.basisCurve());
-        if (sampled.size() < 2) {
-            return List.of(trimmedCurve.trimStart(), trimmedCurve.trimEnd());
-        }
-        boolean closed = sampled.get(0).subtract(sampled.get(sampled.size() - 1)).norm() <= 1.0e-9;
-        List<Point2> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
-        int startIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimStart(), POINT_DISTANCE);
-        int endIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimEnd(), POINT_DISTANCE);
-
-        List<Point2> trimmed = new ArrayList<>(Math.max(segments + 1, 2));
-        trimmed.add(trimmedCurve.trimStart());
-        if (closed) {
-            TrimmedWindowWalk.appendClosed(
-                    trimmed, basisPoints, startIndex, endIndex, trimmedCurve.senseAgreement(), POINT_DISTANCE);
-        } else {
-            TrimmedWindowWalk.appendOpen(trimmed, basisPoints, startIndex, endIndex, POINT_DISTANCE);
-        }
-        TrimmedWindowWalk.addDistinct(trimmed, trimmedCurve.trimEnd(), POINT_DISTANCE);
-        return List.copyOf(trimmed);
+        return TrimmedWindowWalk.sampleWindow(
+                trimmedCurve.trimStart(),
+                trimmedCurve.trimEnd(),
+                sampleLooseCurve2(trimmedCurve.basisCurve()),
+                trimmedCurve.senseAgreement(),
+                segments,
+                POINT_DISTANCE);
     }
 
     public static String curveTypeName(Curve3 curve) {

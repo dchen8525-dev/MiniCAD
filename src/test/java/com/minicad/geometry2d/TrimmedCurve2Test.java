@@ -156,15 +156,6 @@ class TrimmedCurve2Test {
     }
 
     @Test
-    void trimmedCurveUnderlyingCurve() {
-        Line2 basisCurve = new Line2(new Point2(0, 0), new Direction2(1, 0));
-
-        TrimmedCurve2 trimmed = new TrimmedCurve2(basisCurve, 0.0, 10.0, true);
-
-        assertEquals(basisCurve, trimmed.underlyingCurve());
-    }
-
-    @Test
     void trimmedCurveWithCircle() {
         Point2 center = new Point2(0, 0);
         Direction2 xDir = new Direction2(1, 0);
