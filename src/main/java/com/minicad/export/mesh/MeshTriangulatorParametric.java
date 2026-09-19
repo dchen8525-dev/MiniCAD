@@ -1,5 +1,6 @@
 package com.minicad.export.mesh;
 
+import com.minicad.export.glb.PreviewMeshExporter;
 import com.minicad.geometry.*;
 import com.minicad.geometry2d.BSplineCurve2;
 import com.minicad.geometry2d.Circle2;
@@ -8,8 +9,12 @@ import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
+import com.minicad.preview.mapper.ParametricSurfaceMapper;
+import com.minicad.preview.payload.ParametricLoopPayload;
+import com.minicad.preview.payload.UvBounds;
 import com.minicad.preview.payload.UvPoint;
 import com.minicad.preview.sampling.PcurveSamplingHelper;
+import com.minicad.preview.sampling.TriangulationHelper;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepFaceEntity;
 import com.minicad.step.semantic.StepCadBuilder;
@@ -35,56 +40,9 @@ final class MeshTriangulatorParametric {
 
     // --- Inner classes for UV geometry ---
 
-    static final class ParametricLoop {
-        private final boolean outer;
-        private final List<UvPoint> points;
-
-        ParametricLoop(boolean outer, List<UvPoint> points) {
-            this.outer = outer;
-            this.points = points == null ? null : List.copyOf(points);
-        }
-        boolean outer() { return outer; }
-        List<UvPoint> points() { return points; }
-        @Override public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ParametricLoop that = (ParametricLoop) o;
-            return outer == that.outer && Objects.equals(points, that.points);
-        }
-        @Override public int hashCode() { return Objects.hash(outer, points); }
-    }
-
-    static class UvBounds {
-        private final double minU;
-        private final double maxU;
-        private final double minV;
-        private final double maxV;
-
-        UvBounds(double minU, double maxU, double minV, double maxV) {
-            this.minU = minU;
-            this.maxU = maxU;
-            this.minV = minV;
-            this.maxV = maxV;
-        }
-        double minU() { return minU; }
-        double maxU() { return maxU; }
-        double minV() { return minV; }
-        double maxV() { return maxV; }
-        double uSpan() { return maxU - minU; }
-        double vSpan() { return maxV - minV; }
-    }
-
     @FunctionalInterface
     interface SurfacePointSampler {
         CartesianPoint pointAt(double u, double v);
-    }
-
-    interface ParametricMapper {
-        CartesianPoint pointAt(double u, double v);
-        Vector3 normalAt(double u, double v);
-        UvPoint project(CartesianPoint point, UvPoint previous);
-        default Double uPeriod() { return null; }
-        default Double vPeriod() { return null; }
     }
 
     // --- Main triangulation methods ---
@@ -108,16 +66,16 @@ final class MeshTriangulatorParametric {
             BiFunction<CartesianPoint, Vector3, Integer> addVertex,
             Consumer<int[]> addTriangle
     ) {
-        ParametricMapper mapper = mapperFor(surface);
+        ParametricSurfaceMapper mapper = mapperFor(surface);
         if (mapper == null) {
             return false;
         }
-        List<ParametricLoop> loops = buildParametricLoops(face, mapper, surface);
-        if (loops.isEmpty() || loops.stream().noneMatch(ParametricLoop::outer)) {
+        List<ParametricLoopPayload> loops = buildParametricLoops(face, mapper, surface);
+        if (loops.isEmpty() || loops.stream().noneMatch(ParametricLoopPayload::outer)) {
             return false;
         }
-        List<ParametricLoop> normalizedLoops = normalizeLoopPeriods(normalizeLoopRoles(loops), mapper);
-        UvBounds bounds = boundsOf(normalizedLoops);
+        List<ParametricLoopPayload> normalizedLoops = normalizeLoopPeriods(normalizeLoopRoles(loops), mapper);
+        UvBounds bounds = PreviewMeshExporter.boundsOf(normalizedLoops);
         if (bounds == null || bounds.uSpan() <= PLANAR_EPS || bounds.vSpan() <= PLANAR_EPS) {
             return false;
         }
@@ -150,16 +108,16 @@ final class MeshTriangulatorParametric {
             BiFunction<CartesianPoint, Vector3, Integer> addVertex,
             Consumer<int[]> addTriangle
     ) {
-        ParametricMapper mapper = mapperFor(surface);
+        ParametricSurfaceMapper mapper = mapperFor(surface);
         if (mapper == null) {
             return false;
         }
-        List<ParametricLoop> loops = buildSemanticParametricLoops(stepFace, faceGeometry, mapper, builder);
-        if (loops.isEmpty() || loops.stream().noneMatch(ParametricLoop::outer)) {
+        List<ParametricLoopPayload> loops = buildSemanticParametricLoops(stepFace, faceGeometry, mapper, builder);
+        if (loops.isEmpty() || loops.stream().noneMatch(ParametricLoopPayload::outer)) {
             return false;
         }
-        List<ParametricLoop> normalizedLoops = normalizeLoopPeriods(normalizeLoopRoles(loops), mapper);
-        UvBounds bounds = boundsOf(normalizedLoops);
+        List<ParametricLoopPayload> normalizedLoops = normalizeLoopPeriods(normalizeLoopRoles(loops), mapper);
+        UvBounds bounds = PreviewMeshExporter.boundsOf(normalizedLoops);
         if (bounds == null || bounds.uSpan() <= PLANAR_EPS || bounds.vSpan() <= PLANAR_EPS) {
             return false;
         }
@@ -169,7 +127,7 @@ final class MeshTriangulatorParametric {
         return triangulateGrid(mapper, normalizedLoops, bounds, uSegments, vSegments, flipped, triangleCountSupplier, addVertex, addTriangle);
     }
 
-    // --- ParametricMapper factory ---
+    // --- ParametricSurfaceMapper factory ---
 
     /**
      * Triangulates the parametric bounds with a shared corner grid: every
@@ -178,8 +136,8 @@ final class MeshTriangulatorParametric {
      * being rebuilt for every cell's containment test.
      */
     private static boolean triangulateGrid(
-            ParametricMapper mapper,
-            List<ParametricLoop> normalizedLoops,
+            ParametricSurfaceMapper mapper,
+            List<ParametricLoopPayload> normalizedLoops,
             UvBounds bounds,
             int uSegments,
             int vSegments,
@@ -228,22 +186,22 @@ final class MeshTriangulatorParametric {
 
     /** Outer loop plus holes with their bounding boxes resolved once per face. */
     private static final class PrecomputedLoops {
-        private final ParametricLoop outer;
+        private final ParametricLoopPayload outer;
         private final UvBounds outerBox;
-        private final List<ParametricLoop> holes;
+        private final List<ParametricLoopPayload> holes;
         private final List<UvBounds> holeBoxes;
 
-        private PrecomputedLoops(ParametricLoop outer, UvBounds outerBox,
-                                 List<ParametricLoop> holes, List<UvBounds> holeBoxes) {
+        private PrecomputedLoops(ParametricLoopPayload outer, UvBounds outerBox,
+                                 List<ParametricLoopPayload> holes, List<UvBounds> holeBoxes) {
             this.outer = outer;
             this.outerBox = outerBox;
             this.holes = holes;
             this.holeBoxes = holeBoxes;
         }
 
-        static PrecomputedLoops of(List<ParametricLoop> loops) {
-            ParametricLoop outer = null;
-            for (ParametricLoop loop : loops) {
+        static PrecomputedLoops of(List<ParametricLoopPayload> loops) {
+            ParametricLoopPayload outer = null;
+            for (ParametricLoopPayload loop : loops) {
                 if (loop.outer()) {
                     outer = loop;
                     break;
@@ -252,9 +210,9 @@ final class MeshTriangulatorParametric {
             if (outer == null) {
                 return null;
             }
-            List<ParametricLoop> holes = new ArrayList<>();
+            List<ParametricLoopPayload> holes = new ArrayList<>();
             List<UvBounds> holeBoxes = new ArrayList<>();
-            for (ParametricLoop loop : loops) {
+            for (ParametricLoopPayload loop : loops) {
                 if (!loop.outer()) {
                     holes.add(loop);
                     holeBoxes.add(loopBoundingBox(loop));
@@ -268,7 +226,7 @@ final class MeshTriangulatorParametric {
                     || point.v() < outerBox.minV() || point.v() > outerBox.maxV()) {
                 return false;
             }
-            if (!containsUvPolygon(outer.points(), point)) {
+            if (!TriangulationHelper.contains(outer.points(), point)) {
                 return false;
             }
             for (int i = 0; i < holes.size(); i++) {
@@ -277,7 +235,7 @@ final class MeshTriangulatorParametric {
                         || point.v() < holeBox.minV() || point.v() > holeBox.maxV()) {
                     continue;
                 }
-                if (containsUvPolygon(holes.get(i).points(), point)) {
+                if (TriangulationHelper.contains(holes.get(i).points(), point)) {
                     return false;
                 }
             }
@@ -286,13 +244,13 @@ final class MeshTriangulatorParametric {
     }
 
     /**
-     * Builds the {@link ParametricMapper} for one concrete surface type. The
+     * Builds the {@link ParametricSurfaceMapper} for one concrete surface type. The
      * handler receives the already type-tested surface and owns the cast, so
      * each rule body is the original branch body verbatim.
      */
     @FunctionalInterface
     private interface ParametricMapperHandler {
-        ParametricMapper build(SurfaceGeometry surface);
+        ParametricSurfaceMapper build(SurfaceGeometry surface);
     }
 
     private record ParametricMapperRule(
@@ -316,7 +274,7 @@ final class MeshTriangulatorParametric {
     private static final List<ParametricMapperRule> MAPPER_RULES = List.of(
             parametricMapperRule(CylindricalSurface.class, (surface) -> {
                 CylindricalSurface cylinder = (CylindricalSurface) surface;
-                return new ParametricMapper() {
+                return new ParametricSurfaceMapper() {
                     @Override
                     public CartesianPoint pointAt(double u, double v) {
                         return cylinder.pointAt(u, v);
@@ -344,7 +302,7 @@ final class MeshTriangulatorParametric {
             }),
             parametricMapperRule(ConicalSurface.class, (surface) -> {
                 ConicalSurface cone = (ConicalSurface) surface;
-                return new ParametricMapper() {
+                return new ParametricSurfaceMapper() {
                     @Override
                     public CartesianPoint pointAt(double u, double v) {
                         return cone.pointAt(u, v);
@@ -372,7 +330,7 @@ final class MeshTriangulatorParametric {
             }),
             parametricMapperRule(ToroidalSurface.class, (surface) -> {
                 ToroidalSurface torus = (ToroidalSurface) surface;
-                return new ParametricMapper() {
+                return new ParametricSurfaceMapper() {
                     @Override
                     public CartesianPoint pointAt(double u, double v) {
                         return torus.pointAt(u, v);
@@ -404,7 +362,7 @@ final class MeshTriangulatorParametric {
             }),
             parametricMapperRule(SphericalSurface.class, (surface) -> {
                 SphericalSurface sphere = (SphericalSurface) surface;
-                return new ParametricMapper() {
+                return new ParametricSurfaceMapper() {
                     @Override
                     public CartesianPoint pointAt(double u, double v) {
                         return sphere.pointAt(u, v);
@@ -435,7 +393,7 @@ final class MeshTriangulatorParametric {
             }),
             parametricMapperRule(SurfaceOfRevolution3.class, (surface) -> {
                 SurfaceOfRevolution3 revolution = (SurfaceOfRevolution3) surface;
-                return new ParametricMapper() {
+                return new ParametricSurfaceMapper() {
                     @Override
                     public CartesianPoint pointAt(double u, double v) {
                         return revolution.pointAt(v, u);
@@ -456,7 +414,7 @@ final class MeshTriangulatorParametric {
             }),
             parametricMapperRule(SurfaceOfLinearExtrusion3.class, (surface) -> {
                 SurfaceOfLinearExtrusion3 extrusion = (SurfaceOfLinearExtrusion3) surface;
-                return new ParametricMapper() {
+                return new ParametricSurfaceMapper() {
                     @Override
                     public CartesianPoint pointAt(double u, double v) {
                         return extrusion.pointAt(u, v);
@@ -473,7 +431,7 @@ final class MeshTriangulatorParametric {
             })
     );
 
-    static ParametricMapper mapperFor(SurfaceGeometry surface) {
+    static ParametricSurfaceMapper mapperFor(SurfaceGeometry surface) {
         for (ParametricMapperRule rule : MAPPER_RULES) {
             if (rule.matches(surface)) {
                 return rule.handler().build(surface);
@@ -729,8 +687,8 @@ final class MeshTriangulatorParametric {
 
     // --- Loop building ---
 
-    static List<ParametricLoop> buildParametricLoops(Face face, ParametricMapper mapper, SurfaceGeometry surface) {
-        List<ParametricLoop> loops = new ArrayList<>();
+    static List<ParametricLoopPayload> buildParametricLoops(Face face, ParametricSurfaceMapper mapper, SurfaceGeometry surface) {
+        List<ParametricLoopPayload> loops = new ArrayList<>();
         for (FaceBound bound : face.bounds()) {
             List<UvPoint> uvPoints = extractLoopUvPoints(bound.loop(), mapper, surface);
             if (!bound.orientation()) {
@@ -740,12 +698,12 @@ final class MeshTriangulatorParametric {
             if (uvPoints.size() < 3) {
                 continue;
             }
-            if (!sameUv(uvPoints.get(0), uvPoints.get(uvPoints.size() - 1))) {
+            if (!PcurveSamplingHelper.sameUv(uvPoints.get(0), uvPoints.get(uvPoints.size() - 1))) {
                 uvPoints.add(uvPoints.get(0));
             } else {
                 uvPoints.set(uvPoints.size() - 1, uvPoints.get(0));
             }
-            loops.add(new ParametricLoop(bound.outer(), List.copyOf(uvPoints)));
+            loops.add(new ParametricLoopPayload(bound.outer(), uvPoints));
         }
         return List.copyOf(loops);
     }
@@ -759,13 +717,13 @@ final class MeshTriangulatorParametric {
         return List.copyOf(reversed);
     }
 
-    static List<ParametricLoop> buildSemanticParametricLoops(
+    static List<ParametricLoopPayload> buildSemanticParametricLoops(
             StepFaceEntity stepFace,
             StepEntity faceGeometry,
-            ParametricMapper mapper,
+            ParametricSurfaceMapper mapper,
             StepCadBuilder builder
     ) {
-        List<ParametricLoop> loops = new ArrayList<>();
+        List<ParametricLoopPayload> loops = new ArrayList<>();
         boolean promoteSingleOuter = stepFace.bounds().size() == 1
                 && stepFace.bounds().stream().noneMatch(com.minicad.step.model.StepFaceBound::outer);
         for (com.minicad.step.model.StepFaceBound bound : stepFace.bounds()) {
@@ -793,15 +751,15 @@ final class MeshTriangulatorParametric {
             if (loopPoints.size() < 3) {
                 return List.of();
             }
-            if (!sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
+            if (!PcurveSamplingHelper.sameUv(loopPoints.get(0), loopPoints.get(loopPoints.size() - 1))) {
                 loopPoints.add(loopPoints.get(0));
             }
-            loops.add(new ParametricLoop(bound.outer() || promoteSingleOuter, List.copyOf(loopPoints)));
+            loops.add(new ParametricLoopPayload(bound.outer() || promoteSingleOuter, loopPoints));
         }
         return List.copyOf(loops);
     }
 
-    private static List<UvPoint> extractLoopUvPoints(Loop loop, ParametricMapper mapper, SurfaceGeometry surface) {
+    private static List<UvPoint> extractLoopUvPoints(Loop loop, ParametricSurfaceMapper mapper, SurfaceGeometry surface) {
         if (loop instanceof PolyLoop) {
             PolyLoop polyLoop = (PolyLoop) loop;
             List<UvPoint> uvPoints = new ArrayList<>();
@@ -829,7 +787,7 @@ final class MeshTriangulatorParametric {
                     uvPoints.add(edgePoints.get(i));
                 }
             }
-            if (uvPoints.size() > 1 && sameUv(uvPoints.get(0), uvPoints.get(uvPoints.size() - 1))) {
+            if (uvPoints.size() > 1 && PcurveSamplingHelper.sameUv(uvPoints.get(0), uvPoints.get(uvPoints.size() - 1))) {
                 uvPoints.remove(uvPoints.size() - 1);
             }
             return uvPoints;
@@ -840,7 +798,7 @@ final class MeshTriangulatorParametric {
     private static List<UvPoint> sampleSemanticOrientedEdge(
             com.minicad.step.model.StepOrientedEdge orientedEdge,
             StepEntity faceGeometry,
-            ParametricMapper mapper,
+            ParametricSurfaceMapper mapper,
             StepCadBuilder builder
     ) {
         StepEntity edgeGeometry = orientedEdge.edgeElement().edgeGeometry();
@@ -1054,7 +1012,7 @@ final class MeshTriangulatorParametric {
         );
     }
 
-    private static List<UvPoint> extractEdgeUvPoints(OrientedEdge orientedEdge, ParametricMapper mapper, SurfaceGeometry surface) {
+    private static List<UvPoint> extractEdgeUvPoints(OrientedEdge orientedEdge, ParametricSurfaceMapper mapper, SurfaceGeometry surface) {
         List<UvPoint> pcurvePoints = extractSurfaceCurveUvPoints(orientedEdge, mapper, surface);
         if (!pcurvePoints.isEmpty()) {
             return pcurvePoints;
@@ -1074,7 +1032,7 @@ final class MeshTriangulatorParametric {
         return uvPoints;
     }
 
-    private static List<UvPoint> extractSurfaceCurveUvPoints(OrientedEdge orientedEdge, ParametricMapper mapper, SurfaceGeometry surface) {
+    private static List<UvPoint> extractSurfaceCurveUvPoints(OrientedEdge orientedEdge, ParametricSurfaceMapper mapper, SurfaceGeometry surface) {
         Curve3 curve = orientedEdge.edge().curve();
         if (!(curve instanceof SurfaceCurve3)) {
             return List.of();
@@ -1119,7 +1077,7 @@ final class MeshTriangulatorParametric {
         return List.copyOf(matches);
     }
 
-    private static List<UvPoint> orientUvSamples(OrientedEdge orientedEdge, List<UvPoint> samples, ParametricMapper mapper) {
+    private static List<UvPoint> orientUvSamples(OrientedEdge orientedEdge, List<UvPoint> samples, ParametricSurfaceMapper mapper) {
         if (samples.isEmpty()) {
             return List.of();
         }
@@ -1148,7 +1106,7 @@ final class MeshTriangulatorParametric {
         return List.copyOf(oriented);
     }
 
-    private static UvPoint alignToReference(UvPoint point, UvPoint reference, ParametricMapper mapper) {
+    private static UvPoint alignToReference(UvPoint point, UvPoint reference, ParametricSurfaceMapper mapper) {
         if (point == null || reference == null) {
             return point;
         }
@@ -1290,7 +1248,7 @@ final class MeshTriangulatorParametric {
         return du * du + dv * dv;
     }
 
-    private static List<UvPoint> normalizePeriodicLoop(List<UvPoint> points, ParametricMapper mapper) {
+    private static List<UvPoint> normalizePeriodicLoop(List<UvPoint> points, ParametricSurfaceMapper mapper) {
         if (points.size() < 2) {
             return points;
         }
@@ -1326,14 +1284,14 @@ final class MeshTriangulatorParametric {
         return normalized;
     }
 
-    static List<ParametricLoop> normalizeLoopRoles(List<ParametricLoop> loops) {
-        if (loops.stream().anyMatch(ParametricLoop::outer)) {
+    static List<ParametricLoopPayload> normalizeLoopRoles(List<ParametricLoopPayload> loops) {
+        if (loops.stream().anyMatch(ParametricLoopPayload::outer)) {
             return loops;
         }
         int outerIndex = -1;
         double outerArea = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < loops.size(); i++) {
-            double area = Math.abs(signedAreaUv(loops.get(i).points()));
+            double area = Math.abs(TriangulationHelper.signedArea(loops.get(i).points()));
             if (area > outerArea + PLANAR_EPS) {
                 outerArea = area;
                 outerIndex = i;
@@ -1342,18 +1300,18 @@ final class MeshTriangulatorParametric {
         if (outerIndex < 0) {
             return loops;
         }
-        List<ParametricLoop> normalized = new ArrayList<>(loops.size());
+        List<ParametricLoopPayload> normalized = new ArrayList<>(loops.size());
         for (int i = 0; i < loops.size(); i++) {
-            normalized.add(new ParametricLoop(i == outerIndex, loops.get(i).points()));
+            normalized.add(new ParametricLoopPayload(i == outerIndex, loops.get(i).points()));
         }
         return List.copyOf(normalized);
     }
 
-    static List<ParametricLoop> normalizeLoopPeriods(List<ParametricLoop> loops, ParametricMapper mapper) {
+    static List<ParametricLoopPayload> normalizeLoopPeriods(List<ParametricLoopPayload> loops, ParametricSurfaceMapper mapper) {
         if (loops.isEmpty()) {
             return loops;
         }
-        ParametricLoop outer = loops.stream().filter(ParametricLoop::outer).findFirst().orElse(null);
+        ParametricLoopPayload outer = loops.stream().filter(ParametricLoopPayload::outer).findFirst().orElse(null);
         if (outer == null) {
             return loops;
         }
@@ -1363,8 +1321,8 @@ final class MeshTriangulatorParametric {
             return loops;
         }
         UvPoint outerCenter = centroidUv(outer.points());
-        List<ParametricLoop> normalized = new ArrayList<>(loops.size());
-        for (ParametricLoop loop : loops) {
+        List<ParametricLoopPayload> normalized = new ArrayList<>(loops.size());
+        for (ParametricLoopPayload loop : loops) {
             if (loop.outer()) {
                 normalized.add(loop);
                 continue;
@@ -1397,7 +1355,7 @@ final class MeshTriangulatorParametric {
             List<UvPoint> shifted = loop.points().stream()
                     .map(point -> new UvPoint(point.u() + du, point.v() + dv))
                     .collect(Collectors.toList());
-            normalized.add(new ParametricLoop(false, shifted));
+            normalized.add(new ParametricLoopPayload(false, shifted));
         }
         return List.copyOf(normalized);
     }
@@ -1407,7 +1365,7 @@ final class MeshTriangulatorParametric {
             return new UvPoint(0.0, 0.0);
         }
         int count = points.size();
-        if (count > 1 && sameUv(points.get(0), points.get(points.size() - 1))) {
+        if (count > 1 && PcurveSamplingHelper.sameUv(points.get(0), points.get(points.size() - 1))) {
             count--;
         }
         if (count <= 0) {
@@ -1422,25 +1380,7 @@ final class MeshTriangulatorParametric {
         return new UvPoint(sumU / count, sumV / count);
     }
 
-    static UvBounds boundsOf(List<ParametricLoop> loops) {
-        double minU = Double.POSITIVE_INFINITY;
-        double maxU = Double.NEGATIVE_INFINITY;
-        double minV = Double.POSITIVE_INFINITY;
-        double maxV = Double.NEGATIVE_INFINITY;
-        boolean found = false;
-        for (ParametricLoop loop : loops) {
-            for (UvPoint point : loop.points()) {
-                minU = Math.min(minU, point.u());
-                maxU = Math.max(maxU, point.u());
-                minV = Math.min(minV, point.v());
-                maxV = Math.max(maxV, point.v());
-                found = true;
-            }
-        }
-        return found ? new UvBounds(minU, maxU, minV, maxV) : null;
-    }
-
-    private static UvBounds loopBoundingBox(ParametricLoop loop) {
+    private static UvBounds loopBoundingBox(ParametricLoopPayload loop) {
         double minU = Double.POSITIVE_INFINITY;
         double maxU = Double.NEGATIVE_INFINITY;
         double minV = Double.POSITIVE_INFINITY;
@@ -1453,79 +1393,7 @@ final class MeshTriangulatorParametric {
             if (pv < minV) minV = pv;
             if (pv > maxV) maxV = pv;
         }
-        return new UvBounds(minU, maxU, minV, maxV);
-    }
-
-    private static boolean containsUvPolygon(List<UvPoint> polygon, UvPoint point) {
-        if (polygon.size() < 3) {
-            return false;
-        }
-        if (isOnPolygonBoundary(polygon, point)) {
-            return true;
-        }
-        boolean inside = false;
-        for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
-            UvPoint a = polygon.get(i);
-            UvPoint b = polygon.get(j);
-            boolean intersects = ((a.v() > point.v()) != (b.v() > point.v()))
-                    && point.u() < (b.u() - a.u()) * (point.v() - a.v()) / ((b.v() - a.v()) + 1.0e-12) + a.u();
-            if (intersects) {
-                inside = !inside;
-            }
-        }
-        return inside;
-    }
-
-    private static boolean isOnPolygonBoundary(List<UvPoint> polygon, UvPoint point) {
-        for (int i = 0; i + 1 < polygon.size(); i++) {
-            if (isOnSegment(polygon.get(i), polygon.get(i + 1), point)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isOnSegment(UvPoint a, UvPoint b, UvPoint point) {
-        double abU = b.u() - a.u();
-        double abV = b.v() - a.v();
-        double lengthSquared = abU * abU + abV * abV;
-        if (lengthSquared <= 1.0e-18) {
-            return distanceSquared(a, point) <= 1.0e-18;
-        }
-        double apU = point.u() - a.u();
-        double apV = point.v() - a.v();
-        double cross = abU * apV - abV * apU;
-        if (Math.abs(cross) > 1.0e-9) {
-            return false;
-        }
-        double dot = apU * abU + apV * abV;
-        if (dot < -1.0e-9) {
-            return false;
-        }
-        return dot <= lengthSquared + 1.0e-9;
-    }
-
-    private static boolean sameUv(UvPoint left, UvPoint right) {
-        return distanceSquared(left, right) <= 1.0e-12;
-    }
-
-    private static double distanceSquared(UvPoint left, UvPoint right) {
-        double du = left.u() - right.u();
-        double dv = left.v() - right.v();
-        return du * du + dv * dv;
-    }
-
-    private static double signedAreaUv(List<UvPoint> points) {
-        if (points.size() < 3) {
-            return 0.0;
-        }
-        double area = 0.0;
-        for (int i = 0; i + 1 < points.size(); i++) {
-            UvPoint current = points.get(i);
-            UvPoint next = points.get(i + 1);
-            area += current.u() * next.v() - next.u() * current.v();
-        }
-        return area * 0.5;
+        return new UvBounds(minU, minV, maxU, maxV);
     }
 
     private static final double MIN_TRIANGLE_AREA = 1e-12;

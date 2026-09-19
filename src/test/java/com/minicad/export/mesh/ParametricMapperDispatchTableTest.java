@@ -1,6 +1,6 @@
 package com.minicad.export.mesh;
 
-import com.minicad.export.mesh.MeshTriangulatorParametric.ParametricMapper;
+import com.minicad.preview.mapper.ParametricSurfaceMapper;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.ConicalSurface;
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * MeshTriangulatorParametric.mapperFor, and exercises the four quadric rules
  * that had no direct coverage before.
  *
- * mapperFor built a {@link ParametricMapper} for one of six concrete surface
+ * mapperFor built a {@link ParametricSurfaceMapper} for one of six concrete surface
  * types via a sequential if/else-if chain of anonymous classes, with a trailing
  * `return null` for everything else. It is now an ordered list of (type,
  * handler) rules walked by a first-match loop. Two things can go wrong in that
@@ -111,7 +111,7 @@ class ParametricMapperDispatchTableTest {
         CylindricalSurface cylinder = new CylindricalSurface(
                 new Axis2Placement3D(CartesianPoint.origin(), new Direction3(0, 0, 1), new Direction3(1, 0, 0)),
                 2.0);
-        ParametricMapper mapper = MeshTriangulatorParametric.mapperFor(cylinder);
+        ParametricSurfaceMapper mapper = MeshTriangulatorParametric.mapperFor(cylinder);
         assertNotNull(mapper);
 
         for (double[] uv : new double[][] {{0.5, 1.25}, {-1.0, 3.0}, {0.0, -2.0}}) {
@@ -131,7 +131,7 @@ class ParametricMapperDispatchTableTest {
         ConicalSurface cone = new ConicalSurface(
                 new Axis2Placement3D(CartesianPoint.origin(), new Direction3(0, 0, 1), new Direction3(1, 0, 0)),
                 1.0, 0.3);
-        ParametricMapper mapper = MeshTriangulatorParametric.mapperFor(cone);
+        ParametricSurfaceMapper mapper = MeshTriangulatorParametric.mapperFor(cone);
         assertNotNull(mapper);
 
         for (double[] uv : new double[][] {{0.7, 1.5}, {-2.0, 0.25}, {0.0, -1.0}}) {
@@ -151,7 +151,7 @@ class ParametricMapperDispatchTableTest {
         ToroidalSurface torus = new ToroidalSurface(
                 new Axis2Placement3D(CartesianPoint.origin(), new Direction3(0, 0, 1), new Direction3(1, 0, 0)),
                 3.0, 1.0);
-        ParametricMapper mapper = MeshTriangulatorParametric.mapperFor(torus);
+        ParametricSurfaceMapper mapper = MeshTriangulatorParametric.mapperFor(torus);
         assertNotNull(mapper);
 
         for (double[] uv : new double[][] {{0.6, 1.1}, {-1.4, 2.6}, {0.0, -0.5}}) {
@@ -171,7 +171,7 @@ class ParametricMapperDispatchTableTest {
         SphericalSurface sphere = new SphericalSurface(
                 new Axis2Placement3D(CartesianPoint.origin(), new Direction3(0, 0, 1), new Direction3(1, 0, 0)),
                 2.5);
-        ParametricMapper mapper = MeshTriangulatorParametric.mapperFor(sphere);
+        ParametricSurfaceMapper mapper = MeshTriangulatorParametric.mapperFor(sphere);
         assertNotNull(mapper);
 
         // pointAt uses latitude v from the equator; project returns colatitude
@@ -195,7 +195,7 @@ class ParametricMapperDispatchTableTest {
         SphericalSurface sphere = new SphericalSurface(
                 new Axis2Placement3D(CartesianPoint.origin(), new Direction3(0, 0, 1), new Direction3(1, 0, 0)),
                 2.5);
-        ParametricMapper mapper = MeshTriangulatorParametric.mapperFor(sphere);
+        ParametricSurfaceMapper mapper = MeshTriangulatorParametric.mapperFor(sphere);
         assertNotNull(mapper);
         assertNull(mapper.project(CartesianPoint.origin(), null));
     }
@@ -209,7 +209,7 @@ class ParametricMapperDispatchTableTest {
 
     // ─── helpers ─────────────────────────────────────────────────────────
 
-    private static void assertRoundTrip(ParametricMapper mapper,
+    private static void assertRoundTrip(ParametricSurfaceMapper mapper,
                                         CartesianPoint point, UvPoint uv) {
         assertNotNull(uv, "project returned null for a non-degenerate point");
         CartesianPoint mapped = mapper.pointAt(uv.u(), uv.v());

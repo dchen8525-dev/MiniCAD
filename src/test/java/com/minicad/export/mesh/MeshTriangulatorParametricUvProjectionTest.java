@@ -8,6 +8,7 @@ import com.minicad.geometry.SurfaceGeometry;
 import com.minicad.geometry.SurfaceOfLinearExtrusion3;
 import com.minicad.geometry.SurfaceOfRevolution3;
 import com.minicad.geometry.Vector3;
+import com.minicad.preview.mapper.ParametricSurfaceMapper;
 import com.minicad.preview.payload.UvPoint;
 import org.junit.jupiter.api.Test;
 
@@ -29,13 +30,13 @@ class MeshTriangulatorParametricUvProjectionTest {
     private static final double UV_TOLERANCE = 5e-3;
     private static final double ROUND_TRIP_TOLERANCE = 5e-3;
 
-    private static MeshTriangulatorParametric.ParametricMapper mapperFor(SurfaceGeometry surface) {
-        MeshTriangulatorParametric.ParametricMapper mapper = MeshTriangulatorParametric.mapperFor(surface);
+    private static ParametricSurfaceMapper mapperFor(SurfaceGeometry surface) {
+        ParametricSurfaceMapper mapper = MeshTriangulatorParametric.mapperFor(surface);
         assertNotNull(mapper);
         return mapper;
     }
 
-    private static void assertRoundTrip(MeshTriangulatorParametric.ParametricMapper mapper,
+    private static void assertRoundTrip(ParametricSurfaceMapper mapper,
                                         CartesianPoint point, UvPoint uv) {
         CartesianPoint mapped = mapper.pointAt(uv.u(), uv.v());
         assertTrue(mapped.distanceTo(point) < ROUND_TRIP_TOLERANCE,
@@ -48,7 +49,7 @@ class MeshTriangulatorParametricUvProjectionTest {
                 new Line3(new CartesianPoint(1, 0, 0), new Direction3(0, 0, 1)),
                 CartesianPoint.origin(),
                 new Direction3(0, 0, 1));
-        MeshTriangulatorParametric.ParametricMapper mapper = mapperFor(cylinder);
+        ParametricSurfaceMapper mapper = mapperFor(cylinder);
 
         double[][] cases = {{0.5, 0.25}, {1.5, 1.0}, {0.0, 3.0}, {-1.0, -2.5}};
         for (double[] c : cases) {
@@ -68,7 +69,7 @@ class MeshTriangulatorParametricUvProjectionTest {
                 new Line3(new CartesianPoint(1, 0, 0), new Direction3(1, 0, 1)),
                 CartesianPoint.origin(),
                 new Direction3(0, 0, 1));
-        MeshTriangulatorParametric.ParametricMapper mapper = mapperFor(cone);
+        ParametricSurfaceMapper mapper = mapperFor(cone);
 
         for (double phi : new double[] {0.0, 1.0, -1.0, 2.5}) {
             CartesianPoint point = cone.pointAt(0.5, phi);
@@ -89,7 +90,7 @@ class MeshTriangulatorParametricUvProjectionTest {
                 List.of(0.0, 1.0));
         SurfaceOfRevolution3 surface = new SurfaceOfRevolution3(
                 generatrix, CartesianPoint.origin(), new Direction3(0, 0, 1));
-        MeshTriangulatorParametric.ParametricMapper mapper = mapperFor(surface);
+        ParametricSurfaceMapper mapper = mapperFor(surface);
 
         for (double s : new double[] {0.1, 0.5, 0.9}) {
             CartesianPoint point = surface.pointAt(s, 2.0);
@@ -105,7 +106,7 @@ class MeshTriangulatorParametricUvProjectionTest {
                 new Line3(new CartesianPoint(1, 0, 0), new Direction3(0, 0, 1)),
                 CartesianPoint.origin(),
                 new Direction3(0, 0, 1));
-        MeshTriangulatorParametric.ParametricMapper mapper = mapperFor(cylinder);
+        ParametricSurfaceMapper mapper = mapperFor(cylinder);
 
         UvPoint first = mapper.project(cylinder.pointAt(0.5, 0.01), null);
         UvPoint second = mapper.project(cylinder.pointAt(0.5, 2 * Math.PI - 0.01), first);
@@ -120,7 +121,7 @@ class MeshTriangulatorParametricUvProjectionTest {
         SurfaceOfLinearExtrusion3 extrusion = new SurfaceOfLinearExtrusion3(
                 new Line3(CartesianPoint.origin(), new Direction3(1, 0, 0)),
                 new Vector3(0, 0, 2));
-        MeshTriangulatorParametric.ParametricMapper mapper = mapperFor(extrusion);
+        ParametricSurfaceMapper mapper = mapperFor(extrusion);
 
         for (double t : new double[] {0.0, 0.3, 1.0}) {
             CartesianPoint point = extrusion.pointAt(0.7, t);
@@ -141,7 +142,7 @@ class MeshTriangulatorParametricUvProjectionTest {
                 List.of(0.0, 1.0));
         SurfaceOfLinearExtrusion3 extrusion = new SurfaceOfLinearExtrusion3(
                 generatrix, new Vector3(0, 0, 3));
-        MeshTriangulatorParametric.ParametricMapper mapper = mapperFor(extrusion);
+        ParametricSurfaceMapper mapper = mapperFor(extrusion);
 
         CartesianPoint point = extrusion.pointAt(0.4, 0.6);
         UvPoint uv = mapper.project(point, null);
