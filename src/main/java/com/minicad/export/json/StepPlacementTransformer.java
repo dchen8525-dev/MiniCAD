@@ -17,6 +17,12 @@ import java.util.List;
  * matrix lives in {@link StepMappedItemTransformer}, which is the single
  * implementation — this class used to carry a second, divergent copy that
  * nothing called.</p>
+ *
+ * <p>Its {@code pointFromStep} went the same way: it was byte-identical to
+ * {@link StepPointExtractor#pointFromStep} and had no caller at all, since
+ * {@link #matrixForPlacementEntity} reads the 2D origin through
+ * {@code pointFromPlacement} instead. {@link StepPointExtractor} is the single
+ * home of that conversion.</p>
  */
 public final class StepPlacementTransformer {
 
@@ -155,20 +161,6 @@ public final class StepPlacementTransformer {
                 axis1.z() * scale, axis2.z() * scale, axis3.z() * scale, origin.z(),
                 0.0, 0.0, 0.0, 1.0
         };
-    }
-
-    /**
-     * Creates a CartesianPoint from a STEP CartesianPoint.
-     * Handles 2D and 3D points by padding missing coordinates with zero.
-     *
-     * @param point the STEP CartesianPoint
-     * @return the CartesianPoint
-     */
-    public static CartesianPoint pointFromStep(StepCartesianPoint point) {
-        double x = point.coordinates().get(0);
-        double y = point.coordinates().size() > 1 ? point.coordinates().get(1) : 0.0;
-        double z = point.coordinates().size() > 2 ? point.coordinates().get(2) : 0.0;
-        return new CartesianPoint(x, y, z);
     }
 
     // ─── Private helper methods ─────────────────────────────────────

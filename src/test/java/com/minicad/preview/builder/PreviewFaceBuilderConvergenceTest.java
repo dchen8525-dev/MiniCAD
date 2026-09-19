@@ -605,7 +605,7 @@ class PreviewFaceBuilderConvergenceTest {
         }
         assertEquals(List.of(), reappeared,
                 "PreviewFaceBuilder re-declared " + reappeared + ". basisDirectionForNormal "
-                        + "is live in export.glb.PreviewMeshExporter / export.json.StepPointExtractor "
+                        + "is live in export.glb.PreviewMeshExporter "
                         + "and clamp has one home in common.BSplineKernel; every other name in "
                         + "this list lost its last caller when the surface-handler family was "
                         + "deleted, so it would be dead on arrival here.");
