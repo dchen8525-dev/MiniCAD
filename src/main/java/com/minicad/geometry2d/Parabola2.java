@@ -242,17 +242,4 @@ public final class Parabola2 implements Curve2 {
     public Direction2 yDirection() {
         return axisDirection.perpendicular();
     }
-
-    /**
-     * Creates a new parabola at a given vertex with a given focal distance.
-     *
-     * @param newVertex new vertex point
-     * @param newFocalDistance new focal distance
-     * @return new parabola with same axis direction
-     */
-    public Parabola2 withVertex(Point2 newVertex, double newFocalDistance) {
-        Preconditions.requireNonNull(newVertex, "newVertex");
-        Preconditions.requireFinite(newFocalDistance, "newFocalDistance");
-        return new Parabola2(newVertex, axisDirection, newFocalDistance);
-    }
 }

@@ -40,16 +40,6 @@ public final class PreviewStatisticsHelper {
         // Static helper class - no instances
     }
 
-    public static int countEntities(Map<Integer, StepEntity> resolved, Class<? extends StepEntity> type) {
-        int count = 0;
-        for (StepEntity entity : resolved.values()) {
-            if (type.isInstance(entity)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     public static int countSolidEntities(Map<Integer, StepEntity> resolved) {
         int count = 0;
         for (StepEntity entity : resolved.values()) {

@@ -92,19 +92,6 @@ public final class CompiledStepDocument {
         this.builder = builder;
     }
 
-    public String getStepText() {
-        return stepText;
-    }
-    public StepFile getStepFile() {
-        return stepFile;
-    }
-    public Map<Integer, StepEntity> getResolved() {
-        return resolved;
-    }
-    public StepCadBuilder getBuilder() {
-        return builder;
-    }
-
     // Record-style accessors
     public String stepText() { return stepText; }
     public StepFile stepFile() { return stepFile; }

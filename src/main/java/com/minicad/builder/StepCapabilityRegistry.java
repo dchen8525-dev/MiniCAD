@@ -101,38 +101,6 @@ public static final class Capability {
         this.limitations = limitations;
     }
 
-    public String getEntity() {
-        return entity;
-    }
-
-    public String getLevel() {
-        return level;
-    }
-
-    public boolean isParsed() {
-        return parsed;
-    }
-
-    public boolean isResolved() {
-        return resolved;
-    }
-
-    public boolean isBuilt() {
-        return built;
-    }
-
-    public boolean isExported() {
-        return exported;
-    }
-
-    public boolean isTested() {
-        return tested;
-    }
-
-    public String getLimitations() {
-        return limitations;
-    }
-
     // Record-style accessors
     public String entity() {
         return entity;

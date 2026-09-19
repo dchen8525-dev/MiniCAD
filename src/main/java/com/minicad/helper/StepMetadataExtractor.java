@@ -249,22 +249,6 @@ public static final class DisplayMetadata {
         this.pbr = pbr;
     }
 
-    public int[] getRgb() {
-        return rgb;
-    }
-
-    public List<String> getLayers() {
-        return layers;
-    }
-
-    public double getTransparency() {
-        return transparency;
-    }
-
-    public PbrMetadata getPbr() {
-        return pbr;
-    }
-
     // Record-style accessors
     public int[] rgb() { return rgb; }
     public List<String> layers() { return layers; }

@@ -74,17 +74,6 @@ public final class Axis2Placement3D {
     public Direction3 refDirection() { return getRefDirection(); }
 
     /**
-     * Returns a new placement with the given point as the location.
-     *
-     * @param point the new origin point
-     * @return new placement at the given point
-     */
-    public Axis2Placement3D withOrigin(CartesianPoint point) {
-        Preconditions.requireNonNull(point, "point");
-        return new Axis2Placement3D(point, axis, refDirection);
-    }
-
-    /**
      * Returns the local X direction, computed by projecting the reference
      * direction onto the plane normal to the axis (Gram-Schmidt).
      * This ensures an orthonormal coordinate system per the STEP standard.

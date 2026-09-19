@@ -158,21 +158,6 @@ public final class Direction3 {
     }
 
     /**
-     * Returns the cross product as a normalized direction.
-     *
-     * @param other other direction
-     * @return cross product direction (normalized)
-     */
-    public Direction3 crossDirection(Direction3 other) {
-        Preconditions.requireNonNull(other, "other");
-        return new Direction3(
-            y * other.z - z * other.y,
-            z * other.x - x * other.z,
-            x * other.y - y * other.x
-        ).normalize();
-    }
-
-    /**
      * Returns the dot product of this direction with another.
      *
      * @param other other direction

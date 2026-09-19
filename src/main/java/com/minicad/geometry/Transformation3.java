@@ -7,10 +7,6 @@ import java.util.Objects;
  * 3D transformation matrix for coordinate transformations.
  * Represents a 4x4 transformation matrix in homogeneous coordinates.
  */
-/**
- * 3D transformation matrix for coordinate transformations.
- * Represents a 4x4 transformation matrix in homogeneous coordinates.
- */
 public final class Transformation3 {
     private final double m00;
     private final double m01;
@@ -183,70 +179,6 @@ public final class Transformation3 {
             m30 * other.m02 + m31 * other.m12 + m32 * other.m22 + m33 * other.m32,
             m30 * other.m03 + m31 * other.m13 + m32 * other.m23 + m33 * other.m33
         );
-    }
-
-    public double getM00() {
-        return m00;
-    }
-
-    public double getM01() {
-        return m01;
-    }
-
-    public double getM02() {
-        return m02;
-    }
-
-    public double getM03() {
-        return m03;
-    }
-
-    public double getM10() {
-        return m10;
-    }
-
-    public double getM11() {
-        return m11;
-    }
-
-    public double getM12() {
-        return m12;
-    }
-
-    public double getM13() {
-        return m13;
-    }
-
-    public double getM20() {
-        return m20;
-    }
-
-    public double getM21() {
-        return m21;
-    }
-
-    public double getM22() {
-        return m22;
-    }
-
-    public double getM23() {
-        return m23;
-    }
-
-    public double getM30() {
-        return m30;
-    }
-
-    public double getM31() {
-        return m31;
-    }
-
-    public double getM32() {
-        return m32;
-    }
-
-    public double getM33() {
-        return m33;
     }
 
     @Override

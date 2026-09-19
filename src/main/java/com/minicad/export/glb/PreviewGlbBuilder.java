@@ -176,22 +176,6 @@ public final class PreviewGlbBuilder {
         return uvLoopFaceCount;
     }
 
-    public int nodeCount() {
-        return nodes.size();
-    }
-
-    public int materialCount() {
-        return materials.size();
-    }
-
-    public int accessorCount() {
-        return accessors.size();
-    }
-
-    public int bufferViewCount() {
-        return bufferViews.size();
-    }
-
     public long faceVertexCount() {
         return faceVertexCount;
     }
@@ -613,41 +597,6 @@ public final class PreviewGlbBuilder {
             max[2] = Math.max(max[2], (float) point.z());
         }
         return new FloatArrayData(values, points.size(), min, max);
-    }
-
-    private FloatArrayData triangleNormals(List<PointPayload> triangles) {
-        float[] values = new float[triangles.size() * 3];
-        for (int i = 0; i + 2 < triangles.size(); i += 3) {
-            PointPayload a = triangles.get(i);
-            PointPayload b = triangles.get(i + 1);
-            PointPayload c = triangles.get(i + 2);
-            double abx = b.x() - a.x();
-            double aby = b.y() - a.y();
-            double abz = b.z() - a.z();
-            double acx = c.x() - a.x();
-            double acy = c.y() - a.y();
-            double acz = c.z() - a.z();
-            double nx = aby * acz - abz * acy;
-            double ny = abz * acx - abx * acz;
-            double nz = abx * acy - aby * acx;
-            double norm = Math.sqrt(nx * nx + ny * ny + nz * nz);
-            if (norm <= Epsilon.EPS) {
-                nx = 0.0;
-                ny = 0.0;
-                nz = 1.0;
-            } else {
-                nx /= norm;
-                ny /= norm;
-                nz /= norm;
-            }
-            for (int vertex = 0; vertex < 3; vertex++) {
-                int base = (i + vertex) * 3;
-                values[base] = (float) nx;
-                values[base + 1] = (float) ny;
-                values[base + 2] = (float) nz;
-            }
-        }
-        return new FloatArrayData(values, triangles.size(), null, null);
     }
 
     private IndexedTriangleMesh indexedTriangleMesh(List<PointPayload> triangles) {
