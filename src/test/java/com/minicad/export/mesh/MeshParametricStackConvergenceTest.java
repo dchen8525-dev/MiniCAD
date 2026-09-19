@@ -78,6 +78,12 @@ class MeshParametricStackConvergenceTest {
     private static final String TRIANGULATION_HELPER =
             "src/main/java/com/minicad/preview/sampling/TriangulationHelper.java";
 
+    private static final String PARAMETRIC_WINDOW_WALK =
+            "src/main/java/com/minicad/preview/sampling/ParametricWindowWalk.java";
+
+    private static final String GLB_EXPORTER =
+            "src/main/java/com/minicad/export/glb/PreviewMeshExporter.java";
+
     private static final String PCURVE_HELPER =
             "src/main/java/com/minicad/preview/sampling/PcurveSamplingHelper.java";
 
@@ -161,20 +167,29 @@ class MeshParametricStackConvergenceTest {
                             + "in favour of the shared one; call it through the helper that owns "
                             + "it instead of forking the body.");
         }
-        assertTrue(text.contains("TriangulationHelper.contains("),
-                "the loop containment test must call TriangulationHelper.contains.");
-        assertTrue(text.contains("TriangulationHelper.signedArea("),
-                "the outer-loop inference must call TriangulationHelper.signedArea.");
+        assertTrue(text.contains("ParametricWindowWalk.walk("),
+                "the cell walk must be the shared one; a hand-written window loop in this "
+                        + "file is the copy ParametricWindowWalk exists to prevent.");
+        assertTrue(text.contains("PreviewMeshExporter.normalizeLoopRoles("),
+                "the outer-loop inference must call the shared one; the private copy that "
+                        + "used TriangulationHelper.signedArea is gone with it.");
         assertTrue(text.contains("PcurveSamplingHelper.sameUv("),
                 "the loop-closure test must call PcurveSamplingHelper.sameUv; a bare call would "
                         + "mean a local copy or a static import re-entered the file.");
 
-        // ... and the homes really do declare the predicates the mesh side calls.
+        // ... and the homes really do declare the predicates the shared helpers call.
+        String windowWalk = read(PARAMETRIC_WINDOW_WALK);
+        assertTrue(windowWalk.contains("TriangulationHelper.contains("),
+                "ParametricWindowWalk must be the caller of TriangulationHelper.contains; the "
+                        + "containment test moved out of this file with the cell walk.");
+        assertTrue(read(GLB_EXPORTER).contains("TriangulationHelper.signedArea("),
+                "PreviewMeshExporter.normalizeLoopRoles must be the caller of "
+                        + "TriangulationHelper.signedArea -- it is now the one inference.");
         String triangulation = read(TRIANGULATION_HELPER);
         for (String name : List.of("contains", "isOnPolygonBoundary", "isOnSegment", "signedArea")) {
             assertTrue(declaresMethod(triangulation, name),
-                    "TriangulationHelper stopped declaring " + name + ", but the mesh side calls "
-                            + "it as the single implementation.");
+                    "TriangulationHelper stopped declaring " + name + ", but the shared helpers "
+                            + "call it as the single implementation.");
         }
         String pcurve = read(PCURVE_HELPER);
         for (String name : List.of("sameUv", "distanceSquared")) {
@@ -240,22 +255,27 @@ class MeshParametricStackConvergenceTest {
         assertEquals(2.0, bounds.uSpan(), 0.0);
         assertEquals(2.0, bounds.vSpan(), 0.0);
 
-        // The mesh side builds the shared type in exactly one place, and it
-        // must pass the arguments in the payload order. A "restored" call in
-        // the retired nested order compiles and silently transposes the
-        // bounding box the cell prefilter walks, so pin the call form too.
+        // The mesh side no longer builds a bounding box at all: the per-loop
+        // box lives with the shared walk, and it must pass the arguments in the
+        // payload order. A "restored" call in the retired nested order compiles
+        // and silently transposes the box the cell prefilter walks, so pin the
+        // call form where it now lives too.
         String text = read(PARAMETRIC);
-        assertEquals(1, count(text, "new UvBounds("),
-                "the mesh side should construct UvBounds once (the per-loop bounding "
+        assertEquals(0, count(text, "new UvBounds("),
+                "the mesh side must not construct UvBounds any more: the per-loop box "
+                        + "moved to ParametricWindowWalk with the cell walk.");
+        String windowWalk = read(PARAMETRIC_WINDOW_WALK);
+        assertEquals(1, count(windowWalk, "new UvBounds("),
+                "the shared walk should construct UvBounds once (the per-loop bounding "
                         + "box); a second construction site needs its argument order "
                         + "checked against the payload constructor.");
-        assertTrue(text.contains("new UvBounds(minU, minV, maxU, maxV)"),
-                "the mesh loop bounding box must call new UvBounds(minU, minV, maxU, "
+        assertTrue(windowWalk.contains("new UvBounds(minU, minV, maxU, maxV)"),
+                "the loop bounding box must call new UvBounds(minU, minV, maxU, "
                         + "maxV). The retired nested class took (minU, maxU, minV, "
                         + "maxV); that order compiles here and quietly transposes the "
                         + "box.");
-        assertFalse(text.contains("new UvBounds(minU, maxU, minV, maxV)"),
-                "the retired nested constructor order is back at a mesh call site.");
+        assertFalse(windowWalk.contains("new UvBounds(minU, maxU, minV, maxV)"),
+                "the retired nested constructor order is back at a call site.");
     }
 
     // ─── runtime: the semantics the deleted copies used to carry ──────────

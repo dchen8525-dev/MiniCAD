@@ -20,6 +20,7 @@ import com.minicad.preview.payload.PreviewPayloadCopies;
 import com.minicad.preview.payload.UvBounds;
 import com.minicad.preview.payload.UvPoint;
 import com.minicad.preview.payload.VectorPayload;
+import com.minicad.preview.sampling.ParametricWindowWalk;
 import com.minicad.preview.sampling.TriangulationHelper;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepFaceEntity;
@@ -29,7 +30,6 @@ import com.minicad.topology.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import com.minicad.export.json.StepTypeNameResolver;
 
 /**
@@ -466,54 +466,23 @@ public final class PreviewMeshExporter {
             int vSegments,
             boolean sameSense
     ) {
-        ParametricLoopPayload outer = loops.stream()
-                .filter(ParametricLoopPayload::outer)
-                .findFirst()
-                .orElse(null);
-        if (outer == null) {
+        ParametricWindowWalk.Region region = ParametricWindowWalk.Region.of(loops);
+        if (region == null) {
             return List.of();
         }
-
-        List<ParametricLoopPayload> holes = loops.stream()
-                .filter(loop -> !loop.outer())
-                .collect(Collectors.toList());
-
         List<PointPayload> triangles = new ArrayList<>();
-        for (int ui = 0; ui < uSegments; ui++) {
-            double u0 = bounds.minU() + bounds.uSpan() * ui / uSegments;
-            double u1 = bounds.minU() + bounds.uSpan() * (ui + 1) / uSegments;
-            for (int vi = 0; vi < vSegments; vi++) {
-                double v0 = bounds.minV() + bounds.vSpan() * vi / vSegments;
-                double v1 = bounds.minV() + bounds.vSpan() * (vi + 1) / vSegments;
-                UvPoint center = new UvPoint((u0 + u1) * 0.5, (v0 + v1) * 0.5);
-
-                if (!TriangulationHelper.contains(outer.points(), center)) {
-                    continue;
-                }
-
-                boolean insideHole = false;
-                for (ParametricLoopPayload hole : holes) {
-                    if (TriangulationHelper.contains(hole.points(), center)) {
-                        insideHole = true;
-                        break;
-                    }
-                }
-                if (insideHole) {
-                    continue;
-                }
-
-                CartesianPoint p00 = mapper.pointAt(u0, v0);
-                CartesianPoint p10 = mapper.pointAt(u1, v0);
-                CartesianPoint p01 = mapper.pointAt(u0, v1);
-                CartesianPoint p11 = mapper.pointAt(u1, v1);
-                Vector3 normal = mapper.normalAt(center.u(), center.v());
-                if (!sameSense) {
-                    normal = normal.scale(-1.0);
-                }
-                TriangulationHelper.appendOrientedTriangle(triangles, p00, p10, p11, normal);
-                TriangulationHelper.appendOrientedTriangle(triangles, p00, p11, p01, normal);
+        ParametricWindowWalk.walk(bounds, uSegments, vSegments, region, cell -> {
+            CartesianPoint p00 = mapper.pointAt(cell.u0(), cell.v0());
+            CartesianPoint p10 = mapper.pointAt(cell.u1(), cell.v0());
+            CartesianPoint p01 = mapper.pointAt(cell.u0(), cell.v1());
+            CartesianPoint p11 = mapper.pointAt(cell.u1(), cell.v1());
+            Vector3 normal = mapper.normalAt(cell.center().u(), cell.center().v());
+            if (!sameSense) {
+                normal = normal.scale(-1.0);
             }
-        }
+            TriangulationHelper.appendOrientedTriangle(triangles, p00, p10, p11, normal);
+            TriangulationHelper.appendOrientedTriangle(triangles, p00, p11, p01, normal);
+        });
         return List.copyOf(triangles);
     }
 
@@ -544,11 +513,16 @@ public final class PreviewMeshExporter {
 
     // ─── Parametric Loop Utilities ───────────────────────────────────────────────────
 
-    public static List<ParametricLoopPayload> normalizeLoopRoles(
-            StepFaceEntity stepFace,
-            StepEntity geometry,
-            List<ParametricLoopPayload> loops
-    ) {
+    /**
+     * Infers which loop is the outer one when the semantic layer did not say, by
+     * preferring the loop with the largest absolute signed area.
+     *
+     * <p>This is the one implementation of the inference: the mesh exporter used to
+     * carry a private copy, and the json exporter still keeps a logging wrapper of
+     * its own ({@code parametric_outer_bound_inferred}), which is why the json side
+     * is not routed here.</p>
+     */
+    public static List<ParametricLoopPayload> normalizeLoopRoles(List<ParametricLoopPayload> loops) {
         if (loops.isEmpty() || loops.stream().anyMatch(ParametricLoopPayload::outer)) {
             return loops;
         }
