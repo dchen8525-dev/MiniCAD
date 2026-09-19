@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -177,5 +178,77 @@ class StepAssemblyGraphBuilderTest {
 
     private static double length(double[] vector) {
         return Math.sqrt(dot(vector, vector));
+    }
+
+    // ── inverseRigidTransform / multiplyMatrices ─────────────────────────────
+    //
+    // These are the only home of the rigid inverse and the matrix product: the
+    // copies that used to sit in preview/sampling/MatrixTransformHelper
+    // (invertMatrix / composeMatrices) had no production caller and were deleted
+    // with that class, so their behaviour is pinned here instead. The bodies
+    // differed textually but not numerically -- invertMatrix's translation column
+    // is the same three negated dot products, and composeMatrices accumulates the
+    // product in the same order with the implicit 1.0 of the last row written out.
+
+    /** Rotation about Z by theta followed by a translation. */
+    private static double[] rigid(double theta, double tx, double ty, double tz) {
+        double c = Math.cos(theta), s = Math.sin(theta);
+        return new double[]{
+                c, -s, 0.0, tx,
+                s, c, 0.0, ty,
+                0.0, 0.0, 1.0, tz,
+                0.0, 0.0, 0.0, 1.0
+        };
+    }
+
+    @Test
+    void inverseRigidTransformIsItsOwnInverse() {
+        double[] matrix = rigid(0.7, 2.0, -3.0, 5.0);
+
+        double[] back = StepAssemblyGraphBuilder.inverseRigidTransform(
+                StepAssemblyGraphBuilder.inverseRigidTransform(matrix));
+
+        assertArrayEquals(matrix, back, 1.0e-9);
+    }
+
+    @Test
+    void multiplyMatricesWithIdentityKeepsTheMatrix() {
+        double[] matrix = rigid(0.3, 1.0, 1.0, 1.0);
+        double[] identity = StepAssemblyGraphBuilder.identityMatrix();
+
+        assertArrayEquals(matrix, StepAssemblyGraphBuilder.multiplyMatrices(matrix, identity), 1.0e-9);
+        assertArrayEquals(matrix, StepAssemblyGraphBuilder.multiplyMatrices(identity, matrix), 1.0e-9);
+    }
+
+    @Test
+    void multiplyMatricesWithTheInverseYieldsIdentity() {
+        double[] matrix = rigid(0.7, 2.0, -3.0, 5.0);
+
+        double[] product = StepAssemblyGraphBuilder.multiplyMatrices(
+                StepAssemblyGraphBuilder.inverseRigidTransform(matrix), matrix);
+
+        assertArrayEquals(StepAssemblyGraphBuilder.identityMatrix(), product, 1.0e-9);
+    }
+
+    @Test
+    void multiplyMatricesAppliesTheRightOperandFirst() {
+        // multiply(a, b) applies b first, then a: (1,0,0) translated +X by 1 lands
+        // at (2,0,0), then a 90-degree rotation about Z takes it to (0,2,0). The
+        // reversed product would carry (1,0,0) in its translation column instead.
+        double[] rotate90 = rigid(Math.PI / 2.0, 0.0, 0.0, 0.0);
+        double[] translateX = rigid(0.0, 1.0, 0.0, 0.0);
+
+        double[] combined = StepAssemblyGraphBuilder.multiplyMatrices(rotate90, translateX);
+
+        // The translation column is the image of the origin: R * (1,0,0) = (0,1,0).
+        assertEquals(0.0, combined[3], 1.0e-9);
+        assertEquals(1.0, combined[7], 1.0e-9);
+        assertEquals(0.0, combined[11], 1.0e-9);
+
+        // And the image of (1,0,0) is the point the two steps describe. Spelled
+        // out here rather than routed through a point-transform helper so the
+        // operand order is pinned by this class alone.
+        assertEquals(0.0, combined[0] + combined[3], 1.0e-9);
+        assertEquals(2.0, combined[4] + combined[7], 1.0e-9);
     }
 }

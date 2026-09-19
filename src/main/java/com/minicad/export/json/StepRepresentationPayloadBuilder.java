@@ -30,21 +30,6 @@ public final class StepRepresentationPayloadBuilder {
     private static final Logger log = LoggerFactory.getLogger(StepRepresentationPayloadBuilder.class);
     private StepRepresentationPayloadBuilder() {}
 
-    // Delegate to StepPlacementTransformer - extracted utility class
-    public static double[] matrixForMappedPlacement(
-            StepEntity mappedOrigin,
-            StepEntity mappingTarget,
-            StepCadBuilder builder
-    ) {
-        return StepPlacementTransformer.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
-    }
-
-    // Delegate to StepPlacementTransformer - extracted utility class
-    public static double[] matrixForPlacementEntity(StepEntity placement, StepCadBuilder builder) {
-        return StepPlacementTransformer.matrixForPlacementEntity(placement, builder);
-    }
-
-
     static AssemblyData buildAssemblyData(
             Map<Integer, StepEntity> resolved,
             StepCadBuilder builder,

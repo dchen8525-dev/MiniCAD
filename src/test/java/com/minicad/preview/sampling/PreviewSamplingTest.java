@@ -1,6 +1,7 @@
 package com.minicad.preview.sampling;
 
 import com.minicad.geometry.CartesianPoint;
+import com.minicad.helper.MathUtilityHelper;
 import com.minicad.geometry.BSplineSurface3;
 import com.minicad.geometry2d.Circle2;
 import com.minicad.geometry2d.Direction2;
@@ -18,7 +19,7 @@ class PreviewSamplingTest {
 
     private static final double EPS = 1e-9;
 
-    // ── MatrixTransformHelper.transformCartesian ───────────────────────────
+    // ── MathUtilityHelper.transformCartesian ───────────────────────────────
 
     @Test
     void transformCartesian_identityKeepsPoint() {
@@ -29,7 +30,7 @@ class PreviewSamplingTest {
                 0, 0, 0, 1
         };
         CartesianPoint p = new CartesianPoint(1.0, 2.0, 3.0);
-        CartesianPoint r = MatrixTransformHelper.transformCartesian(p, id);
+        CartesianPoint r = MathUtilityHelper.transformCartesian(p, id);
         assertEquals(1.0, r.x(), EPS);
         assertEquals(2.0, r.y(), EPS);
         assertEquals(3.0, r.z(), EPS);
@@ -45,7 +46,7 @@ class PreviewSamplingTest {
                 0, 0, 0, 1
         };
         CartesianPoint p = new CartesianPoint(1.0, 2.0, 3.0);
-        CartesianPoint r = MatrixTransformHelper.transformCartesian(p, translate);
+        CartesianPoint r = MathUtilityHelper.transformCartesian(p, translate);
         assertEquals(6.0, r.x(), EPS);
         assertEquals(9.0, r.y(), EPS);
         assertEquals(12.0, r.z(), EPS);
@@ -60,7 +61,7 @@ class PreviewSamplingTest {
                 0, 0, 0, 1
         };
         CartesianPoint p = new CartesianPoint(1.0, 2.0, 3.0);
-        CartesianPoint r = MatrixTransformHelper.transformCartesian(p, scale);
+        CartesianPoint r = MathUtilityHelper.transformCartesian(p, scale);
         assertEquals(2.0, r.x(), EPS);
         assertEquals(4.0, r.y(), EPS);
         assertEquals(6.0, r.z(), EPS);
