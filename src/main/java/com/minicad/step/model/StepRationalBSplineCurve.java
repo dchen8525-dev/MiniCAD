@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,27 +18,7 @@ import java.util.Objects;
  * @param knots optional knot values
  * @param knotSpec optional knot-spec enum
  */
-/**
- * Minimal rational B-spline curve.
- *
- * @param id step id
- * @param name step label
- * @param degree spline degree
- * @param controlPoints control-point references
- * @param curveForm curve form enum
- * @param closedCurve closed flag
- * @param selfIntersect self-intersection flag
- * @param weightsData rational weights
- * @param knotMultiplicities optional knot multiplicities
- * @param knots optional knot values
- * @param knotSpec optional knot-spec enum
- */
-public final class StepRationalBSplineCurve implements StepEntity {
-    private final int id;
-    private final String name;
-    private final int degree;
-    private final List<StepCartesianPoint> controlPoints;
-    private final String curveForm;
+public final class StepRationalBSplineCurve extends AbstractStepControlPointCurve {
     private final boolean closedCurve;
     private final boolean selfIntersect;
     private final List<Double> weightsData;
@@ -48,37 +27,13 @@ public final class StepRationalBSplineCurve implements StepEntity {
     private final String knotSpec;
 
     public StepRationalBSplineCurve(int id, String name, int degree, List<StepCartesianPoint> controlPoints, String curveForm, boolean closedCurve, boolean selfIntersect, List<Double> weightsData, List<Integer> knotMultiplicities, List<Double> knots, String knotSpec) {
-        this.id = id;
-        this.name = name;
-        this.degree = degree;
-        this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-        this.curveForm = curveForm;
+        super(id, name, degree, controlPoints, curveForm);
         this.closedCurve = closedCurve;
         this.selfIntersect = selfIntersect;
         this.weightsData = weightsData == null ? null : java.util.List.copyOf(weightsData);
         this.knotMultiplicities = knotMultiplicities == null ? null : java.util.List.copyOf(knotMultiplicities);
         this.knots = knots == null ? null : java.util.List.copyOf(knots);
         this.knotSpec = knotSpec;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getDegree() {
-        return degree;
-    }
-
-    public List<StepCartesianPoint> getControlPoints() {
-        return controlPoints;
-    }
-
-    public String getCurveForm() {
-        return curveForm;
     }
 
     public boolean isClosedCurve() {
@@ -106,11 +61,6 @@ public final class StepRationalBSplineCurve implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return getId(); }
-    public String name() { return getName(); }
-    public int degree() { return getDegree(); }
-    public List<StepCartesianPoint> controlPoints() { return getControlPoints(); }
-    public String curveForm() { return getCurveForm(); }
     public boolean closedCurve() { return isClosedCurve(); }
     public boolean selfIntersect() { return isSelfIntersect(); }
     public List<Double> weightsData() { return getWeightsData(); }
@@ -123,16 +73,16 @@ public final class StepRationalBSplineCurve implements StepEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StepRationalBSplineCurve that = (StepRationalBSplineCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(curveForm, that.curveForm) && closedCurve == that.closedCurve && selfIntersect == that.selfIntersect && Objects.equals(weightsData, that.weightsData) && Objects.equals(knotMultiplicities, that.knotMultiplicities) && Objects.equals(knots, that.knots) && Objects.equals(knotSpec, that.knotSpec);
+        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getDegree() == that.getDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(getCurveForm(), that.getCurveForm()) && closedCurve == that.closedCurve && selfIntersect == that.selfIntersect && Objects.equals(weightsData, that.weightsData) && Objects.equals(knotMultiplicities, that.knotMultiplicities) && Objects.equals(knots, that.knots) && Objects.equals(knotSpec, that.knotSpec);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, degree, controlPoints, curveForm, closedCurve, selfIntersect, weightsData, knotMultiplicities, knots, knotSpec);
+        return Objects.hash(getId(), getName(), getDegree(), getControlPoints(), getCurveForm(), closedCurve, selfIntersect, weightsData, knotMultiplicities, knots, knotSpec);
     }
 
     @Override
     public String toString() {
-        return "StepRationalBSplineCurve{" + "id=" + id + "name=" + name + "degree=" + degree + "controlPoints=" + controlPoints + "curveForm=" + curveForm + "closedCurve=" + closedCurve + "selfIntersect=" + selfIntersect + "weightsData=" + weightsData + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "knotSpec=" + knotSpec + "}";
+        return "StepRationalBSplineCurve{" + "id=" + getId() + "name=" + getName() + "degree=" + getDegree() + "controlPoints=" + getControlPoints() + "curveForm=" + getCurveForm() + "closedCurve=" + closedCurve + "selfIntersect=" + selfIntersect + "weightsData=" + weightsData + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "knotSpec=" + knotSpec + "}";
     }
 }

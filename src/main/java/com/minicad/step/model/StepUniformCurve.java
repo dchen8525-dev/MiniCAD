@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,54 +14,14 @@ import java.util.Objects;
  * @param closedCurve closed flag
  * @param selfIntersect self-intersection flag
  */
-/**
- * Resolved UNIFORM_CURVE marker with inherited B-spline data when present.
- *
- * @param id STEP instance id
- * @param name inherited geometric-representation-item name when available
- * @param degree spline degree, or {@code -1} when this is only a marker
- * @param controlPoints control-point references
- * @param curveForm curve form enum
- * @param closedCurve closed flag
- * @param selfIntersect self-intersection flag
- */
-public final class StepUniformCurve implements StepEntity {
-    private final int id;
-    private final String name;
-    private final int degree;
-    private final List<StepCartesianPoint> controlPoints;
-    private final String curveForm;
+public final class StepUniformCurve extends AbstractStepControlPointCurve {
     private final boolean closedCurve;
     private final boolean selfIntersect;
 
     public StepUniformCurve(int id, String name, int degree, List<StepCartesianPoint> controlPoints, String curveForm, boolean closedCurve, boolean selfIntersect) {
-        this.id = id;
-        this.name = name;
-        this.degree = degree;
-        this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-        this.curveForm = curveForm;
+        super(id, name, degree, controlPoints, curveForm);
         this.closedCurve = closedCurve;
         this.selfIntersect = selfIntersect;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getDegree() {
-        return degree;
-    }
-
-    public List<StepCartesianPoint> getControlPoints() {
-        return controlPoints;
-    }
-
-    public String getCurveForm() {
-        return curveForm;
     }
 
     public boolean isClosedCurve() {
@@ -73,25 +32,21 @@ public final class StepUniformCurve implements StepEntity {
         return selfIntersect;
     }
 
-    // Record-style accessors
-    public int degree() { return getDegree(); }
-    public List<StepCartesianPoint> controlPoints() { return getControlPoints(); }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StepUniformCurve that = (StepUniformCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(curveForm, that.curveForm) && closedCurve == that.closedCurve && selfIntersect == that.selfIntersect;
+        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getDegree() == that.getDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(getCurveForm(), that.getCurveForm()) && closedCurve == that.closedCurve && selfIntersect == that.selfIntersect;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, degree, controlPoints, curveForm, closedCurve, selfIntersect);
+        return Objects.hash(getId(), getName(), getDegree(), getControlPoints(), getCurveForm(), closedCurve, selfIntersect);
     }
 
     @Override
     public String toString() {
-        return "StepUniformCurve{" + "id=" + id + "name=" + name + "degree=" + degree + "controlPoints=" + controlPoints + "curveForm=" + curveForm + "closedCurve=" + closedCurve + "selfIntersect=" + selfIntersect + "}";
+        return "StepUniformCurve{" + "id=" + getId() + "name=" + getName() + "degree=" + getDegree() + "controlPoints=" + getControlPoints() + "curveForm=" + getCurveForm() + "closedCurve=" + closedCurve + "selfIntersect=" + selfIntersect + "}";
     }
 }

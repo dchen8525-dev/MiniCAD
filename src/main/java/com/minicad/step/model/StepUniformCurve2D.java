@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,72 +12,26 @@ import java.util.Objects;
  * @param controlPoints control points in 2D
  * @param curveForm the form of the curve
  */
-/**
- * Resolved UNIFORM_CURVE_2D.
- *
- * @param id step id
- * @param name step label
- * @param degree degree of the curve
- * @param controlPoints control points in 2D
- * @param curveForm the form of the curve
- */
-public final class StepUniformCurve2D implements StepEntity {
-    private final int id;
-    private final String name;
-    private final int degree;
-    private final List<StepCartesianPoint> controlPoints;
-    private final String curveForm;
-
+public final class StepUniformCurve2D extends AbstractStepControlPointCurve {
     public StepUniformCurve2D(int id, String name, int degree, List<StepCartesianPoint> controlPoints, String curveForm) {
-        this.id = id;
-        this.name = name;
-        this.degree = degree;
-        this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-        this.curveForm = curveForm;
+        super(id, name, degree, controlPoints, curveForm);
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getDegree() {
-        return degree;
-    }
-
-    public List<StepCartesianPoint> getControlPoints() {
-        return controlPoints;
-    }
-
-    public String getCurveForm() {
-        return curveForm;
-    }
-
-    // Record-style accessors
-    public int id() { return getId(); }
-    public String name() { return getName(); }
-    public int degree() { return getDegree(); }
-    public List<StepCartesianPoint> controlPoints() { return getControlPoints(); }
-    public String curveForm() { return getCurveForm(); }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StepUniformCurve2D that = (StepUniformCurve2D) o;
-        return id == that.id && Objects.equals(name, that.name) && degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(curveForm, that.curveForm);
+        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getDegree() == that.getDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(getCurveForm(), that.getCurveForm());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, degree, controlPoints, curveForm);
+        return Objects.hash(getId(), getName(), getDegree(), getControlPoints(), getCurveForm());
     }
 
     @Override
     public String toString() {
-        return "StepUniformCurve2D{" + "id=" + id + "name=" + name + "degree=" + degree + "controlPoints=" + controlPoints + "curveForm=" + curveForm + "}";
+        return "StepUniformCurve2D{" + "id=" + getId() + "name=" + getName() + "degree=" + getDegree() + "controlPoints=" + getControlPoints() + "curveForm=" + getCurveForm() + "}";
     }
 }
