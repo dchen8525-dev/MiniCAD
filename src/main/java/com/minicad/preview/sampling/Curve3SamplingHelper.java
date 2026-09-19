@@ -1,6 +1,7 @@
 package com.minicad.preview.sampling;
 
 import com.minicad.common.Epsilon;
+import com.minicad.common.TrimmedWindowWalk;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Circle;
@@ -19,6 +20,10 @@ import java.util.List;
  * Extracted from StepPreviewJsonExporter for better maintainability.
  */
 public final class Curve3SamplingHelper {
+
+    /** The 3D metric the shared walk needs; the walk itself is dimension-free. */
+    private static final TrimmedWindowWalk.PointDistance<CartesianPoint> POINT_DISTANCE =
+            CartesianPoint::distanceTo;
 
     private Curve3SamplingHelper() {
         // Utility class
@@ -98,69 +103,19 @@ public final class Curve3SamplingHelper {
         }
         boolean closed = sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) <= 1.0e-9;
         List<CartesianPoint> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
-        int startIndex = nearestPointIndex(basisPoints, trimmedCurve.trimStart());
-        int endIndex = nearestPointIndex(basisPoints, trimmedCurve.trimEnd());
+        int startIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimStart(), POINT_DISTANCE);
+        int endIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimEnd(), POINT_DISTANCE);
 
         List<CartesianPoint> trimmed = new ArrayList<>(Math.max(segments + 1, 2));
         trimmed.add(trimmedCurve.trimStart());
         if (closed) {
-            appendClosedTrimmedPoints(trimmed, basisPoints, startIndex, endIndex, trimmedCurve.senseAgreement());
+            TrimmedWindowWalk.appendClosed(
+                    trimmed, basisPoints, startIndex, endIndex, trimmedCurve.senseAgreement(), POINT_DISTANCE);
         } else {
-            appendOpenTrimmedPoints(trimmed, basisPoints, startIndex, endIndex);
+            TrimmedWindowWalk.appendOpen(trimmed, basisPoints, startIndex, endIndex, POINT_DISTANCE);
         }
-        addDistinctPoint(trimmed, trimmedCurve.trimEnd());
+        TrimmedWindowWalk.addDistinct(trimmed, trimmedCurve.trimEnd(), POINT_DISTANCE);
         return List.copyOf(trimmed);
-    }
-
-    public static int nearestPointIndex(List<CartesianPoint> points, CartesianPoint target) {
-        int nearestIndex = 0;
-        double nearestDistance = Double.POSITIVE_INFINITY;
-        for (int index = 0; index < points.size(); index++) {
-            double distance = points.get(index).distanceTo(target);
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestIndex = index;
-            }
-        }
-        return nearestIndex;
-    }
-
-    public static void appendClosedTrimmedPoints(
-            List<CartesianPoint> target,
-            List<CartesianPoint> basisPoints,
-            int startIndex,
-            int endIndex,
-            boolean senseAgreement
-    ) {
-        int size = basisPoints.size();
-        int index = startIndex;
-        while (index != endIndex) {
-            index = senseAgreement ? (index + 1) % size : (index - 1 + size) % size;
-            addDistinctPoint(target, basisPoints.get(index));
-        }
-    }
-
-    public static void appendOpenTrimmedPoints(
-            List<CartesianPoint> target,
-            List<CartesianPoint> basisPoints,
-            int startIndex,
-            int endIndex
-    ) {
-        if (startIndex <= endIndex) {
-            for (int index = startIndex + 1; index <= endIndex; index++) {
-                addDistinctPoint(target, basisPoints.get(index));
-            }
-            return;
-        }
-        for (int index = startIndex - 1; index >= endIndex; index--) {
-            addDistinctPoint(target, basisPoints.get(index));
-        }
-    }
-
-    public static void addDistinctPoint(List<CartesianPoint> points, CartesianPoint candidate) {
-        if (points.isEmpty() || points.get(points.size() - 1).distanceTo(candidate) > 1.0e-9) {
-            points.add(candidate);
-        }
     }
 
     public static List<CartesianPoint> sampleCircleArc(Circle circle, CartesianPoint start, CartesianPoint end, boolean naturalForward) {

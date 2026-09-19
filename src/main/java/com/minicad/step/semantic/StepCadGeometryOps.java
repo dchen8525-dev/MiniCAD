@@ -55,6 +55,7 @@ import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepCartesianTransformationOperator;
 import com.minicad.step.model.StepDirection;
 
+import com.minicad.common.TrimmedWindowWalk;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +70,13 @@ final class StepCadGeometryOps {
     // builder and re-validates orthogonality; transformPoint3 calls it once
     // per control point on B-spline transforms, so cache per transformation id.
     private final Map<Integer, TransformBasis3> transformBasisCache = new HashMap<>();
+
+    /** The 2D metric the shared walk needs; the walk itself is dimension-free. */
+    private static final TrimmedWindowWalk.PointDistance<Point2> POINT2_DISTANCE = Point2::distanceTo;
+
+    /** The 3D metric the shared walk needs; the walk itself is dimension-free. */
+    private static final TrimmedWindowWalk.PointDistance<CartesianPoint> POINT3_DISTANCE =
+            CartesianPoint::distanceTo;
 
     StepCadGeometryOps(StepCadBuilder builder) {
         this.builder = builder;
@@ -794,69 +802,19 @@ final class StepCadGeometryOps {
         }
         boolean closed = sampled.get(0).subtract(sampled.get(sampled.size() - 1)).norm() <= 1.0e-9;
         List<Point2> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
-        int startIndex = nearestPointIndex2(basisPoints, trimmedCurve.trimStart());
-        int endIndex = nearestPointIndex2(basisPoints, trimmedCurve.trimEnd());
+        int startIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimStart(), POINT2_DISTANCE);
+        int endIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimEnd(), POINT2_DISTANCE);
 
         List<Point2> trimmed = new ArrayList<>();
         trimmed.add(trimmedCurve.trimStart());
         if (closed) {
-            appendClosedTrimmedPoints2(trimmed, basisPoints, startIndex, endIndex, trimmedCurve.isSenseAgreement());
+            TrimmedWindowWalk.appendClosed(
+                    trimmed, basisPoints, startIndex, endIndex, trimmedCurve.isSenseAgreement(), POINT2_DISTANCE);
         } else {
-            appendOpenTrimmedPoints2(trimmed, basisPoints, startIndex, endIndex);
+            TrimmedWindowWalk.appendOpen(trimmed, basisPoints, startIndex, endIndex, POINT2_DISTANCE);
         }
-        addDistinctPoint2(trimmed, trimmedCurve.trimEnd());
+        TrimmedWindowWalk.addDistinct(trimmed, trimmedCurve.trimEnd(), POINT2_DISTANCE);
         return List.copyOf(trimmed);
-    }
-
-    private int nearestPointIndex2(List<Point2> points, Point2 target) {
-        int nearestIndex = 0;
-        double nearestDistance = Double.POSITIVE_INFINITY;
-        for (int index = 0; index < points.size(); index++) {
-            double distance = points.get(index).subtract(target).norm();
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestIndex = index;
-            }
-        }
-        return nearestIndex;
-    }
-
-    private void appendClosedTrimmedPoints2(
-            List<Point2> target,
-            List<Point2> basisPoints,
-            int startIndex,
-            int endIndex,
-            boolean senseAgreement
-    ) {
-        int size = basisPoints.size();
-        int index = startIndex;
-        while (index != endIndex) {
-            index = senseAgreement ? (index + 1) % size : (index - 1 + size) % size;
-            addDistinctPoint2(target, basisPoints.get(index));
-        }
-    }
-
-    private void appendOpenTrimmedPoints2(
-            List<Point2> target,
-            List<Point2> basisPoints,
-            int startIndex,
-            int endIndex
-    ) {
-        if (startIndex <= endIndex) {
-            for (int index = startIndex + 1; index <= endIndex; index++) {
-                addDistinctPoint2(target, basisPoints.get(index));
-            }
-            return;
-        }
-        for (int index = startIndex - 1; index >= endIndex; index--) {
-            addDistinctPoint2(target, basisPoints.get(index));
-        }
-    }
-
-    private void addDistinctPoint2(List<Point2> points, Point2 candidate) {
-        if (points.isEmpty() || points.get(points.size() - 1).subtract(candidate).norm() > 1.0e-9) {
-            points.add(candidate);
-        }
     }
 
     private List<CartesianPoint> sampleTrimmedCurve3(TrimmedCurve3 trimmedCurve, int segments) {
@@ -866,69 +824,19 @@ final class StepCadGeometryOps {
         }
         boolean closed = sampled.get(0).distanceTo(sampled.get(sampled.size() - 1)) <= 1.0e-9;
         List<CartesianPoint> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
-        int startIndex = nearestPointIndex3(basisPoints, trimmedCurve.trimStart());
-        int endIndex = nearestPointIndex3(basisPoints, trimmedCurve.trimEnd());
+        int startIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimStart(), POINT3_DISTANCE);
+        int endIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimEnd(), POINT3_DISTANCE);
 
         List<CartesianPoint> trimmed = new ArrayList<>();
         trimmed.add(trimmedCurve.trimStart());
         if (closed) {
-            appendClosedTrimmedPoints3(trimmed, basisPoints, startIndex, endIndex, trimmedCurve.isSenseAgreement());
+            TrimmedWindowWalk.appendClosed(
+                    trimmed, basisPoints, startIndex, endIndex, trimmedCurve.isSenseAgreement(), POINT3_DISTANCE);
         } else {
-            appendOpenTrimmedPoints3(trimmed, basisPoints, startIndex, endIndex);
+            TrimmedWindowWalk.appendOpen(trimmed, basisPoints, startIndex, endIndex, POINT3_DISTANCE);
         }
-        addDistinctPoint3(trimmed, trimmedCurve.trimEnd());
+        TrimmedWindowWalk.addDistinct(trimmed, trimmedCurve.trimEnd(), POINT3_DISTANCE);
         return List.copyOf(trimmed);
-    }
-
-    private int nearestPointIndex3(List<CartesianPoint> points, CartesianPoint target) {
-        int nearestIndex = 0;
-        double nearestDistance = Double.POSITIVE_INFINITY;
-        for (int index = 0; index < points.size(); index++) {
-            double distance = points.get(index).distanceTo(target);
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestIndex = index;
-            }
-        }
-        return nearestIndex;
-    }
-
-    private void appendClosedTrimmedPoints3(
-            List<CartesianPoint> target,
-            List<CartesianPoint> basisPoints,
-            int startIndex,
-            int endIndex,
-            boolean senseAgreement
-    ) {
-        int size = basisPoints.size();
-        int index = startIndex;
-        while (index != endIndex) {
-            index = senseAgreement ? (index + 1) % size : (index - 1 + size) % size;
-            addDistinctPoint3(target, basisPoints.get(index));
-        }
-    }
-
-    private void appendOpenTrimmedPoints3(
-            List<CartesianPoint> target,
-            List<CartesianPoint> basisPoints,
-            int startIndex,
-            int endIndex
-    ) {
-        if (startIndex <= endIndex) {
-            for (int index = startIndex + 1; index <= endIndex; index++) {
-                addDistinctPoint3(target, basisPoints.get(index));
-            }
-            return;
-        }
-        for (int index = startIndex - 1; index >= endIndex; index--) {
-            addDistinctPoint3(target, basisPoints.get(index));
-        }
-    }
-
-    private void addDistinctPoint3(List<CartesianPoint> points, CartesianPoint candidate) {
-        if (points.isEmpty() || points.get(points.size() - 1).distanceTo(candidate) > 1.0e-9) {
-            points.add(candidate);
-        }
     }
 
     private Plane transformPlane(Plane plane, StepCartesianTransformationOperator transformation) {

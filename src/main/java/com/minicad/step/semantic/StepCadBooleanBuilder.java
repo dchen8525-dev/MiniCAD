@@ -40,6 +40,7 @@ import com.minicad.topology.PolyLoop;
 import com.minicad.topology.Shell;
 import com.minicad.topology.Solid;
 
+import com.minicad.common.TrimmedWindowWalk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,10 @@ final class StepCadBooleanBuilder {
 
     private final StepCadBuilder builder;
     private final Map<Integer, StepEntity> entitiesById;
+
+    /** The 3D metric the shared walk needs; the walk itself is dimension-free. */
+    private static final TrimmedWindowWalk.PointDistance<CartesianPoint> POINT_DISTANCE =
+            CartesianPoint::distanceTo;
 
     StepCadBooleanBuilder(StepCadBuilder builder, Map<Integer, StepEntity> entitiesById) {
         this.builder = builder;
@@ -765,16 +770,16 @@ final class StepCadBooleanBuilder {
             boolean currentInside = currentDistance >= -1.0e-9;
             boolean nextInside = nextDistance >= -1.0e-9;
             if (currentInside && nextInside) {
-                addDistinctPoint(output, next);
+                TrimmedWindowWalk.addDistinct(output, next, POINT_DISTANCE);
             } else if (currentInside) {
                 CartesianPoint intersection = interpolatePlaneIntersection(current, next, currentDistance, nextDistance);
-                addDistinctPoint(output, intersection);
-                addDistinctPoint(capPoints, intersection);
+                TrimmedWindowWalk.addDistinct(output, intersection, POINT_DISTANCE);
+                TrimmedWindowWalk.addDistinct(capPoints, intersection, POINT_DISTANCE);
             } else if (nextInside) {
                 CartesianPoint intersection = interpolatePlaneIntersection(current, next, currentDistance, nextDistance);
-                addDistinctPoint(output, intersection);
-                addDistinctPoint(output, next);
-                addDistinctPoint(capPoints, intersection);
+                TrimmedWindowWalk.addDistinct(output, intersection, POINT_DISTANCE);
+                TrimmedWindowWalk.addDistinct(output, next, POINT_DISTANCE);
+                TrimmedWindowWalk.addDistinct(capPoints, intersection, POINT_DISTANCE);
             }
         }
         if (!output.isEmpty() && output.get(0).distanceTo(output.get(output.size() - 1)) <= 1.0e-9) {
@@ -797,12 +802,6 @@ final class StepCadBooleanBuilder {
         double t = startDistance / (startDistance - endDistance);
         Vector3 edge = end.subtract(start);
         return start.add(edge.scale(t));
-    }
-
-    private void addDistinctPoint(List<CartesianPoint> points, CartesianPoint candidate) {
-        if (points.isEmpty() || points.get(points.size() - 1).distanceTo(candidate) > 1.0e-9) {
-            points.add(candidate);
-        }
     }
 
     private List<CartesianPoint> buildCapLoop(List<CartesianPoint> capPoints, Plane plane) {

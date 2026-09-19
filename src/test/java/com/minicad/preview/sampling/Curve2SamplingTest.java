@@ -1,5 +1,6 @@
 package com.minicad.preview.sampling;
 
+import com.minicad.common.TrimmedWindowWalk;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Axis2Placement3D;
 import com.minicad.geometry.CartesianPoint;
@@ -182,33 +183,33 @@ class Curve2SamplingTest {
         assertEquals(2, pts.size());
     }
 
-    // ---- appendClosedTrimmedPoints2 both directions ----
+    // ---- TrimmedWindowWalk.appendClosed both directions ----
 
     @Test
-    void appendClosedTrimmedPoints2Reversed() {
+    void theClosedWalkRunsBackwardsToo() {
         List<Point2> target = new ArrayList<>();
         List<Point2> basis = Arrays.asList(p2(0, 0), p2(1, 0), p2(2, 0));
-        Curve2SamplingHelper.appendClosedTrimmedPoints2(target, basis, 0, 2, false);
+        TrimmedWindowWalk.appendClosed(target, basis, 0, 2, false, Point2::distanceTo);
         assertTrue(target.size() >= 1);
         assertTrue(target.get(target.size() - 1).subtract(p2(2, 0)).norm() < EPS);
     }
 
-    // ---- nearestPointIndex2 / addDistinctPoint2 ----
+    // ---- TrimmedWindowWalk.nearestIndex / addDistinct ----
 
     @Test
-    void nearestPointIndex2PicksClosest() {
+    void picksTheNearestBasisIndex() {
         List<Point2> pts = Arrays.asList(p2(0, 0), p2(10, 0), p2(20, 0));
-        assertEquals(1, Curve2SamplingHelper.nearestPointIndex2(pts, p2(11, 0)));
-        assertEquals(0, Curve2SamplingHelper.nearestPointIndex2(pts, p2(1, 0)));
+        assertEquals(1, TrimmedWindowWalk.nearestIndex(pts, p2(11, 0), Point2::distanceTo));
+        assertEquals(0, TrimmedWindowWalk.nearestIndex(pts, p2(1, 0), Point2::distanceTo));
     }
 
     @Test
     void addDistinctPoint2SkipsDuplicates() {
         List<Point2> pts = new ArrayList<>();
         pts.add(p2(0, 0));
-        Curve2SamplingHelper.addDistinctPoint2(pts, p2(0, 0));
+        TrimmedWindowWalk.addDistinct(pts, p2(0, 0), Point2::distanceTo);
         assertEquals(1, pts.size());
-        Curve2SamplingHelper.addDistinctPoint2(pts, p2(1, 0));
+        TrimmedWindowWalk.addDistinct(pts, p2(1, 0), Point2::distanceTo);
         assertEquals(2, pts.size());
     }
 

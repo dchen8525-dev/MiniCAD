@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.minicad.common.TrimmedWindowWalk;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry2d.Point2;
 import com.minicad.preview.payload.UvPoint;
@@ -13,23 +14,25 @@ import org.junit.jupiter.api.Test;
 class PreviewSamplingGeometryTest {
 
     @Test
-    void nearestPointIndexFindsClosestIn3d() {
+    void picksTheNearestBasisIndexIn3d() {
         List<CartesianPoint> pts = List.of(
                 new CartesianPoint(0, 0, 0),
                 new CartesianPoint(5, 0, 0),
                 new CartesianPoint(0, 9, 0));
-        assertEquals(1, Curve3SamplingHelper.nearestPointIndex(pts, new CartesianPoint(4, 1, 0)));
-        assertEquals(2, Curve3SamplingHelper.nearestPointIndex(pts, new CartesianPoint(1, 8, 0)));
+        assertEquals(
+                1, TrimmedWindowWalk.nearestIndex(pts, new CartesianPoint(4, 1, 0), CartesianPoint::distanceTo));
+        assertEquals(
+                2, TrimmedWindowWalk.nearestIndex(pts, new CartesianPoint(1, 8, 0), CartesianPoint::distanceTo));
     }
 
     @Test
-    void nearestPointIndex2FindsClosestIn2d() {
+    void picksTheNearestBasisIndexIn2d() {
         List<Point2> pts = List.of(
                 new Point2(0, 0),
                 new Point2(5, 0),
                 new Point2(0, 9));
-        assertEquals(1, Curve2SamplingHelper.nearestPointIndex2(pts, new Point2(4, 1)));
-        assertEquals(2, Curve2SamplingHelper.nearestPointIndex2(pts, new Point2(1, 8)));
+        assertEquals(1, TrimmedWindowWalk.nearestIndex(pts, new Point2(4, 1), Point2::distanceTo));
+        assertEquals(2, TrimmedWindowWalk.nearestIndex(pts, new Point2(1, 8), Point2::distanceTo));
     }
 
     @Test

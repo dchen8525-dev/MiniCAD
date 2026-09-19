@@ -1,5 +1,6 @@
 package com.minicad.preview.sampling;
 
+import com.minicad.common.TrimmedWindowWalk;
 import com.minicad.common.UnsupportedGeometryException;
 import com.minicad.geometry.Circle;
 import com.minicad.geometry.Ellipse3;
@@ -38,6 +39,9 @@ import java.util.List;
  * Extracted from StepPreviewJsonExporter for better maintainability.
  */
 public final class Curve2SamplingHelper {
+
+    /** The 2D metric the shared walk needs; the walk itself is dimension-free. */
+    private static final TrimmedWindowWalk.PointDistance<Point2> POINT_DISTANCE = Point2::distanceTo;
 
     private Curve2SamplingHelper() {
         // Utility class
@@ -127,69 +131,19 @@ public final class Curve2SamplingHelper {
         }
         boolean closed = sampled.get(0).subtract(sampled.get(sampled.size() - 1)).norm() <= 1.0e-9;
         List<Point2> basisPoints = closed ? List.copyOf(sampled.subList(0, sampled.size() - 1)) : sampled;
-        int startIndex = nearestPointIndex2(basisPoints, trimmedCurve.trimStart());
-        int endIndex = nearestPointIndex2(basisPoints, trimmedCurve.trimEnd());
+        int startIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimStart(), POINT_DISTANCE);
+        int endIndex = TrimmedWindowWalk.nearestIndex(basisPoints, trimmedCurve.trimEnd(), POINT_DISTANCE);
 
         List<Point2> trimmed = new ArrayList<>(Math.max(segments + 1, 2));
         trimmed.add(trimmedCurve.trimStart());
         if (closed) {
-            appendClosedTrimmedPoints2(trimmed, basisPoints, startIndex, endIndex, trimmedCurve.senseAgreement());
+            TrimmedWindowWalk.appendClosed(
+                    trimmed, basisPoints, startIndex, endIndex, trimmedCurve.senseAgreement(), POINT_DISTANCE);
         } else {
-            appendOpenTrimmedPoints2(trimmed, basisPoints, startIndex, endIndex);
+            TrimmedWindowWalk.appendOpen(trimmed, basisPoints, startIndex, endIndex, POINT_DISTANCE);
         }
-        addDistinctPoint2(trimmed, trimmedCurve.trimEnd());
+        TrimmedWindowWalk.addDistinct(trimmed, trimmedCurve.trimEnd(), POINT_DISTANCE);
         return List.copyOf(trimmed);
-    }
-
-    public static int nearestPointIndex2(List<Point2> points, Point2 target) {
-        int nearestIndex = 0;
-        double nearestDistance = Double.POSITIVE_INFINITY;
-        for (int index = 0; index < points.size(); index++) {
-            double distance = points.get(index).subtract(target).norm();
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestIndex = index;
-            }
-        }
-        return nearestIndex;
-    }
-
-    public static void appendClosedTrimmedPoints2(
-            List<Point2> target,
-            List<Point2> basisPoints,
-            int startIndex,
-            int endIndex,
-            boolean senseAgreement
-    ) {
-        int size = basisPoints.size();
-        int index = startIndex;
-        while (index != endIndex) {
-            index = senseAgreement ? (index + 1) % size : (index - 1 + size) % size;
-            addDistinctPoint2(target, basisPoints.get(index));
-        }
-    }
-
-    public static void appendOpenTrimmedPoints2(
-            List<Point2> target,
-            List<Point2> basisPoints,
-            int startIndex,
-            int endIndex
-    ) {
-        if (startIndex <= endIndex) {
-            for (int index = startIndex + 1; index <= endIndex; index++) {
-                addDistinctPoint2(target, basisPoints.get(index));
-            }
-            return;
-        }
-        for (int index = startIndex - 1; index >= endIndex; index--) {
-            addDistinctPoint2(target, basisPoints.get(index));
-        }
-    }
-
-    public static void addDistinctPoint2(List<Point2> points, Point2 candidate) {
-        if (points.isEmpty() || points.get(points.size() - 1).subtract(candidate).norm() > 1.0e-9) {
-            points.add(candidate);
-        }
     }
 
     public static String curveTypeName(Curve3 curve) {
