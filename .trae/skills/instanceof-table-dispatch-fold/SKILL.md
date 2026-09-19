@@ -3,6 +3,14 @@ name: "instanceof-table-dispatch-fold"
 description: "把 MiniCAD 里长的 instanceof 顺序分发链折叠为 (type, guard, handler) 表驱动分发，并补齐冻结顺序守卫测试与门禁；同时覆盖「跨类重复实现收敛 + 防回潮守卫」（scan_duplicate_methods、抽取 helper、一行委托）。当用户要求继续/执行 instanceof 链折叠、表驱动重构、重复实现收敛，或提到 scan_instanceof_chains、scan_duplicate_methods、dispatch table、折叠某方法时使用。"
 ---
 
+> **Superseded snapshot (2026-09-19).** This file is an old copy of the user-level skill
+> `~/.workbuddy/skills/java-table-driven-fold/SKILL.md`, frozen before the preview-side
+> convergence. The "active files" it names no longer exist: `PreviewGeometryCollector` was
+> deleted whole, and `COMPOSITE_BASIS_FACE_RULES`, `PreviewFaceBuilder`'s
+> `toXxxFacePayload` handlers and the preview dispatch tables went with it. Treat the
+> user-level skill as authoritative; this copy is kept for history only and is not
+> maintained.
+
 # instanceof 链表驱动折叠（MiniCAD）
 
 把 `if (x instanceof T) { ... }` 的长顺序分发链折叠成有序 `(type, guard, handler)`
