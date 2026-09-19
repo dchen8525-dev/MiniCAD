@@ -2,21 +2,12 @@ package com.minicad.geometry2d;
 
 import com.minicad.common.BSplineKernel;
 import com.minicad.common.GeometryException;
+import com.minicad.common.KnotVector;
 import com.minicad.common.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal rational 2D B-spline curve with knot multiplicities.
- *
- * @param degree spline degree
- * @param controlPoints control points
- * @param weights weights for control points
- * @param knotMultiplicities multiplicities for unique knots
- * @param knots unique knot values
- */
 /**
  * Minimal rational 2D B-spline curve with knot multiplicities.
  *
@@ -30,10 +21,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
     private final int degree;
     private final List<Point2> controlPoints;
     private final List<Double> weights;
-    private final List<Integer> knotMultiplicities;
-    private final List<Double> knots;
-
-    private volatile List<Double> expandedKnotsCache;
+    private final KnotVector knotVector;
 
     public RationalBSplineCurve2(int degree, List<Point2> controlPoints, List<Double> weights, List<Integer> knotMultiplicities, List<Double> knots) {
         BSplineCurve2.validateDefinition(degree, controlPoints, knotMultiplicities, knots);
@@ -48,8 +36,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
         this.degree = degree;
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
         this.weights = weights == null ? null : java.util.List.copyOf(weights);
-        this.knotMultiplicities = knotMultiplicities == null ? null : java.util.List.copyOf(knotMultiplicities);
-        this.knots = knots == null ? null : java.util.List.copyOf(knots);
+        this.knotVector = new KnotVector(knots, knotMultiplicities);
     }
 
     public int getDegree() {
@@ -65,11 +52,11 @@ public final class RationalBSplineCurve2 implements Curve2 {
     }
 
     public List<Integer> getKnotMultiplicities() {
-        return knotMultiplicities;
+        return knotVector.multiplicities();
     }
 
     public List<Double> getKnots() {
-        return knots;
+        return knotVector.knots();
     }
 
     // Record-style accessors
@@ -97,12 +84,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
      * Cached after first use to avoid repeated allocation on evaluation hot paths.
      */
     public List<Double> expandedKnots() {
-        List<Double> local = expandedKnotsCache;
-        if (local == null) {
-            local = BSplineKernel.expandedKnots(knots, knotMultiplicities);
-            expandedKnotsCache = local;
-        }
-        return local;
+        return knotVector.expanded();
     }
 
     /**
@@ -111,7 +93,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
      * @return start parameter
      */
     public double startParameter() {
-        return BSplineKernel.knotStart(knots);
+        return knotVector.start();
     }
 
     /**
@@ -120,7 +102,7 @@ public final class RationalBSplineCurve2 implements Curve2 {
      * @return end parameter
      */
     public double endParameter() {
-        return BSplineKernel.knotEnd(knots);
+        return knotVector.end();
     }
 
     @Override
@@ -128,31 +110,21 @@ public final class RationalBSplineCurve2 implements Curve2 {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RationalBSplineCurve2 that = (RationalBSplineCurve2) o;
-        return degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(weights, that.weights) && Objects.equals(knotMultiplicities, that.knotMultiplicities) && Objects.equals(knots, that.knots);
+        return degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(weights, that.weights) && Objects.equals(knotVector.multiplicities(), that.knotVector.multiplicities()) && Objects.equals(knotVector.knots(), that.knotVector.knots());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(degree, controlPoints, weights, knotMultiplicities, knots);
+        return Objects.hash(degree, controlPoints, weights, knotVector.multiplicities(), knotVector.knots());
     }
 
     @Override
     public String toString() {
-        return "RationalBSplineCurve2{" + "degree=" + degree + "controlPoints=" + controlPoints + "weights=" + weights + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "}";
+        return "RationalBSplineCurve2{" + "degree=" + degree + "controlPoints=" + controlPoints + "weights=" + weights + "knotMultiplicities=" + knotVector.multiplicities() + "knots=" + knotVector.knots() + "}";
     }
 
     @Override
     public List<Point2> sample(int segments) {
-        List<Point2> points = new ArrayList<>();
-        if (controlPoints == null || controlPoints.isEmpty()) {
-            return List.copyOf(points);
-        }
-        double start = startParameter();
-        double end = endParameter();
-        for (int i = 0; i <= segments; i++) {
-            double t = start + (end - start) * i / segments;
-            points.add(pointAt(t));
-        }
-        return List.copyOf(points);
+        return BSplineKernel.sampleDomain(startParameter(), endParameter(), segments, this::pointAt);
     }
 }

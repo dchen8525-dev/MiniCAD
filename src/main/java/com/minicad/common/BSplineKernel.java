@@ -2,6 +2,7 @@ package com.minicad.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleFunction;
 import java.util.function.DoubleUnaryOperator;
 
 /**
@@ -206,6 +207,32 @@ public final class BSplineKernel {
             return 1.0;
         }
         return knots.get(knots.size() - 1);
+    }
+
+    /**
+     * Samples the parameter domain {@code [start, end]} at evenly spaced parameters,
+     * evaluating {@code pointAt} at each of them.
+     *
+     * <p>The B-spline curve families pin a floor of 8 segments - a spline is never
+     * sampled so coarsely that its shape cannot be read off the result - and both
+     * dimensions have to apply it. Before this method existed the two rational
+     * curves sampled whatever they were handed, so {@code sample(2)} returned 3
+     * points on a rational spline and 9 on its non-rational twin.</p>
+     *
+     * @param start start of the parameter domain
+     * @param end end of the parameter domain
+     * @param segments requested number of segments; raised to the family floor of 8
+     * @param pointAt evaluation of the shape at one parameter
+     * @param <P> point type of the calling dimension
+     * @return {@code max(8, segments) + 1} points, from {@code start} to {@code end}
+     */
+    public static <P> List<P> sampleDomain(double start, double end, int segments, DoubleFunction<P> pointAt) {
+        int count = Math.max(8, segments);
+        List<P> samples = new ArrayList<>(count + 1);
+        for (int i = 0; i <= count; i++) {
+            samples.add(pointAt.apply(start + (end - start) * i / count));
+        }
+        return List.copyOf(samples);
     }
 
     /**

@@ -154,7 +154,10 @@ final class StepCadGeometryOps {
      * bodies call Curve2.pointAt directly: the original branches downcast to
      * the concrete type first, but pointAt is virtual and every listed type
      * overrides the interface default, so dynamic dispatch reaches the same
-     * method.
+     * method. The two spline branches delegate to their own sample(segments)
+     * instead of re-running the sweep: the family floor of 8 segments then lives
+     * in BSplineKernel.sampleDomain alone, so the rational and the non-rational
+     * spline cannot be sampled on two different grids.
      */
     private static final List<SampleCurve2Rule> SAMPLE_CURVE2_RULES = List.of(
             sampleCurve2Rule(Line2.class, (ops, curve, segments) -> {
@@ -165,13 +168,7 @@ final class StepCadGeometryOps {
             fullSweepRule(Ellipse2.class),
             sampleCurve2Rule(BSplineCurve2.class, (ops, curve, segments) -> {
                 BSplineCurve2 spline = (BSplineCurve2) curve;
-                List<Point2> points = new ArrayList<>(segments + 1);
-                double start = spline.startParameter();
-                double end = spline.endParameter();
-                for (int index = 0; index <= segments; index++) {
-                    points.add(spline.pointAt(start + (end - start) * index / segments));
-                }
-                return List.copyOf(points);
+                return spline.sample(segments);
             }),
             sampleCurve2Rule(RationalBSplineCurve2.class, (ops, curve, segments) -> {
                 RationalBSplineCurve2 spline = (RationalBSplineCurve2) curve;

@@ -3,6 +3,7 @@ package com.minicad.geometry;
 import com.minicad.common.Epsilon;
 import com.minicad.common.BSplineKernel;
 import com.minicad.common.GeometryException;
+import com.minicad.common.KnotVector;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,13 +19,8 @@ public final class BSplineSurface3 implements SurfaceGeometry {
     private final int uDegree;
     private final int vDegree;
     private final List<List<CartesianPoint>> controlPoints;
-    private final List<Integer> uMultiplicities;
-    private final List<Integer> vMultiplicities;
-    private final List<Double> uKnots;
-    private final List<Double> vKnots;
-
-    private volatile List<Double> uExpandedKnots;
-    private volatile List<Double> vExpandedKnots;
+    private final KnotVector uKnotVector;
+    private final KnotVector vKnotVector;
 
     public BSplineSurface3(
             int uDegree,
@@ -39,10 +35,6 @@ public final class BSplineSurface3 implements SurfaceGeometry {
             throw new GeometryException("surface degrees must be at least 1");
         }
         this.controlPoints = controlPoints.stream().map(List::copyOf).collect(Collectors.toList());
-        this.uMultiplicities = List.copyOf(uMultiplicities);
-        this.vMultiplicities = List.copyOf(vMultiplicities);
-        this.uKnots = List.copyOf(uKnots);
-        this.vKnots = List.copyOf(vKnots);
         if (this.controlPoints.size() < uDegree + 1) {
             throw new GeometryException("U control-point count must be at least degree + 1");
         }
@@ -55,69 +47,53 @@ public final class BSplineSurface3 implements SurfaceGeometry {
                 throw new GeometryException("control-point rows must have uniform length");
             }
         }
-        if (this.uMultiplicities.size() != this.uKnots.size() || this.vMultiplicities.size() != this.vKnots.size()) {
+        if (uMultiplicities.size() != uKnots.size() || vMultiplicities.size() != vKnots.size()) {
             throw new GeometryException("knot multiplicities and knot values must have matching sizes");
         }
-        BSplineSurfaceHelper.validateKnots(uDegree, this.controlPoints.size(), this.uKnots, this.uMultiplicities);
-        BSplineSurfaceHelper.validateKnots(vDegree, vCount, this.vKnots, this.vMultiplicities);
+        BSplineSurfaceHelper.validateKnots(uDegree, this.controlPoints.size(), uKnots, uMultiplicities);
+        BSplineSurfaceHelper.validateKnots(vDegree, vCount, vKnots, vMultiplicities);
         this.uDegree = uDegree;
         this.vDegree = vDegree;
+        this.uKnotVector = new KnotVector(uKnots, uMultiplicities);
+        this.vKnotVector = new KnotVector(vKnots, vMultiplicities);
     }
 
     public int uDegree() { return uDegree; }
     public int vDegree() { return vDegree; }
     public List<List<CartesianPoint>> controlPoints() { return controlPoints; }
-    public List<Integer> uMultiplicities() { return uMultiplicities; }
-    public List<Integer> vMultiplicities() { return vMultiplicities; }
-    public List<Double> uKnots() { return uKnots; }
-    public List<Double> vKnots() { return vKnots; }
+    public List<Integer> uMultiplicities() { return uKnotVector.multiplicities(); }
+    public List<Integer> vMultiplicities() { return vKnotVector.multiplicities(); }
+    public List<Double> uKnots() { return uKnotVector.knots(); }
+    public List<Double> vKnots() { return vKnotVector.knots(); }
 
     // Java Bean getters
     public int getUDegree() { return uDegree; }
     public int getVDegree() { return vDegree; }
     public List<List<CartesianPoint>> getControlPoints() { return controlPoints; }
-    public List<Integer> getUMultiplicities() { return uMultiplicities; }
-    public List<Integer> getVMultiplicities() { return vMultiplicities; }
-    public List<Double> getUKnots() { return uKnots; }
-    public List<Double> getVKnots() { return vKnots; }
-
-    private List<Double> uExpanded() {
-        List<Double> local = uExpandedKnots;
-        if (local == null) {
-            local = BSplineKernel.expandedKnots(uKnots, uMultiplicities);
-            uExpandedKnots = local;
-        }
-        return local;
-    }
-
-    private List<Double> vExpanded() {
-        List<Double> local = vExpandedKnots;
-        if (local == null) {
-            local = BSplineKernel.expandedKnots(vKnots, vMultiplicities);
-            vExpandedKnots = local;
-        }
-        return local;
-    }
+    public List<Integer> getUMultiplicities() { return uKnotVector.multiplicities(); }
+    public List<Integer> getVMultiplicities() { return vKnotVector.multiplicities(); }
+    public List<Double> getUKnots() { return uKnotVector.knots(); }
+    public List<Double> getVKnots() { return vKnotVector.knots(); }
 
     public double uStart() {
-        return uExpanded().get(uDegree);
+        return uKnotVector.expandedStart(uDegree);
     }
 
     public double uEnd() {
-        return uExpanded().get(controlPoints.size());
+        return uKnotVector.expandedEnd(controlPoints.size());
     }
 
     public double vStart() {
-        return vExpanded().get(vDegree);
+        return vKnotVector.expandedStart(vDegree);
     }
 
     public double vEnd() {
-        return vExpanded().get(controlPoints.get(0).size());
+        return vKnotVector.expandedEnd(controlPoints.get(0).size());
     }
 
     public CartesianPoint pointAt(double u, double v) {
-        List<Double> uExp = uExpanded();
-        List<Double> vExp = vExpanded();
+        List<Double> uExp = uKnotVector.expanded();
+        List<Double> vExp = vKnotVector.expanded();
         double clampedU = BSplineKernel.clamp(u, uExp.get(uDegree), uExp.get(controlPoints.size()));
         double clampedV = BSplineKernel.clamp(v, vExp.get(vDegree), vExp.get(controlPoints.get(0).size()));
 
@@ -152,8 +128,8 @@ public final class BSplineSurface3 implements SurfaceGeometry {
     }
 
     public Vector3 normalAt(double u, double v) {
-        List<Double> uExp = uExpanded();
-        List<Double> vExp = vExpanded();
+        List<Double> uExp = uKnotVector.expanded();
+        List<Double> vExp = vKnotVector.expanded();
         double clampedU = BSplineKernel.clamp(u, uStart(), uEnd());
         double clampedV = BSplineKernel.clamp(v, vStart(), vEnd());
 

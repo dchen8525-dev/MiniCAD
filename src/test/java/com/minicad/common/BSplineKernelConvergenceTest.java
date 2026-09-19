@@ -91,6 +91,7 @@ class BSplineKernelConvergenceTest {
             "static\\s+List<Double>\\s+expandedKnots\\s*\\(",
             "static\\s+double\\s+knotStart\\s*\\(",
             "static\\s+double\\s+knotEnd\\s*\\(",
+            "static\\s+<P>\\s+List<P>\\s+sampleDomain\\s*\\(",
             "static\\s+double\\s+refineLocalMinimum\\s*\\(");
 
     /**

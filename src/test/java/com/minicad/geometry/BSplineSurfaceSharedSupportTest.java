@@ -1,5 +1,6 @@
 package com.minicad.geometry;
 
+import com.minicad.common.KnotVector;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -101,10 +102,19 @@ class BSplineSurfaceSharedSupportTest {
 
     @Test
     void expandedKnotVectorsAreCachedPerSurface() throws Exception {
+        Field cache = KnotVector.class.getDeclaredField("expanded");
+        cache.setAccessible(true);
+
         for (Object surface : List.of(nonRational(), rational(UNIT_WEIGHTS))) {
-            Field field = surface.getClass().getDeclaredField("uExpandedKnots");
-            field.setAccessible(true);
-            assertNull(field.get(surface), "cache must start empty");
+            // Both parameter directions keep their knots in a KnotVector now, so there is
+            // no per-surface cache field left to hold the expansion.
+            for (String name : List.of("uKnotVector", "vKnotVector")) {
+                Field field = surface.getClass().getDeclaredField(name);
+                field.setAccessible(true);
+                KnotVector knotVector = (KnotVector) field.get(surface);
+                assertNotNull(knotVector);
+                assertNull(cache.get(knotVector), "cache must start empty");
+            }
 
             if (surface instanceof BSplineSurface3) {
                 ((BSplineSurface3) surface).uStart();
@@ -114,10 +124,18 @@ class BSplineSurfaceSharedSupportTest {
                 ((RationalBSplineSurface3) surface).sampleGrid(2, 2);
             }
 
-            Object cached = field.get(surface);
-            assertNotNull(cached);
-            assertEquals(List.of(0.0, 0.0, 1.0, 1.0), cached);
-            assertSame(cached, field.get(surface), "cache must not be rebuilt");
+            Field uField = surface.getClass().getDeclaredField("uKnotVector");
+            uField.setAccessible(true);
+            KnotVector uKnotVector = (KnotVector) uField.get(surface);
+            assertEquals(List.of(0.0, 0.0, 1.0, 1.0), uKnotVector.expanded());
+            assertSame(uKnotVector.expanded(), uKnotVector.expanded(), "cache must not be rebuilt");
+
+            for (String stale : List.of("uExpandedKnots", "vExpandedKnots")) {
+                assertThrows(NoSuchFieldException.class, () -> surface.getClass().getDeclaredField(stale));
+            }
+            for (String stale : List.of("uExpanded", "vExpanded")) {
+                assertThrows(NoSuchMethodException.class, () -> surface.getClass().getDeclaredMethod(stale));
+            }
         }
     }
 

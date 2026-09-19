@@ -28,7 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Runtime behaviour tests for the SAMPLE_CURVE2_RULES dispatch in
  * StepCadGeometryOps.sampleCurve2, one test per branch plus the terminal
- * throw for a type no rule covers.
+ * throw for a type no rule covers, plus a parity test tying the two spline
+ * branches to one sampling grid (the family floor of 8 segments).
  *
  * The builder is never consulted by sampleCurve2 (its handlers only use
  * geometry arithmetic and the instance's own trim helpers), so a null
@@ -87,27 +88,43 @@ class StepCadGeometryOpsSampleCurve2Test {
     @Test
     @DisplayName("BSplineCurve2 sweeps its own start..end parameter range")
     void bsplineCurve2() {
-        BSplineCurve2 spline = new BSplineCurve2(
-                1, Arrays.asList(p2(0, 0), p2(10, 0)), Arrays.asList(2, 2), Arrays.asList(1.0, 4.0));
+        BSplineCurve2 spline = plainSpline();
         List<Point2> pts = ops.sampleCurve2(spline, 6);
-        assertEquals(7, pts.size());
+        // the request for 6 segments is raised to the family floor of 8
+        assertEquals(9, pts.size());
         // startParameter/endParameter are the first/last knot: 1.0 and 4.0
         assertPoint2(pts.get(0), spline.pointAt(1.0).getX(), spline.pointAt(1.0).getY());
-        assertPoint2(pts.get(6), spline.pointAt(4.0).getX(), spline.pointAt(4.0).getY());
-        // sweep parameter at index 2 is 1 + (4-1)*2/6 = 2
-        assertPoint2(pts.get(2), spline.pointAt(2.0).getX(), spline.pointAt(2.0).getY());
+        assertPoint2(pts.get(8), spline.pointAt(4.0).getX(), spline.pointAt(4.0).getY());
+        // sweep parameter at index 4 is 1 + (4-1)*4/8 = 2.5
+        assertPoint2(pts.get(4), spline.pointAt(2.5).getX(), spline.pointAt(2.5).getY());
     }
 
     @Test
     @DisplayName("RationalBSplineCurve2 samples through its own sample(segments)")
     void rationalBsplineCurve2() {
-        RationalBSplineCurve2 spline = new RationalBSplineCurve2(
-                1, Arrays.asList(p2(0, 0), p2(10, 0)), Arrays.asList(1.0, 1.0),
-                Arrays.asList(2, 2), Arrays.asList(0.0, 1.0));
+        RationalBSplineCurve2 spline = weightedSpline();
         List<Point2> pts = ops.sampleCurve2(spline, 6);
-        assertEquals(7, pts.size());
+        // the request for 6 segments is raised to the family floor of 8
+        assertEquals(9, pts.size());
         assertPoint2(pts.get(0), 0.0, 0.0);
-        assertPoint2(pts.get(6), 10.0, 0.0);
+        assertPoint2(pts.get(8), 10.0, 0.0);
+    }
+
+    @Test
+    @DisplayName("the two spline branches sample on the same grid, floor included")
+    void splineBranchesShareTheirSamplingGrid() {
+        // Before the fold the non-rational branch re-ran the sweep inline (with the
+        // floor) while the rational branch delegated to its own sample(segments)
+        // (without it), so the same request produced 7 points on one and 9 on the
+        // other. Both now delegate, so a low request is floored and a high one is
+        // honoured verbatim on both sides.
+        for (int segments : new int[]{2, 6, 8, 24}) {
+            int expected = Math.max(8, segments) + 1;
+            assertEquals(expected, ops.sampleCurve2(plainSpline(), segments).size(),
+                    "the non-rational branch ignored the family floor at " + segments + " segments");
+            assertEquals(expected, ops.sampleCurve2(weightedSpline(), segments).size(),
+                    "the rational branch ignored the family floor at " + segments + " segments");
+        }
     }
 
     @Test
@@ -171,5 +188,22 @@ class StepCadGeometryOpsSampleCurve2Test {
         // original chain either), so it must hit the terminal throw.
         DegenerateCurve2 degenerate = new DegenerateCurve2(p2(5, 7));
         assertThrows(UnsupportedGeometryException.class, () -> ops.sampleCurve2(degenerate, 72));
+    }
+
+    // ------------------------------------------------------------------
+    // Fixtures shared by the two spline branches
+    // ------------------------------------------------------------------
+
+    /** Non-rational 2D spline on the domain 1.0..4.0: a straight x ramp 0 -> 10. */
+    private static BSplineCurve2 plainSpline() {
+        return new BSplineCurve2(
+                1, Arrays.asList(p2(0, 0), p2(10, 0)), Arrays.asList(2, 2), Arrays.asList(1.0, 4.0));
+    }
+
+    /** Its rational twin on the domain 0.0..1.0: unit weights, the same x ramp. */
+    private static RationalBSplineCurve2 weightedSpline() {
+        return new RationalBSplineCurve2(
+                1, Arrays.asList(p2(0, 0), p2(10, 0)), Arrays.asList(1.0, 1.0),
+                Arrays.asList(2, 2), Arrays.asList(0.0, 1.0));
     }
 }

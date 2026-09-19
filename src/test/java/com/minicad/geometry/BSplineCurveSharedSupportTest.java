@@ -1,5 +1,6 @@
 package com.minicad.geometry;
 
+import com.minicad.common.KnotVector;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -81,9 +82,15 @@ class BSplineCurveSharedSupportTest {
     @Test
     void expandedKnotVectorsAreCachedPerCurve() throws Exception {
         for (Object curve : List.of(nonRational(), rational())) {
-            Field field = curve.getClass().getDeclaredField("expandedKnotsCache");
+            // The knots and their expansion cache now live in one shared KnotVector; the
+            // per-instance caching of that vector is pinned on KnotVector itself.
+            Field field = curve.getClass().getDeclaredField("knotVector");
             field.setAccessible(true);
-            assertNull(field.get(curve), "cache must start empty");
+            KnotVector knotVector = (KnotVector) field.get(curve);
+            assertNotNull(knotVector);
+            Field cache = KnotVector.class.getDeclaredField("expanded");
+            cache.setAccessible(true);
+            assertNull(cache.get(knotVector), "cache must start empty");
 
             if (curve instanceof BSplineCurve3) {
                 ((BSplineCurve3) curve).expandedKnots();
@@ -93,10 +100,10 @@ class BSplineCurveSharedSupportTest {
                 ((RationalBSplineCurve3) curve).parameterAt(new CartesianPoint(1.5, 0.9, 0));
             }
 
-            Object cached = field.get(curve);
-            assertNotNull(cached);
-            assertEquals(EXPANDED, cached);
-            assertSame(cached, field.get(curve), "cache must not be rebuilt");
+            assertEquals(EXPANDED, knotVector.expanded());
+            assertSame(knotVector.expanded(), knotVector.expanded(), "cache must not be rebuilt");
+            assertThrows(NoSuchFieldException.class,
+                    () -> curve.getClass().getDeclaredField("expandedKnotsCache"));
         }
     }
 

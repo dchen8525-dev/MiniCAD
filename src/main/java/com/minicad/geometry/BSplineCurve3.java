@@ -2,6 +2,7 @@ package com.minicad.geometry;
 
 import com.minicad.common.BSplineKernel;
 import com.minicad.common.GeometryException;
+import com.minicad.common.KnotVector;
 import com.minicad.common.Preconditions;
 
 import java.util.List;
@@ -15,28 +16,16 @@ import java.util.Objects;
  * @param knotMultiplicities multiplicities for unique knots
  * @param knots unique knot values
  */
-/**
- * Minimal non-rational B-spline curve with knot multiplicities.
- *
- * @param degree spline degree
- * @param controlPoints control points
- * @param knotMultiplicities multiplicities for unique knots
- * @param knots unique knot values
- */
 public final class BSplineCurve3 implements Curve3 {
     private final int degree;
     private final List<CartesianPoint> controlPoints;
-    private final List<Integer> knotMultiplicities;
-    private final List<Double> knots;
-
-    private volatile List<Double> expandedKnotsCache;
+    private final KnotVector knotVector;
 
     public BSplineCurve3(int degree, List<CartesianPoint> controlPoints, List<Integer> knotMultiplicities, List<Double> knots) {
         validateDefinition(degree, controlPoints, knotMultiplicities, knots);
         this.degree = degree;
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-        this.knotMultiplicities = knotMultiplicities == null ? null : java.util.List.copyOf(knotMultiplicities);
-        this.knots = knots == null ? null : java.util.List.copyOf(knots);
+        this.knotVector = new KnotVector(knots, knotMultiplicities);
     }
 
     static void validateDefinition(int degree, List<CartesianPoint> controlPoints,
@@ -78,35 +67,35 @@ public final class BSplineCurve3 implements Curve3 {
     }
 
     public List<Integer> getKnotMultiplicities() {
-        return knotMultiplicities;
+        return knotVector.multiplicities();
     }
 
     public List<Double> getKnots() {
-        return knots;
+        return knotVector.knots();
     }
 
     // Record-style accessors
     public int degree() { return degree; }
     public List<CartesianPoint> controlPoints() { return controlPoints; }
-    public List<Integer> knotMultiplicities() { return knotMultiplicities; }
-    public List<Double> knots() { return knots; }
+    public List<Integer> knotMultiplicities() { return getKnotMultiplicities(); }
+    public List<Double> knots() { return getKnots(); }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BSplineCurve3 that = (BSplineCurve3) o;
-        return degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(knotMultiplicities, that.knotMultiplicities) && Objects.equals(knots, that.knots);
+        return degree == that.degree && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(knotVector.multiplicities(), that.knotVector.multiplicities()) && Objects.equals(knotVector.knots(), that.knotVector.knots());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(degree, controlPoints, knotMultiplicities, knots);
+        return Objects.hash(degree, controlPoints, knotVector.multiplicities(), knotVector.knots());
     }
 
     @Override
     public String toString() {
-        return "BSplineCurve3{" + "degree=" + degree + "controlPoints=" + controlPoints + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "}";
+        return "BSplineCurve3{" + "degree=" + degree + "controlPoints=" + controlPoints + "knotMultiplicities=" + knotVector.multiplicities() + "knots=" + knotVector.knots() + "}";
     }
 
     /**
@@ -115,7 +104,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return start parameter
      */
     public double startParameter() {
-        return BSplineKernel.knotStart(knots);
+        return knotVector.start();
     }
 
     /**
@@ -124,7 +113,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return end parameter
      */
     public double endParameter() {
-        return BSplineKernel.knotEnd(knots);
+        return knotVector.end();
     }
 
     /**
@@ -134,12 +123,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return expanded knot vector
      */
     public List<Double> expandedKnots() {
-        List<Double> local = expandedKnotsCache;
-        if (local == null) {
-            local = BSplineKernel.expandedKnots(knots, knotMultiplicities);
-            expandedKnotsCache = local;
-        }
-        return local;
+        return knotVector.expanded();
     }
 
     /**
@@ -167,7 +151,7 @@ public final class BSplineCurve3 implements Curve3 {
      * @return knot count
      */
     public int knotCount() {
-        return knots == null ? 0 : knots.size();
+        return knotVector.knots().size();
     }
 
     @Override
@@ -185,22 +169,11 @@ public final class BSplineCurve3 implements Curve3 {
 
     @Override
     public double parameterAt(CartesianPoint point) {
-        return BSplineCurveHelper.parameterAt(point, knots, this::pointAt);
+        return BSplineCurveHelper.parameterAt(point, knotVector.knots(), this::pointAt);
     }
 
     @Override
     public java.util.List<CartesianPoint> sample(int segments) {
-        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
-        if (controlPoints == null || controlPoints.isEmpty()) {
-            return java.util.List.copyOf(points);
-        }
-        segments = Math.max(8, segments);
-        double start = startParameter();
-        double end = endParameter();
-        for (int i = 0; i <= segments; i++) {
-            double t = start + (end - start) * i / segments;
-            points.add(pointAt(t));
-        }
-        return java.util.List.copyOf(points);
+        return BSplineKernel.sampleDomain(startParameter(), endParameter(), segments, this::pointAt);
     }
 }
