@@ -851,19 +851,12 @@ final class StepCadGeometryOps {
 
     CartesianPoint transformPoint3(CartesianPoint point, StepCartesianTransformationOperator transformation) {
         TransformationOperatorBasis basis = transformBasis3(transformation);
-        double scale = transformationScale(transformation);
-        Vector3 offset = basis.x().scale(point.getX() * scale)
-                .add(basis.y().scale(point.getY() * scale))
-                .add(basis.z().scale(point.getZ() * scale));
-        return builder.buildPoint(transformation.localOrigin().id()).add(offset);
+        return TransformationOperatorBasis.originOf(transformation, builder)
+                .add(basis.applyTo(point.getX(), point.getY(), point.getZ()));
     }
 
     Vector3 transformVector3(Vector3 vector, StepCartesianTransformationOperator transformation) {
-        TransformationOperatorBasis basis = transformBasis3(transformation);
-        double scale = transformationScale(transformation);
-        return basis.x().scale(vector.getX() * scale)
-                .add(basis.y().scale(vector.getY() * scale))
-                .add(basis.z().scale(vector.getZ() * scale));
+        return transformBasis3(transformation).applyTo(vector.getX(), vector.getY(), vector.getZ());
     }
 
     Point2 transformPoint2(Point2 point, StepCartesianTransformationOperator transformation) {
@@ -876,13 +869,9 @@ final class StepCadGeometryOps {
     }
 
     Direction3 transformDirection3(Direction3 direction, StepCartesianTransformationOperator transformation) {
-        TransformationOperatorBasis basis = transformBasis3(transformation);
         Vector3 source = direction.asVector();
-        return Direction3.from(
-                basis.x().scale(source.getX())
-                        .add(basis.y().scale(source.getY()))
-                        .add(basis.z().scale(source.getZ()))
-        );
+        return Direction3.from(transformBasis3(transformation)
+                .applyToDirection(source.getX(), source.getY(), source.getZ()));
     }
 
     Direction2 transformDirection2(Direction2 direction, StepCartesianTransformationOperator transformation) {

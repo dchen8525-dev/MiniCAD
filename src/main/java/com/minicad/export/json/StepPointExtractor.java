@@ -3,7 +3,6 @@ package com.minicad.export.json;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.TransformationOperatorBasis;
 import com.minicad.geometry.CartesianPoint;
-import com.minicad.geometry.Vector3;
 import com.minicad.step.model.*;
 
 /**
@@ -45,21 +44,25 @@ public final class StepPointExtractor {
         return new CartesianPoint(x, y, z);
     }
 
+    /**
+     * Applies a CARTESIAN_TRANSFORMATION_OPERATOR to an already-converted point.
+     *
+     * <p>A one-line delegate to {@code TransformationOperatorBasis.transformPoint},
+     * which is where the frame is resolved, scaled and translated. The name stays
+     * because the callers sit in the json payload builders' frozen dispatch rows.
+     * </p>
+     *
+     * @param point the point to transform
+     * @param transformation the transformation operator
+     * @param builder the CAD builder the frame resolves through
+     * @return the transformed point
+     */
     static CartesianPoint transformPoint(
             CartesianPoint point,
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
-        Vector3 axis1 = basis.x();
-        Vector3 axis2 = basis.y();
-        Vector3 axis3 = basis.z();
-        double scale = basis.scale();
-        CartesianPoint origin = builder.buildPoint(transformation.localOrigin().id());
-        Vector3 offset = axis1.scale(point.x() * scale)
-                .add(axis2.scale(point.y() * scale))
-                .add(axis3.scale(point.z() * scale));
-        return origin.add(offset);
+        return TransformationOperatorBasis.transformPoint(point, transformation, builder);
     }
 
 }

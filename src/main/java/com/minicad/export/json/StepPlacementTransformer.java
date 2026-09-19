@@ -142,7 +142,7 @@ public final class StepPlacementTransformer {
         Vector3 axis2 = basis.y();
         Vector3 axis3 = basis.z();
         double scale = basis.scale();
-        CartesianPoint origin = builder.buildPoint(transformation.localOrigin().id());
+        CartesianPoint origin = TransformationOperatorBasis.originOf(transformation, builder);
         return new double[]{
                 axis1.x() * scale, axis2.x() * scale, axis3.x() * scale, origin.x(),
                 axis1.y() * scale, axis2.y() * scale, axis3.y() * scale, origin.y(),

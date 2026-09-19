@@ -500,11 +500,7 @@ public final class StepMeshExporter {
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
-        Vector3 offset = basis.x().scale(point.x() * basis.scale())
-                .add(basis.y().scale(point.y() * basis.scale()))
-                .add(basis.z().scale(point.z() * basis.scale()));
-        return builder.buildPoint(transformation.localOrigin().id()).add(offset);
+        return TransformationOperatorBasis.transformPoint(point, transformation, builder);
     }
 
     private static Direction3 transformDirection3(
@@ -512,12 +508,9 @@ public final class StepMeshExporter {
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
         Vector3 source = direction.asVector();
-        return Direction3.from(
-                basis.x().scale(source.x())
-                        .add(basis.y().scale(source.y()))
-                        .add(basis.z().scale(source.z())));
+        return Direction3.from(TransformationOperatorBasis.resolve(transformation, builder)
+                .applyToDirection(source.x(), source.y(), source.z()));
     }
 
     private static Vector3 transformVector3(
@@ -525,10 +518,8 @@ public final class StepMeshExporter {
             com.minicad.step.model.StepCartesianTransformationOperator transformation,
             StepCadBuilder builder
     ) {
-        TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
-        return basis.x().scale(vector.x() * basis.scale())
-                .add(basis.y().scale(vector.y() * basis.scale()))
-                .add(basis.z().scale(vector.z() * basis.scale()));
+        return TransformationOperatorBasis.resolve(transformation, builder)
+                .applyTo(vector.x(), vector.y(), vector.z());
     }
 
     /**

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.minicad.geometry.CartesianPoint;
+import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Vector3;
 import com.minicad.step.model.StepCartesianPoint;
 import com.minicad.step.model.StepCartesianTransformationOperator;
@@ -47,6 +48,17 @@ import org.junit.jupiter.api.Test;
  * directly and compares the shared home against the retired body kept below as
  * an oracle — including the branch where a missing axis2 would otherwise be
  * parallel to axis1.</p>
+ *
+ * <p>The record is also where the frame is <em>applied</em>. That part was
+ * written out seven times — a point, a vector and a direction on each of
+ * {@code StepCadGeometryOps} and {@code StepMeshExporter}, plus
+ * {@code StepPointExtractor} — and the frame's translation four times. The
+ * linear map is pinned by comparing the shared applier against the retired body
+ * kept below as a second oracle. The scale asymmetry — a point and a vector are
+ * scaled, a direction is not — is pinned by calling {@code applyTo} and
+ * {@code applyToDirection} <em>directly</em>: routing that check through
+ * {@code Direction3.from} would normalize the difference away, since a direction
+ * wrongly multiplied by three is still a unit vector.</p>
  */
 class TransformationOperatorBasisConvergenceTest {
 
@@ -83,6 +95,31 @@ class TransformationOperatorBasisConvergenceTest {
      */
     private static final List<String> KEPT_2D_SPELLINGS =
             List.of("transformAxis1_2", "transformAxis2OrDefault2");
+
+    /**
+     * How the seven deleted copies applied the frame: one axis at a time,
+     * scaled by hand. Each fragment is a {@code Vector3} accessor followed by a
+     * multiply, which is precisely the shape a shared applier removes. The home
+     * itself is unaffected — it scales the record's components directly
+     * ({@code this.x.scale(...)}), not through an accessor.
+     */
+    private static final List<String> RETIRED_APPLY_SPELLINGS = List.of(
+            ".x().scale(", ".y().scale(", ".z().scale(", "axis1.scale(", "axis2.scale(", "axis3.scale(");
+
+    /**
+     * The one expression that read the frame's translation, written out in four
+     * files before this convergence.
+     */
+    private static final String RETIRED_ORIGIN_SPELLING = "localOrigin().id()";
+
+    /**
+     * The only two main sources allowed to read the operator's origin:
+     * the home, for the point applier, and {@code StepCadBuilder.buildTransformation},
+     * which turns an operator into a placement and needs the origin on its own
+     * terms. Set equality, so a third reader names itself.
+     */
+    private static final List<String> ORIGIN_READERS = List.of(
+            HOME, "src/main/java/com/minicad/step/semantic/StepCadBuilder.java");
 
     private static final String STEP =
             "DATA;\n"
@@ -231,7 +268,148 @@ class TransformationOperatorBasisConvergenceTest {
                         + "parts that differed, and both stayed with their callers.");
     }
 
+    @Test
+    @DisplayName("the retired hand-scaled axis spellings are declared nowhere in main")
+    void theRetiredApplySpellingsAreGone() throws Exception {
+        List<String> found = new ArrayList<>();
+        for (Path file : sourcesUnder("src/main/java")) {
+            String text = code(read(file));
+            for (String spelling : RETIRED_APPLY_SPELLINGS) {
+                if (text.contains(spelling)) {
+                    found.add(spelling + " in " + file.toString().replace('\\', '/'));
+                }
+            }
+        }
+        assertEquals(List.of(), found,
+                "a caller scales a frame axis by hand again. That is the shape all seven deleted "
+                        + "copies had, and it is free to drift on the scale handling -- the "
+                        + "direction path must not scale, the point path must.");
+    }
+
+    @Test
+    @DisplayName("only the home and the placement builder read the operator's origin")
+    void onlyTheHomeAndThePlacementBuilderReadTheOrigin() throws Exception {
+        List<String> readers = new ArrayList<>();
+        for (Path file : sourcesUnder("src/main/java")) {
+            if (code(read(file)).contains(RETIRED_ORIGIN_SPELLING)) {
+                readers.add(file.toString().replace('\\', '/'));
+            }
+        }
+        List<String> expected = new ArrayList<>(ORIGIN_READERS);
+        expected.sort(String::compareTo);
+        readers.sort(String::compareTo);
+        assertEquals(expected, readers,
+                "the frame's translation gained or lost a reader. A new one is a fourth copy of "
+                        + "'local origin, built through the builder'; a missing one means the home "
+                        + "stopped being the place points get translated.");
+    }
+
+    @Test
+    @DisplayName("each application member has exactly one home, and transformPoint keeps one door")
+    void theApplicationMembersHaveOneHomeEach() throws Exception {
+        assertDeclaredInExactly("applyTo", List.of(HOME));
+        assertDeclaredInExactly("applyToDirection", List.of(HOME));
+        assertDeclaredInExactly("originOf", List.of(HOME));
+        // transformPoint keeps a second door on StepPointExtractor so the json
+        // payload builders' call rows did not have to move; that door is a
+        // one-line delegate and nothing else may add a third.
+        assertDeclaredInExactly("transformPoint", List.of(HOME, POINT_EXTRACTOR));
+    }
+
+    @Test
+    @DisplayName("the shared applier reproduces the retired point, vector and direction bodies")
+    void theApplierReproducesTheRetiredImplementation() {
+        List<StepCartesianTransformationOperator> operators = List.of(
+                operator(ax, ay, 2.0, az),
+                operator(ax, null, 3.0, null),
+                operator(null, null, null, null),
+                operator(ay, null, 6.0, null),
+                operator(axLong, null, 0.5, null));
+        List<CartesianPoint> points = List.of(
+                new CartesianPoint(1.0, 2.0, 3.0),
+                new CartesianPoint(-4.0, 0.5, 7.25),
+                new CartesianPoint(0.0, 0.0, 0.0));
+
+        for (StepCartesianTransformationOperator transformation : operators) {
+            TransformationOperatorBasis basis = TransformationOperatorBasis.resolve(transformation, builder);
+            for (CartesianPoint point : points) {
+                CartesianPoint expected = retiredTransformPoint(point, transformation);
+                assertPoint(TransformationOperatorBasis.transformPoint(point, transformation, builder),
+                        expected, "transformPoint for " + describe(transformation));
+                assertPoint(TransformationOperatorBasis.originOf(transformation, builder)
+                                .add(basis.applyTo(point.x(), point.y(), point.z())),
+                        expected, "applyTo plus originOf for " + describe(transformation));
+
+                Vector3 vector = new Vector3(point.x(), point.y(), point.z());
+                Vector3 mapped = basis.applyTo(vector.x(), vector.y(), vector.z());
+                assertVector(mapped, retiredTransformVector(vector, transformation),
+                        "applyTo(vector) for " + describe(transformation));
+            }
+            for (Direction3 direction : List.of(Direction3.xAxis(), Direction3.yAxis(), Direction3.zAxis())) {
+                assertVector(basis.applyToDirection(
+                                direction.x(), direction.y(), direction.z()),
+                        retiredTransformDirection(direction, transformation),
+                        "applyToDirection for " + describe(transformation));
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("a point and a vector are scaled; a direction deliberately is not")
+    void theDirectionPathDeliberatelySkipsTheScale() {
+        TransformationOperatorBasis basis =
+                TransformationOperatorBasis.resolve(operator(ax, ay, 3.0, az), builder);
+
+        // Asserted straight off the two members. Going through Direction3.from
+        // would normalize the difference away: +X times three is still +X once
+        // normalized, so a fold that scaled directions too would pass here.
+        assertVector(basis.applyTo(1.0, 0.0, 0.0), 3.0, 0.0, 0.0);
+        assertVector(basis.applyToDirection(1.0, 0.0, 0.0), 1.0, 0.0, 0.0);
+
+        // And the point path sees the same 3.0 through the full applier.
+        CartesianPoint transformed =
+                TransformationOperatorBasis.transformPoint(new CartesianPoint(1.0, 0.0, 0.0),
+                        operator(ax, ay, 3.0, az), builder);
+        assertPoint(transformed, new CartesianPoint(13.0, 0.0, 0.0), "scale reaches points");
+    }
+
     // ─── helpers ─────────────────────────────────────────────────────────
+
+    /**
+     * Asserts {@code member} is declared in exactly the given files. Set
+     * equality rather than a count, so a regression names the file that grew a
+     * copy instead of reporting a number.
+     */
+    private static void assertDeclaredInExactly(String member, List<String> expectedFiles) throws Exception {
+        List<String> declaring = new ArrayList<>();
+        for (Path file : sourcesUnder("src/main/java")) {
+            if (declares(code(read(file)), member)) {
+                declaring.add(file.toString().replace('\\', '/'));
+            }
+        }
+        List<String> expected = new ArrayList<>(expectedFiles);
+        expected.sort(String::compareTo);
+        declaring.sort(String::compareTo);
+        assertEquals(expected, declaring,
+                "the declaration set of " + member + " changed. This member is the shared home of "
+                        + "applying a transformation operator's frame; a second declaration is a "
+                        + "copy free to drift, and a missing one means a caller went back to "
+                        + "hand-rolling the arithmetic.");
+    }
+
+    private static void assertPoint(CartesianPoint actual, CartesianPoint expected, String what) {
+        assertEquals(expected.x(), actual.x(), 0.0, what + ": x");
+        assertEquals(expected.y(), actual.y(), 0.0, what + ": y");
+        assertEquals(expected.z(), actual.z(), 0.0, what + ": z");
+    }
+
+    private static String describe(StepCartesianTransformationOperator transformation) {
+        return "operator(axis1=" + (transformation.axis1() == null ? "derived" : "given")
+                + ", axis2=" + (transformation.axis2() == null ? "derived" : "given")
+                + ", axis3=" + (transformation.axis3() == null ? "derived" : "given")
+                + ", scale=" + (transformation.scale() == null ? "absent" : transformation.scale())
+                + ")";
+    }
 
     /**
      * The body the four copies shared, kept verbatim as an oracle. Comparing
@@ -258,6 +436,51 @@ class TransformationOperatorBasisConvergenceTest {
             axis3 = cross.isZero() ? new Vector3(0.0, 0.0, 1.0) : cross.normalize().asVector();
         }
         return new Vector3[]{axis1, axis2, axis3};
+    }
+
+    /**
+     * The body {@code StepCadGeometryOps.transformPoint3},
+     * {@code StepMeshExporter.transformPoint3} and
+     * {@code StepPointExtractor.transformPoint} shared, kept verbatim as an
+     * oracle.
+     */
+    private static CartesianPoint retiredTransformPoint(
+            CartesianPoint point, StepCartesianTransformationOperator transformation) {
+        Vector3[] frame = retiredFrame(transformation);
+        double scale = transformation.scale() == null ? 1.0 : transformation.scale();
+        Vector3 offset = frame[0].scale(point.x() * scale)
+                .add(frame[1].scale(point.y() * scale))
+                .add(frame[2].scale(point.z() * scale));
+        return builder.buildPoint(transformation.localOrigin().id()).add(offset);
+    }
+
+    /**
+     * The body {@code StepCadGeometryOps.transformVector3} and
+     * {@code StepMeshExporter.transformVector3} shared, kept verbatim as an
+     * oracle. A displacement is scaled.
+     */
+    private static Vector3 retiredTransformVector(
+            Vector3 vector, StepCartesianTransformationOperator transformation) {
+        Vector3[] frame = retiredFrame(transformation);
+        double scale = transformation.scale() == null ? 1.0 : transformation.scale();
+        return frame[0].scale(vector.x() * scale)
+                .add(frame[1].scale(vector.y() * scale))
+                .add(frame[2].scale(vector.z() * scale));
+    }
+
+    /**
+     * The body {@code StepCadGeometryOps.transformDirection3} and
+     * {@code StepMeshExporter.transformDirection3} shared, kept verbatim as an
+     * oracle. A direction is <em>not</em> scaled, and this oracle is what makes
+     * that asymmetry testable.
+     */
+    private static Vector3 retiredTransformDirection(
+            Direction3 direction, StepCartesianTransformationOperator transformation) {
+        Vector3[] frame = retiredFrame(transformation);
+        Vector3 source = direction.asVector();
+        return frame[0].scale(source.x())
+                .add(frame[1].scale(source.y()))
+                .add(frame[2].scale(source.z()));
     }
 
     private static void assertFrame(
