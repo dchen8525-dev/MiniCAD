@@ -1,40 +1,44 @@
 package com.minicad.preview.sampling;
 
-import com.minicad.common.Epsilon;
-import com.minicad.export.json.StepEdgePayloadBuilder;
-import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.geometry.*;
 import com.minicad.geometry2d.*;
 import com.minicad.step.model.StepAnnotationCurveOccurrence;
-import com.minicad.step.model.StepAnnotationFillArea;
-import com.minicad.step.model.StepAnnotationFillAreaOccurrence;
-import com.minicad.step.model.StepAnnotationSymbol;
-import com.minicad.step.model.StepAnnotationText;
-import com.minicad.step.model.StepAnnotationTextCharacter;
 import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
 import com.minicad.step.model.StepLeaderCurve;
 import com.minicad.step.model.StepTerminatorSymbol;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.*;
-import com.minicad.step.model.*;
 import com.minicad.step.model.StepDimensionCurve;
-import com.minicad.step.model.StepConnectedEdgeSet;
 import com.minicad.step.model.StepEdgeCurve;
-import com.minicad.step.model.StepEdgeWire;
-import com.minicad.step.model.StepLoop;
-import com.minicad.step.model.StepWireShell;
-import com.minicad.step.model.StepRepresentation;
 import com.minicad.step.semantic.StepCadBuilder;
-import com.minicad.step.semantic.StepEntityNamingUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
-/** Curve evaluation, sampling, and preview payload construction.
- *  Extracted from StepPreviewJsonExporter to isolate curve logic. */
+/**
+ * The curve-evaluator factory table for the preview pipeline.
+ *
+ * <p>This file used to carry a second copy of almost the whole json-side curve
+ * stack: {@code sampleLooseEdgePoints} and its {@code LOOSE_EDGE_POINTS_RULES}
+ * table, {@code curveForLooseEdge} and its {@code LOOSE_EDGE_RULES} table, the
+ * {@code sampleAnnotationFillAreaPoints} / {@code sampleGeometricCollectionPoints} /
+ * {@code sampleWireShellPoints} / {@code sampleWireframeBoundaryPoints} /
+ * {@code sampleMappedAnnotationPoints} helpers, a private {@code transformPoint},
+ * the conic samplers, and revolution helpers ({@code radialComponent},
+ * {@code fallbackNormal}, {@code unwrapPeriodic}). None of it had a production
+ * caller here -- the json stack in {@code StepEdgePayloadBuilder} had already
+ * been extracted and refactored past it, so the copies were stale snapshots kept
+ * alive only by their own twin tests. Only {@link #curveEvaluator} and
+ * {@link #sampledCurveEvaluator} were reachable, via
+ * {@code StepRepresentationPayloadBuilder.curveEvaluator}.
+ *
+ * <p>What remains is the one thing this file is the home of: the ordered
+ * {@code CURVE_EVALUATOR_RULES} table that turns a {@code StepEntity} into a
+ * {@link CurveEvaluator}. Everything else resolves through its live owner --
+ * conic sampling through {@link ConicSamplingHelper}, loose-edge sampling and
+ * loose-curve resolution through {@code StepEdgePayloadBuilder}, point transforms
+ * through {@code MathUtilityHelper} / {@code StepPointExtractor}.
+ */
 public final class PreviewCurveEvaluator {
 
     private PreviewCurveEvaluator() {}
@@ -179,7 +183,10 @@ public final class PreviewCurveEvaluator {
             }),
             rule(StepConicCurve.class, (curve, builder) -> {
                 StepConicCurve conic = (StepConicCurve) curve;
-                List<CartesianPoint> points = sampleConicCurvePoints(conic, builder);
+                // Conic point sampling has one home, ConicSamplingHelper; the private
+                // circle/ellipse/parabola/hyperbola samplers that used to sit in this
+                // file were a stale byte-identical copy of it and are gone.
+                List<CartesianPoint> points = ConicSamplingHelper.sampleConicCurvePoints(conic, builder);
                 if (points == null || points.size() < 2) return null;
                 return sampledCurveEvaluator(new Polyline3(points));
             }),
@@ -275,474 +282,5 @@ public final class PreviewCurveEvaluator {
                 );
             }
         };
-    }
-
-    // ─── Revolution helpers ──────────────────────────────────────────────
-
-    public static Vector3 radialComponent(CartesianPoint point, CartesianPoint axisOrigin, Direction3 axisDirection) {
-        Vector3 offset = point.subtract(axisOrigin);
-        return offset.subtract(axisDirection.asVector().scale(offset.dot(axisDirection.asVector())));
-    }
-
-    public static Vector3 fallbackNormal(Vector3 preferredAxis) {
-        Vector3 seed = Math.abs(preferredAxis.x()) < 0.9 ? new Vector3(1.0, 0.0, 0.0) : new Vector3(0.0, 1.0, 0.0);
-        Vector3 normal = preferredAxis.cross(seed);
-        if (normal.norm() <= Epsilon.EPS) {
-            normal = preferredAxis.cross(new Vector3(0.0, 0.0, 1.0));
-        }
-        return normal.norm() <= Epsilon.EPS ? new Vector3(0.0, 0.0, 1.0) : normal;
-    }
-
-    public static double unwrapPeriodic(double value, Double previous, double period) {
-        if (previous == null) {
-            return value;
-        }
-        while (value - previous > period * 0.5) {
-            value -= period;
-        }
-        while (value - previous < -period * 0.5) {
-            value += period;
-        }
-        return value;
-    }
-
-    // ─── Loose curve sampling (3D) ───────────────────────────────────────
-
-    public static List<CartesianPoint> sampleLooseCurve(Curve3 curve) {
-        return Curve3SamplingHelper.sampleLooseCurve(curve);
-    }
-
-    // ─── Loose curve sampling (2D) ───────────────────────────────────────
-
-    public static Curve3 liftCurve2(Curve2 curve) {
-        List<Point2> points2 = sampleLooseCurve2(curve);
-        List<CartesianPoint> points3 = new ArrayList<>(points2.size());
-        for (Point2 point : points2) {
-            points3.add(new CartesianPoint(point.x(), point.y(), 0.0));
-        }
-        return new Polyline3(List.copyOf(points3));
-    }
-
-    public static List<Point2> sampleLooseCurve2(Curve2 curve) {
-        return Curve2SamplingHelper.sampleLooseCurve2(curve);
-    }
-
-    // ─── Curve type names ────────────────────────────────────────────────
-
-    public static String curveTypeName(Curve3 curve) {
-        return StepEntityNamingUtils.curveTypeName(curve);
-    }
-
-    public static String curveTypeName(Curve2 curve) {
-        return StepEntityNamingUtils.curveTypeName(curve);
-    }
-
-    // ─── Conic curve sampling ────────────────────────────────────────────
-
-    public static List<CartesianPoint> sampleConicCurvePoints(StepConicCurve curve, StepCadBuilder builder) {
-        double[] matrix = MatrixTransformHelper.matrixForPlacementEntity(curve.position(), builder);
-        if (matrix == null) {
-            return null;
-        }
-        String entityName = curve.entityName();
-        if (entityName.equals("CIRCLE")) {
-            return sampleConicCirclePoints(curve, matrix);
-        } else if (entityName.equals("ELLIPSE")) {
-            return sampleConicEllipsePoints(curve, matrix);
-        } else if (entityName.equals("PARABOLA")) {
-            return sampleParabolaPoints(curve, matrix);
-        } else if (entityName.equals("HYPERBOLA")) {
-            return sampleHyperbolaPoints(curve, matrix);
-        } else if (entityName.equals("DEGENERATE_CONIC")) {
-            CartesianPoint point = MatrixTransformHelper.transformCartesian(new CartesianPoint(0.0, 0.0, 0.0), matrix);
-            return List.of(point, point);
-        } else {
-            return null;
-        }
-    }
-
-    private static List<CartesianPoint> sampleConicCirclePoints(StepConicCurve curve, double[] matrix) {
-        if (curve.parameters().isEmpty()) return null;
-        double radius = curve.parameters().get(0);
-        if (!Double.isFinite(radius) || radius <= Epsilon.EPS) return null;
-        return sampleConicPointsInMatrix(matrix, radius, radius, 72);
-    }
-
-    private static List<CartesianPoint> sampleConicEllipsePoints(StepConicCurve curve, double[] matrix) {
-        if (curve.parameters().size() < 2) return null;
-        double semiMajor = curve.parameters().get(0);
-        double semiMinor = curve.parameters().get(1);
-        if (!Double.isFinite(semiMajor) || !Double.isFinite(semiMinor)) return null;
-        if (semiMajor <= Epsilon.EPS || semiMinor <= Epsilon.EPS) return null;
-        return sampleConicPointsInMatrix(matrix, semiMajor, semiMinor, 72);
-    }
-
-    private static List<CartesianPoint> sampleConicPointsInMatrix(double[] matrix, double rx, double ry, int segments) {
-        List<CartesianPoint> points = new ArrayList<>(segments + 1);
-        for (int i = 0; i <= segments; i++) {
-            double angle = 2.0 * Math.PI * i / segments;
-            CartesianPoint local = new CartesianPoint(rx * Math.cos(angle), ry * Math.sin(angle), 0.0);
-            points.add(MatrixTransformHelper.transformCartesian(local, matrix));
-        }
-        return List.copyOf(points);
-    }
-
-    private static List<CartesianPoint> sampleParabolaPoints(StepConicCurve curve, double[] matrix) {
-        if (curve.parameters().isEmpty()) return null;
-        double focalDistance = curve.parameters().get(0);
-        if (!Double.isFinite(focalDistance) || focalDistance <= Epsilon.EPS) return null;
-        double yExtent = Math.max(1.0, focalDistance * 4.0);
-        int segments = 96;
-        List<CartesianPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double t = -yExtent + (2.0 * yExtent * index) / segments;
-            double x = (t * t) / (4.0 * focalDistance);
-            points.add(MatrixTransformHelper.transformCartesian(new CartesianPoint(x, t, 0.0), matrix));
-        }
-        return List.copyOf(points);
-    }
-
-    private static List<CartesianPoint> sampleHyperbolaPoints(StepConicCurve curve, double[] matrix) {
-        if (curve.parameters().size() < 2) return null;
-        double semiAxis = curve.parameters().get(0);
-        double semiImaginaryAxis = curve.parameters().get(1);
-        if (!Double.isFinite(semiAxis) || !Double.isFinite(semiImaginaryAxis)
-                || semiAxis <= Epsilon.EPS || semiImaginaryAxis <= Epsilon.EPS) return null;
-        double extent = 1.75;
-        int segments = 96;
-        List<CartesianPoint> points = new ArrayList<>(segments + 1);
-        for (int index = 0; index <= segments; index++) {
-            double t = -extent + (2.0 * extent * index) / segments;
-            double x = semiAxis * Math.cosh(t);
-            double y = semiImaginaryAxis * Math.sinh(t);
-            points.add(MatrixTransformHelper.transformCartesian(new CartesianPoint(x, y, 0.0), matrix));
-        }
-        return List.copyOf(points);
-    }
-
-    // ─── Edge sampling ───────────────────────────────────────────────────
-
-    /** Delegates to the shared EDGE_SAMPLE_RULES table; see StepEdgePayloadBuilder. */
-    public static List<CartesianPoint> sampleEdge(CartesianPoint start, CartesianPoint end, Curve3 curve, boolean naturalForward) {
-        return StepEdgePayloadBuilder.sampleEdge(start, end, curve, naturalForward);
-    }
-
-    // ─── sampleLooseEdgePoints (copied from StepPreviewJsonExporter) ─────
-
-    @FunctionalInterface
-    private interface LoosePointsHandler {
-        List<CartesianPoint> sample(StepEntity item, StepCadBuilder builder);
-    }
-
-    private record LoosePointsRule(Class<?> type, Predicate<StepEntity> guard, LoosePointsHandler handler) {
-        boolean matches(StepEntity item) {
-            return type.isInstance(item) && (guard == null || guard.test(item));
-        }
-    }
-
-    private static LoosePointsRule loosePointsRule(Class<?> type, LoosePointsHandler handler) {
-        return new LoosePointsRule(type, null, handler);
-    }
-
-    /** Collection families whose points are the concatenation of their members' samples. */
-    private static LoosePointsRule collectionRule(Class<?> type, Function<StepEntity, List<? extends StepEntity>> members) {
-        return loosePointsRule(type, (item, builder) -> sampleGeometricCollectionPoints(members.apply(item), builder));
-    }
-
-    /** Mapped annotation carriers whose points come from their mapped representation. */
-    private static LoosePointsRule mappedAnnotationRule(
-            Class<?> type,
-            Function<StepEntity, StepRepresentation> mappedRepresentation,
-            Function<StepEntity, StepEntity> mappedOrigin,
-            Function<StepEntity, StepEntity> mappingTarget
-    ) {
-        return loosePointsRule(type, (item, builder) -> sampleMappedAnnotationPoints(
-                mappedRepresentation.apply(item), mappedOrigin.apply(item), mappingTarget.apply(item), builder));
-    }
-
-    /**
-     * Loose-edge point sampling rules keyed by concrete type, replacing the
-     * former 14-branch if/else-if chain. Order mirrors the original chain
-     * (first match wins); any item matching no rule falls back to sampling its
-     * loose curve via curveForLooseEdge, as the old trailing branch did.
-     */
-    private static final List<LoosePointsRule> LOOSE_EDGE_POINTS_RULES = List.of(
-            loosePointsRule(StepAnnotationFillArea.class, (item, builder) ->
-                    sampleAnnotationFillAreaPoints((StepAnnotationFillArea) item, builder)),
-            loosePointsRule(StepAnnotationFillAreaOccurrence.class, (item, builder) ->
-                    sampleAnnotationFillAreaPoints(((StepAnnotationFillAreaOccurrence) item).item(), builder)),
-            loosePointsRule(StepEdgeBasedWireframeModel.class, (item, builder) ->
-                    sampleWireframeBoundaryPoints(((StepEdgeBasedWireframeModel) item).boundaries(), builder)),
-            loosePointsRule(StepShellBasedWireframeModel.class, (item, builder) ->
-                    sampleWireframeBoundaryPoints(((StepShellBasedWireframeModel) item).boundaries(), builder)),
-            mappedAnnotationRule(StepAnnotationSymbol.class,
-                    item -> ((StepAnnotationSymbol) item).mappingSource().mappedRepresentation(),
-                    item -> ((StepAnnotationSymbol) item).mappingSource().mappedOrigin(),
-                    item -> ((StepAnnotationSymbol) item).mappingTarget()),
-            mappedAnnotationRule(StepAnnotationText.class,
-                    item -> ((StepAnnotationText) item).mappingSource().mappedRepresentation(),
-                    item -> ((StepAnnotationText) item).mappingSource().mappedOrigin(),
-                    item -> ((StepAnnotationText) item).mappingTarget()),
-            mappedAnnotationRule(StepAnnotationTextCharacter.class,
-                    item -> ((StepAnnotationTextCharacter) item).mappingSource().mappedRepresentation(),
-                    item -> ((StepAnnotationTextCharacter) item).mappingSource().mappedOrigin(),
-                    item -> ((StepAnnotationTextCharacter) item).mappingTarget()),
-            new LoosePointsRule(StepGeometricReplica.class,
-                    item -> "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()),
-                    (item, builder) -> {
-                        StepGeometricReplica replica = (StepGeometricReplica) item;
-                        List<CartesianPoint> parentPoints = sampleLooseEdgePoints(replica.parent(), builder);
-                        if (parentPoints == null) {
-                            return null;
-                        }
-                        List<CartesianPoint> transformed = new ArrayList<>(parentPoints.size());
-                        for (CartesianPoint point : parentPoints) {
-                            transformed.add(transformPoint(point, replica.transformation(), builder));
-                        }
-                        return List.copyOf(transformed);
-                    }),
-            loosePointsRule(StepOrientedCurve.class, (item, builder) -> {
-                StepOrientedCurve orientedCurve = (StepOrientedCurve) item;
-                List<CartesianPoint> points = sampleLooseEdgePoints(orientedCurve.curveElement(), builder);
-                if (points == null) {
-                    return null;
-                }
-                if (orientedCurve.orientation()) {
-                    return points;
-                }
-                List<CartesianPoint> reversed = new ArrayList<>(points);
-                Collections.reverse(reversed);
-                return List.copyOf(reversed);
-            }),
-            collectionRule(StepGeometricSet.class, item -> ((StepGeometricSet) item).elements()),
-            collectionRule(StepGeometricCurveSet.class, item -> ((StepGeometricCurveSet) item).elements()),
-            collectionRule(StepConnectedEdgeSet.class, item -> ((StepConnectedEdgeSet) item).edges()),
-            loosePointsRule(StepWireShell.class, (item, builder) ->
-                    sampleWireShellPoints((StepWireShell) item, builder)),
-            collectionRule(StepEdgeWire.class, item -> ((StepEdgeWire) item).edges())
-    );
-
-    /** Package-private for tests; dispatch goes through LOOSE_EDGE_POINTS_RULES. */
-    static List<CartesianPoint> sampleLooseEdgePoints(StepEntity item, StepCadBuilder builder) {
-        for (LoosePointsRule rule : LOOSE_EDGE_POINTS_RULES) {
-            if (rule.matches(item)) {
-                return rule.handler().sample(item, builder);
-            }
-        }
-        Curve3 curve = curveForLooseEdge(item, builder);
-        if (curve == null) return null;
-        return sampleLooseCurve(curve);
-    }
-
-    @FunctionalInterface
-    private interface LooseEdgeCurveFactory {
-        Curve3 build(StepEntity item, StepCadBuilder builder);
-    }
-
-    private record LooseEdgeRule(Class<?> type, Predicate<StepEntity> guard, LooseEdgeCurveFactory factory) {
-        boolean matches(StepEntity item) {
-            return type.isInstance(item) && (guard == null || guard.test(item));
-        }
-    }
-
-    private static LooseEdgeRule looseRule(Class<?> type, LooseEdgeCurveFactory factory) {
-        return new LooseEdgeRule(type, null, factory);
-    }
-
-    /** Types materialized through builder.buildCurveReference3. */
-    private static LooseEdgeRule looseRefRule(Class<?> type) {
-        return looseRule(type, (item, builder) -> builder.buildCurveReference3(item.id()));
-    }
-
-    /** Wrapper curves resolved through the curve they reference. */
-    private static LooseEdgeRule looseRecurseRule(Class<?> type, Function<StepEntity, StepEntity> next) {
-        return looseRule(type, (item, builder) -> curveForLooseEdge(next.apply(item), builder));
-    }
-
-    /** Pcurve families whose builder result is a 2D curve lifted to 3D. */
-    private static LooseEdgeRule loosePcurveRule(Class<?> type) {
-        return looseRule(type, (item, builder) -> {
-            Object built = builder.buildPcurve2(item.id());
-            return built instanceof Curve2 ? liftCurve2((Curve2) built) : null;
-        });
-    }
-
-    /** 2D curve families lifted to 3D through builder.buildCurve3From2D. */
-    private static final List<Class<?>> LOOSE_CURVE_FROM_2D_TYPES = List.of(
-            StepCompositeCurve2D.class,
-            StepTrimmedCurve2D.class,
-            StepBezierCurve2D.class,
-            StepQuasiUniformCurve2D.class,
-            StepUniformCurve2D.class,
-            StepPiecewiseBezierCurve2D.class,
-            StepIndexedPolyCurve2D.class,
-            StepDegenerateCurve2D.class,
-            StepBSplineCurve2D.class,
-            StepRationalBSplineCurve2D.class,
-            StepLine2D.class,
-            StepCurve2D.class,
-            StepHyperbola2D.class,
-            StepParabola2D.class
-    );
-
-    /**
-     * Loose-edge curve factories keyed by concrete type, replacing the former
-     * 53-branch if/else-if chain. Order mirrors the original chain (first
-     * match wins). The dead cast to StepBoundedCurve in the wireframe-model
-     * branch (which always threw ClassCastException for entities that reach
-     * it, since StepEdgeBasedWireframeModel is not a StepBoundedCurve) is
-     * dropped; the branch keeps its intended sampling behavior.
-     */
-    private static final List<LooseEdgeRule> LOOSE_EDGE_RULES = List.of(
-            looseRule(StepLine.class, (item, builder) -> builder.buildLine(item.id())),
-            looseRule(StepCircle.class, (item, builder) -> builder.buildCircle(item.id())),
-            looseRule(StepEllipse.class, (item, builder) -> builder.buildEllipse(item.id())),
-            looseRule(StepConicCurve.class, (item, builder) -> {
-                List<CartesianPoint> points = sampleConicCurvePoints((StepConicCurve) item, builder);
-                return points == null ? null : new Polyline3(points);
-            }),
-            looseRefRule(StepBezierCurve.class),
-            looseRefRule(StepUniformCurve.class),
-            looseRefRule(StepQuasiUniformCurve.class),
-            looseRefRule(StepPiecewiseBezierCurve.class),
-            looseRule(StepBSplineCurveWithKnots.class, (item, builder) -> builder.buildBSplineCurve(item.id())),
-            looseRule(StepSurfaceCurve.class, (item, builder) -> builder.buildSurfaceCurve(item.id())),
-            looseRule(StepSeamCurve.class, (item, builder) -> builder.buildSeamCurve(item.id())),
-            looseRule(StepTrimmedCurve.class, (item, builder) -> builder.buildTrimmedCurve(item.id())),
-            looseRule(StepPolyline.class, (item, builder) -> builder.buildPolyline(item.id())),
-            looseRule(StepCompositeCurve.class, (item, builder) -> builder.buildCompositeCurve(item.id())),
-            looseRule(StepCompositeCurveOnSurface.class, (item, builder) -> builder.buildCompositeCurve(item.id())),
-            looseRule(StepRationalBSplineCurve.class, (item, builder) -> builder.buildRationalBSplineCurve(item.id())),
-            looseRule(StepOffsetCurve2D.class, (item, builder) -> liftCurve2(builder.buildOffsetCurve2(item.id()))),
-            looseRule(StepOffsetCurve3D.class, (item, builder) -> builder.buildOffsetCurve3(item.id())),
-            loosePcurveRule(StepPcurve.class),
-            loosePcurveRule(StepDegeneratePcurve.class),
-            looseRecurseRule(StepOrientedCurve.class, item -> ((StepOrientedCurve) item).curveElement()),
-            looseRecurseRule(StepAnnotationCurveOccurrence.class, item -> ((StepAnnotationCurveOccurrence) item).item()),
-            looseRecurseRule(StepDimensionCurve.class, item -> ((StepDimensionCurve) item).item()),
-            looseRecurseRule(StepLeaderCurve.class, item -> ((StepLeaderCurve) item).item()),
-            looseRecurseRule(StepProjectionCurve.class, item -> ((StepProjectionCurve) item).item()),
-            looseRecurseRule(StepDraughtingAnnotationOccurrence.class, item -> ((StepDraughtingAnnotationOccurrence) item).item()),
-            looseRecurseRule(StepTerminatorSymbol.class, item -> ((StepTerminatorSymbol) item).annotatedCurve()),
-            new LooseEdgeRule(StepGeometricReplica.class,
-                    item -> "CURVE_REPLICA".equals(((StepGeometricReplica) item).entityName()),
-                    (item, builder) -> curveForLooseEdge(((StepGeometricReplica) item).parent(), builder)),
-            looseRule(StepPath.class, (item, builder) -> builder.buildPath(item.id())),
-            looseRule(StepOpenPath.class, (item, builder) -> builder.buildPath(item.id())),
-            looseRule(StepSubpath.class, (item, builder) -> builder.buildPath(item.id())),
-            looseRule(StepOrientedPath.class, (item, builder) -> builder.buildPath(item.id())),
-            new LooseEdgeRule(StepEntity.class,
-                    item -> LOOSE_CURVE_FROM_2D_TYPES.stream().anyMatch(type -> type.isInstance(item)),
-                    (item, builder) -> builder.buildCurve3From2D(item.id())),
-            looseRefRule(StepEdgeCurve.class),
-            looseRefRule(StepSurfacedEdgeCurve.class),
-            looseRefRule(StepCurve.class),
-            looseRefRule(StepBoundedCurve.class),
-            looseRule(StepEdgeBasedWireframeModel.class, (item, builder) -> {
-                List<CartesianPoint> sampled = sampleWireframeBoundaryPoints(((StepEdgeBasedWireframeModel) item).boundaries(), builder);
-                return sampled == null || sampled.size() < 2 ? null : new Polyline3(sampled);
-            })
-    );
-
-    private static Curve3 curveForLooseEdge(StepEntity item, StepCadBuilder builder) {
-        try {
-            for (LooseEdgeRule rule : LOOSE_EDGE_RULES) {
-                if (rule.matches(item)) {
-                    return rule.factory().build(item, builder);
-                }
-            }
-        } catch (com.minicad.common.GeometryException | com.minicad.common.TopologyException | com.minicad.common.StepResolutionException ignored) {
-            // fallthrough
-        }
-        return null;
-    }
-
-    private static List<CartesianPoint> sampleAnnotationFillAreaPoints(StepAnnotationFillArea fillArea, StepCadBuilder builder) {
-        List<CartesianPoint> points = new ArrayList<>();
-        boolean first = true;
-        for (StepEntity boundary : fillArea.boundaries()) {
-            List<CartesianPoint> sampled = sampleLooseEdgePoints(boundary, builder);
-            if (sampled == null || sampled.isEmpty()) continue;
-            int start = first ? 0 : 1;
-            for (int i = start; i < sampled.size(); i++) points.add(sampled.get(i));
-            first = false;
-        }
-        return points.isEmpty() ? null : List.copyOf(points);
-    }
-
-    private static List<CartesianPoint> sampleGeometricCollectionPoints(List<? extends StepEntity> elements, StepCadBuilder builder) {
-        List<CartesianPoint> points = new ArrayList<>();
-        for (StepEntity element : elements) {
-            List<CartesianPoint> sampled = sampleLooseEdgePoints(element, builder);
-            if (sampled != null && !sampled.isEmpty()) points.addAll(sampled);
-        }
-        return points.isEmpty() ? null : List.copyOf(points);
-    }
-
-    private static List<CartesianPoint> sampleWireShellPoints(StepWireShell wireShell, StepCadBuilder builder) {
-        List<CartesianPoint> points = new ArrayList<>();
-        for (StepLoop loop : wireShell.loops()) {
-            List<CartesianPoint> sampled = sampleLooseEdgePoints(loop, builder);
-            if (sampled != null && !sampled.isEmpty()) points.addAll(sampled);
-        }
-        return points.isEmpty() ? null : List.copyOf(points);
-    }
-
-    private static List<CartesianPoint> sampleWireframeBoundaryPoints(List<? extends StepEntity> boundaries, StepCadBuilder builder) {
-        List<CartesianPoint> points = new ArrayList<>();
-        boolean first = true;
-        for (StepEntity boundary : boundaries) {
-            List<CartesianPoint> sampled = sampleLooseEdgePoints(boundary, builder);
-            if (sampled == null || sampled.isEmpty()) continue;
-            int start = first ? 0 : 1;
-            for (int i = start; i < sampled.size(); i++) points.add(sampled.get(i));
-            first = false;
-        }
-        return points.isEmpty() ? null : List.copyOf(points);
-    }
-
-    private static List<CartesianPoint> sampleMappedAnnotationPoints(
-            StepRepresentation representation, StepEntity mappedOrigin, StepEntity mappingTarget, StepCadBuilder builder) {
-        double[] matrix = MatrixTransformHelper.matrixForMappedPlacement(mappedOrigin, mappingTarget, builder);
-        if (matrix == null) return null;
-        List<CartesianPoint> points = new ArrayList<>();
-        for (StepEntity content : representation.items()) {
-            List<CartesianPoint> sampled = sampleLooseEdgePoints(content, builder);
-            if (sampled == null) continue;
-            for (CartesianPoint point : sampled) points.add(MatrixTransformHelper.transformCartesian(point, matrix));
-        }
-        return points.isEmpty() ? null : List.copyOf(points);
-    }
-
-    private static CartesianPoint transformPoint(
-            CartesianPoint point,
-            StepCartesianTransformationOperator transformation,
-            StepCadBuilder builder
-    ) {
-        Vector3 axis1 = transformation.axis1() == null
-                ? new Vector3(1.0, 0.0, 0.0)
-                : builder.buildDirection(transformation.axis1().id()).asVector();
-        Vector3 axis2;
-        if (transformation.axis2() == null) {
-            Vector3 fallback = PreviewCurveEvaluator.fallbackNormal(axis1);
-            axis2 = Direction3.from(fallback).asVector();
-        } else {
-            axis2 = builder.buildDirection(transformation.axis2().id()).asVector();
-        }
-        Vector3 axis3 = axis1.cross(axis2).normalize().asVector();
-        axis2 = axis3.cross(axis1).normalize().asVector();
-        CartesianPoint localOrigin = transformation.localOrigin() == null
-                ? new CartesianPoint(0.0, 0.0, 0.0)
-                : builder.buildPoint(transformation.localOrigin().id());
-        double scale = transformation.scale() <= 0.0 ? 1.0 : transformation.scale();
-        Vector3 offset = point.subtract(new CartesianPoint(0.0, 0.0, 0.0));
-        double x = offset.x() * axis1.x() + offset.y() * axis2.x() + offset.z() * axis3.x();
-        double y = offset.x() * axis1.y() + offset.y() * axis2.y() + offset.z() * axis3.y();
-        double z = offset.x() * axis1.z() + offset.y() * axis2.z() + offset.z() * axis3.z();
-        return new CartesianPoint(
-                localOrigin.x() + x * scale,
-                localOrigin.y() + y * scale,
-                localOrigin.z() + z * scale
-        );
     }
 }

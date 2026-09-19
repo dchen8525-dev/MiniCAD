@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -75,18 +76,39 @@ class EdgeSampleDispatchTableTest {
     }
 
     /**
-     * The delegating call site must not grow its own copy of this chain back:
-     * that duplication is exactly what this table was introduced to remove.
+     * This table is the one home of edge sampling. The preview pipeline used to
+     * keep a byte-identical facade on {@code PreviewCurveEvaluator.sampleEdge}
+     * whose only caller was its own test; both are gone, so the pin is no longer
+     * "must delegate" but "must not reappear". A second copy is free to drift,
+     * and the two pipelines would then silently disagree about which sampling
+     * strategy an edge curve gets.
      */
     @Test
-    @DisplayName("PreviewCurveEvaluator.sampleEdge delegates to the shared table")
-    void previewCurveEvaluatorShouldDelegate() throws Exception {
-        String text = Files.readString(
+    @DisplayName("the preview side no longer holds any of the edge/loose sampling stack")
+    void previewSideShouldNotRedeclareTheStack() throws Exception {
+        String text = code(Files.readString(
                 Paths.get("src/main/java/com/minicad/preview/sampling/PreviewCurveEvaluator.java"),
-                StandardCharsets.UTF_8);
-        assertEquals(true,
-                text.contains("return StepEdgePayloadBuilder.sampleEdge(start, end, curve, naturalForward);"),
-                "PreviewCurveEvaluator.sampleEdge must delegate to StepEdgePayloadBuilder.");
+                StandardCharsets.UTF_8));
+        for (String retired : List.of(
+                "EDGE_SAMPLE_RULES",
+                "sampleEdge(",
+                "LOOSE_EDGE_POINTS_RULES",
+                "LOOSE_EDGE_RULES",
+                "sampleLooseEdgePoints",
+                "curveForLooseEdge")) {
+            assertFalse(text.contains(retired),
+                    "PreviewCurveEvaluator declared " + retired + " again. That stack has exactly "
+                            + "one home, StepEdgePayloadBuilder; the preview copy had no production "
+                            + "caller, only a twin test, and was deleted.");
+        }
+    }
+
+    /**
+     * Strips comments first: PreviewCurveEvaluator's class javadoc explains which
+     * members were retired, so a raw {@code contains} would match the explanation.
+     */
+    private static String code(String text) {
+        return text.replaceAll("(?s)/\\*.*?\\*/", "").replaceAll("(?m)//[^\\r\\n]*", "");
     }
 
     private static List<String> frozenTypes(Path frozenOrder) throws IOException {
