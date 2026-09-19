@@ -9630,29 +9630,6 @@ public final class StepPmiTargetBuilder {
     }
 
 
-    static void appendProductDefinitionRepresentationTargets(
-            Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
-            StepEntity identifiedItem,
-            StepProductDefinition productDefinition,
-            Map<Integer, StepEntity> resolved,
-            Map<Integer, List<String>> instanceIdsByTargetId
-    ) {
-        for (StepEntity candidate : resolved.values()) {
-            if (candidate instanceof StepProductDefinitionShape
-                    && ((StepProductDefinitionShape) candidate).definition().id() == productDefinition.id()) {
-                StepProductDefinitionShape shape = (StepProductDefinitionShape) candidate;
-                appendProductDefinitionShapeRepresentationTargets(
-                        targetsByUsageId,
-                        identifiedItem,
-                        shape,
-                        resolved,
-                        instanceIdsByTargetId
-                );
-            }
-        }
-    }
-
-
     static void appendProductDefinitionShapeRepresentationTargets(
             Map<Integer, List<PmiTargetPayload>> targetsByUsageId,
             StepEntity identifiedItem,
