@@ -139,20 +139,16 @@ public final class Plane implements SurfaceGeometry {
         return origin.add(xDir.asVector().scale(u)).add(yDir.asVector().scale(v));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The plane is infinite, so the grid walks the finite window {@code [-10, 10]} on both
+     * axes - the same region {@link #boundingBox()} reports.</p>
+     */
     @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>();
-        // Sample a finite region of the infinite plane (from -10 to 10)
-        for (int i = 0; i <= uSegments; i++) {
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>();
-            double u = -10.0 + 20.0 * i / uSegments;
-            for (int j = 0; j <= vSegments; j++) {
-                double v = -10.0 + 20.0 * j / vSegments;
-                row.add(pointAt(u, v));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, -10.0, 10.0, -10.0, 10.0, this::pointAt);
     }
 
     @Override

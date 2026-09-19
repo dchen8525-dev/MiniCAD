@@ -92,20 +92,16 @@ public final class HyperboloidSurface implements SurfaceGeometry {
                 eRadial.scale(radius * v / root).add(axis.scale(semiAxis)));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>U sweeps one full turn {@code [0, 2PI]}; V walks the height parameter over
+     * {@code [-1, 1]}, which brackets the waist circle at {@code v = 0}.</p>
+     */
     @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        int uCount = Math.max(uSegments, 1);
-        int vCount = Math.max(vSegments, 1);
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>(uCount + 1);
-        for (int iu = 0; iu <= uCount; iu++) {
-            double u = Math.PI * 2.0 * iu / uCount;
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>(vCount + 1);
-            for (int iv = 0; iv <= vCount; iv++) {
-                row.add(pointAt(u, 2.0 * iv / vCount - 1.0));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, 0.0, 2.0 * Math.PI, -1.0, 1.0, this::pointAt);
     }
 
     @Override

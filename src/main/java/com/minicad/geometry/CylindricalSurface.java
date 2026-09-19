@@ -124,6 +124,17 @@ public final class CylindricalSurface implements SurfaceGeometry {
         return boundingBox(-10, 10);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This is the one surface that keeps its own grid walk instead of
+     * delegating to {@link SurfaceGridSampling}. Its axial coordinate is written
+     * {@code v = (j / vSegments) * 20 - 10}, which rounds twice, where the shared
+     * sampler's {@code v = -10 + (20 * j) / vSegments} rounds once; the two differ
+     * in the last few ulp, so folding this loop in would move every sample it
+     * reports. {@code SurfaceGridSamplingConvergenceTest} pins both the exception
+     * and the rounding order it turns on.</p>
+     */
     @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
         java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>();

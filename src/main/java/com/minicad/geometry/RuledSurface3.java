@@ -94,24 +94,15 @@ public final class RuledSurface3 implements SurfaceGeometry {
     }
 
     /**
-     * Samples the ruled surface on a grid.
+     * {@inheritDoc}
      *
-     * @param uSegments number of segments along u direction
-     * @param vSegments number of segments along v direction
-     * @return list of sampled point rows
+     * <p>Both directrices are sampled over their normalized parameter, so the grid walks
+     * {@code [0, 1] x [0, 1]}.</p>
      */
+    @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>();
-        for (int i = 0; i <= uSegments; i++) {
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>();
-            double u = (double) i / uSegments;
-            for (int j = 0; j <= vSegments; j++) {
-                double v = (double) j / vSegments;
-                row.add(pointAt(u, v));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, 0.0, 1.0, 0.0, 1.0, this::pointAt);
     }
 
     @Override

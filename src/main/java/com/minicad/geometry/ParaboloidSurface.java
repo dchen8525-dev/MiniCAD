@@ -80,20 +80,16 @@ public final class ParaboloidSurface implements SurfaceGeometry {
                 eRadial.scale(2.0 * focalLength).add(axis.scale(2.0 * focalLength * v)));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>U sweeps one full turn {@code [0, 2PI]}; V is the radial growth parameter over
+     * {@code [0, 1]}, which starts on the apex.</p>
+     */
     @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        int uCount = Math.max(uSegments, 1);
-        int vCount = Math.max(vSegments, 1);
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>(uCount + 1);
-        for (int iu = 0; iu <= uCount; iu++) {
-            double u = Math.PI * 2.0 * iu / uCount;
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>(vCount + 1);
-            for (int iv = 0; iv <= vCount; iv++) {
-                row.add(pointAt(u, (double) iv / vCount));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, 0.0, 2.0 * Math.PI, 0.0, 1.0, this::pointAt);
     }
 
     @Override

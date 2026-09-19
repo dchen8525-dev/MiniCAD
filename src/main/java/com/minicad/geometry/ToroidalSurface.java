@@ -72,24 +72,15 @@ public final class ToroidalSurface implements SurfaceGeometry {
     }
 
     /**
-     * Samples the toroidal surface on a grid.
+     * {@inheritDoc}
      *
-     * @param uSegments number of segments around the torus axis
-     * @param vSegments number of segments around the tube cross-section
-     * @return list of sampled point rows
+     * <p>U sweeps the tube around the torus axis and V the tube cross-section, each over
+     * one full turn {@code [0, 2PI]}.</p>
      */
+    @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>();
-        for (int i = 0; i <= uSegments; i++) {
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>();
-            double u = 2 * Math.PI * i / uSegments;
-            for (int j = 0; j <= vSegments; j++) {
-                double v = 2 * Math.PI * j / vSegments;
-                row.add(pointAt(u, v));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, 0.0, 2.0 * Math.PI, 0.0, 2.0 * Math.PI, this::pointAt);
     }
 
     @Override

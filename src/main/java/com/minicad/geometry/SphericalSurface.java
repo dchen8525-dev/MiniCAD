@@ -66,24 +66,16 @@ public final class SphericalSurface implements SurfaceGeometry {
     }
 
     /**
-     * Samples the spherical surface on a grid.
+     * {@inheritDoc}
      *
-     * @param uSegments number of segments around the axis
-     * @param vSegments number of segments from pole to pole
-     * @return list of sampled point rows
+     * <p>U is the azimuth over one full turn {@code [0, 2PI]}; V is the latitude over
+     * {@code [-PI/2, PI/2]}, which puts {@code v = 0} on the equator, exactly as
+     * {@link #pointAt} reads it.</p>
      */
+    @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>();
-        for (int i = 0; i <= uSegments; i++) {
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>();
-            double u = 2 * Math.PI * i / uSegments;
-            for (int j = 0; j <= vSegments; j++) {
-                double v = Math.PI * j / vSegments - Math.PI / 2;
-                row.add(pointAt(u, v));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, 0.0, 2.0 * Math.PI, -Math.PI / 2, Math.PI / 2, this::pointAt);
     }
 
     /**

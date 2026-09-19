@@ -3,12 +3,11 @@ package com.minicad.geometry;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Shared implementation of the {@link BSplineSurface3} / {@link RationalBSplineSurface3}
- * pair.
+ * pair, minus the parts that turned out not to be about B-splines at all.
  *
  * <p>The two surfaces differ only in how they evaluate a point (weights or not) and in
  * their validation of the weight grid; everything that is expressed purely in terms of
@@ -18,22 +17,16 @@ import java.util.List;
  *
  * <p>Knot multiplicity expansion and the domain clamp are dimension-free and no longer
  * live here: they belong to {@code com.minicad.common.BSplineKernel}, which the curves
- * use as well. What is left is surface-specific - the two-parameter domain, the weight
- * grid validation and the {@code (u, v)} sampling.</p>
+ * use as well. The {@code (u, v)} grid walk no longer lives here either: it is not
+ * B-spline-specific, so it moved to {@link SurfaceGridSampling} and is reached through
+ * the delegate below. What is left is genuinely surface-specific - the two-parameter
+ * domain, the weight grid validation, the control polygon bounds and the nearest-point
+ * search.</p>
  *
  * <p>Bodies are lifted verbatim from the two classes; the delegated methods keep their
  * original entry signatures so no caller is affected.</p>
  */
 final class BSplineSurfaceHelper {
-
-    /**
-     * Surface point evaluation, supplied by the owning surface so this helper stays
-     * independent of how the point is produced (plain or weighted basis).
-     */
-    @FunctionalInterface
-    interface PointEvaluator {
-        CartesianPoint at(double u, double v);
-    }
 
     private BSplineSurfaceHelper() {
     }
@@ -67,6 +60,13 @@ final class BSplineSurfaceHelper {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The lattice itself is shared with every other surface whose parameters live in a
+     * rectangle; only the {@code (u, v)} window and the point evaluation are B-spline
+     * specific. Kept as a delegate so the pair's callers are untouched.</p>
+     */
     static List<List<CartesianPoint>> sampleGrid(
             int uSegments,
             int vSegments,
@@ -74,23 +74,10 @@ final class BSplineSurfaceHelper {
             double uEnd,
             double vStart,
             double vEnd,
-            PointEvaluator pointAt
+            SurfaceGridSampling.PointEvaluator pointAt
     ) {
-        int uCount = Math.max(uSegments, 1);
-        int vCount = Math.max(vSegments, 1);
-        List<List<CartesianPoint>> rows = new ArrayList<>(uCount + 1);
-        double uRange = uEnd - uStart;
-        double vRange = vEnd - vStart;
-        for (int ui = 0; ui <= uCount; ui++) {
-            double u = uStart + uRange * ui / uCount;
-            List<CartesianPoint> row = new ArrayList<>(vCount + 1);
-            for (int vi = 0; vi <= vCount; vi++) {
-                double v = vStart + vRange * vi / vCount;
-                row.add(pointAt.at(u, v));
-            }
-            rows.add(List.copyOf(row));
-        }
-        return List.copyOf(rows);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, uStart, uEnd, vStart, vEnd, pointAt);
     }
 
     static BoundingBox3 boundingBoxOf(List<List<CartesianPoint>> rows) {
@@ -109,7 +96,7 @@ final class BSplineSurfaceHelper {
             double uEnd,
             double vStart,
             double vEnd,
-            PointEvaluator pointAt
+            SurfaceGridSampling.PointEvaluator pointAt
     ) {
         Preconditions.requireNonNull(point, "point");
         CartesianPoint closest = null;
@@ -135,7 +122,7 @@ final class BSplineSurfaceHelper {
             double uEnd,
             double vStart,
             double vEnd,
-            PointEvaluator pointAt
+            SurfaceGridSampling.PointEvaluator pointAt
     ) {
         Preconditions.requireNonNull(point, "point");
         return point.distanceTo(closestPointTo(point, uStart, uEnd, vStart, vEnd, pointAt));

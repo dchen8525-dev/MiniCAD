@@ -100,24 +100,15 @@ public final class ConicalSurface implements SurfaceGeometry {
     }
 
     /**
-     * Samples the conical surface on a grid.
+     * {@inheritDoc}
      *
-     * @param uSegments number of segments around the axis
-     * @param vSegments number of segments along the axis
-     * @return list of sampled point rows
+     * <p>U sweeps one full turn {@code [0, 2PI]}; V walks the finite axial window
+     * {@code [-10, 10]}, the extent over which a cone of unlimited height is drawn.</p>
      */
+    @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>();
-        for (int i = 0; i <= uSegments; i++) {
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>();
-            double u = 2 * Math.PI * i / uSegments;
-            for (int j = 0; j <= vSegments; j++) {
-                double v = -10.0 + 20.0 * j / vSegments; // Sample a range
-                row.add(pointAt(u, v));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, 0.0, 2.0 * Math.PI, -10.0, 10.0, this::pointAt);
     }
 
     @Override

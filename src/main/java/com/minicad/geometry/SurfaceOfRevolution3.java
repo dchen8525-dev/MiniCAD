@@ -80,23 +80,13 @@ public final class SurfaceOfRevolution3 implements SurfaceGeometry {
     /**
      * {@inheritDoc}
      *
-     * <p>U is swept through the generatrix's own sampling (its parameter domain
-     * is curve-specific) and V over one full turn, {@code [0, 2PI)}.</p>
+     * <p>U follows the generatrix's own normalized parameter - its domain is
+     * curve-specific - and V sweeps one full turn {@code [0, 2PI]}.</p>
      */
     @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        int uCount = Math.max(uSegments, 1);
-        int vCount = Math.max(vSegments, 1);
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>(uCount + 1);
-        for (int iu = 0; iu <= uCount; iu++) {
-            double u = (double) iu / uCount;
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>(vCount + 1);
-            for (int iv = 0; iv <= vCount; iv++) {
-                row.add(pointAt(u, 2.0 * Math.PI * iv / vCount));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, 0.0, 1.0, 0.0, 2.0 * Math.PI, this::pointAt);
     }
 
     /**

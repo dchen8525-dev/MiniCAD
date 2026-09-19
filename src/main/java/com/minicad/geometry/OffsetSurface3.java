@@ -70,23 +70,15 @@ public final class OffsetSurface3 implements SurfaceGeometry {
     }
 
     /**
-     * Samples the offset of a uniform [0,1]² parameter grid over the basis
-     * surface (the surface builders produce normalized-knot bases, whose
-     * natural domain is [0,1]²).
+     * {@inheritDoc}
+     *
+     * <p>Both parameters follow the basis surface's normalized domain {@code [0, 1]}, which
+     * is what the surface builders produce.</p>
      */
     @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
-        int uCount = Math.max(uSegments, 1);
-        int vCount = Math.max(vSegments, 1);
-        java.util.List<java.util.List<CartesianPoint>> grid = new java.util.ArrayList<>(uCount + 1);
-        for (int iu = 0; iu <= uCount; iu++) {
-            java.util.List<CartesianPoint> row = new java.util.ArrayList<>(vCount + 1);
-            for (int iv = 0; iv <= vCount; iv++) {
-                row.add(pointAt((double) iu / uCount, (double) iv / vCount));
-            }
-            grid.add(java.util.List.copyOf(row));
-        }
-        return java.util.List.copyOf(grid);
+        return SurfaceGridSampling.sampleGrid(
+                uSegments, vSegments, 0.0, 1.0, 0.0, 1.0, this::pointAt);
     }
 
     @Override
