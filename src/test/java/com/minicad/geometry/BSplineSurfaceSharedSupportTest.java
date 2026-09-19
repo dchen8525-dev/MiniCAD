@@ -16,14 +16,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Pins the behaviour the two B-spline surfaces now share through
- * {@link BSplineSurfaceHelper}.
+ * Pins the behaviour the two B-spline surfaces have in common.
  *
- * <p>The convergence replaced a copy-pasted block in {@link BSplineSurface3} and
- * {@link RationalBSplineSurface3} with one helper, so the non-rational and
- * unit-weight rational variants must stay identical, the rational variant must
- * still honour non-unit weights, and the expanded-knot caches must survive the
- * indirection.</p>
+ * <p>The pair shares two seams: the parameter domain - degrees, control-point counts,
+ * natural domain and basis lookup - in {@link BSplineSurfaceDomain}, and the queries
+ * expressed purely in terms of {@code pointAt} in {@link BSplineSurfaceHelper}. The
+ * non-rational and unit-weight rational variants must therefore stay identical, the
+ * rational variant must still honour non-unit weights, and the expanded-knot caches
+ * must survive both indirections.</p>
  */
 class BSplineSurfaceSharedSupportTest {
 
@@ -101,17 +101,24 @@ class BSplineSurfaceSharedSupportTest {
     }
 
     @Test
-    void expandedKnotVectorsAreCachedPerSurface() throws Exception {
+    void expandedKnotVectorsAreCachedPerDomain() throws Exception {
         Field cache = KnotVector.class.getDeclaredField("expanded");
         cache.setAccessible(true);
 
         for (Object surface : List.of(nonRational(), rational(UNIT_WEIGHTS))) {
-            // Both parameter directions keep their knots in a KnotVector now, so there is
-            // no per-surface cache field left to hold the expansion.
+            // Neither direction keeps its knots on the surface any more: both knot vectors
+            // hang off the one domain object, so there is no per-surface cache field left.
+            for (String stale : List.of("uKnotVector", "vKnotVector", "uExpandedKnots", "vExpandedKnots")) {
+                assertThrows(NoSuchFieldException.class, () -> surface.getClass().getDeclaredField(stale));
+            }
+            for (String stale : List.of("uExpanded", "vExpanded")) {
+                assertThrows(NoSuchMethodException.class, () -> surface.getClass().getDeclaredMethod(stale));
+            }
+
             for (String name : List.of("uKnotVector", "vKnotVector")) {
-                Field field = surface.getClass().getDeclaredField(name);
+                Field field = BSplineSurfaceDomain.class.getDeclaredField(name);
                 field.setAccessible(true);
-                KnotVector knotVector = (KnotVector) field.get(surface);
+                KnotVector knotVector = (KnotVector) field.get(domainOf(surface));
                 assertNotNull(knotVector);
                 assertNull(cache.get(knotVector), "cache must start empty");
             }
@@ -124,26 +131,24 @@ class BSplineSurfaceSharedSupportTest {
                 ((RationalBSplineSurface3) surface).sampleGrid(2, 2);
             }
 
-            Field uField = surface.getClass().getDeclaredField("uKnotVector");
+            Field uField = BSplineSurfaceDomain.class.getDeclaredField("uKnotVector");
             uField.setAccessible(true);
-            KnotVector uKnotVector = (KnotVector) uField.get(surface);
+            KnotVector uKnotVector = (KnotVector) uField.get(domainOf(surface));
             assertEquals(List.of(0.0, 0.0, 1.0, 1.0), uKnotVector.expanded());
             assertSame(uKnotVector.expanded(), uKnotVector.expanded(), "cache must not be rebuilt");
-
-            for (String stale : List.of("uExpandedKnots", "vExpandedKnots")) {
-                assertThrows(NoSuchFieldException.class, () -> surface.getClass().getDeclaredField(stale));
-            }
-            for (String stale : List.of("uExpanded", "vExpanded")) {
-                assertThrows(NoSuchMethodException.class, () -> surface.getClass().getDeclaredMethod(stale));
-            }
         }
     }
 
     @Test
-    void sharedHelpersLiveInTheSupportClassOnly() throws Exception {
-        Method validate = BSplineSurfaceHelper.class.getDeclaredMethod(
+    void sharedHelpersLiveInTheSupportClassAndTheDomain() throws Exception {
+        // Knot validation belongs to the domain object now, not to the sampling helper.
+        assertThrows(NoSuchMethodException.class, () -> BSplineSurfaceHelper.class.getDeclaredMethod(
+                "validateKnots", int.class, int.class, List.class, List.class));
+        Method validate = BSplineSurfaceDomain.class.getDeclaredMethod(
                 "validateKnots", int.class, int.class, List.class, List.class);
         assertTrue(Modifier.isStatic(validate.getModifiers()));
+        assertTrue(Modifier.isPrivate(validate.getModifiers()),
+                "the shared knot contract stays behind the domain's factory");
 
         // Knot multiplicity expansion and the domain clamp are dimension-free; both now
         // live in the shared kernel rather than in this support class.
@@ -169,6 +174,12 @@ class BSplineSurfaceSharedSupportTest {
             assertThrows(NoSuchMethodException.class,
                     () -> surface.getDeclaredMethod("validateKnots", int.class, int.class, List.class, List.class));
         }
+    }
+
+    private static BSplineSurfaceDomain domainOf(Object surface) throws Exception {
+        Field field = surface.getClass().getDeclaredField("domain");
+        field.setAccessible(true);
+        return (BSplineSurfaceDomain) field.get(surface);
     }
 
     private static void assertGridsClose(List<List<CartesianPoint>> expected, List<List<CartesianPoint>> actual) {

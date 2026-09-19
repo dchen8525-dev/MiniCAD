@@ -1,9 +1,7 @@
 package com.minicad.geometry;
 
 import com.minicad.common.Epsilon;
-import com.minicad.common.BSplineKernel;
 import com.minicad.common.GeometryException;
-import com.minicad.common.KnotVector;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,18 +9,18 @@ import java.util.stream.Collectors;
 /**
  * Minimal rational tensor-product B-spline surface.
  * Expanded knot vectors are cached after first use to avoid repeated allocations.
- * Domain sampling, bounds and nearest-point search are shared with
- * {@link BSplineSurface3} through {@link BSplineSurfaceHelper}; only the weighted
- * point evaluation and the weight-grid validation are specific to this class.
+ * The parameter domain - degrees, control-point counts, natural domain in each
+ * direction and the basis lookup at a parameter pair - lives in
+ * {@link BSplineSurfaceDomain} and domain sampling, bounds and nearest-point search
+ * are shared with {@link BSplineSurface3} through {@link BSplineSurfaceHelper}; only
+ * the weighted point evaluation, the weighted normal and the weight-grid validation
+ * are specific to this class.
  */
 public final class RationalBSplineSurface3 implements SurfaceGeometry {
 
-    private final int uDegree;
-    private final int vDegree;
     private final List<List<CartesianPoint>> controlPoints;
     private final List<List<Double>> weightsData;
-    private final KnotVector uKnotVector;
-    private final KnotVector vKnotVector;
+    private final BSplineSurfaceDomain domain;
 
     public RationalBSplineSurface3(
             int uDegree,
@@ -34,102 +32,87 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
             List<Double> uKnots,
             List<Double> vKnots
     ) {
-        if (uDegree < 1 || vDegree < 1) {
-            throw new GeometryException("surface degrees must be at least 1");
-        }
         this.controlPoints = controlPoints.stream().map(List::copyOf).collect(Collectors.toList());
         this.weightsData = weightsData.stream().map(List::copyOf).collect(Collectors.toList());
-        if (this.controlPoints.size() < uDegree + 1) {
-            throw new GeometryException("U control-point count must be at least degree + 1");
-        }
-        int vCount = this.controlPoints.get(0).size();
-        if (vCount < vDegree + 1) {
-            throw new GeometryException("V control-point count must be at least degree + 1");
-        }
-        if (this.weightsData.size() != this.controlPoints.size()) {
+        this.domain = BSplineSurfaceDomain.of(
+                uDegree, vDegree, this.controlPoints, uKnots, uMultiplicities, vKnots, vMultiplicities);
+        requireUsableWeights();
+    }
+
+    /**
+     * Rejects a weight grid that cannot be paired with the control-point grid. The
+     * control-point side of this is what {@link BSplineSurfaceDomain} already checked;
+     * the weights are the part only this class has, so the check lives here rather than
+     * in the shared domain.
+     */
+    private void requireUsableWeights() {
+        if (weightsData.size() != controlPoints.size()) {
             throw new GeometryException("weight rows must match control-point rows");
         }
-        for (int row = 0; row < this.controlPoints.size(); row++) {
-            if (this.controlPoints.get(row).size() != vCount || this.weightsData.get(row).size() != vCount) {
-                throw new GeometryException("control-point and weight rows must have uniform length");
+        int vCount = domain.vCount();
+        for (int row = 0; row < controlPoints.size(); row++) {
+            if (weightsData.get(row).size() != vCount) {
+                throw new GeometryException("weight rows must have uniform length");
             }
-            for (double weight : this.weightsData.get(row)) {
+            for (double weight : weightsData.get(row)) {
                 if (!Double.isFinite(weight) || weight <= 0.0) {
                     throw new GeometryException("weights must be finite and positive");
                 }
             }
         }
-        if (uMultiplicities.size() != uKnots.size() || vMultiplicities.size() != vKnots.size()) {
-            throw new GeometryException("knot multiplicities and knot values must have matching sizes");
-        }
-        BSplineSurfaceHelper.validateKnots(uDegree, this.controlPoints.size(), uKnots, uMultiplicities);
-        BSplineSurfaceHelper.validateKnots(vDegree, vCount, vKnots, vMultiplicities);
-        this.uDegree = uDegree;
-        this.vDegree = vDegree;
-        this.uKnotVector = new KnotVector(uKnots, uMultiplicities);
-        this.vKnotVector = new KnotVector(vKnots, vMultiplicities);
     }
 
-    public int uDegree() { return uDegree; }
-    public int vDegree() { return vDegree; }
+    public int uDegree() { return domain.uDegree(); }
+    public int vDegree() { return domain.vDegree(); }
     public List<List<CartesianPoint>> controlPoints() { return controlPoints; }
     public List<List<Double>> weightsData() { return weightsData; }
-    public List<Integer> uMultiplicities() { return uKnotVector.multiplicities(); }
-    public List<Integer> vMultiplicities() { return vKnotVector.multiplicities(); }
-    public List<Double> uKnots() { return uKnotVector.knots(); }
-    public List<Double> vKnots() { return vKnotVector.knots(); }
+    public List<Integer> uMultiplicities() { return domain.uMultiplicities(); }
+    public List<Integer> vMultiplicities() { return domain.vMultiplicities(); }
+    public List<Double> uKnots() { return domain.uKnots(); }
+    public List<Double> vKnots() { return domain.vKnots(); }
 
     // Java Bean getters
-    public int getUDegree() { return uDegree; }
-    public int getVDegree() { return vDegree; }
+    public int getUDegree() { return domain.uDegree(); }
+    public int getVDegree() { return domain.vDegree(); }
     public List<List<CartesianPoint>> getControlPoints() { return controlPoints; }
     public List<List<Double>> getWeightsData() { return weightsData; }
-    public List<Integer> getUMultiplicities() { return uKnotVector.multiplicities(); }
-    public List<Integer> getVMultiplicities() { return vKnotVector.multiplicities(); }
-    public List<Double> getUKnots() { return uKnotVector.knots(); }
-    public List<Double> getVKnots() { return vKnotVector.knots(); }
+    public List<Integer> getUMultiplicities() { return domain.uMultiplicities(); }
+    public List<Integer> getVMultiplicities() { return domain.vMultiplicities(); }
+    public List<Double> getUKnots() { return domain.uKnots(); }
+    public List<Double> getVKnots() { return domain.vKnots(); }
 
     public double uStart() {
-        return uKnotVector.expandedStart(uDegree);
+        return domain.uStart();
     }
 
     public double uEnd() {
-        return uKnotVector.expandedEnd(controlPoints.size());
+        return domain.uEnd();
     }
 
     public double vStart() {
-        return vKnotVector.expandedStart(vDegree);
+        return domain.vStart();
     }
 
     public double vEnd() {
-        return vKnotVector.expandedEnd(controlPoints.get(0).size());
+        return domain.vEnd();
     }
 
     public CartesianPoint pointAt(double u, double v) {
-        List<Double> uExp = uKnotVector.expanded();
-        List<Double> vExp = vKnotVector.expanded();
-        double clampedU = BSplineKernel.clamp(u, uExp.get(uDegree), uExp.get(controlPoints.size()));
-        double clampedV = BSplineKernel.clamp(v, vExp.get(vDegree), vExp.get(controlPoints.get(0).size()));
-
-        int uCount = controlPoints.size();
-        int vCount = controlPoints.get(0).size();
-        int uSpan = BSplineKernel.findSpan(uCount - 1, uDegree, clampedU, uExp);
-        int vSpan = BSplineKernel.findSpan(vCount - 1, vDegree, clampedV, vExp);
-        double[] nu = BSplineKernel.basisFunctions(uSpan, clampedU, uDegree, uExp);
-        double[] nv = BSplineKernel.basisFunctions(vSpan, clampedV, vDegree, vExp);
+        int uDegree = domain.uDegree();
+        int vDegree = domain.vDegree();
+        BSplineSurfaceDomain.BasisAt basis = domain.basisAt(u, v);
 
         double x = 0.0;
         double y = 0.0;
         double z = 0.0;
         double denominator = 0.0;
         for (int i = 0; i <= uDegree; i++) {
-            int ui = uSpan - uDegree + i;
-            List<CartesianPoint> row = controlPoints.get(ui);
-            List<Double> weightRow = weightsData.get(ui);
-            double bu = nu[i];
+            List<CartesianPoint> row = controlPoints.get(basis.uIndex(i));
+            List<Double> weightRow = weightsData.get(basis.uIndex(i));
+            double bu = basis.uBasis(i);
             for (int j = 0; j <= vDegree; j++) {
-                int vIndex = vSpan - vDegree + j;
-                double weightedBasis = bu * nv[j] * weightRow.get(vIndex);
+                int vIndex = basis.vIndex(j);
+                double weightedBasis = bu * basis.vBasis(j) * weightRow.get(vIndex);
                 CartesianPoint control = row.get(vIndex);
                 x += control.getX() * weightedBasis;
                 y += control.getY() * weightedBasis;
@@ -144,18 +127,9 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
     }
 
     public Vector3 normalAt(double u, double v) {
-        List<Double> uExp = uKnotVector.expanded();
-        List<Double> vExp = vKnotVector.expanded();
-        double clampedU = BSplineKernel.clamp(u, uStart(), uEnd());
-        double clampedV = BSplineKernel.clamp(v, vStart(), vEnd());
-
-        int uCount = controlPoints.size();
-        int vCount = controlPoints.get(0).size();
-
-        int uSpan = BSplineKernel.findSpan(uCount - 1, uDegree, clampedU, uExp);
-        int vSpan = BSplineKernel.findSpan(vCount - 1, vDegree, clampedV, vExp);
-        double[] nu = BSplineKernel.basisFunctions(uSpan, clampedU, uDegree, uExp);
-        double[] nv = BSplineKernel.basisFunctions(vSpan, clampedV, vDegree, vExp);
+        int uDegree = domain.uDegree();
+        int vDegree = domain.vDegree();
+        BSplineSurfaceDomain.BasisAt basis = domain.basisAt(u, v);
 
         Vector3 A = new Vector3(0.0, 0.0, 0.0);
         Vector3 dAdu = new Vector3(0.0, 0.0, 0.0);
@@ -164,15 +138,14 @@ public final class RationalBSplineSurface3 implements SurfaceGeometry {
         double dWdu = 0.0;
         double dWdv = 0.0;
         for (int i = 0; i <= uDegree; i++) {
-            int ui = uSpan - uDegree + i;
-            List<CartesianPoint> row = controlPoints.get(ui);
-            List<Double> weightRow = weightsData.get(ui);
-            double bu = nu[i];
-            double dBu = BSplineKernel.derivativeBasisValue(ui, uDegree, clampedU, uExp);
+            List<CartesianPoint> row = controlPoints.get(basis.uIndex(i));
+            List<Double> weightRow = weightsData.get(basis.uIndex(i));
+            double bu = basis.uBasis(i);
+            double dBu = basis.uDerivative(i);
             for (int j = 0; j <= vDegree; j++) {
-                int vIndex = vSpan - vDegree + j;
-                double bv = nv[j];
-                double dBv = BSplineKernel.derivativeBasisValue(vIndex, vDegree, clampedV, vExp);
+                int vIndex = basis.vIndex(j);
+                double bv = basis.vBasis(j);
+                double dBv = basis.vDerivative(j);
                 double w = weightRow.get(vIndex);
                 double weightedBasis = w * bu * bv;
                 CartesianPoint cp = row.get(vIndex);

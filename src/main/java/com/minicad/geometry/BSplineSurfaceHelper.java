@@ -1,6 +1,5 @@
 package com.minicad.geometry;
 
-import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
 import java.util.List;
@@ -9,19 +8,20 @@ import java.util.List;
  * Shared implementation of the {@link BSplineSurface3} / {@link RationalBSplineSurface3}
  * pair, minus the parts that turned out not to be about B-splines at all.
  *
- * <p>The two surfaces differ only in how they evaluate a point (weights or not) and in
- * their validation of the weight grid; everything that is expressed purely in terms of
- * {@code pointAt} and the natural {@code (u, v)} domain is therefore identical in both.
- * Keeping one copy here means a fix to knot validation, sampling, bounds or nearest-point
- * search cannot drift between the non-rational and rational variants.</p>
+ * <p>The two surfaces differ only in how they evaluate a point (weights or not), in
+ * their weighted normal and in their validation of the weight grid; everything that is
+ * expressed purely in terms of {@code pointAt} and the natural {@code (u, v)} domain is
+ * therefore identical in both. Keeping one copy here means a fix to sampling, bounds or
+ * nearest-point search cannot drift between the non-rational and rational variants.</p>
  *
- * <p>Knot multiplicity expansion and the domain clamp are dimension-free and no longer
- * live here: they belong to {@code com.minicad.common.BSplineKernel}, which the curves
- * use as well. The {@code (u, v)} grid walk no longer lives here either: it is not
- * B-spline-specific, so it moved to {@link SurfaceGridSampling} and is reached through
- * the delegate below. What is left is genuinely surface-specific - the two-parameter
- * domain, the weight grid validation, the control polygon bounds and the nearest-point
- * search.</p>
+ * <p>Three other groups of members have since left, each to the home that matched what it
+ * actually was: knot multiplicity expansion and the domain clamp to
+ * {@code com.minicad.common.BSplineKernel}, which the curves use as well; the
+ * {@code (u, v)} grid walk to {@link SurfaceGridSampling}, which is not
+ * B-spline-specific; and the degrees, control-point counts, natural domain and basis
+ * lookup to {@link BSplineSurfaceDomain}, which is where the two-parameter domain now
+ * lives rather than being read off fields of each surface. What is left here is the
+ * control polygon bounds and the nearest-point search.</p>
  *
  * <p>Bodies are lifted verbatim from the two classes; the delegated methods keep their
  * original entry signatures so no caller is affected.</p>
@@ -29,35 +29,6 @@ import java.util.List;
 final class BSplineSurfaceHelper {
 
     private BSplineSurfaceHelper() {
-    }
-
-    static void validateKnots(
-            int degree,
-            int controlPointCount,
-            List<Double> knots,
-            List<Integer> multiplicities
-    ) {
-        int expandedCount = 0;
-        double previous = Double.NEGATIVE_INFINITY;
-        for (int index = 0; index < knots.size(); index++) {
-            double knot = knots.get(index);
-            if (!Double.isFinite(knot)) {
-                throw new GeometryException("knot values must be finite");
-            }
-            if (knot < previous) {
-                throw new GeometryException("knot values must be nondecreasing");
-            }
-            int multiplicity = multiplicities.get(index);
-            if (multiplicity < 1) {
-                throw new GeometryException("knot multiplicities must be positive");
-            }
-            expandedCount += multiplicity;
-            previous = knot;
-        }
-        int expected = controlPointCount + degree + 1;
-        if (expandedCount != expected) {
-            throw new GeometryException("expanded knot count must equal control point count + degree + 1");
-        }
     }
 
     /**
