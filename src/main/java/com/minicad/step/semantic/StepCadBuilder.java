@@ -21,7 +21,6 @@ import com.minicad.geometry.Curve3;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Ellipse3;
 import com.minicad.geometry.Clothoid3;
-import com.minicad.geometry.DegenerateCurve3;
 import com.minicad.geometry.Parabola3;
 import com.minicad.geometry.Hyperbola3;
 import com.minicad.geometry.Line3;
@@ -60,7 +59,6 @@ import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.step.model.StepAdvancedFace;
 import com.minicad.step.model.StepAnnotationCurveOccurrence;
 import com.minicad.step.model.StepAxis1Placement;
-import com.minicad.step.model.StepAxis2Placement2D;
 import com.minicad.step.model.StepAxis2Placement3D;
 import com.minicad.step.model.StepBSplineCurve;
 import com.minicad.step.model.StepBSplineSurface;
@@ -85,7 +83,6 @@ import com.minicad.step.model.StepCompositeCurveOnSurface3D;
 import com.minicad.step.model.StepCompositeCurveOnSurface;
 import com.minicad.step.model.StepCompositeCurveSegment;
 import com.minicad.step.model.StepConicalSurface;
-import com.minicad.step.model.StepConicCurve;
 import com.minicad.step.model.StepCylindricalSurface;
 import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDimensionCurve;
@@ -179,9 +176,7 @@ import com.minicad.step.model.StepSurfaceModel;
 import com.minicad.step.model.StepSurfaceOfConstantRadius;
 import com.minicad.step.model.StepSurfacePatch;
 import com.minicad.step.model.StepRectangularCompositeSurface;
-import com.minicad.step.model.StepIndexedPolyCurve;
 import com.minicad.step.model.StepPolyline3D;
-import com.minicad.step.model.StepDegenerateCurve;
 import com.minicad.step.model.StepNonManifoldSolidBrep;
 import com.minicad.step.model.StepSurfaceOfLinearExtrusion;
 import com.minicad.step.model.StepSurfaceOfRevolution;
@@ -638,36 +633,6 @@ public final class StepCadBuilder {
     }
 
     /**
-     * Returns a unit direction perpendicular to the given direction.
-     */
-    private Direction3 perpendicularDirection(Direction3 dir) {
-        Vector3 v = dir.asVector();
-        // Find the smallest component and cross with that axis
-        if (Math.abs(v.getX()) <= Math.abs(v.getY()) && Math.abs(v.getX()) <= Math.abs(v.getZ())) {
-            // Cross with X axis
-            Vector3 perp = new Vector3(1, 0, 0).cross(v);
-            if (perp.isZero()) {
-                return new Direction3(0, 1, 0);
-            }
-            return Direction3.from(perp);
-        } else if (Math.abs(v.getY()) <= Math.abs(v.getZ())) {
-            // Cross with Y axis
-            Vector3 perp = new Vector3(0, 1, 0).cross(v);
-            if (perp.isZero()) {
-                return new Direction3(1, 0, 0);
-            }
-            return Direction3.from(perp);
-        } else {
-            // Cross with Z axis
-            Vector3 perp = new Vector3(0, 0, 1).cross(v);
-            if (perp.isZero()) {
-                return new Direction3(1, 0, 0);
-            }
-            return Direction3.from(perp);
-        }
-    }
-
-    /**
      * Builds a CARTESIAN_TRANSFORMATION_OPERATOR_3D into an Axis2Placement3D.
      *
      * @param id STEP entity id
@@ -682,7 +647,7 @@ public final class StepCadBuilder {
                 "CARTESIAN_TRANSFORMATION_OPERATOR");
         Direction3 zAxis = op.axis3() != null ? buildDirection(op.axis3().id()) : Direction3.zAxis();
         Direction3 xAxis = op.axis1() != null ? buildDirection(op.axis1().id()) :
-                perpendicularDirection(zAxis);
+                geometryBuilder.perpendicularDirection(zAxis);
         CartesianPoint origin = buildPoint(op.localOrigin().id());
         Axis2Placement3D built = new Axis2Placement3D(origin, zAxis, xAxis);
         placements.put(id, built);
@@ -1230,27 +1195,6 @@ public final class StepCadBuilder {
      */
     public Clothoid3 buildClothoid(int id) {
         return curveBuilder.buildClothoid3(id);
-    }
-
-    /**
-     * Converts a 2D placement to a 3D placement in the XY plane (Z=0).
-     */
-    private Axis2Placement3D convert2DPlacementTo3D(StepEntity position) {
-        if (position instanceof StepAxis2Placement3D) {
-            StepAxis2Placement3D placement3D = (StepAxis2Placement3D) position;
-            return buildPlacement(placement3D.id());
-        }
-        if (!(position instanceof StepAxis2Placement2D)) {
-            throw new StepResolutionException("position must be AXIS2_PLACEMENT_2D or AXIS2_PLACEMENT_3D");
-        }
-        StepAxis2Placement2D placement2D = (StepAxis2Placement2D) position;
-        Point2 origin = buildPoint2(placement2D.getLocation().id());
-        Direction2 refDir = buildDirection2(placement2D.getRefDirection().id());
-        // Create 3D placement: location at (x, y, 0), Z axis as normal, X direction from 2D
-        CartesianPoint location3D = new CartesianPoint(origin.getX(), origin.getY(), 0.0);
-        Direction3 axis = new Direction3(0, 0, 1);
-        Direction3 xDirection = new Direction3(refDir.getX(), refDir.getY(), 0);
-        return new Axis2Placement3D(location3D, axis, xDirection);
     }
 
     /**
@@ -2034,6 +1978,14 @@ public final class StepCadBuilder {
         return StepCadEntityLookup.require(entitiesById, id, type, expectedName);
     }
 
+    /**
+     * Extracts the geometry entity from a face entity, unwrapping {@code ORIENTED_FACE}.
+     *
+     * <p>This is the topology-side home of the lookup. The export-side
+     * {@code StepGeometryHelper.faceGeometry} answers the same question but returns {@code null}
+     * on an unhandled subtype where this one throws {@code UnsupportedGeometryException}; the two
+     * are deliberately not merged, because the callers differ on what an unknown face means.
+     */
     static StepEntity faceGeometry(StepFaceEntity stepFace) {
         if (stepFace instanceof StepAdvancedFace) {
             StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
@@ -2208,23 +2160,6 @@ public final class StepCadBuilder {
         return new Vertex(transformPoint3(vertex.point(), transformation));
     }
 
-    private BSplineCurve3 buildImplicitBSplineCurve3(StepEntity entity) {
-        BSplineCurve3 existing = bsplineCurves.get(entity.id());
-        if (existing != null) {
-            return existing;
-        }
-        StepBSplineKnotGenerator.ImplicitBSplineCurveData spline = implicitBSplineCurveData(entity);
-        List<CartesianPoint> controlPoints = spline.getControlPoints().stream().map(point -> buildPoint(point.id())).collect(Collectors.toList());
-        BSplineCurve3 built = new BSplineCurve3(
-                spline.getDegree(),
-                controlPoints,
-                spline.getKnotMultiplicities(),
-                spline.getKnots()
-        );
-        bsplineCurves.put(entity.id(), built);
-        return built;
-    }
-
     /**
      * Builds a Curve3 by entity ID (for callback from StepCadCurveBuilder).
      */
@@ -2263,21 +2198,6 @@ public final class StepCadBuilder {
     }
 
 
-    private Curve3 buildIndexedPolyCurve3(StepIndexedPolyCurve polyCurve) {
-        // Indexed poly curve is defined by indices into a point list
-        List<StepCartesianPoint> stepPoints = polyCurve.getPoints();
-        List<Integer> indices = polyCurve.indices();
-        List<CartesianPoint> points = indices.stream()
-                .map(index -> buildPoint(stepPoints.get(index).id()))
-                .collect(Collectors.toList());
-        if (polyCurve.isClosed() && !points.isEmpty()) {
-            points = new ArrayList<>(points);
-            points.add(points.get(0));
-            points = List.copyOf(points);
-        }
-        return new Polyline3(points);
-    }
-
     private Curve3 buildPolyline3D(StepPolyline3D polyline3D) {
         // Polyline defined by entity references to Cartesian points
         List<CartesianPoint> points = polyline3D.getPoints().stream()
@@ -2290,18 +2210,6 @@ public final class StepCadBuilder {
                 })
                 .collect(Collectors.toList());
         return points.isEmpty() ? new Polyline3(List.of()) : new Polyline3(points);
-    }
-
-    private Curve3 buildDegenerateCurve3(StepDegenerateCurve degenerateCurve) {
-        // Degenerate curve collapses to a point
-        Curve3 basis = buildCurve3(degenerateCurve.getBasisCurve());
-        List<CartesianPoint> sampledPoints = sampleCurve3(basis, 2);
-        if (sampledPoints.isEmpty()) {
-            throw new UnsupportedGeometryException("DEGENERATE_CURVE basis curve has no sample points");
-        }
-        // Return a degenerate curve at the first sample point
-        CartesianPoint point = sampledPoints.get(0);
-        return new DegenerateCurve3(point);
     }
 
     @FunctionalInterface
@@ -2344,10 +2252,12 @@ public final class StepCadBuilder {
             }));
 
     /**
-     * Shared implicit-curve-knot dispatch. Returns {@code null} when no rule
-     * matches so each caller keeps its own exception wording (StepCadBuilder
-     * renders UPPER_SNAKE type names via StepEntityNamingUtils, while
-     * StepCadCurveBuilder keeps its camelCase twin).
+     * Shared implicit-curve-knot dispatch: {@code BEZIER_CURVE}, {@code UNIFORM_CURVE},
+     * {@code QUASI_UNIFORM_CURVE} and {@code PIECEWISE_BEZIER_CURVE} all become implicit
+     * B-splines. Returns {@code null} when no rule matches, so the single remaining
+     * caller -- {@code StepCadCurveBuilder.implicitBSplineCurveData} -- keeps its own
+     * exception wording. The UPPER_SNAKE-rendering wrapper that used to sit next to this
+     * table went with {@code buildImplicitBSplineCurve3}, which was its only caller.
      */
     static StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveDataOrNull(StepEntity entity) {
         for (ImplicitCurveDataRule rule : IMPLICIT_CURVE_DATA_RULES) {
@@ -2356,14 +2266,6 @@ public final class StepCadBuilder {
             }
         }
         return null;
-    }
-
-    private StepBSplineKnotGenerator.ImplicitBSplineCurveData implicitBSplineCurveData(StepEntity entity) {
-        StepBSplineKnotGenerator.ImplicitBSplineCurveData data = implicitBSplineCurveDataOrNull(entity);
-        if (data == null) {
-            throw new UnsupportedGeometryException(stepEntityTypeName(entity) + " implicit knot data is unsupported");
-        }
-        return data;
     }
 
     @FunctionalInterface
@@ -2416,32 +2318,6 @@ public final class StepCadBuilder {
 
     public Curve3 buildOffsetCurve3(int id) {
         return curveBuilder.buildOffsetCurve3(id);
-    }
-
-    private Curve3 buildConicCurve3(StepConicCurve conic) {
-        if (!(conic.getPosition() instanceof StepAxis2Placement3D)) {
-            throw new UnsupportedGeometryException("3D conic curve for " + conic.entityName() + " requires AXIS2_PLACEMENT_3D");
-        }
-        StepAxis2Placement3D placement3D = (StepAxis2Placement3D) conic.getPosition();
-        String entityName = conic.entityName();
-        switch (entityName) {
-            case "PARABOLA":
-                return buildParabola(conic.id());
-            case "HYPERBOLA":
-                return buildHyperbola(conic.id());
-            case "DEGENERATE_CONIC":
-                return new DegenerateCurve3(buildPlacement(placement3D.id()).getLocation());
-            case "CONIC_CURVE":
-                // Generic CONIC_CURVE: try parabola first (most common in STEP files),
-                // then hyperbola if parameters don't match.
-                try {
-                    return buildParabola(conic.id());
-                } catch (UnsupportedGeometryException e) {
-                    return buildHyperbola(conic.id());
-                }
-            default:
-                throw new UnsupportedGeometryException("surface directrix for " + conic.entityName() + " is unsupported");
-        }
     }
 
     Plane buildSupportedPlaneGeometry(StepEntity geometry, String faceType) {
@@ -3228,12 +3104,6 @@ public final class StepCadBuilder {
 
     private static String curveTypeName(Curve2 curve) {
         return StepEntityNamingUtils.curveTypeName(curve);
-    }
-
-    private Plane transformPlane(Plane plane, StepCartesianTransformationOperator transformation) {
-        return new Plane(
-                transformPoint3(plane.getOrigin(), transformation),
-                transformDirection3(plane.getNormal(), transformation));
     }
 
     private SurfaceGeometry transformSurfaceGeometry(SurfaceGeometry surface, StepCartesianTransformationOperator transformation) {

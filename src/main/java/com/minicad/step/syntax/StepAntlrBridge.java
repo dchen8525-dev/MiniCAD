@@ -241,37 +241,11 @@ public final class StepAntlrBridge {
         throw new StepParseException("entity instance must have simpleEntity or complexEntity");
     }
 
-    private static String extractEntityTypeName(StepAntlrParser.EntityInstanceContext ctx) {
-        if (ctx.simpleEntity() != null) {
-            return ctx.simpleEntity().typeName().getText();
-        } else if (ctx.complexEntity() != null) {
-            // Complex entity: concatenate type names
-            StringBuilder sb = new StringBuilder();
-            for (StepAntlrParser.SimpleEntityContext simpleCtx : ctx.complexEntity().simpleEntity()) {
-                if (sb.length() > 0) {
-                    sb.append("+");
-                }
-                sb.append(simpleCtx.typeName().getText());
-            }
-            return sb.toString();
-        }
-        return "UNKNOWN";
-    }
-
     private static List<StepValue> convertSimpleEntityParameters(StepAntlrParser.SimpleEntityContext ctx) {
         if (ctx.parameterList() == null) {
             return List.of();
         }
         return convertParameterList(ctx.parameterList().parameter());
-    }
-
-    private static List<StepValue> convertComplexEntityParameters(StepAntlrParser.ComplexEntityContext ctx) {
-        // Complex entities: merge parameters from all subtypes
-        List<StepValue> allParams = new ArrayList<>();
-        for (StepAntlrParser.SimpleEntityContext simpleCtx : ctx.simpleEntity()) {
-            allParams.addAll(convertSimpleEntityParameters(simpleCtx));
-        }
-        return allParams;
     }
 
     private static List<StepValue> convertParameterList(List<StepAntlrParser.ParameterContext> params) {

@@ -65,8 +65,10 @@ import static org.junit.jupiter.api.Assertions.fail;
  *       four-sided patch builder. With that gone there is no export-side type
  *       left in this file, and no four-sided patch code left either.
  *       {@code sampleTopologySurfaceGrid} -- unmatched for a while -- and
- *       {@code MAX_TOTAL_TRIANGLE_POINTS}, whose live twin is private to
- *       {@code StepPreviewJsonExporter}, went in the same pass.</li>
+ *       {@code MAX_TOTAL_TRIANGLE_POINTS} went in the same pass. The name was then
+ *       believed to live on in {@code StepPreviewJsonExporter}; a later sweep found that
+ *       copy dead too (nothing there ever read it), so the constant's only live home is
+ *       {@code PayloadReductionHelper}, which is where the reduction actually happens.</li>
  * </ul>
  *
  * <p>Both carry a paired assertion, because "deleted a dead copy" and "dropped

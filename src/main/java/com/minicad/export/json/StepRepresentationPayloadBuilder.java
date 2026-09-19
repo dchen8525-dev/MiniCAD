@@ -19,15 +19,12 @@ import com.minicad.preview.sampling.*;
 import com.minicad.preview.mapper.*;
 import com.minicad.export.mesh.*;
 import com.minicad.builder.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * StepRepresentationPayloadBuilder.
  */
 
 public final class StepRepresentationPayloadBuilder {
-    private static final Logger log = LoggerFactory.getLogger(StepRepresentationPayloadBuilder.class);
     private StepRepresentationPayloadBuilder() {}
 
     static AssemblyData buildAssemblyData(

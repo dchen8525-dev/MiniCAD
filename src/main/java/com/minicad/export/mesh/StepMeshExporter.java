@@ -32,11 +32,6 @@ public final class StepMeshExporter {
 
     private static final Logger LOG = LoggerFactory.getLogger(StepMeshExporter.class);
 
-    // STL binary layout constants
-    private static final int STL_HEADER_SIZE = 80;
-    private static final int STL_TRIANGLE_RECORD_SIZE = 50;
-    private static final int STL_COUNT_SIZE = 4;
-
     // Tessellation defaults
     private static final int DEFAULT_CURVE_SEGMENTS = 32;
     private static final int MIN_CURVE_SEGMENTS = 8;
@@ -650,8 +645,6 @@ public final class StepMeshExporter {
     private static class Triangulator {
         private final Map<MeshVertex, Integer> vertexIndex = new LinkedHashMap<>();
         private final List<int[]> faceIndices = new ArrayList<>();
-        private static final double PLANAR_EPS = 1e-9;
-
         private static class MeshVertex {
             private final double x;
             private final double y;
@@ -847,28 +840,6 @@ public final class StepMeshExporter {
                 return new Vector3(0, 0, 1);
             }
             return n.normalize().asVector();
-        }
-        private void appendOrientedTriangle(
-                CartesianPoint p0,
-                CartesianPoint p1,
-                CartesianPoint p2,
-                Vector3 normal,
-                boolean flipped
-        ) {
-            if (triangleArea(p0, p1, p2) <= MIN_TRIANGLE_AREA) {
-                return;
-            }
-            int v0 = addVertex(p0, normal);
-            int v1 = addVertex(p1, normal);
-            int v2 = addVertex(p2, normal);
-            if (flipped) {
-                addTriangle(v0, v2, v1);
-            } else {
-                addTriangle(v0, v1, v2);
-            }
-        }
-        private double triangleArea(CartesianPoint a, CartesianPoint b, CartesianPoint c) {
-            return b.subtract(a).cross(c.subtract(a)).norm() * 0.5;
         }
         MeshData toMeshData() {
             List<double[]> v = new ArrayList<>(vertexIndex.size());

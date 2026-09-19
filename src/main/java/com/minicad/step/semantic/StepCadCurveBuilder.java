@@ -1748,11 +1748,6 @@ final class StepCadCurveBuilder {
         return new DegenerateCurve3(sampledPoints.get(0));
     }
 
-    private Curve3 buildReplicaCurve3(StepGeometricReplica replica) {
-        Curve3 parent = buildCurve3Internal(replica.parent());
-        return geometryOps.transformCurve3(parent, replica.transformation());
-    }
-
     private List<SurfaceCurve3.ParametricCurve> buildSurfaceCurveBindings(List<StepEntity> associatedGeometry) {
         List<SurfaceCurve3.ParametricCurve> bindings = new ArrayList<>();
         for (StepEntity geometry : associatedGeometry) {

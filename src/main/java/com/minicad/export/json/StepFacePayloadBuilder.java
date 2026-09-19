@@ -53,7 +53,6 @@ import com.minicad.step.model.StepBSplineSurfaceWithKnotsAndBreakpoints;
 import com.minicad.step.model.StepConicalSurface;
 import com.minicad.step.model.StepCurveBoundedSurface;
 import com.minicad.step.model.StepCylindricalSurface;
-import com.minicad.step.model.StepDegeneratePcurve;
 import com.minicad.step.model.StepDegenerateToroidalSurface;
 import com.minicad.step.model.StepDimensionCurve;
 import com.minicad.step.model.StepDraughtingAnnotationOccurrence;
@@ -72,7 +71,6 @@ import com.minicad.step.model.StepOrientedSurface;
 import com.minicad.step.model.StepOffsetSurface;
 import com.minicad.step.model.StepOffsetSurface2;
 import com.minicad.step.model.StepParaboloidSurface;
-import com.minicad.step.model.StepPcurve;
 import com.minicad.step.model.StepPiecewiseBezierSurface;
 import com.minicad.step.model.StepPlane;
 import com.minicad.step.model.StepProjectionCurve;
@@ -110,10 +108,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.function.Predicate;
@@ -180,7 +176,7 @@ public final class StepFacePayloadBuilder {
             return new PreviewFaceResult(reversed, null);
         }
 
-        StepEntity geometry = faceGeometry(stepFace);
+        StepEntity geometry = StepGeometryHelper.faceGeometry(stepFace);
         StepEntity previewGeometry = unwrapParametricPreviewSurface(geometry);
         return dispatchPreviewFace(stepFace, geometry, previewGeometry, builder, metadata);
     }
@@ -1977,56 +1973,6 @@ public final class StepFacePayloadBuilder {
         return StepEdgePayloadBuilder.previewCurveSemanticItem(edgeGeometry);
     }
 
-    private static List<StepEntity> matchingPcurves(List<StepEntity> associatedGeometry, StepEntity faceGeometry) {
-        Set<Integer> acceptableSurfaceIds = acceptablePcurveBasisSurfaceIds(faceGeometry);
-        List<StepEntity> matches = new ArrayList<>();
-        for (StepEntity associated : associatedGeometry) {
-            if (associated instanceof StepPcurve && acceptableSurfaceIds.contains(((StepPcurve) associated).basisSurface().id())) {
-                StepPcurve pcurve = (StepPcurve) associated;
-                matches.add(pcurve);
-            } else if (associated instanceof StepDegeneratePcurve && acceptableSurfaceIds.contains(((StepDegeneratePcurve) associated).basisSurface().id())) {
-                StepDegeneratePcurve pcurve = (StepDegeneratePcurve) associated;
-                matches.add(pcurve);
-            }
-        }
-        return List.copyOf(matches);
-    }
-
-    private static Set<Integer> acceptablePcurveBasisSurfaceIds(StepEntity faceGeometry) {
-        LinkedHashSet<Integer> ids = new LinkedHashSet<>();
-        StepEntity current = faceGeometry;
-        for (int depth = 0; depth < 16 && current != null; depth++) {
-            ids.add(current.id());
-            if (current instanceof StepRectangularTrimmedSurface) {
-            StepRectangularTrimmedSurface trimmedSurface = (StepRectangularTrimmedSurface) current;
-                current = trimmedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepCurveBoundedSurface) {
-            StepCurveBoundedSurface boundedSurface = (StepCurveBoundedSurface) current;
-                current = boundedSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepOrientedSurface) {
-            StepOrientedSurface orientedSurface = (StepOrientedSurface) current;
-                current = orientedSurface.surfaceElement();
-                continue;
-            }
-            if (current instanceof StepOffsetSurface) {
-            StepOffsetSurface offsetSurface = (StepOffsetSurface) current;
-                current = offsetSurface.basisSurface();
-                continue;
-            }
-            if (current instanceof StepGeometricReplica && "SURFACE_REPLICA".equals(((StepGeometricReplica) current).entityName())) {
-                StepGeometricReplica replica = (StepGeometricReplica) current;
-                current = replica.parent();
-                continue;
-            }
-            break;
-        }
-        return Set.copyOf(ids);
-    }
-
     private static List<ParametricLoopPayload> normalizeLoopRoles(
             StepFaceEntity stepFace,
             StepEntity geometry,
@@ -2054,10 +2000,6 @@ public final class StepFacePayloadBuilder {
             normalized.add(new ParametricLoopPayload(index == outerIndex, loops.get(index).points()));
         }
         return List.copyOf(normalized);
-    }
-
-    private static StepEntity faceGeometry(StepFaceEntity stepFace) {
-        return StepGeometryHelper.faceGeometry(stepFace);
     }
 
     private static FacePayload reverseFacePayload(FacePayload base) {

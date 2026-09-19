@@ -238,9 +238,19 @@ final class StepCadGeometryBuilder {
   }
 
   /**
-   * Returns a unit direction perpendicular to the given direction.
+   * Returns a unit direction perpendicular to the given direction, by crossing the axis the
+   * direction leans on least. Completing a placement's axis system needs an answer that is
+   * *numerically* safe rather than geometrically canonical, which is why this is not {@code
+   * Direction3.perpendicular()}: for {@code +X} that method returns {@code +Y} while this one
+   * returns {@code -Z}, and the axis flips a downstream {@code instanceof} branch.
+   *
+   * <p>Package-private because {@code StepCadBuilder} -- the class this builder was extracted
+   * from -- needs the same rule for its {@code buildTransformation}: it used to keep a 20-line
+   * copy and now calls back here instead. One home, one answer. The call is guarded by {@code
+   * StepCadBuilderDeadOrphansTest.perpendicularDirectionHasOneHome}, which also pins that this
+   * method is <b>not</b> {@code Direction3.perpendicular()}.
    */
-  private Direction3 perpendicularDirection(Direction3 dir) {
+  Direction3 perpendicularDirection(Direction3 dir) {
     Vector3 v = dir.asVector();
     // Find the smallest component and cross with that axis
     if (Math.abs(v.getX()) <= Math.abs(v.getY()) && Math.abs(v.getX()) <= Math.abs(v.getZ())) {

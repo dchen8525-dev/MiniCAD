@@ -32,9 +32,6 @@ import com.minicad.step.model.StepGeneralizedAreaProfile;
 import com.minicad.step.model.StepProfileDef;
 import com.minicad.step.model.StepRectangleHollowProfileDef;
 import com.minicad.step.model.StepSweptProfileAreaOutline;
-import com.minicad.step.model.StepAdvancedFace;
-import com.minicad.step.model.StepFaceSurface;
-import com.minicad.step.model.StepOrientedFace;
 import com.minicad.topology.Face;
 import com.minicad.topology.FaceBound;
 import com.minicad.topology.PolyLoop;
@@ -71,7 +68,7 @@ final class StepCadSweptBuilder {
             throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID swept_face must be a face entity");
         }
         StepFaceEntity stepFace = (StepFaceEntity) faceGeometry;
-        SurfaceGeometry surface = builder.buildSupportedFaceGeometry(faceGeometry(stepFace), "EXTRUDED_FACE_SOLID");
+        SurfaceGeometry surface = builder.buildSupportedFaceGeometry(StepCadBuilder.faceGeometry(stepFace), "EXTRUDED_FACE_SOLID");
         List<CartesianPoint> localProfilePoints = sampleFaceBoundary(surface, 72);
         if (localProfilePoints.isEmpty()) {
             throw new UnsupportedGeometryException("EXTRUDED_FACE_SOLID could not extract boundary points");
@@ -100,7 +97,7 @@ final class StepCadSweptBuilder {
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID swept_face must be a face entity");
         }
         StepFaceEntity stepFace = (StepFaceEntity) faceGeometry;
-        SurfaceGeometry surface = builder.buildSupportedFaceGeometry(faceGeometry(stepFace), "REVOLVED_FACE_SOLID");
+        SurfaceGeometry surface = builder.buildSupportedFaceGeometry(StepCadBuilder.faceGeometry(stepFace), "REVOLVED_FACE_SOLID");
         List<CartesianPoint> localProfilePoints = sampleFaceBoundary(surface, 72);
         if (localProfilePoints.isEmpty()) {
             throw new UnsupportedGeometryException("REVOLVED_FACE_SOLID could not extract boundary points");
@@ -864,26 +861,6 @@ final class StepCadSweptBuilder {
 
     private CircularFrame circularFrameAtPoint(CartesianPoint point, Direction3 tangent) {
         return StepCadShellGeometry.circularFrameAtPoint(point, tangent);
-    }
-
-    // ========================================================================
-    // Face geometry helper
-    // ========================================================================
-
-    static StepEntity faceGeometry(StepFaceEntity stepFace) {
-        if (stepFace instanceof StepAdvancedFace) {
-            StepAdvancedFace advancedFace = (StepAdvancedFace) stepFace;
-            return advancedFace.faceGeometry();
-        }
-        if (stepFace instanceof StepFaceSurface) {
-            StepFaceSurface faceSurface = (StepFaceSurface) stepFace;
-            return faceSurface.faceGeometry();
-        }
-        if (stepFace instanceof StepOrientedFace) {
-            StepOrientedFace orientedFace = (StepOrientedFace) stepFace;
-            return faceGeometry(orientedFace.faceElement());
-        }
-        throw new UnsupportedGeometryException("unsupported face subtype");
     }
 
     // ========================================================================

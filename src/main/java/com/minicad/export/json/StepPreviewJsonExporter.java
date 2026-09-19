@@ -575,13 +575,8 @@ import java.util.stream.Collectors;
 public final class StepPreviewJsonExporter {
     private static final Logger log = LoggerFactory.getLogger(StepPreviewJsonExporter.class);
 
-    private static final int FACE_PROGRESS_INTERVAL = 25;
-    private static final int EDGE_PROGRESS_INTERVAL = 100;
-    private static final int MAX_TOTAL_TRIANGLE_POINTS = 6_000_000;
     private static final int GLB_MAX_TOTAL_TRIANGLE_POINTS = 12_000_000;
     private static final int MAX_TOTAL_LOOP_POINTS = 250_000;
-    private static final int TOPOLOGY_SURFACE_GRID_SEGMENTS = 16;
-
     private StepPreviewJsonExporter() {
     }
 

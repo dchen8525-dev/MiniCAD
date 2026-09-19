@@ -136,10 +136,6 @@ final class StepCadSurfaceBuilder {
         return built;
     }
 
-    private StepEntity requireExistingEntity(int id) {
-        return StepCadEntityLookup.requireExisting(entitiesById, id);
-    }
-
     private <T extends StepEntity> T requireEntity(int id, Class<T> type, String expectedName) {
         return StepCadEntityLookup.require(entitiesById, id, type, expectedName);
     }

@@ -1,6 +1,5 @@
 package com.minicad.step.semantic;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,74 +30,6 @@ public final class SelectTypeRegistry {
       "POSITIVE_RATIO_MEASURE",
       "DESCRIPTIVE_MEASURE",
       "MEASURE_VALUE");
-
-  // ---------------------------------------------------------------------------
-  // Action SELECT types (AP242 Part 1, Section 7.3)
-  // ---------------------------------------------------------------------------
-
-  /** Action-related SELECT types for process modeling. */
-  public static final Set<String> ACTION_SELECT_TYPES = Set.of(
-      "action_method",
-      "action_method_assignment_select",
-      "action_request_solution",
-      "action_directive");
-
-  // ---------------------------------------------------------------------------
-  // Definition SELECT types (AP242 Part 1, Section 6.2)
-  // ---------------------------------------------------------------------------
-
-  /** Characterized definition types for product characterization. */
-  public static final Set<String> DEFINITION_SELECT_TYPES = Set.of(
-      "characterized_definition",
-      "characterized_product_definition",
-      "characterized_object");
-
-  // ---------------------------------------------------------------------------
-  // Geometric SELECT types (AP242 Part 1, Section 5.2)
-  // ---------------------------------------------------------------------------
-
-  /** Geometric model and set SELECT types. */
-  public static final Set<String> GEOMETRIC_SELECT_TYPES = Set.of(
-      "geometric_model_select",
-      "geometric_set_select",
-      "transformed_shape_with_scale_and_mirror");
-
-  // ---------------------------------------------------------------------------
-  // Representation SELECT types
-  // ---------------------------------------------------------------------------
-
-  /** Representation item SELECT types. */
-  public static final Set<String> REPRESENTATION_SELECT_TYPES = Set.of(
-      "representation_item",
-      "founded_item_select",
-      "representation_or_representation_item",
-      // Additional representation item wrappers found in test files
-      "INTEGER_REPRESENTATION_ITEM",
-      "REAL_REPRESENTATION_ITEM",
-      "NUMBER_REPRESENTATION_ITEM",
-      "BOOLEAN_REPRESENTATION_ITEM",
-      "STRING_REPRESENTATION_ITEM",
-      "DESCRIPTIVE_REPRESENTATION_ITEM");
-
-  // ---------------------------------------------------------------------------
-  // Organization and Person SELECT types
-  // ---------------------------------------------------------------------------
-
-  /** Organization and person SELECT types. */
-  public static final Set<String> ORGANIZATION_SELECT_TYPES = Set.of(
-      "organization",
-      "person",
-      "person_and_organization");
-
-  // ---------------------------------------------------------------------------
-  // Date and Time SELECT types
-  // ---------------------------------------------------------------------------
-
-  /** Date and time SELECT types. */
-  public static final Set<String> DATETIME_SELECT_TYPES = Set.of(
-      "date",
-      "date_and_time",
-      "calendar_date");
 
   // ---------------------------------------------------------------------------
   // All known SELECT types combined
@@ -150,65 +81,6 @@ public final class SelectTypeRegistry {
       "date",
       "date_and_time",
       "calendar_date");
-
-  // ---------------------------------------------------------------------------
-  // Category mapping
-  // ---------------------------------------------------------------------------
-
-  private static final Map<String, String> SELECT_TYPE_TO_CATEGORY = Map.ofEntries(
-      // Measure types -> "measure"
-      Map.entry("LENGTH_MEASURE", "measure"),
-      Map.entry("AREA_MEASURE", "measure"),
-      Map.entry("VOLUME_MEASURE", "measure"),
-      Map.entry("PLANE_ANGLE_MEASURE", "measure"),
-      Map.entry("SOLID_ANGLE_MEASURE", "measure"),
-      Map.entry("RATIO_MEASURE", "measure"),
-      Map.entry("PARAMETER_VALUE", "measure"),
-      Map.entry("POSITIVE_LENGTH_MEASURE", "measure"),
-      Map.entry("POSITIVE_PLANE_ANGLE_MEASURE", "measure"),
-      Map.entry("POSITIVE_RATIO_MEASURE", "measure"),
-      Map.entry("DESCRIPTIVE_MEASURE", "measure"),
-      Map.entry("MEASURE_VALUE", "measure"),
-      // Action types -> "action"
-      Map.entry("action_method", "action"),
-      Map.entry("action_method_assignment_select", "action"),
-      Map.entry("action_request_solution", "action"),
-      Map.entry("action_directive", "action"),
-      // Definition types -> "definition"
-      Map.entry("characterized_definition", "definition"),
-      Map.entry("characterized_product_definition", "definition"),
-      Map.entry("characterized_object", "definition"),
-      // Geometric types -> "geometric"
-      Map.entry("geometric_model_select", "geometric"),
-      Map.entry("geometric_set_select", "geometric"),
-      Map.entry("transformed_shape_with_scale_and_mirror", "geometric"),
-      // Representation types -> "representation"
-      Map.entry("representation_item", "representation"),
-      Map.entry("founded_item_select", "representation"),
-      Map.entry("representation_or_representation_item", "representation"),
-      Map.entry("INTEGER_REPRESENTATION_ITEM", "representation"),
-      Map.entry("REAL_REPRESENTATION_ITEM", "representation"),
-      Map.entry("NUMBER_REPRESENTATION_ITEM", "representation"),
-      Map.entry("BOOLEAN_REPRESENTATION_ITEM", "representation"),
-      Map.entry("STRING_REPRESENTATION_ITEM", "representation"),
-      Map.entry("DESCRIPTIVE_REPRESENTATION_ITEM", "representation"),
-      // Organization types -> "organization"
-      Map.entry("organization", "organization"),
-      Map.entry("person", "organization"),
-      Map.entry("person_and_organization", "organization"),
-      // Date/time types -> "datetime"
-      Map.entry("date", "datetime"),
-      Map.entry("date_and_time", "datetime"),
-      Map.entry("calendar_date", "datetime"));
-
-  private static final Map<String, Set<String>> CATEGORY_TO_TYPES = Map.of(
-      "measure", MEASURE_SELECT_TYPES,
-      "action", ACTION_SELECT_TYPES,
-      "definition", DEFINITION_SELECT_TYPES,
-      "geometric", GEOMETRIC_SELECT_TYPES,
-      "representation", REPRESENTATION_SELECT_TYPES,
-      "organization", ORGANIZATION_SELECT_TYPES,
-      "datetime", DATETIME_SELECT_TYPES);
 
   // ---------------------------------------------------------------------------
   // Validation methods
