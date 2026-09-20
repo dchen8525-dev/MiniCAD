@@ -169,12 +169,7 @@ public final class StepParameterReader {
    * Unwraps all {@link StepValue.TypedValue} layers to reach the leaf value.
    */
   public static StepValue unwrapTyped(StepValue value) {
-    StepValue current = value;
-    while (current instanceof StepValue.TypedValue) {
-      StepValue.TypedValue typedValue = (StepValue.TypedValue) current;
-      current = typedValue.value();
-    }
-    return current;
+    return StepResolverValueHelpers.unwrapTyped(value);
   }
 
   /**
