@@ -5,7 +5,10 @@ import com.minicad.step.model.StepPlanarBox;
 import com.minicad.step.model.StepPlanarExtent;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.model.StepFaceEntity;
+import com.minicad.step.model.StepFaceBasedSurfaceModel;
 import com.minicad.step.model.StepFiniteElementMesh;
+import com.minicad.step.model.StepManifoldSurfaceModel;
+import com.minicad.step.model.StepShellBasedSurfaceModel;
 import com.minicad.step.model.StepSurfacePatch;
 import com.minicad.step.model.StepSurfacedOpenShell;
 import com.minicad.step.model.StepFlatPattern;
@@ -117,5 +120,24 @@ public final class ShellHelper {
                 || entity instanceof StepFiniteElementMesh
                 || entity instanceof StepFlatPattern
                 || entity instanceof StepSurfacePatch;
+    }
+
+    /**
+     * Checks whether an entity is a candidate for shell building: open/closed
+     * shells, connected face sets, tessellated geometry, or a surface model
+     * (face-, manifold- or shell-based). Shared by the benchmark and mesh
+     * exporter entry points, which previously each carried a byte-identical
+     * private copy of this predicate.
+     */
+    public static boolean isShellCandidate(StepEntity entity) {
+        return entity instanceof StepOpenShell
+                || entity instanceof StepClosedShell
+                || entity instanceof StepSurfacedOpenShell
+                || entity instanceof StepConnectedFaceSet
+                || entity instanceof StepTessellatedFaceSet
+                || entity instanceof StepTessellatedFace
+                || entity instanceof StepFaceBasedSurfaceModel
+                || entity instanceof StepManifoldSurfaceModel
+                || entity instanceof StepShellBasedSurfaceModel;
     }
 }

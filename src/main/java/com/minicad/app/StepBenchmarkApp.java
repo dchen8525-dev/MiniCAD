@@ -4,6 +4,7 @@ import com.minicad.builder.CompiledStepDocument;
 import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.export.mesh.StepMeshExporter;
 import com.minicad.helper.StepTextReader;
+import com.minicad.helper.ShellHelper;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;
@@ -170,7 +171,7 @@ public final class StepBenchmarkApp {
                 }
                 continue;
             }
-            if (isShellCandidate(entity)) {
+            if (ShellHelper.isShellCandidate(entity)) {
                 try {
                     builder.buildShell(id);
                     shellsBuilt++;
@@ -204,18 +205,6 @@ public final class StepBenchmarkApp {
             message = ex.getClass().getSimpleName();
         }
         return "#" + id + " " + entity.getClass().getSimpleName() + ": " + message;
-    }
-
-    private static boolean isShellCandidate(StepEntity entity) {
-        return entity instanceof com.minicad.step.model.StepOpenShell
-                || entity instanceof com.minicad.step.model.StepClosedShell
-                || entity instanceof com.minicad.step.model.StepSurfacedOpenShell
-                || entity instanceof com.minicad.step.model.StepConnectedFaceSet
-                || entity instanceof com.minicad.step.model.StepTessellatedFaceSet
-                || entity instanceof com.minicad.step.model.StepTessellatedFace
-                || entity instanceof com.minicad.step.model.StepFaceBasedSurfaceModel
-                || entity instanceof com.minicad.step.model.StepManifoldSurfaceModel
-                || entity instanceof com.minicad.step.model.StepShellBasedSurfaceModel;
     }
 
     private static double formatMillis(long nanos) {

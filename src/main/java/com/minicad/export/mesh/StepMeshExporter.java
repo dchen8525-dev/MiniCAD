@@ -7,6 +7,7 @@ import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
+import com.minicad.helper.ShellHelper;
 import com.minicad.step.model.StepEntity;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.TransformationOperatorBasis;
@@ -596,7 +597,7 @@ public final class StepMeshExporter {
                         firstSolidFailure = "#" + id + ": " + e.getMessage();
                     }
                 }
-            } else if (isShellCandidate(entity)) {
+            } else if (ShellHelper.isShellCandidate(entity)) {
                 try {
                     Shell shell = builder.buildShell(id);
                     t.triangulateShell(shell);
@@ -630,17 +631,6 @@ public final class StepMeshExporter {
                 || entity instanceof com.minicad.step.model.StepShellBasedSurfaceModel
                 || entity instanceof com.minicad.step.model.StepManifoldSolidBrep
                 || entity instanceof com.minicad.step.model.StepBrepWithVoids;
-    }
-    private static boolean isShellCandidate(StepEntity entity) {
-        return entity instanceof com.minicad.step.model.StepOpenShell
-                || entity instanceof com.minicad.step.model.StepClosedShell
-                || entity instanceof com.minicad.step.model.StepSurfacedOpenShell
-                || entity instanceof com.minicad.step.model.StepConnectedFaceSet
-                || entity instanceof com.minicad.step.model.StepTessellatedFaceSet
-                || entity instanceof com.minicad.step.model.StepTessellatedFace
-                || entity instanceof com.minicad.step.model.StepFaceBasedSurfaceModel
-                || entity instanceof com.minicad.step.model.StepManifoldSurfaceModel
-                || entity instanceof com.minicad.step.model.StepShellBasedSurfaceModel;
     }
     private static class Triangulator {
         private final Map<MeshVertex, Integer> vertexIndex = new LinkedHashMap<>();
