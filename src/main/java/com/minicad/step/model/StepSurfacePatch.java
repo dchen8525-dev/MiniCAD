@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SURFACE_PATCH.
- * A bounded portion of a surface.
- *
- * @param id STEP instance id
- * @param name patch name
- * @param basisSurface the underlying surface
- * @param sameSense whether the patch has the same orientation as the basis surface
- */
 /**
  * Resolved SURFACE_PATCH.
  * A bounded portion of a surface.

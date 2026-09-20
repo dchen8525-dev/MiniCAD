@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMPOSITE_DATUM_REFERENCE.
- * A composite datum reference entity.
- *
- * @param id STEP instance id
- * @param name datum name
- * @param datums list of datum entities
- * @param compositeType composite type (common, simultaneous, etc.)
- */
 /**
  * Resolved COMPOSITE_DATUM_REFERENCE.
  * A composite datum reference entity.

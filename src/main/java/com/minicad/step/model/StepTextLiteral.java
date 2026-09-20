@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TEXT_LITERAL.
- * A single text string at a specific placement.
- *
- * @param id STEP instance id
- * @param name text name
- * @param literal the text content
- * @param path text path placement
- */
 /**
  * Resolved TEXT_LITERAL.
  * A single text string at a specific placement.

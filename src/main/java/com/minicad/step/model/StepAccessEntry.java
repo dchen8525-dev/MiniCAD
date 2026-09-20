@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ACCESS_ENTRY.
- * An access entry entity.
- *
- * @param id STEP instance id
- * @param name entry name
- * @param entryType entry variance type
- * @param entryAction entry variance action (read/write/delete)
- * @param entryTarget entry variance target reference
- * @param entryActor entry variance actor reference
- * @param entryTimestamp entry variance timestamp
- * @param entryResult entry variance result
- * @param entryStatus entry variance status
- */
 /**
  * Resolved ACCESS_ENTRY.
  * An access entry entity.

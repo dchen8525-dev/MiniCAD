@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved STRUCTURAL_ANALYSIS_MODEL.
- * A structural analysis model for FEA.
- */
 /**
  * Resolved STRUCTURAL_ANALYSIS_MODEL.
  * A structural analysis model for FEA.

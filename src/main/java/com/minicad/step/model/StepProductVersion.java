@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PRODUCT_VERSION.
- * A product version entity.
- *
- * @param id STEP instance id
- * @param name version name
- * @param versionId version identifier
- * @param description version description
- * @param product relating product
- * @param versionContext version context information
- */
 /**
  * Resolved PRODUCT_VERSION.
  * A product version entity.

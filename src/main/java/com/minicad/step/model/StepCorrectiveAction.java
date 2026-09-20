@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CORRECTIVE_ACTION.
- * A corrective action entity.
- *
- * @param id STEP instance id
- * @param name action name
- * @varianceProblem identified variance problem
- * @varianceRootCause root variance cause
- * @varianceAction corrective variance action description
- * @varianceResponsible responsible variance person
- * @varianceTarget target variance completion date
- * @varianceStatus action variance status
- * @varianceEffectiveness effectiveness variance verification
- */
 /**
  * Resolved CORRECTIVE_ACTION.
  * A corrective action entity.

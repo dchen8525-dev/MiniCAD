@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DATUM_TARGET.
- * A datum target used in geometric tolerancing.
- *
- * @param id STEP instance id
- * @param name target name
- * @param targetId target identifier
- * @param targetShape target shape reference
- */
 /**
  * Resolved DATUM_TARGET.
  * A datum target used in geometric tolerancing.

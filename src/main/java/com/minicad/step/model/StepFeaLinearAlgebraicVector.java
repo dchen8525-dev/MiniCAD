@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FEA_LINEAR_ALGEBRAIC_VECTOR.
- * A vector used in finite element linear algebra computations.
- */
 /**
  * Resolved FEA_LINEAR_ALGEBRAIC_VECTOR.
  * A vector used in finite element linear algebra computations.

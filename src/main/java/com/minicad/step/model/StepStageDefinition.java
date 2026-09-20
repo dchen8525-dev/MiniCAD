@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STAGE_DEFINITION.
- * A stage definition entity.
- *
- * @param id STEP instance id
- * @param name stage name
- * @param stageType stage variance type
- * @param stageSequence stage variance sequence number
- * @param stageTasks stage variance task definitions
- * @param stageDependencies stage variance dependencies
- * @param stageStatus stage variance status
- */
 /**
  * Resolved STAGE_DEFINITION.
  * A stage definition entity.

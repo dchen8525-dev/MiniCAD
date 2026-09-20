@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PARTITION_INSTANCE.
- * A partition instance entity.
- *
- * @param id STEP instance id
- * @param name partition instance name
- * @param partitionDefinition partition variance definition reference
- * @param partitionState partition variance state
- * @param partitionSize partition variance size
- * @param partitionEntries partition variance entry count
- * @param partitionStatus partition variance status
- */
 /**
  * Resolved PARTITION_INSTANCE.
  * A partition instance entity.

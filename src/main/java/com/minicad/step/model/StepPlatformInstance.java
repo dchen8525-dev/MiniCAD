@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PLATFORM_INSTANCE.
- * A platform instance entity.
- *
- * @param id STEP instance id
- * @param name platform instance name
- * @param platformDefinition platform variance definition reference
- * @param platformState platform variance state
- * @param platformVersion platform variance version
- * @param platformHealth platform variance health status
- * @param platformStatus platform variance status
- */
 /**
  * Resolved PLATFORM_INSTANCE.
  * A platform instance entity.

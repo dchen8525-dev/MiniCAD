@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal ORIENTED_SURFACE parse-only surface wrapper.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param surfaceElement referenced surface
- * @param orientation orientation sense
- */
 /**
  * Minimal ORIENTED_SURFACE parse-only surface wrapper.
  *

@@ -1,12 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved HYBRID_SHAPE_REPRESENTATION.
- */
 /**
  * Resolved HYBRID_SHAPE_REPRESENTATION.
  */

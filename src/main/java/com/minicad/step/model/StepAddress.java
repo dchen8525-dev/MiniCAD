@@ -1,24 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal ADDRESS metadata.
- *
- * @param id STEP instance id
- * @param internalLocation internal location
- * @param streetNumber street number
- * @param street street
- * @param postalBox postal box
- * @param town town
- * @param region region
- * @param postalCode postal code
- * @param country country
- * @param facsimileNumber facsimile number
- * @param telephoneNumber telephone number
- * @param electronicMailAddress email address
- * @param telexNumber telex number
- */
 /**
  * Minimal ADDRESS metadata.
  *

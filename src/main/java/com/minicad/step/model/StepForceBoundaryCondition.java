@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FORCE_BOUNDARY_CONDITION.
- * Force boundary condition for FEA.
- */
 /**
  * Resolved FORCE_BOUNDARY_CONDITION.
  * Force boundary condition for FEA.

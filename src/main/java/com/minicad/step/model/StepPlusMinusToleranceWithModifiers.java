@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PLUS_MINUS_TOLERANCE_WITH_MODIFIERS.
- * A plus-minus tolerance with modifiers entity.
- *
- * @param id STEP instance id
- * @param name tolerance name
- * @param upperDeviation upper deviation value
- * @param lowerDeviation lower deviation value
- * * @param deviationUnit deviation unit
- * @param modifiers tolerance modifiers
- */
 /**
  * Resolved PLUS_MINUS_TOLERANCE_WITH_MODIFIERS.
  * A plus-minus tolerance with modifiers entity.

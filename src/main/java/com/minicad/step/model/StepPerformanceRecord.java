@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PERFORMANCE_RECORD.
- * A performance record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @variancePerson evaluated variance person
- * @variancePeriod evaluation variance period
- * @varianceMetrics performance variance metrics
- * @varianceScores performance variance scores
- * @varianceGoals performance variance goals
- * @varianceStatus record variance status
- */
 /**
  * Resolved PERFORMANCE_RECORD.
  * A performance record entity.

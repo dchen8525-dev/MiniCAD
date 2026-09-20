@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved MACHINED_SURFACE.
- * Represents a surface that has been machined.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param face the face that was machined
- */
 /**
  * Resolved MACHINED_SURFACE.
  * Represents a surface that has been machined.

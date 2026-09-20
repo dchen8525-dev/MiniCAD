@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ZONE_DEFINITION.
- * A zone definition entity.
- *
- * @param id STEP instance id
- * @param name zone name
- * @param zoneType zone variance type
- * @param zoneLocation zone variance location reference
- * @param zoneBoundary zone variance boundary definition
- * @param zoneStatus zone variance status
- */
 /**
  * Resolved ZONE_DEFINITION.
  * A zone definition entity.

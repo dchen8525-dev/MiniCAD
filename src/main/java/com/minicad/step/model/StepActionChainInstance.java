@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ACTION_CHAIN_INSTANCE.
- * An action chain instance entity.
- *
- * @param id STEP instance id
- * @param name action chain instance name
- * @param chainDefinition chain variance definition reference
- * @param chainState chain variance state
- * @param chainCurrentAction chain variance current action
- * @param chainCompletedActions chain variance completed action count
- * @param chainStatus chain variance status
- */
 /**
  * Resolved ACTION_CHAIN_INSTANCE.
  * An action chain instance entity.

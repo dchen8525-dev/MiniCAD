@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved REVIEW_RECORD.
- * A review record entity.
- *
- * @param id STEP instance id
- * @param name review name
- * @param reviewType review variance type
- * @param reviewResult review variance result (approved/rejected)
- * @param reviewComments review variance comments
- * @param reviewReviewer review variance reviewer reference
- * @param reviewTimestamp review variance timestamp
- * @param reviewStatus review variance status
- */
 /**
  * Resolved REVIEW_RECORD.
  * A review record entity.

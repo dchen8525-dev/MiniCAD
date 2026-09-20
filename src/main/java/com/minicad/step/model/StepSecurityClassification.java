@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal SECURITY_CLASSIFICATION metadata.
- *
- * @param id STEP instance id
- * @param name classification name
- * @param purpose classification purpose
- * @param securityLevel classification level
- */
 /**
  * Minimal SECURITY_CLASSIFICATION metadata.
  *

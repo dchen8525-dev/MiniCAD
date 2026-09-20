@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TIMEOUT_INSTANCE.
- * A timeout instance entity.
- *
- * @param id STEP instance id
- * @param name timeout instance name
- * @param timeoutDefinition timeout variance definition reference
- * @param timeoutState timeout variance state
- * @param timeoutStartTime timeout variance start time
- * @param timeoutTriggered timeout variance triggered flag
- * @param timeoutStatus timeout variance status
- */
 /**
  * Resolved TIMEOUT_INSTANCE.
  * A timeout instance entity.

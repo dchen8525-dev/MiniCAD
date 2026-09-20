@@ -1,19 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepAxis2Placement2D;
 import java.util.Objects;
-/**
- * Resolved CENTRE_LINE_ARC_PROFILE_DEF.
- * An arc profile defined along its centre line.
- *
- * @param id STEP instance id
- * @param name profile name
- * @param position placement for the profile
- * @param radius arc radius
- * @param angle sweep angle
- */
 /**
  * Resolved CENTRE_LINE_ARC_PROFILE_DEF.
  * An arc profile defined along its centre line.

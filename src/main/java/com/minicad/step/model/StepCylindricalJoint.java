@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CYLINDRICAL_JOINT.
- * A cylindrical joint between two links.
- */
 /**
  * Resolved CYLINDRICAL_JOINT.
  * A cylindrical joint between two links.

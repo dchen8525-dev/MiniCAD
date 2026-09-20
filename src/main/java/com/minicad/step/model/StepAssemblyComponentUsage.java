@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ASSEMBLY_COMPONENT_USAGE.
- * An assembly component usage entity.
- *
- * @param id STEP instance id
- * @param name usage name
- * @param parentAssembly parent assembly reference
- * @param childComponent child component reference
- * @param quantity quantity of components
- * @param usageType usage type classification
- * @param location placement location
- */
 /**
  * Resolved ASSEMBLY_COMPONENT_USAGE.
  * An assembly component usage entity.

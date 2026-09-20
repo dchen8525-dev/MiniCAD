@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WARRANTY_INFORMATION.
- * A warranty information entity.
- *
- * @param id STEP instance id
- * @param name warranty name
- * @param warrantyType warranty type (standard, extended, service)
- * @param warrantyPeriod warranty period duration
- * @param warrantyStart warranty start date
- * @param warrantyEnd warranty end date
- * @varianceConditions warranty variance conditions
- * @param warrantyProvider warranty provider reference
- * @param warrantyStatus warranty status (active, expired)
- */
 /**
  * Resolved WARRANTY_INFORMATION.
  * A warranty information entity.

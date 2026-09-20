@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CYLINDRICAL_PAIR.
- * A cylindrical kinematic pair allowing both rotation and translation along one axis.
- */
 /**
  * Resolved CYLINDRICAL_PAIR.
  * A cylindrical kinematic pair allowing both rotation and translation along one axis.

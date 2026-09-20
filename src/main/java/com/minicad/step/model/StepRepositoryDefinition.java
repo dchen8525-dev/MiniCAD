@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved REPOSITORY_DEFINITION.
- * A repository definition entity.
- *
- * @param id STEP instance id
- * @param name repository name
- * @param repositoryType repository variance type
- * @param repositoryDescription repository variance description
- * @param repositoryContents repository variance content definitions
- * @param repositoryPolicy repository variance policy
- * @param repositoryStatus repository variance status
- */
 /**
  * Resolved REPOSITORY_DEFINITION.
  * A repository definition entity.

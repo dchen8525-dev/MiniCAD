@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TOOL_ASSEMBLY.
- * A tool assembly entity.
- *
- * @param id STEP instance id
- * @param name assembly name
- * @param cuttingTool cutting tool component
- * @param toolHolder tool holder component
- * @param adapter adapter components if present
- * @param overallLength overall assembly length
- * @param gaugeLength gauge length from spindle face
- * @param spindleInterface spindle interface type
- */
 /**
  * Resolved TOOL_ASSEMBLY.
  * A tool assembly entity.

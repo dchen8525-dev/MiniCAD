@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CONICAL_SURFACE.
- *
- * @param id step id
- * @param name step label
- * @param position surface placement
- * @param radius radius at placement origin
- * @param semiAngle semi-angle in radians
- */
 /**
  * Resolved CONICAL_SURFACE.
  *

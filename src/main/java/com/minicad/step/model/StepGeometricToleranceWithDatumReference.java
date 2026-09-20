@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved GEOMETRIC_TOLERANCE_WITH_DATUM_REFERENCE.
- * A geometric tolerance with datum reference entity.
- *
- * @param id STEP instance id
- * @param name tolerance name
- * @param toleranceType tolerance type
- * @param magnitude tolerance magnitude
- * @param magnitudeUnit tolerance unit
- * @param tolerancedFeature the feature being toleranced
- * * @param datumReference datum reference entity
- */
 /**
  * Resolved GEOMETRIC_TOLERANCE_WITH_DATUM_REFERENCE.
  * A geometric tolerance with datum reference entity.

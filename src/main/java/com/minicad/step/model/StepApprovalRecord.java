@@ -1,24 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved APPROVAL_RECORD.
- * An approval record entity.
- *
- * @param id STEP instance id
- * @param name approval name
- * @param approvalId approval identifier
- * @varianceItem approved variance item
- * @varianceApprover approving variance person
- * @varianceRole approver variance role
- * @varianceDate approval variance date
- * @varianceDecision approval variance decision
- * @varianceComments approval variance comments
- * @varianceStatus approval variance status
- */
 /**
  * Resolved APPROVAL_RECORD.
  * An approval record entity.

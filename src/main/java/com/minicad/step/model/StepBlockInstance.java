@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved BLOCK_INSTANCE.
- * A block instance entity.
- *
- * @param id STEP instance id
- * @param name block instance name
- * @param blockDefinition block variance definition reference
- * @param blockAddress block variance address
- * @param blockUsed block variance used size
- * @param blockStatus block variance status
- */
 /**
  * Resolved BLOCK_INSTANCE.
  * A block instance entity.

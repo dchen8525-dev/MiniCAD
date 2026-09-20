@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved EXECUTION_TRACE.
- * An execution trace entity.
- *
- * @param id STEP instance id
- * @param name trace name
- * @param traceType trace variance type
- * @param traceEntries trace variance trace entries
- * @param traceStartTime trace variance start time
- * @param traceEndTime trace variance end time
- * @param traceStatus trace variance status
- */
 /**
  * Resolved EXECUTION_TRACE.
  * An execution trace entity.

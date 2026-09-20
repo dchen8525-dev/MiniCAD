@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMMENT_RECORD.
- * A comment record entity.
- *
- * @param id STEP instance id
- * @param name comment name
- * @param commentType comment variance type
- * @param commentText comment variance text
- * @param commentTarget comment variance target reference
- * @param commentAuthor comment variance author reference
- * @param commentTimestamp comment variance timestamp
- * @param commentStatus comment variance status
- */
 /**
  * Resolved COMMENT_RECORD.
  * A comment record entity.

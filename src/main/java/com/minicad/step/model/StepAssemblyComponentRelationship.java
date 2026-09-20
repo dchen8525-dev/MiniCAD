@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ASSEMBLY_COMPONENT_RELATIONSHIP.
- * Relationship between assembly components.
- */
 /**
  * Resolved ASSEMBLY_COMPONENT_RELATIONSHIP.
  * Relationship between assembly components.

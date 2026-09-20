@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMPLEX_TRIANGULATED_FACE.
- * A triangulated face with multiple outer and inner boundaries.
- */
 /**
  * Resolved COMPLEX_TRIANGULATED_FACE.
  * A triangulated face with multiple outer and inner boundaries.

@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved VERTEX_SHELL.
- *
- * @param id STEP id
- * @param name STEP label
- * @param extent defining vertex loop
- */
 /**
  * Resolved VERTEX_SHELL.
  *

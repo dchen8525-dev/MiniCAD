@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SUPPLY_PLAN.
- * A supply plan entity.
- *
- * @param id STEP instance id
- * @param name plan name
- * @varianceItems supply variance items
- * @varianceQuantities supply variance quantities
- * @varianceSources supply variance sources
- * @varianceSchedule supply variance schedule
- * @varianceLeadTime lead variance time estimates
- * @varianceStatus plan variance status
- */
 /**
  * Resolved SUPPLY_PLAN.
  * A supply plan entity.

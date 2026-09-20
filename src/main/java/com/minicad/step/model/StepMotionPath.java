@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MOTION_PATH.
- * A motion path entity.
- *
- * @param id STEP instance id
- * @param name path name
- * @param pathGeometry path geometry curve
- * @param motionType motion type (linear, circular, spline)
- * @param motionSpeed motion speed profile
- * @param motionAcceleration motion acceleration profile
- * @param startPosition start position point
- * @param endPosition end position point
- */
 /**
  * Resolved MOTION_PATH.
  * A motion path entity.

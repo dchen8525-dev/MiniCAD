@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved MASS_ELEMENT.
- * A mass finite element.
- */
 /**
  * Resolved MASS_ELEMENT.
  * A mass finite element.

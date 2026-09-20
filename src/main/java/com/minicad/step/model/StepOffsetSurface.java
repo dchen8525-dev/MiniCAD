@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved OFFSET_SURFACE.
- *
- * @param id step id
- * @param name step label
- * @param basisSurface basis surface
- * @param distance offset distance
- * @param selfIntersect self-intersection flag
- */
 /**
  * Resolved OFFSET_SURFACE.
  *

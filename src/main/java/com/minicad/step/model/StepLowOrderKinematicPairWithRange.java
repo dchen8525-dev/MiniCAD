@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LOW_ORDER_KINEMATIC_PAIR_WITH_RANGE.
- * A low-order kinematic pair with specified range limits.
- */
 /**
  * Resolved LOW_ORDER_KINEMATIC_PAIR_WITH_RANGE.
  * A low-order kinematic pair with specified range limits.

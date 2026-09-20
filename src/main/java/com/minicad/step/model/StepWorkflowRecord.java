@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WORKFLOW_RECORD.
- * A workflow record entity.
- *
- * @param id STEP instance id
- * @param name workflow name
- * @param workflowType workflow variance type
- * @param workflowTarget workflow variance target reference
- * @param workflowStartTime workflow variance start time
- * @param workflowEndTime workflow variance end time
- * @param workflowResult workflow variance result
- * @param workflowSteps workflow variance completed steps
- * @param workflowStatus workflow variance status
- */
 /**
  * Resolved WORKFLOW_RECORD.
  * A workflow record entity.

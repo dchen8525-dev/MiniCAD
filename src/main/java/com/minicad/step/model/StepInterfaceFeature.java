@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INTERFACE_FEATURE.
- * An interface feature entity.
- *
- * @param id STEP instance id
- * @param name interface name
- * @param interfaceType interface type (mechanical, electrical, data)
- * @param interfaceGeometry interface geometry representation
- * @param interfacePosition interface position placement
- * @varianceConnections variance connections count
- * @param interfaceStandard interface standard reference
- * @param matingInterface mating interface reference
- */
 /**
  * Resolved INTERFACE_FEATURE.
  * An interface feature entity.

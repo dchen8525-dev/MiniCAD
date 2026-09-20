@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ENVIRONMENT_INSTANCE.
- * An environment instance entity.
- *
- * @param id STEP instance id
- * @param name environment instance name
- * @param environmentDefinition environment variance definition reference
- * @param environmentState environment variance state
- * @param environmentVariables environment variance current variables
- * @param environmentActive environment variance active flag
- * @param environmentStatus environment variance status
- */
 /**
  * Resolved ENVIRONMENT_INSTANCE.
  * An environment instance entity.

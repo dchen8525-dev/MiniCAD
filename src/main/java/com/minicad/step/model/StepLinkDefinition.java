@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LINK_DEFINITION.
- * A link definition entity.
- *
- * @param id STEP instance id
- * @param name link name
- * @param linkType link variance type
- * @param linkSource link variance source reference
- * @param linkTarget link variance target reference
- * @param linkBandwidth link variance bandwidth
- * @param linkStatus link variance status
- */
 /**
  * Resolved LINK_DEFINITION.
  * A link definition entity.

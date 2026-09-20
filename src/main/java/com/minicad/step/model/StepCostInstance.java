@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COST_INSTANCE.
- * A cost instance entity.
- *
- * @param id STEP instance id
- * @param name cost instance name
- * @param costDefinition cost variance definition reference
- * @param costPlanned cost variance planned amount
- * @param costActual cost variance actual amount
- * @param costVariance cost variance difference
- * @param costBreakdown cost variance breakdown details
- * @param costStatus cost variance status
- */
 /**
  * Resolved COST_INSTANCE.
  * A cost instance entity.

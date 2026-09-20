@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ROLE_DEFINITION.
- * A role definition entity.
- *
- * @param id STEP instance id
- * @param name role name
- * @param roleType role variance type
- * @param roleDescription role variance description
- * @param rolePermissions role variance permissions
- * @param roleResponsibilities role variance responsibilities
- * @param roleStatus role variance status
- */
 /**
  * Resolved ROLE_DEFINITION.
  * A role definition entity.

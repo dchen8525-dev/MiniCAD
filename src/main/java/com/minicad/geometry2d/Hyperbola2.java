@@ -17,15 +17,6 @@ import java.util.Objects;
  * @param semiAxisA semi-major axis (transverse axis)
  * @param semiAxisB semi-minor axis (conjugate axis)
  */
-/**
- * Minimal 2D hyperbola representation.
- * A hyperbola is a conic section defined by two semi-axes.
- *
- * @param center hyperbola center
- * @param xDirection local x direction (transverse axis direction)
- * @param semiAxisA semi-major axis (transverse axis)
- * @param semiAxisB semi-minor axis (conjugate axis)
- */
 public final class Hyperbola2 implements Curve2 {
     private final Point2 center;
     private final Direction2 xDirection;

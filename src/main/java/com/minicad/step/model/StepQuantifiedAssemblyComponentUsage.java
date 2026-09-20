@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved QUANTIFIED_ASSEMBLY_COMPONENT_USAGE.
- * Assembly component usage with quantity.
- */
 /**
  * Resolved QUANTIFIED_ASSEMBLY_COMPONENT_USAGE.
  * Assembly component usage with quantity.

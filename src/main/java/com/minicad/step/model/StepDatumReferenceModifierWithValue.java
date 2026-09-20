@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DATUM_REFERENCE_MODIFIER_WITH_VALUE.
- * A datum reference modifier with an associated value (e.g., maximum material condition value).
- */
 /**
  * Resolved DATUM_REFERENCE_MODIFIER_WITH_VALUE.
  * A datum reference modifier with an associated value (e.g., maximum material condition value).

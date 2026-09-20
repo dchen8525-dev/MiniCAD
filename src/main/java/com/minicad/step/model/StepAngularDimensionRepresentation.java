@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ANGULAR_DIMENSION_REPRESENTATION.
- * An angular dimension representation entity.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param items representation items
- * * @param context representation context
- * @param angleValue angle value
- * @param angleUnit angle unit
- */
 /**
  * Resolved ANGULAR_DIMENSION_REPRESENTATION.
  * An angular dimension representation entity.

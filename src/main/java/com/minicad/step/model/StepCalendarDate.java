@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal CALENDAR_DATE metadata.
- *
- * @param id STEP instance id
- * @param yearComponent year value
- * @param dayComponent day of month
- * @param monthComponent month of year
- */
 /**
  * Minimal CALENDAR_DATE metadata.
  *

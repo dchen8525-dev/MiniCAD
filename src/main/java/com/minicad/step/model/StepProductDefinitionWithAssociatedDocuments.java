@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PRODUCT_DEFINITION_WITH_ASSOCIATED_DOCUMENTS.
- * Product definition with linked documents.
- */
 /**
  * Resolved PRODUCT_DEFINITION_WITH_ASSOCIATED_DOCUMENTS.
  * Product definition with linked documents.

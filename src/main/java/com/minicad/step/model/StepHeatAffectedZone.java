@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved HEAT_AFFECTED_ZONE.
- * A heat affected zone entity.
- *
- * @param id STEP instance id
- * @param name zone name
- * @param zoneGeometry zone geometry representation
- * @param affectedMaterial affected material properties
- * @param zoneWidth zone width specification
- * @param hardnessChange hardness change in HAZ
- * @param microstructureChange microstructure change description
- */
 /**
  * Resolved HEAT_AFFECTED_ZONE.
  * A heat affected zone entity.

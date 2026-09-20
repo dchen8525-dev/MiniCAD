@@ -10,9 +10,6 @@ import java.util.Objects;
 /**
  * 2D axis-aligned bounding box.
  */
-/**
- * 2D axis-aligned bounding box.
- */
 public final class BoundingBox2 {
     private final double minX;
     private final double minY;

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ORDER_INFORMATION.
- * An order information entity.
- *
- * @param id STEP instance id
- * @param name order name
- * @param orderId order identifier
- * @param orderItems ordered items
- * @param orderQuantity order quantities
- * @param orderDate order date
- * @param deliveryDate expected delivery date
- * @param orderStatus order status (pending, confirmed, shipped)
- * @param orderCustomer customer reference
- */
 /**
  * Resolved ORDER_INFORMATION.
  * An order information entity.

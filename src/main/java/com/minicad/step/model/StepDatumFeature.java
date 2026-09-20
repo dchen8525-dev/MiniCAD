@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DATUM_FEATURE.
- * A datum feature used for geometric dimensioning and tolerancing.
- *
- * @param id STEP instance id
- * @param name feature name
- * @param description feature description
- * @param ofShape product definition shape
- */
 /**
  * Resolved DATUM_FEATURE.
  * A datum feature used for geometric dimensioning and tolerancing.

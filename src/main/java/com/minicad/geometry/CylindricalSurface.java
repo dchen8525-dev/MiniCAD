@@ -11,12 +11,6 @@ import java.util.Objects;
  * @param position cylinder placement
  * @param radius positive radius
  */
-/**
- * Minimal infinite cylindrical surface representation.
- *
- * @param position cylinder placement
- * @param radius positive radius
- */
 public final class CylindricalSurface implements SurfaceGeometry {
     private final Axis2Placement3D position;
     private final double radius;

@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MATERIAL_DESIGNATION.
- * A named material specification.
- *
- * @param id STEP instance id
- * @param name material name
- * @param definitions references defining the material properties
- */
 /**
  * Resolved MATERIAL_DESIGNATION.
  * A named material specification.

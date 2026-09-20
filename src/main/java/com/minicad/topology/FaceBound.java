@@ -10,13 +10,6 @@ import java.util.Objects;
  * @param orientation orientation relative to the face
  * @param outer whether this is the outer boundary
  */
-/**
- * Face boundary based on a loop subtype.
- *
- * @param loop boundary loop
- * @param orientation orientation relative to the face
- * @param outer whether this is the outer boundary
- */
 public final class FaceBound {
     private final Loop loop;
     private final boolean orientation;

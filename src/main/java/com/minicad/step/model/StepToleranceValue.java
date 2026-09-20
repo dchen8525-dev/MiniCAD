@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved TOLERANCE_VALUE.
- * A tolerance value specification.
- *
- * @param id STEP instance id
- * @param name tolerance name
- * @param lowerBound lower bound value
- * @param upperBound upper bound value
- */
 /**
  * Resolved TOLERANCE_VALUE.
  * A tolerance value specification.

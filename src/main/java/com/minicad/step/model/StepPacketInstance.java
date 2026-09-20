@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PACKET_INSTANCE.
- * A packet instance entity.
- *
- * @param id STEP instance id
- * @param name packet instance name
- * @param packetDefinition packet variance definition reference
- * @param packetSequence packet variance sequence number
- * @param packetData packet variance data content
- * @param packetChecksum packet variance checksum
- * @param packetStatus packet variance status
- */
 /**
  * Resolved PACKET_INSTANCE.
  * A packet instance entity.

@@ -13,12 +13,6 @@ import java.util.Objects;
  * @param position circle placement
  * @param radius positive radius
  */
-/**
- * Minimal 3D circle representation.
- *
- * @param position circle placement
- * @param radius positive radius
- */
 public final class Circle implements Curve3 {
     private final Axis2Placement3D position;
     private final double radius;

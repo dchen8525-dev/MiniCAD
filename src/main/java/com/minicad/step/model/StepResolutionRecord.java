@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RESOLUTION_RECORD.
- * A resolution record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceIssue resolved variance issue
- * @varianceSolution solution variance applied
- * @varianceDate resolution variance date
- * @varianceResolver resolver variance reference
- * @varianceVerification verification variance method
- * @variancePrevention prevention variance measures
- * @varianceStatus record variance status
- */
 /**
  * Resolved RESOLUTION_RECORD.
  * A resolution record entity.

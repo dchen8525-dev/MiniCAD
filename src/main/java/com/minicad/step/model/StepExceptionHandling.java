@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved EXCEPTION_HANDLING.
- * An exception handling entity.
- *
- * @param id STEP instance id
- * @param name handling name
- * @varianceException exception variance type
- * @varianceCondition exception variance condition
- * @varianceAction exception variance handling action
- * @varianceNotification notification variance requirements
- * @varianceLogging logging variance requirements
- * @varianceStatus handling variance status
- */
 /**
  * Resolved EXCEPTION_HANDLING.
  * An exception handling entity.

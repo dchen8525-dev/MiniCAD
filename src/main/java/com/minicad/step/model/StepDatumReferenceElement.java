@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DATUM_REFERENCE_ELEMENT.
- * A datum reference element used in geometric tolerancing.
- *
- * @param id STEP instance id
- * @param name element name
- * @param description element description
- * @param ofShape product definition shape
- * @param compartments datum reference compartments
- */
 /**
  * Resolved DATUM_REFERENCE_ELEMENT.
  * A datum reference element used in geometric tolerancing.

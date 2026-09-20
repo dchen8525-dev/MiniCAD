@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal TERMINATOR_SYMBOL.
- *
- * @param id STEP instance id
- * @param name symbol name
- * @param styles presentation style assignments
- * @param item referenced supported annotation content or occurrence
- * @param annotatedCurve referenced annotation curve occurrence
- */
 /**
  * Minimal TERMINATOR_SYMBOL.
  *

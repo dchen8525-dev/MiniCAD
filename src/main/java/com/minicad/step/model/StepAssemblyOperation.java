@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ASSEMBLY_OPERATION.
- * An assembly operation entity.
- *
- * @param id STEP instance id
- * @param name operation name
- * @param operationType assembly operation type (fasten, insert, align, weld)
- * @param operationParameters operation parameters
- * @param components components involved in operation
- * @param toolRequirement tool requirement reference
- * @param fixtureRequirement fixture requirement reference
- * @param operationTime estimated operation time
- */
 /**
  * Resolved ASSEMBLY_OPERATION.
  * An assembly operation entity.

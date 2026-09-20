@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved THREAD.
- * Represents a thread feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name thread name
- * @param nominalDiameter nominal diameter
- * @param pitch thread pitch
- * @param threadType thread type (internal/external)
- * @param length thread length
- */
 /**
  * Resolved THREAD.
  * Represents a thread feature in manufacturing.

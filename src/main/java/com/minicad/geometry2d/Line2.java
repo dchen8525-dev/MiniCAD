@@ -14,13 +14,6 @@ import java.util.Objects;
  * @param direction line direction
  * @param parameterScale world-space distance covered by one unit of line parameter
  */
-/**
- * Infinite 2D line.
- *
- * @param origin line origin
- * @param direction line direction
- * @param parameterScale world-space distance covered by one unit of line parameter
- */
 public final class Line2 implements Curve2 {
     private final Point2 origin;
     private final Direction2 direction;

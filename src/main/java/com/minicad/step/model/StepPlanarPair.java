@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved PLANAR_PAIR.
- * A planar kinematic pair allowing translation in a plane and rotation about the plane normal.
- */
 /**
  * Resolved PLANAR_PAIR.
  * A planar kinematic pair allowing translation in a plane and rotation about the plane normal.

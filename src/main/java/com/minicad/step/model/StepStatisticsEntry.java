@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STATISTICS_ENTRY.
- * A statistics entry entity.
- *
- * @param id STEP instance id
- * @param name entry name
- * @param entryType entry variance type
- * @param entryStatistic entry variance statistic type
- * @param entryValues entry variance values
- * @param entryTimestamp entry variance timestamp
- * @param entryContext entry variance context reference
- * @param entryStatus entry variance status
- */
 /**
  * Resolved STATISTICS_ENTRY.
  * A statistics entry entity.

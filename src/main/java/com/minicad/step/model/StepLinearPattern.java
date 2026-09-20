@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LINEAR_PATTERN.
- * Represents a linear pattern feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name pattern name
- * @param baseFeature base feature being patterned
- * @param direction pattern direction
- * @param spacing spacing between features
- * @param count number of features
- */
 /**
  * Resolved LINEAR_PATTERN.
  * Represents a linear pattern feature in manufacturing.

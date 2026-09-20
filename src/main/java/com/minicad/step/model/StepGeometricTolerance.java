@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved GEOMETRIC_TOLERANCE.
- * Base type for geometric dimensioning and tolerancing entities.
- *
- * @param id STEP instance id
- * @param name tolerance name
- * @param magnitude tolerance magnitude value
- * @param toleratedShape tolerated shape aspect
- */
 /**
  * Resolved GEOMETRIC_TOLERANCE.
  * Base type for geometric dimensioning and tolerancing entities.

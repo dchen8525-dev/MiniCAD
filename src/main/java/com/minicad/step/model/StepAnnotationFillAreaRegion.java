@@ -1,12 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ANNOTATION_FILL_AREA_REGION.
- */
 /**
  * Resolved ANNOTATION_FILL_AREA_REGION.
  */

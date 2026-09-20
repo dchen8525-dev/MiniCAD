@@ -15,14 +15,6 @@ import java.util.Objects;
  * @param semiAxis1 local x semi-axis
  * @param semiAxis2 local y semi-axis
  */
-/**
- * Minimal 2D ellipse representation.
- *
- * @param center ellipse center
- * @param xDirection local x direction
- * @param semiAxis1 local x semi-axis
- * @param semiAxis2 local y semi-axis
- */
 public final class Ellipse2 implements Curve2 {
     private final Point2 center;
     private final Direction2 xDirection;

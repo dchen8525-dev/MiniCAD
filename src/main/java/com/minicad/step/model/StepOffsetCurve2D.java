@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal OFFSET_CURVE_2D parse-only curve.
- *
- * @param id STEP instance id
- * @param name curve name
- * @param basisCurve curve being offset
- * @param distance offset distance
- * @param selfIntersect self-intersection flag
- */
 /**
  * Minimal OFFSET_CURVE_2D parse-only curve.
  *

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RECEIVING_RECORD.
- * A receiving record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceItems received variance items
- * @varianceQuantities received variance quantities
- * @varianceSupplier supplier variance reference
- * @varianceDate receiving variance date
- * @varianceCondition received variance condition
- * @varianceInspection inspection variance status
- * @varianceStatus receiving variance status
- */
 /**
  * Resolved RECEIVING_RECORD.
  * A receiving record entity.

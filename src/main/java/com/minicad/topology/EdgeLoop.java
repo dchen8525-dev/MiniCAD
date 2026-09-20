@@ -13,11 +13,6 @@ import java.util.Objects;
  *
  * @param edges oriented edges in traversal order
  */
-/**
- * Ordered closed loop of oriented edges.
- *
- * @param edges oriented edges in traversal order
- */
 public final class EdgeLoop implements Loop {
     private final List<OrientedEdge> edges;
 

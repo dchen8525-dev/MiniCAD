@@ -1,23 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepCartesianPoint;
-import com.minicad.step.model.StepAxis2Placement3D;
 import java.util.Objects;
 
-/**
- * Resolved POLYGONAL_BOUNDED_HALF_SPACE.
- * A half-space bounded by a polygonal face.
- *
- * @param id STEP instance id
- * @param name solid name
- * @param basisSurface the half-space surface
- * @param position placement for the polygon
- * @param polygonPoints vertices of the bounding polygon
- * @param sameSense orientation flag
- */
 /**
  * Resolved POLYGONAL_BOUNDED_HALF_SPACE.
  * A half-space bounded by a polygonal face.

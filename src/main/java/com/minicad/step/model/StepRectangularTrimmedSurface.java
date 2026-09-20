@@ -1,20 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal RECTANGULAR_TRIMMED_SURFACE parse-only surface.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param basisSurface surface being trimmed
- * @param u1 lower u parameter
- * @param u2 upper u parameter
- * @param v1 lower v parameter
- * @param v2 upper v parameter
- * @param usense u direction sense
- * @param vsense v direction sense
- */
 /**
  * Minimal RECTANGULAR_TRIMMED_SURFACE parse-only surface.
  *

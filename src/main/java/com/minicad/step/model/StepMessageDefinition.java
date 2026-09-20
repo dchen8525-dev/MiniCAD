@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MESSAGE_DEFINITION.
- * A message definition entity.
- *
- * @param id STEP instance id
- * @param name message name
- * @param messageType message variance type
- * @param messageFormat message variance format
- * @param messageFields message variance field definitions
- * @param messageStatus message variance status
- */
 /**
  * Resolved MESSAGE_DEFINITION.
  * A message definition entity.

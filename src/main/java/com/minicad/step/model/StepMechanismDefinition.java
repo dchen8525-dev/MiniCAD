@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MECHANISM_DEFINITION.
- * A mechanism definition entity.
- *
- * @param id STEP instance id
- * @param name mechanism name
- * @param mechanismType mechanism type classification
- * @param links mechanism links/parts
- * @param joints mechanism joints connecting links
- * @param degreesOfFreedom degrees of freedom count
- * @param baseLink base/grounded link
- * @param actuatedJoints actuated joints list
- */
 /**
  * Resolved MECHANISM_DEFINITION.
  * A mechanism definition entity.

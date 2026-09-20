@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved REGULATION_DEFINITION.
- * A regulation definition entity.
- *
- * @param id STEP instance id
- * @param name regulation name
- * @param regulationType regulation variance type
- * @param regulationAuthority regulation variance authority
- * @param regulationRequirements regulation variance requirements
- * @param regulationPenalties regulation variance penalties
- * @param regulationStatus regulation variance status
- */
 /**
  * Resolved REGULATION_DEFINITION.
  * A regulation definition entity.

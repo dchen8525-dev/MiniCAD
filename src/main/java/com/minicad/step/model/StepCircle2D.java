@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CIRCLE_2D.
- * A circle in 2D parameter space.
- *
- * @param id step id
- * @param name step label
- * @param position 2D placement (center and direction)
- * @param radius circle radius
- */
 /**
  * Resolved CIRCLE_2D.
  * A circle in 2D parameter space.

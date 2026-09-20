@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved THERMAL_BOUNDARY_CONDITION.
- * Thermal boundary condition for FEA.
- */
 /**
  * Resolved THERMAL_BOUNDARY_CONDITION.
  * Thermal boundary condition for FEA.

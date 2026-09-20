@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal CSG_SOLID parse-only solid model.
- *
- * @param id STEP instance id
- * @param name solid name
- * @param treeRootExpression CSG tree root expression
- */
 /**
  * Minimal CSG_SOLID parse-only solid model.
  *

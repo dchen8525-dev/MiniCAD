@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LABEL_FEATURE.
- * A label feature entity.
- *
- * @param id STEP instance id
- * @param name label name
- * @param labelType label type (barcode, QR, RFID, text)
- * @param labelGeometry label geometry representation
- * @param labelPosition label position placement
- * @param labelContent label content text/data
- * @param labelStandard label standard reference
- */
 /**
  * Resolved LABEL_FEATURE.
  * A label feature entity.

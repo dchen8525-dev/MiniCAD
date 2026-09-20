@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal SHELL_BASED_SURFACE_MODEL.
- *
- * @param id step id
- * @param name step label
- * @param shells referenced open or closed shells
- */
 /**
  * Minimal SHELL_BASED_SURFACE_MODEL.
  *

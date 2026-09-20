@@ -11,12 +11,6 @@ import java.util.Objects;
  * @param edge referenced base edge
  * @param orientation true for forward, false for reversed
  */
-/**
- * Use of an edge with an explicit orientation inside a loop.
- *
- * @param edge referenced base edge
- * @param orientation true for forward, false for reversed
- */
 public final class OrientedEdge {
     private final Edge edge;
     private final boolean orientation;

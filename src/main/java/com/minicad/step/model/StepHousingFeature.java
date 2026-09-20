@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved HOUSING_FEATURE.
- * A housing feature entity.
- *
- * @param id STEP instance id
- * @param name housing name
- * @param housingType housing type classification
- * @param bearingSeats bearing seat features
- * @param mountingFeatures mounting features (bolt holes, dowels)
- * @param sealGrooves seal groove features
- * @param housingMaterial housing material specification
- * @param housingGeometry housing geometry representation
- */
 /**
  * Resolved HOUSING_FEATURE.
  * A housing feature entity.

@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DIRECTED_DIMENSIONAL_SIZE.
- * A dimensional size with a direction for tolerance.
- *
- * @param id STEP instance id
- * @param name size name
- * @param magnitude size magnitude
- * @param direction reference direction for the measurement
- */
 /**
  * Resolved DIRECTED_DIMENSIONAL_SIZE.
  * A dimensional size with a direction for tolerance.

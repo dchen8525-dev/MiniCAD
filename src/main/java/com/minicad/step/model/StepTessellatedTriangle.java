@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal TESSELLATED_TRIANGLE.
- * A single triangle in a tessellated face.
- *
- * @param id STEP id
- * @param vertices the three vertices of the triangle
- */
 /**
  * Minimal TESSELLATED_TRIANGLE.
  * A single triangle in a tessellated face.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CALIBRATION_RECORD.
- * A calibration record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceEquipment calibrated variance equipment
- * @varianceStandard calibration variance standard
- * @varianceDate calibration variance date
- * @varianceResults calibration variance results
- * @varianceNext next variance calibration date
- * @varianceStatus record variance status
- */
 /**
  * Resolved CALIBRATION_RECORD.
  * A calibration record entity.

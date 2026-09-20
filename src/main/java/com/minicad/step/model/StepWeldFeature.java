@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WELD_FEATURE.
- * A weld feature entity.
- *
- * @param id STEP instance id
- * @param name feature name
- * @param featureType feature variance type
- * @param featureGeometry feature variance geometry reference
- * @param featureSpecification feature variance specification reference
- * @param featureStatus feature variance status
- */
 /**
  * Resolved WELD_FEATURE.
  * A weld feature entity.

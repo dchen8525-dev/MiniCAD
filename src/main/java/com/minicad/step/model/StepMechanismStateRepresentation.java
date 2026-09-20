@@ -1,14 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MECHANISM_STATE_REPRESENTATION.
- * A representation of a mechanism in a particular configuration state.
- * Subtype of REPRESENTATION.
- */
 /**
  * Resolved MECHANISM_STATE_REPRESENTATION.
  * A representation of a mechanism in a particular configuration state.

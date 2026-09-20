@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal DATE_AND_TIME metadata.
- *
- * @param id STEP instance id
- * @param dateComponent calendar date
- * @param timeComponent local time
- */
 /**
  * Minimal DATE_AND_TIME metadata.
  *

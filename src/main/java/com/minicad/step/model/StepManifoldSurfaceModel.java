@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MANIFOLD_SURFACE_MODEL.
- * A surface model composed of a manifold set of connected faces.
- *
- * @param id STEP instance id
- * @param name model name
- * @param shells the shells forming the model
- */
 /**
  * Resolved MANIFOLD_SURFACE_MODEL.
  * A surface model composed of a manifold set of connected faces.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SEAL_FEATURE.
- * A seal feature entity.
- *
- * @param id STEP instance id
- * @param name seal name
- * @param sealType seal type classification (O-ring, gasket, lip seal)
- * @param innerDiameter inner diameter
- * @param outerDiameter outer diameter
- * @param sealWidth seal width/cross-section
- * @param sealMaterial seal material specification
- * @param sealPlacement seal position placement
- */
 /**
  * Resolved SEAL_FEATURE.
  * A seal feature entity.

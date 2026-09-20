@@ -1,24 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved THREAD_FEATURE.
- * A thread feature entity with complete thread definition.
- *
- * @param id STEP instance id
- * @param name thread name
- * @param threadType thread type (internal, external)
- * @param threadStandard thread standard specification
- * @param nominalDiameter nominal diameter
- * @param pitch thread pitch
- * @param threadLength thread length
- * @param numberOfStarts number of thread starts
- * @param threadProfile thread profile shape
- * @param threadDirection thread direction (right-hand, left-hand)
- */
 /**
  * Resolved THREAD_FEATURE.
  * A thread feature entity with complete thread definition.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INSTRUCTION_INSTANCE.
- * An instruction instance entity.
- *
- * @param id STEP instance id
- * @param name instruction instance name
- * @param instructionDefinition instruction variance definition reference
- * @param instructionState instruction variance state
- * @param instructionAddress instruction variance address
- * @param instructionExecuted instruction variance executed flag
- * @param instructionResult instruction variance result
- * @param instructionStatus instruction variance status
- */
 /**
  * Resolved INSTRUCTION_INSTANCE.
  * An instruction instance entity.

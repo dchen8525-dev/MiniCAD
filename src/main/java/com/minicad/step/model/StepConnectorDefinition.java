@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONNECTOR_DEFINITION.
- * A connector definition entity.
- *
- * @param id STEP instance id
- * @param name connector name
- * @param connectorType connector variance type
- * @param connectorGeometry connector variance geometry reference
- * @param connectorPins connector variance pin definitions
- * @param connectorRating connector variance electrical rating
- * @param connectorStatus connector variance status
- */
 /**
  * Resolved CONNECTOR_DEFINITION.
  * A connector definition entity.

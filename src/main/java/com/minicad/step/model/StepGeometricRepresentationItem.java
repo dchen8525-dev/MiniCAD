@@ -8,12 +8,6 @@ import java.util.Objects;
  * @param id STEP instance id
  * @param name inherited representation-item name when available
  */
-/**
- * Minimal geometric representation item marker.
- *
- * @param id STEP instance id
- * @param name inherited representation-item name when available
- */
 public final class StepGeometricRepresentationItem implements StepEntity {
     private final int id;
     private final String name;

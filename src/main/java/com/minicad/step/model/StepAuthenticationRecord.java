@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved AUTHENTICATION_RECORD.
- * An authentication record entity.
- *
- * @param id STEP instance id
- * @param name authentication name
- * @param authType authentication variance type
- * @param authResult authentication variance result (success/failure)
- * @param authHolder authentication variance holder reference
- * @param authTimestamp authentication variance timestamp
- * @param authDetails authentication variance details
- * @param authStatus authentication variance status
- */
 /**
  * Resolved AUTHENTICATION_RECORD.
  * An authentication record entity.

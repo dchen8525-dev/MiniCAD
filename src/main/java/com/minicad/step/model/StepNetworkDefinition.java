@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved NETWORK_DEFINITION.
- * A network definition entity.
- *
- * @param id STEP instance id
- * @param name network name
- * @param networkType network variance type
- * @param networkTopology network variance topology
- * @param networkNodes network variance node definitions
- * @param networkLinks network variance link definitions
- * @param networkStatus network variance status
- */
 /**
  * Resolved NETWORK_DEFINITION.
  * A network definition entity.

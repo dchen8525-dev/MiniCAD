@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FEA_SECURED_VARIABLE.
- * A secured (constrained) variable in finite element analysis.
- */
 /**
  * Resolved FEA_SECURED_VARIABLE.
  * A secured (constrained) variable in finite element analysis.

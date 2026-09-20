@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved SURFACE_STYLE_PARAMETER_LINES.
- */
 /**
  * Resolved SURFACE_STYLE_PARAMETER_LINES.
  */

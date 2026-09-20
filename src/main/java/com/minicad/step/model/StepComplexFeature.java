@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMPLEX_FEATURE.
- * A complex feature entity combining multiple features.
- *
- * @param id STEP instance id
- * @param name feature name
- * @param componentFeatures component features
- * @param featureType complex feature type classification
- * @param position feature position placement
- * @param orientation feature orientation
- */
 /**
  * Resolved COMPLEX_FEATURE.
  * A complex feature entity combining multiple features.

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved START_WORK.
- * A start work record in AP203 configuration management.
- */
 /**
  * Resolved START_WORK.
  * A start work record in AP203 configuration management.

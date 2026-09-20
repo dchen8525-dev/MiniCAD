@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PLATING_FEATURE.
- * A plating feature entity.
- *
- * @param id STEP instance id
- * @param name plating name
- * @param platingType plating type (electroplating, electroless, anodizing)
- * @param platingMaterial plating material specification
- * @param platingThickness plating thickness
- * @param appliedSurfaces surfaces to be plated
- * @param platingParameters plating process parameters
- * @param platingQuality plating quality grade
- */
 /**
  * Resolved PLATING_FEATURE.
  * A plating feature entity.

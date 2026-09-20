@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CIRCULAR_PATTERN.
- * Represents a circular pattern feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name pattern name
- * @param baseFeature base feature being patterned
- * @param axis pattern axis
- * @param angularSpacing angular spacing between features
- * @param count number of features
- */
 /**
  * Resolved CIRCULAR_PATTERN.
  * Represents a circular pattern feature in manufacturing.

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS.
- * Parameters for structural analysis representation.
- */
 /**
  * Resolved STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS.
  * Parameters for structural analysis representation.

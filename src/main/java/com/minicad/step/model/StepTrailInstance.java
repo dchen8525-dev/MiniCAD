@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRAIL_INSTANCE.
- * A trail instance entity.
- *
- * @param id STEP instance id
- * @param name trail instance name
- * @param trailDefinition trail variance definition reference
- * @param trailEntries trail variance entry count
- * @param trailStartTime trail variance start time
- * @param trailEndTime trail variance end time
- * @param trailStatus trail variance status
- */
 /**
  * Resolved TRAIL_INSTANCE.
  * A trail instance entity.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BEHAVIOR_SPECIFICATION.
- * A behavior specification entity.
- *
- * @param id STEP instance id
- * @param name specification name
- * @varianceBehavior specified variance behavior
- * @varianceConditions behavior variance conditions
- * @varianceActions behavior variance actions
- * @varianceEvents behavior variance triggering events
- * @variancePriority behavior variance priority
- * @varianceStatus specification variance status
- */
 /**
  * Resolved BEHAVIOR_SPECIFICATION.
  * A behavior specification entity.

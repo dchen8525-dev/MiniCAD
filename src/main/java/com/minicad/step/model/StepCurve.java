@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal curve marker.
- *
- * @param id STEP instance id
- * @param name inherited geometric-representation-item name when available
- */
 /**
  * Minimal curve marker.
  *

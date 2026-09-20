@@ -11,12 +11,6 @@ import java.util.Objects;
  * @param sweptCurve directrix curve
  * @param extrusionVector extrusion vector
  */
-/**
- * Minimal surface of linear extrusion representation.
- *
- * @param sweptCurve directrix curve
- * @param extrusionVector extrusion vector
- */
 public final class SurfaceOfLinearExtrusion3 implements SurfaceGeometry {
     private final Curve3 sweptCurve;
     private final Vector3 extrusionVector;

@@ -1,12 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved POLYLINE_3D.
- */
 /**
  * Resolved POLYLINE_3D.
  */

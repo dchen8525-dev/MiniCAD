@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved PRISMATIC_JOINT.
- * A prismatic (translational) joint between two links.
- */
 /**
  * Resolved PRISMATIC_JOINT.
  * A prismatic (translational) joint between two links.

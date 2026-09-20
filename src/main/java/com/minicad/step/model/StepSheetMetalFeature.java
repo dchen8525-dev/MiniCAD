@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SHEET_METAL_FEATURE.
- * A sheet metal feature entity.
- *
- * @param id STEP instance id
- * @param name feature name
- * @param featureType sheet metal feature type (flange, bend, cutout, hole)
- * @param sheetThickness sheet thickness
- * @param bendRadius bend radius for bends
- * @param bendAngle bend angle for bends
- * @param featureGeometry feature geometry representation
- * @param flatPattern flat pattern geometry reference
- */
 /**
  * Resolved SHEET_METAL_FEATURE.
  * A sheet metal feature entity.

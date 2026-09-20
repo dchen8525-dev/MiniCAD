@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal APPLIED_DOCUMENT_REFERENCE metadata.
- *
- * @param id STEP instance id
- * @param entityName concrete STEP entity name
- * @param assignedDocument assigned document
- * @param source document source label
- * @param items referenced target items
- */
 /**
  * Minimal APPLIED_DOCUMENT_REFERENCE metadata.
  *

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved REQUIREMENT_SPECIFICATION.
- * A requirement specification entity.
- *
- * @param id STEP instance id
- * @param name specification name
- * @param specificationId specification identifier
- * @param requirements list of requirements
- * @param specificationType specification type (functional, performance, safety)
- * @param specificationStatus specification status
- * @param specificationVersion specification version reference
- */
 /**
  * Resolved REQUIREMENT_SPECIFICATION.
  * A requirement specification entity.

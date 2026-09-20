@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MACHINING_TOOLPATH.
- * A machining toolpath entity.
- *
- * @param id STEP instance id
- * @param name toolpath name
- * @param pathGeometry path geometry curve/curve set
- * @param tool tool used for this path
- * @param pathParameters path parameters (speed, feed, etc.)
- * @param approachStrategy approach strategy configuration
- */
 /**
  * Resolved MACHINING_TOOLPATH.
  * A machining toolpath entity.

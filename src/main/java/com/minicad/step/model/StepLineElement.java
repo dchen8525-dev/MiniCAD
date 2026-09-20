@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved LINE_ELEMENT.
- * A 1D line finite element.
- */
 /**
  * Resolved LINE_ELEMENT.
  * A 1D line finite element.

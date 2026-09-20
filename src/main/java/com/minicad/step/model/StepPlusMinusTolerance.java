@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved PLUS_MINUS_TOLERANCE.
- * A plus/minus tolerance specification.
- *
- * @param id STEP instance id
- * @param name tolerance name
- * @param range tolerance range
- * @param tolerancedMeasure toleranced measure
- */
 /**
  * Resolved PLUS_MINUS_TOLERANCE.
  * A plus/minus tolerance specification.

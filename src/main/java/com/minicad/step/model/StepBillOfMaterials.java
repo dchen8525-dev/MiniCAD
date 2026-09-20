@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BILL_OF_MATERIALS.
- * A bill of materials entity.
- *
- * @param id STEP instance id
- * @param name BOM name
- * @param bomId BOM identifier
- * @param bomItems BOM line items
- * @param bomQuantities quantities for each item
- * @param bomStructure BOM structure type (flat, hierarchical)
- * @varianceLevel BOM variance level in hierarchy
- * @param bomStatus BOM status (current, revision)
- */
 /**
  * Resolved BILL_OF_MATERIALS.
  * A bill of materials entity.

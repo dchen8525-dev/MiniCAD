@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal DEGENERATE_TOROIDAL_SURFACE parse-only surface.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param position surface placement
- * @param majorRadius major radius
- * @param minorRadius minor radius
- * @param selectOuter selected torus side flag
- */
 /**
  * Minimal DEGENERATE_TOROIDAL_SURFACE parse-only surface.
  *

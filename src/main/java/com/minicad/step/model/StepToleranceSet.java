@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TOLERANCE_SET.
- * A tolerance set entity containing multiple tolerances.
- *
- * @param id STEP instance id
- * @param name set name
- * @param tolerances list of geometric tolerances
- * @param toleranceContext tolerance context reference
- * @param appliedTo geometry the tolerances apply to
- */
 /**
  * Resolved TOLERANCE_SET.
  * A tolerance set entity containing multiple tolerances.

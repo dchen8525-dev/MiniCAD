@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved GEOMETRIC_TOLERANCE_WITH_MAXIMUM_TOLERANCE.
- * A geometric tolerance with a specified maximum tolerance limit.
- */
 /**
  * Resolved GEOMETRIC_TOLERANCE_WITH_MAXIMUM_TOLERANCE.
  * A geometric tolerance with a specified maximum tolerance limit.

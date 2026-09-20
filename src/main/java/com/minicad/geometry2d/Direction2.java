@@ -12,12 +12,6 @@ import java.util.Objects;
  * @param x x component
  * @param y y component
  */
-/**
- * Immutable unit 2D direction.
- *
- * @param x x component
- * @param y y component
- */
 public final class Direction2 {
     private final double x;
     private final double y;

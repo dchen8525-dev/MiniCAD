@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CUSTOMER_INFORMATION.
- * A customer information entity.
- *
- * @param id STEP instance id
- * @param name customer name
- * @param customerId customer identifier
- * @param customerContact customer contact information
- * @param orderedProducts products ordered by customer
- * @param customerRequirements customer-specific requirements
- * @variancePriority customer variance priority level
- * @param customerStatus customer status (active, inactive)
- */
 /**
  * Resolved CUSTOMER_INFORMATION.
  * A customer information entity.

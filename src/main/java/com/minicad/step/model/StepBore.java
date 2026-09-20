@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BORE.
- * Represents a bore feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name bore name
- * @param profile profile definition
- * @param depth bore depth
- * @param direction bore direction
- */
 /**
  * Resolved BORE.
  * Represents a bore feature in manufacturing.

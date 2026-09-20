@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal leader curve presentation occurrence.
- *
- * @param id STEP instance id
- * @param name occurrence name
- * @param styles style assignments
- * @param item leader curve geometry
- */
 /**
  * Minimal leader curve presentation occurrence.
  *

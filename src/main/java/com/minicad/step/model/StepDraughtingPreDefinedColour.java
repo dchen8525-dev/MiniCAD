@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal DRAUGHTING_PRE_DEFINED_COLOUR.
- *
- * @param id step id
- * @param name predefined colour name
- */
 /**
  * Minimal DRAUGHTING_PRE_DEFINED_COLOUR.
  *

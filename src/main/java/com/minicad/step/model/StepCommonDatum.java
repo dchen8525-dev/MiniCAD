@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMMON_DATUM.
- * A datum established from two or more datum features.
- *
- * @param id STEP instance id
- * @param name datum name
- * @param description datum description
- * @param ofShape product definition shape
- * @param constituentDatums constituent datum references
- */
 /**
  * Resolved COMMON_DATUM.
  * A datum established from two or more datum features.

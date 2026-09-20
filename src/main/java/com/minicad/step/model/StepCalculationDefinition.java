@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CALCULATION_DEFINITION.
- * A calculation definition entity.
- *
- * @param id STEP instance id
- * @param name calculation name
- * @param calculationType calculation variance type
- * @param calculationMethod calculation variance method
- * @param calculationInputs calculation variance input parameters
- * @param calculationOutputs calculation variance output parameters
- * @param calculationAccuracy calculation variance accuracy
- * @param calculationStatus calculation variance status
- */
 /**
  * Resolved CALCULATION_DEFINITION.
  * A calculation definition entity.

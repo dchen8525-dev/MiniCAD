@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CREDENTIAL_RECORD.
- * A credential record entity.
- *
- * @param id STEP instance id
- * @param name credential name
- * @param credentialType credential variance type
- * @param credentialHolder credential variance holder reference
- * @param credentialValid credential variance valid flag
- * @param credentialExpiry credential variance expiry time
- * @param credentialStatus credential variance status
- */
 /**
  * Resolved CREDENTIAL_RECORD.
  * A credential record entity.

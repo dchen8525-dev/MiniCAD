@@ -12,16 +12,6 @@ import java.util.Objects;
  * @param entityType optional STEP entity type
  * @param message human-readable diagnostic
  */
-/**
- * Structured diagnostic produced during parsing, resolution, geometry building,
- * validation, preview, or export.
- *
- * @param severity issue severity
- * @param code stable machine-readable code
- * @param entityId optional STEP entity id
- * @param entityType optional STEP entity type
- * @param message human-readable diagnostic
- */
 public final class MiniCadIssue {
     private final Severity severity;
     private final String code;

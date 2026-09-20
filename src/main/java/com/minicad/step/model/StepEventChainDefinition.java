@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved EVENT_CHAIN_DEFINITION.
- * An event chain definition entity.
- *
- * @param id STEP instance id
- * @param name event chain name
- * @param chainType chain variance type
- * @param chainEvents chain variance event definitions
- * @param chainOrder chain variance ordering
- * @param chainParallel chain variance parallel flag
- * @param chainStatus chain variance status
- */
 /**
  * Resolved EVENT_CHAIN_DEFINITION.
  * An event chain definition entity.

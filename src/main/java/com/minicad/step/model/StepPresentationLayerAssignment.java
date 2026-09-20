@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal layer assignment.
- *
- * @param id STEP instance id
- * @param name layer name
- * @param description optional layer description
- * @param assignedItems assigned STEP items
- */
 /**
  * Minimal layer assignment.
  *

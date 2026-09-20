@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SERVICE_INSTANCE.
- * A service instance entity.
- *
- * @param id STEP instance id
- * @param name service instance name
- * @param serviceDefinition service variance definition reference
- * @param serviceState service variance state
- * @param serviceAvailability service variance availability
- * @param serviceResponseTime service variance response time
- * @param serviceStatus service variance status
- */
 /**
  * Resolved SERVICE_INSTANCE.
  * A service instance entity.

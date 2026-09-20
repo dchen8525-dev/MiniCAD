@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BOUNDARY_CONDITION.
- * A boundary condition entity.
- *
- * @param id STEP instance id
- * @param name boundary condition name
- * @param conditionType condition variance type
- * @param conditionLocation condition variance location reference
- * @param conditionConstraints condition variance constraints
- * @param conditionStatus condition variance status
- */
 /**
  * Resolved BOUNDARY_CONDITION.
  * A boundary condition entity.

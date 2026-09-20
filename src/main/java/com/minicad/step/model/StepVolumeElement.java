@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved VOLUME_ELEMENT.
- * A 3D volume finite element.
- */
 /**
  * Resolved VOLUME_ELEMENT.
  * A 3D volume finite element.

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved HANDLING_FEATURE.
- * A handling feature entity.
- *
- * @param id STEP instance id
- * @param name handling name
- * @param handlingType handling type (lift, grab, support, transport)
- * @param handlingGeometry handling geometry representation
- * @param handlingPoints handling point locations
- * @param handlingWeight handling weight capacity
- * @param handlingEquipment handling equipment reference
- */
 /**
  * Resolved HANDLING_FEATURE.
  * A handling feature entity.

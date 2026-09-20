@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SURFACE_3D_ELEMENT_PROPERTY.
- * Properties associated with 3D surface/shell elements.
- */
 /**
  * Resolved SURFACE_3D_ELEMENT_PROPERTY.
  * Properties associated with 3D surface/shell elements.

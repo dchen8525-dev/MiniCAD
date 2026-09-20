@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved BOUNDED_CURVE_2D.
- * A 2D curve with bounded extent.
- *
- * @param id step id
- * @param name step label
- * @param curve the underlying 2D curve
- */
 /**
  * Resolved BOUNDED_CURVE_2D.
  * A 2D curve with bounded extent.

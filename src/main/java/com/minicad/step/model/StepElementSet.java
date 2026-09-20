@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ELEMENT_SET.
- * A named set of finite elements.
- */
 /**
  * Resolved ELEMENT_SET.
  * A named set of finite elements.

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DELIVERY_INFORMATION.
- * A delivery information entity.
- *
- * @param id STEP instance id
- * @param name delivery name
- * @param deliveryId delivery identifier
- * @param deliveryItems items to be delivered
- * @param deliveryAddress delivery address
- * @param shippingDate shipping date
- * @varianceDate delivery variance date
- * @varianceMethod delivery variance method
- * @param deliveryStatus delivery status
- */
 /**
  * Resolved DELIVERY_INFORMATION.
  * A delivery information entity.

@@ -1,20 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepAxis1Placement;
 import java.util.Objects;
-/**
- * Resolved REVOLVED_AREA_SOLID_TAPERED.
- * A revolved solid with tapered profile.
- *
- * @param id STEP instance id
- * @param name solid name
- * @param sweptArea profile to revolve
- * @param axis axis of revolution
- * @param angle revolution angle
- * @param taperAngle taper angle
- */
 /**
  * Resolved REVOLVED_AREA_SOLID_TAPERED.
  * A revolved solid with tapered profile.

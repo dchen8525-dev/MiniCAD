@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal geometric curve set for PMI leaders or outlines.
- *
- * @param id STEP instance id
- * @param name set name
- * @param elements supported geometric elements
- */
 /**
  * Minimal geometric curve set for PMI leaders or outlines.
  *

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PAUSE_INSTANCE.
- * A pause instance entity.
- *
- * @param id STEP instance id
- * @param name pause instance name
- * @param pauseDefinition pause variance definition reference
- * @param pauseState pause variance state
- * @param pauseStartTime pause variance start time
- * @param pauseDuration pause variance current duration
- * @param pauseStatus pause variance status
- */
 /**
  * Resolved PAUSE_INSTANCE.
  * A pause instance entity.

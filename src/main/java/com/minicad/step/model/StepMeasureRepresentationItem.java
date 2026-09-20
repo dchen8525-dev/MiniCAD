@@ -11,15 +11,6 @@ import java.util.Objects;
  * @param value numeric value
  * @param unit unit reference
  */
-/**
- * Minimal measure representation item for native validation payloads.
- *
- * @param id STEP instance id
- * @param name item name
- * @param measureType typed measure wrapper name
- * @param value numeric value
- * @param unit unit reference
- */
 public final class StepMeasureRepresentationItem implements StepEntity {
     private final int id;
     private final String name;

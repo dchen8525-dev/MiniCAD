@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ASSET_DEFINITION.
- * An asset definition entity.
- *
- * @param id STEP instance id
- * @param name asset name
- * @param assetType asset variance type
- * @param assetCategory asset variance category
- * @param assetProperties asset variance properties
- * @param assetLifecycle asset variance lifecycle info
- * @param assetStatus asset variance status
- */
 /**
  * Resolved ASSET_DEFINITION.
  * An asset definition entity.

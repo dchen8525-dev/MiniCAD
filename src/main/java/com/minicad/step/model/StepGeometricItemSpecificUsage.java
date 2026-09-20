@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal semantic PMI link from a callout to a geometric item.
- *
- * @param id STEP instance id
- * @param name usage name
- * @param description usage description
- * @param usage source PMI item
- * @param identifiedItem referenced geometric item
- */
 /**
  * Minimal semantic PMI link from a callout to a geometric item.
  *

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ANNOTATION_RECORD.
- * An annotation record entity.
- *
- * @param id STEP instance id
- * @param name annotation name
- * @param annotationType annotation variance type
- * @param annotationText annotation variance text
- * @param annotationTarget annotation variance target reference
- * @param annotationAuthor annotation variance author reference
- * @param annotationTimestamp annotation variance timestamp
- * @param annotationStatus annotation variance status
- */
 /**
  * Resolved ANNOTATION_RECORD.
  * An annotation record entity.

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRIGGER_INSTANCE.
- * A trigger instance entity.
- *
- * @param id STEP instance id
- * @param name trigger instance name
- * @param triggerDefinition trigger variance definition reference
- * @param triggerState trigger variance state
- * @param triggerFireCount trigger variance fire count
- * @param triggerLastFire trigger variance last fire time
- * @param triggerStatus trigger variance status
- */
 /**
  * Resolved TRIGGER_INSTANCE.
  * A trigger instance entity.

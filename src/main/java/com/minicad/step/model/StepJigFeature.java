@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved JIG_FEATURE.
- * A jig feature entity.
- *
- * @param id STEP instance id
- * @param name jig name
- * @param jigType jig type classification
- * @param jigGeometry jig geometry representation
- * @param guideElements guide elements for tool positioning
- * @param referenceSurfaces reference surfaces for alignment
- * @param jigCapacity jig capacity/workpiece size
- * @param jigMaterial jig material reference
- */
 /**
  * Resolved JIG_FEATURE.
  * A jig feature entity.

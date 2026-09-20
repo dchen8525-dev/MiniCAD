@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved MAKE_FROM_RELATIONSHIP.
- * Relationship indicating a product is made from another.
- *
- * @param id STEP instance id
- * @param name relationship name
- * @param description relationship description
- * @param relatingProduct source product
- * @param relatedProduct resulting product
- */
 /**
  * Resolved MAKE_FROM_RELATIONSHIP.
  * Relationship indicating a product is made from another.

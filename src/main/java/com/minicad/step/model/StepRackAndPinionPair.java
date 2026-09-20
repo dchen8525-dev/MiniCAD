@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved RACK_AND_PINION_PAIR.
- * A rack and pinion kinematic pair coupling rotation and linear translation.
- */
 /**
  * Resolved RACK_AND_PINION_PAIR.
  * A rack and pinion kinematic pair coupling rotation and linear translation.

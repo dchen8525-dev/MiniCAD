@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STRUCTURAL_FEATURE.
- * A structural feature entity.
- *
- * @param id STEP instance id
- * @param name feature name
- * @param structuralType structural type (beam, column, plate, connection)
- * @param crossSection cross-section geometry
- * @param structuralLength length dimension
- * @param structuralMaterial material specification
- * @param endConditions end condition features
- * @param loadPoints load application points
- */
 /**
  * Resolved STRUCTURAL_FEATURE.
  * A structural feature entity.

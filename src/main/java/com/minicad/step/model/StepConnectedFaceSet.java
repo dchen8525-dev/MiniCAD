@@ -1,18 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepFaceEntity;
 import java.util.Objects;
 
-/**
- * Resolved CONNECTED_FACE_SET.
- *
- * @param id STEP id
- * @param name STEP label
- * @param faces connected faces
- */
 /**
  * Resolved CONNECTED_FACE_SET.
  *

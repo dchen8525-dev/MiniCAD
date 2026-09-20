@@ -17,13 +17,6 @@ import java.util.Objects;
  * @param bounds face boundaries
  * @param sameSense whether the face orientation matches the surface normal
  */
-/**
- * Minimal face with optional planar validation.
- *
- * @param surface supporting surface
- * @param bounds face boundaries
- * @param sameSense whether the face orientation matches the surface normal
- */
 public final class Face {
     private final SurfaceGeometry surface;
     private final List<FaceBound> bounds;

@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved OFFSET_CURVE_3D.
- *
- * @param id step id
- * @param name step label
- * @param basisCurve basis curve
- * @param distance offset distance
- * @param selfIntersect self-intersection flag
- * @param refDirection reference direction
- */
 /**
  * Resolved OFFSET_CURVE_3D.
  *

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RESOURCE_ALLOCATION.
- * A resource allocation entity.
- *
- * @param id STEP instance id
- * @param name allocation name
- * @param allocationType allocation type (machine, tool, personnel)
- * @param allocatedResource allocated resource reference
- * @param allocationQuantity allocation quantity
- * @param allocationPeriod allocation period (start/end times)
- * @variancePriority allocation variance priority
- * @param allocationStatus allocation status
- */
 /**
  * Resolved RESOURCE_ALLOCATION.
  * A resource allocation entity.

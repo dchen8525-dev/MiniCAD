@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SIMULATION_INSTANCE.
- * A simulation instance entity.
- *
- * @param id STEP instance id
- * @param name simulation instance name
- * @param simulationDefinition simulation variance definition reference
- * @param simulationState simulation variance state
- * @param simulationStartTime simulation variance start time
- * @param simulationEndTime simulation variance end time
- * @param simulationResults simulation variance results
- * @param simulationStatus simulation variance status
- */
 /**
  * Resolved SIMULATION_INSTANCE.
  * A simulation instance entity.

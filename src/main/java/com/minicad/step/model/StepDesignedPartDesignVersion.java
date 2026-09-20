@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DESIGNED_PART_DESIGN_VERSION.
- * A design version associated with a designed part.
- *
- * @param id STEP instance id
- * @param name part name
- * @param description part description
- * @param frameOfReference product context
- */
 /**
  * Resolved DESIGNED_PART_DESIGN_VERSION.
  * A design version associated with a designed part.

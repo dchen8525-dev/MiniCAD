@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ORIENTED_EDGE.
- *
- * @param id step id
- * @param name step label
- * @param edgeElement referenced base edge
- * @param orientation orientation flag
- */
 /**
  * Resolved ORIENTED_EDGE.
  *

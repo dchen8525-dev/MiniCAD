@@ -1,17 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepRepresentationMap;
 import java.util.Objects;
-/**
- * Minimal USER_DEFINED_CURVE_FONT.
- *
- * @param id STEP instance id
- * @param name font name
- * @param mappingSource representation map
- * @param mappingTarget placement target
- */
 /**
  * Minimal USER_DEFINED_CURVE_FONT.
  *

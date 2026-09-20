@@ -1,18 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepApplicationContext;
 import java.util.Objects;
-/**
- * Minimal product context.
- *
- * @param id STEP instance id
- * @param name context name
- * @param disciplineType discipline type
- * @param frameOfReference referenced application context
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal product context.
  *

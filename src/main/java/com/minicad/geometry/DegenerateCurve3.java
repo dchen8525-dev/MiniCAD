@@ -11,12 +11,6 @@ import java.util.Objects;
  *
  * @param point the single point where the curve degenerates
  */
-/**
- * Minimal 3D degenerate curve representation.
- * A degenerate curve collapses to a single point.
- *
- * @param point the single point where the curve degenerates
- */
 public final class DegenerateCurve3 implements Curve3 {
     private final CartesianPoint point;
 

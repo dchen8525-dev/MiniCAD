@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DESIGN_MAKE_FROM.
- * Design-to-manufacturing mapping.
- */
 /**
  * Resolved DESIGN_MAKE_FROM.
  * Design-to-manufacturing mapping.

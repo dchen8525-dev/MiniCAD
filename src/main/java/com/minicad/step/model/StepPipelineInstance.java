@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PIPELINE_INSTANCE.
- * A pipeline instance entity.
- *
- * @param id STEP instance id
- * @param name pipeline instance name
- * @param pipelineDefinition pipeline variance definition reference
- * @param pipelineState pipeline variance state
- * @param pipelineCurrentStage pipeline variance current stage
- * @param pipelineStartTime pipeline variance start time
- * @param pipelineEndTime pipeline variance end time
- * @param pipelineStatus pipeline variance status
- */
 /**
  * Resolved PIPELINE_INSTANCE.
  * A pipeline instance entity.

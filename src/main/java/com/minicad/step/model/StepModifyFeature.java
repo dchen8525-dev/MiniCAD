@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MODIFY_FEATURE.
- * A modify feature entity for feature modifications.
- *
- * @param id STEP instance id
- * @param name modification name
- * @param originalFeature original feature being modified
- * @param modificationType modification type classification
- * @param modificationParameters modification parameters
- * @param modifiedGeometry modified geometry result
- */
 /**
  * Resolved MODIFY_FEATURE.
  * A modify feature entity for feature modifications.

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved HYPERBOLOID_SURFACE.
- * A quadric surface defined by a hyperboloid shape (one-sheet or two-sheet).
- */
 /**
  * Resolved HYPERBOLOID_SURFACE.
  * A quadric surface defined by a hyperboloid shape (one-sheet or two-sheet).

@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FEA_MATERIAL_PROPERTY_REPRESENTATION.
- * Material properties for finite element analysis.
- */
 /**
  * Resolved FEA_MATERIAL_PROPERTY_REPRESENTATION.
  * Material properties for finite element analysis.

@@ -13,12 +13,6 @@ import java.util.Objects;
  * @param curve3d supported 3D curve
  * @param parametricCurves optional parameter-space curves associated with supporting surfaces
  */
-/**
- * Minimal surface-curve wrapper over a supported 3D curve.
- *
- * @param curve3d supported 3D curve
- * @param parametricCurves optional parameter-space curves associated with supporting surfaces
- */
 public final class SurfaceCurve3 implements Curve3 {
     private final Curve3 curve3d;
     private final List<ParametricCurve> parametricCurves;

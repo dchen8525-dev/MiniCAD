@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PAINTING_FEATURE.
- * A painting feature entity.
- *
- * @param id STEP instance id
- * @param name painting name
- * @param paintType paint type classification
- * @param paintColor paint color specification
- * @param paintThickness paint thickness
- * @param appliedSurfaces surfaces to be painted
- * @param primerCoat primer coat specification
- * @varnishCoat varnish/clear coat specification
- * @param paintStandard paint standard reference
- */
 /**
  * Resolved PAINTING_FEATURE.
  * A painting feature entity.

@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MACHINING_OPERATION.
- * Represents a machining operation in manufacturing.
- *
- * @param id STEP instance id
- * @param name operation name
- * @param status operation status
- * @param features features being machined
- */
 /**
  * Resolved MACHINING_OPERATION.
  * Represents a machining operation in manufacturing.

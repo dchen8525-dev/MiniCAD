@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TARGET_DEFINITION.
- * A target definition entity.
- *
- * @param id STEP instance id
- * @param name target name
- * @param targetType target variance type
- * @param targetValue target variance value
- * @param targetUnit target variance unit
- * @param targetDeadline target variance deadline
- * @param targetPriority target variance priority
- * @param targetStatus target variance status
- */
 /**
  * Resolved TARGET_DEFINITION.
  * A target definition entity.

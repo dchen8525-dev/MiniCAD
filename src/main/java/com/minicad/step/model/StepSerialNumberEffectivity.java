@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved SERIAL_NUMBER_EFFECTIVITY.
- */
 /**
  * Resolved SERIAL_NUMBER_EFFECTIVITY.
  */

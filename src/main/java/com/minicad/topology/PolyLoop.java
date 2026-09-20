@@ -12,11 +12,6 @@ import java.util.Objects;
  *
  * @param points polygon vertices in order
  */
-/**
- * Loop represented directly by polygon vertices.
- *
- * @param points polygon vertices in order
- */
 public final class PolyLoop implements Loop {
     private final List<CartesianPoint> points;
 

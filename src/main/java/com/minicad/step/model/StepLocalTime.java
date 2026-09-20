@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal LOCAL_TIME metadata.
- *
- * @param id STEP instance id
- * @param hourComponent hour value
- * @param minuteComponent minute value
- * @param secondComponent optional second value
- * @param zone UTC offset
- */
 /**
  * Minimal LOCAL_TIME metadata.
  *

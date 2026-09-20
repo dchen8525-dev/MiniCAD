@@ -11,13 +11,6 @@ import java.util.Objects;
  * @param radius radius at placement origin
  * @param semiAngle cone semi-angle in radians
  */
-/**
- * Minimal infinite conical surface representation.
- *
- * @param position cone placement
- * @param radius radius at placement origin
- * @param semiAngle cone semi-angle in radians
- */
 public final class ConicalSurface implements SurfaceGeometry {
     private final Axis2Placement3D position;
     private final double radius;

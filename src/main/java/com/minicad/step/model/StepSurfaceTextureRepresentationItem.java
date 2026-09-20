@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SURFACE_TEXTURE_REPRESENTATION_ITEM.
- * A surface texture representation item entity.
- *
- * @param id STEP instance id
- * @param name item name
- * @param roughnessValue roughness value
- * @param roughnessUnit roughness unit
- * @param measurementMethod measurement method
- */
 /**
  * Resolved SURFACE_TEXTURE_REPRESENTATION_ITEM.
  * A surface texture representation item entity.

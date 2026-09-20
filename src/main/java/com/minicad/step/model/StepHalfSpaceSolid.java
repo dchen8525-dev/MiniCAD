@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal parse-only half-space solid.
- *
- * @param id step id
- * @param name step label
- * @param baseSurface boundary surface
- * @param agreementFlag side agreement flag
- * @param enclosure optional enclosure entity for boxed half spaces
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal parse-only half-space solid.
  *

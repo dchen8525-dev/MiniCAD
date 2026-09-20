@@ -15,16 +15,6 @@ import java.util.Objects;
  * @param maxY maximum Y coordinate
  * @param maxZ maximum Z coordinate
  */
-/**
- * Immutable axis-aligned bounding box in 3D space.
- *
- * @param minX minimum X coordinate
- * @param minY minimum Y coordinate
- * @param minZ minimum Z coordinate
- * @param maxX maximum X coordinate
- * @param maxY maximum Y coordinate
- * @param maxZ maximum Z coordinate
- */
 public final class BoundingBox3 {
     private final double minX;
     private final double minY;

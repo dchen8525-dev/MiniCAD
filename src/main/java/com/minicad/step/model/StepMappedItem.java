@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal MAPPED_ITEM.
- *
- * @param id step id
- * @param mappingSource representation map
- * @param mappingTarget target representation item
- */
 /**
  * Minimal MAPPED_ITEM.
  *

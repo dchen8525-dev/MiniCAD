@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LOCATOR_FEATURE.
- * A locator feature entity.
- *
- * @param id STEP instance id
- * @param name locator name
- * @param locatorType locator type (pin, surface, datum)
- * @param locatorGeometry locator geometry representation
- * @param locatorPosition locator position placement
- * @varianceTolerance locator variance tolerance
- * @param locatorMaterial locator material reference
- */
 /**
  * Resolved LOCATOR_FEATURE.
  * A locator feature entity.

@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved BLOCK_VOLUME.
- * A block-shaped volume defined by position and dimensions.
- *
- * @param id STEP instance id
- * @param name volume name
- * @param position axis2 placement
- * @param xLength x dimension
- * @param yLength y dimension
- * @param zLength z dimension
- */
 /**
  * Resolved BLOCK_VOLUME.
  * A block-shaped volume defined by position and dimensions.

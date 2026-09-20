@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved METADATA_RECORD.
- * A metadata record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @param metadataType metadata variance type
- * @param metadataKey metadata variance key
- * @param metadataValue metadata variance value
- * @param metadataSource metadata variance source reference
- * @param metadataTimestamp metadata variance timestamp
- * @param metadataStatus metadata variance status
- */
 /**
  * Resolved METADATA_RECORD.
  * A metadata record entity.

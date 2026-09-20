@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PIPE_FEATURE.
- * A pipe feature entity.
- *
- * @param id STEP instance id
- * @param name pipe name
- * @param pipeType pipe type classification (straight, bent)
- * @param outerDiameter outer diameter
- * @param innerDiameter inner diameter
- * @param pipeLength pipe length
- * @param wallThickness wall thickness
- * @param pipeBends pipe bend features for bent pipes
- * @param pipeMaterial pipe material specification
- */
 /**
  * Resolved PIPE_FEATURE.
  * A pipe feature entity.

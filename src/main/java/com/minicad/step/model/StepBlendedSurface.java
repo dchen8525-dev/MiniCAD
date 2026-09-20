@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BLENDED_SURFACE.
- * A blended surface entity.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param blendingType blending type classification
- * @param primarySurface primary surface for blend
- * @param secondarySurface secondary surface for blend
- * @param blendRadius blend radius
- * @param blendCurve blend curve defining the blend path
- */
 /**
  * Resolved BLENDED_SURFACE.
  * A blended surface entity.

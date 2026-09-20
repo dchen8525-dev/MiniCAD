@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP metadata.
- *
- * @param id STEP instance id
- * @param identifier relationship identifier
- * @param name relationship name
- * @param description relationship description
- * @param relating source product definition relationship
- * @param related target product definition relationship
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal PRODUCT_DEFINITION_RELATIONSHIP_RELATIONSHIP metadata.
  *

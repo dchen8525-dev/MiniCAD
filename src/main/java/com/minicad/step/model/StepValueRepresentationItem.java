@@ -10,14 +10,6 @@ import java.util.Objects;
  * @param valueType typed wrapper name
  * @param valueText unwrapped literal text
  */
-/**
- * Minimal value representation item.
- *
- * @param id STEP instance id
- * @param name item name
- * @param valueType typed wrapper name
- * @param valueText unwrapped literal text
- */
 public final class StepValueRepresentationItem implements StepEntity {
     private final int id;
     private final String name;

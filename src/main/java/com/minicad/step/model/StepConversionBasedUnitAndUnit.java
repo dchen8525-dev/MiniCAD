@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved CONVERSION_BASED_UNIT_AND_UNIT.
- */
 /**
  * Resolved CONVERSION_BASED_UNIT_AND_UNIT.
  */

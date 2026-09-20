@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FLAT_PATTERN.
- * A flat pattern entity for sheet metal.
- *
- * @param id STEP instance id
- * @param name pattern name
- * @param flatGeometry flat pattern geometry
- * @param bendLines bend line locations
- * @param formingFeatures forming features in flat state
- * @param grainDirection grain direction reference
- * @param unfoldingSequence unfolding sequence operations
- */
 /**
  * Resolved FLAT_PATTERN.
  * A flat pattern entity for sheet metal.

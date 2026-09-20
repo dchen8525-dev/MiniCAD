@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MOLD_FEATURE.
- * A mold feature entity.
- *
- * @param id STEP instance id
- * @param name mold name
- * @param moldType mold type classification (injection, compression, blow)
- * @param cavityGeometry cavity geometry representation
- * @param coreGeometry core geometry representation
- * @param partingLine parting line geometry
- * @param gatingSystem gating system features
- * @param coolingChannels cooling channel features
- */
 /**
  * Resolved MOLD_FEATURE.
  * A mold feature entity.

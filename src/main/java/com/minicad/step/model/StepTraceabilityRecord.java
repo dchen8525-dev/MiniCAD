@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRACEABILITY_RECORD.
- * A traceability record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceItem traced variance item
- * @varianceOrigin origin variance source
- * @variancePath trace variance path/chain
- * @varianceDestination destination variance reference
- * @varianceDate trace variance date
- * @varianceStatus record variance status
- */
 /**
  * Resolved TRACEABILITY_RECORD.
  * A traceability record entity.

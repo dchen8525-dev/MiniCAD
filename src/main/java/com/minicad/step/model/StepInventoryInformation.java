@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INVENTORY_INFORMATION.
- * An inventory information entity.
- *
- * @param id STEP instance id
- * @param name inventory name
- * @param inventoryItems inventory items
- * @varianceQuantities item variance quantities in stock
- * @varianceLocation inventory variance location
- * @varianceThreshold reorder variance threshold
- * @param inventoryStatus inventory status
- * @param lastUpdated last update date
- */
 /**
  * Resolved INVENTORY_INFORMATION.
  * An inventory information entity.

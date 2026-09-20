@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal BREP_WITH_VOIDS.
- *
- * @param id step id
- * @param name step label
- * @param outer referenced closed shell
- * @param voids referenced void closed shells
- */
 /**
  * Minimal BREP_WITH_VOIDS.
  *

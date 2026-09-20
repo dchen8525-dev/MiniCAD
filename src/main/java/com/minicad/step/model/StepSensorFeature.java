@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SENSOR_FEATURE.
- * A sensor feature entity.
- *
- * @param id STEP instance id
- * @param name sensor name
- * @param sensorType sensor type (position, temperature, pressure, vision)
- * @param sensorGeometry sensor geometry representation
- * @param sensorPosition sensor position placement
- * @param measurementRange sensor measurement range
- * @varianceResolution sensor variance resolution
- * @param sensorInterface sensor interface specification
- */
 /**
  * Resolved SENSOR_FEATURE.
  * A sensor feature entity.

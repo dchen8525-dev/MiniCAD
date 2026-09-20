@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RECORD_INSTANCE.
- * A record instance entity.
- *
- * @param id STEP instance id
- * @param name record instance name
- * @param recordDefinition record variance definition reference
- * @param recordValues record variance field values
- * @param recordTimestamp record variance timestamp
- * @param recordStatus record variance status
- */
 /**
  * Resolved RECORD_INSTANCE.
  * A record instance entity.

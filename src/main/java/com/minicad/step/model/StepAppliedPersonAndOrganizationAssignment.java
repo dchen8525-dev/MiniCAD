@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT metadata.
- *
- * @param id STEP instance id
- * @param entityName concrete STEP entity name
- * @param assignedPersonAndOrganization assigned person and organization
- * @param role assignment role
- * @param items assigned target items
- */
 /**
  * Minimal APPLIED_PERSON_AND_ORGANIZATION_ASSIGNMENT metadata.
  *

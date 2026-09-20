@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved VARIABLE_DEFINITION.
- * A variable definition entity.
- *
- * @param id STEP instance id
- * @param name variable name
- * @param variableType variable variance type
- * @param variableDataType variable variance data type
- * @param variableScope variable variance scope (local/global)
- * @param variableInitial variable variance initial value
- * @param variableStatus variable variance status
- */
 /**
  * Resolved VARIABLE_DEFINITION.
  * A variable definition entity.

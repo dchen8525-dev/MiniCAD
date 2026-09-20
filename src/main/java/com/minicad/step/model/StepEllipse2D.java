@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ELLIPSE_2D.
- * An ellipse in 2D parameter space.
- *
- * @param id step id
- * @param name step label
- * @param position 2D placement (center and direction)
- * @param semiAxis1 semi-major axis length
- * @param semiAxis2 semi-minor axis length
- */
 /**
  * Resolved ELLIPSE_2D.
  * An ellipse in 2D parameter space.

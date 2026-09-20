@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STRESS_TEST_RESULT.
- * A stress test result entity.
- *
- * @param id STEP instance id
- * @param name result name
- * @param testType test variance type
- * @param testValue test variance measured value
- * @param testUnit test variance unit reference
- * @param testLimit test variance limit value
- * @param testPass test variance pass/fail status
- * @param testStatus test variance status
- */
 /**
  * Resolved STRESS_TEST_RESULT.
  * A stress test result entity.

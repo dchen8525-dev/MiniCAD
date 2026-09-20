@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DEGENERATE_CURVE.
- * A curve that has degenerated to a point or line.
- *
- * @param id STEP instance id
- * @param name curve name
- * @param basisCurve the original curve before degeneration
- */
 /**
  * Resolved DEGENERATE_CURVE.
  * A curve that has degenerated to a point or line.

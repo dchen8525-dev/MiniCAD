@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TIMER_INSTANCE.
- * A timer instance entity.
- *
- * @param id STEP instance id
- * @param name timer instance name
- * @param timerDefinition timer variance definition reference
- * @param timerState timer variance state
- * @param timerStartTime timer variance start time
- * @param timerRemaining timer variance remaining time
- * @param timerStatus timer variance status
- */
 /**
  * Resolved TIMER_INSTANCE.
  * A timer instance entity.

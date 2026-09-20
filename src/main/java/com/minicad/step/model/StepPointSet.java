@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal point set.
- *
- * @param id STEP instance id
- * @param name set name
- * @param points point elements
- */
 /**
  * Minimal point set.
  *

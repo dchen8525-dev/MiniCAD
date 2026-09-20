@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal measure-with-unit value.
- *
- * @param id STEP instance id
- * @param valueComponent numeric value
- * @param unitComponent referenced unit entity
- */
 /**
  * Minimal measure-with-unit value.
  *

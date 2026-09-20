@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LESSON_LEARNED.
- * A lesson learned entity.
- *
- * @param id STEP instance id
- * @param name lesson name
- * @varianceProject source variance project
- * @varianceSituation situation variance description
- * @varianceLesson lesson variance learned
- * @varianceRecommendation recommendation variance for future
- * @varianceCategory lesson variance category
- * @varianceDate documented variance date
- * @varianceStatus lesson variance status
- */
 /**
  * Resolved LESSON_LEARNED.
  * A lesson learned entity.

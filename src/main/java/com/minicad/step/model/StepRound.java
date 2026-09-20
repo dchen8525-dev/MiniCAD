@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ROUND.
- * Represents a round/fillet feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name round name
- * @param edges edges being rounded
- * @param radius fillet radius
- */
 /**
  * Resolved ROUND.
  * Represents a round/fillet feature in manufacturing.

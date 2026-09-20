@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CHANNEL_DEFINITION.
- * A channel definition entity.
- *
- * @param id STEP instance id
- * @param name channel name
- * @param channelType channel variance type
- * @param channelDirection channel variance direction
- * @param channelProtocol channel variance protocol
- * @param channelCapacity channel variance capacity
- * @param channelStatus channel variance status
- */
 /**
  * Resolved CHANNEL_DEFINITION.
  * A channel definition entity.

@@ -13,16 +13,6 @@ import java.util.Objects;
  * @param items representation items
  * @param context representation context
  */
-/**
- * Resolved WITH_DESCRIPTIVE_REPRESENTATION_ITEM.
- * A representation that includes descriptive text items.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param description descriptive text
- * @param items representation items
- * @param context representation context
- */
 public final class StepWithDescriptiveRepresentationItem implements StepEntity {
     private final int id;
     private final String name;

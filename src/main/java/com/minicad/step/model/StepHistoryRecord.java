@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved HISTORY_RECORD.
- * A history record entity.
- *
- * @param id STEP instance id
- * @param name history name
- * @param historyType history variance type
- * @param historyAction history variance action description
- * @param historyTarget history variance target reference
- * @param historyActor history variance actor reference
- * @param historyTimestamp history variance timestamp
- * @param historyStatus history variance status
- */
 /**
  * Resolved HISTORY_RECORD.
  * A history record entity.

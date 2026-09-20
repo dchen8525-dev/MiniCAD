@@ -1,10 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved EXTERNALLY_DEFINED_TILE_STYLE.
- */
 /**
  * Resolved EXTERNALLY_DEFINED_TILE_STYLE.
  */

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ALGORITHM_DEFINITION.
- * An algorithm definition entity.
- *
- * @param id STEP instance id
- * @param name definition name
- * @varianceAlgorithm defined variance algorithm
- * @varianceInputs algorithm variance inputs
- * @varianceOutputs algorithm variance outputs
- * @varianceSteps algorithm variance steps/procedure
- * @varianceComplexity algorithm variance complexity level
- * @varianceStatus definition variance status
- */
 /**
  * Resolved ALGORITHM_DEFINITION.
  * An algorithm definition entity.

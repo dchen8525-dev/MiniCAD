@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved VALIDATION_PROPERTY_REPRESENTATION.
- * A representation used to validate geometric properties against a reference.
- */
 /**
  * Resolved VALIDATION_PROPERTY_REPRESENTATION.
  * A representation used to validate geometric properties against a reference.

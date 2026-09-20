@@ -8,12 +8,6 @@ import java.util.Objects;
  * @param id STEP instance id
  * @param name item name
  */
-/**
- * Minimal representation item marker.
- *
- * @param id STEP instance id
- * @param name item name
- */
 public final class StepRepresentationItem implements StepEntity {
     private final int id;
     private final String name;

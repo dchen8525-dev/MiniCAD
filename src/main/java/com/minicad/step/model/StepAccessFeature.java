@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ACCESS_FEATURE.
- * An access feature entity.
- *
- * @param id STEP instance id
- * @param name access name
- * @param accessType access type (door, panel, hatch, inspection)
- * @param accessGeometry access geometry representation
- * @param accessOpening access opening dimensions
- * @param accessLocation access location placement
- * @varianceFrequency access variance frequency (regular, emergency)
- */
 /**
  * Resolved ACCESS_FEATURE.
  * An access feature entity.

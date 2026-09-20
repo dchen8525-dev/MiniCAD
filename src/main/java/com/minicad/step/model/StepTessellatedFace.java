@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal TESSELLATED_FACE.
- * A face defined by a tessellated (triangulated) surface.
- *
- * @param id STEP id
- * @param name STEP label
- * @param triangles list of triangle entities or vertex references
- */
 /**
  * Minimal TESSELLATED_FACE.
  * A face defined by a tessellated (triangulated) surface.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FREE_FORM_SURFACE.
- * A free-form surface entity.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param surfaceType free-form surface type classification
- * @param controlPoints control points matrix
- * @param degreeU degree in U direction
- * @param degreeV degree in V direction
- * @param knotVectors knot vectors for U and V
- * @param weights weight values for rational surfaces
- */
 /**
  * Resolved FREE_FORM_SURFACE.
  * A free-form surface entity.

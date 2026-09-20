@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal COLOUR_SPECIFICATION.
- *
- * @param id step id
- * @param name colour name
- */
 /**
  * Minimal COLOUR_SPECIFICATION.
  *

@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal resolved SEAM_CURVE.
- *
- * @param id STEP id
- * @param name STEP label
- * @param curve3d referenced 3D curve
- * @param associatedGeometry seam-associated PCURVE items
- * @param masterRepresentation preferred representation enum
- */
 /**
  * Minimal resolved SEAM_CURVE.
  *

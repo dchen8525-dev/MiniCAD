@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMPOSITE_TEXT.
- * Text composed of multiple text literals and text paths.
- *
- * @param id STEP instance id
- * @param name text name
- * @param collection collection of text elements
- */
 /**
  * Resolved COMPOSITE_TEXT.
  * Text composed of multiple text literals and text paths.

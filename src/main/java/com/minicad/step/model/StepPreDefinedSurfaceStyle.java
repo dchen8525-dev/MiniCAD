@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved PRE_DEFINED_SURFACE_STYLE.
- */
 /**
  * Resolved PRE_DEFINED_SURFACE_STYLE.
  */

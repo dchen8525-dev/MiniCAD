@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved POOL_INSTANCE.
- * A pool instance entity.
- *
- * @param id STEP instance id
- * @param name pool instance name
- * @param poolDefinition pool variance definition reference
- * @param poolState pool variance state
- * @param poolUsed pool variance used capacity
- * @param poolAvailable pool variance available capacity
- * @param poolStatus pool variance status
- */
 /**
  * Resolved POOL_INSTANCE.
  * A pool instance entity.

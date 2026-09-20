@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal next assembly usage occurrence.
- *
- * @param id STEP instance id
- * @param identifier business identifier
- * @param name occurrence name
- * @param description optional description
- * @param relatingProductDefinition assembly product definition
- * @param relatedProductDefinition component product definition
- * @param referenceDesignator optional occurrence reference designator
- */
 /**
  * Minimal next assembly usage occurrence.
  *

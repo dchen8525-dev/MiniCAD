@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PORT_INSTANCE.
- * A port instance entity.
- *
- * @param id STEP instance id
- * @param name port instance name
- * @param portDefinition port variance definition reference
- * @param portState port variance state
- * @param portValue port variance current value
- * @param portConnections port variance connections
- * @param portStatus port variance status
- */
 /**
  * Resolved PORT_INSTANCE.
  * A port instance entity.

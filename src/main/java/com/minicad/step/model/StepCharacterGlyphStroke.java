@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved CHARACTER_GLYPH_STROKE.
- */
 /**
  * Resolved CHARACTER_GLYPH_STROKE.
  */

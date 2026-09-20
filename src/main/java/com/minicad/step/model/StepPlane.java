@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved PLANE.
- *
- * @param id step id
- * @param name step label
- * @param position plane placement
- */
 /**
  * Resolved PLANE.
  *

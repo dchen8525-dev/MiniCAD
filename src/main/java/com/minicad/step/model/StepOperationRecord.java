@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved OPERATION_RECORD.
- * An operation record entity.
- *
- * @param id STEP instance id
- * @param name operation name
- * @param operationType operation variance type
- * @param operationName operation variance operation name
- * @param operationTarget operation variance target reference
- * @param operationActor operation variance actor reference
- * @param operationTimestamp operation variance timestamp
- * @param operationResult operation variance result
- * @param operationStatus operation variance status
- */
 /**
  * Resolved OPERATION_RECORD.
  * An operation record entity.

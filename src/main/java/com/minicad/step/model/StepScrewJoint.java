@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SCREW_JOINT.
- * A screw joint between two links.
- */
 /**
  * Resolved SCREW_JOINT.
  * A screw joint between two links.

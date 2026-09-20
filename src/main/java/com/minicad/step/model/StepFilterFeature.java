@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FILTER_FEATURE.
- * A filter feature entity.
- *
- * @param id STEP instance id
- * @param name filter name
- * @param filterType filter type (air, liquid, magnetic)
- * @param filterGeometry filter geometry representation
- * @param filterMedia filter media specification
- * @varianceMicron variance micron rating
- * @varianceFlow variance flow capacity
- * @param replacementInterval replacement interval specification
- */
 /**
  * Resolved FILTER_FEATURE.
  * A filter feature entity.

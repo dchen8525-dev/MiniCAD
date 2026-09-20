@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RISK_ASSESSMENT.
- * A risk assessment entity.
- *
- * @param id STEP instance id
- * @param name assessment name
- * @varianceItem assessed variance item
- * @varianceHazards identified variance hazards
- * @varianceRisks risk variance ratings
- * @varianceMitigations mitigation variance measures
- * @varianceResidual residual variance risk after mitigation
- * @varianceStatus assessment variance status
- */
 /**
  * Resolved RISK_ASSESSMENT.
  * A risk assessment entity.

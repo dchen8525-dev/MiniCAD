@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DEPRESSION.
- * Represents a depression/pocket feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name depression name
- * @param profile profile definition
- * @param depth depression depth
- * @param direction depression direction
- * @param taperAngle optional taper angle
- */
 /**
  * Resolved DEPRESSION.
  * Represents a depression/pocket feature in manufacturing.

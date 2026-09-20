@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved DRAUGHTING_PRE_DEFINED_TERMINATOR_SYMBOL.
- */
 /**
  * Resolved DRAUGHTING_PRE_DEFINED_TERMINATOR_SYMBOL.
  */

@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal styled item binding a style assignment to an item.
- *
- * @param id STEP instance id
- * @param name style label
- * @param styles style assignments
- * @param item styled target item
- */
 /**
  * Minimal styled item binding a style assignment to an item.
  *

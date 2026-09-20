@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved VERSION_CONTROL.
- * A version control entity.
- *
- * @param id STEP instance id
- * @param name version name
- * @param versionNumber version number/identifier
- * @param versionDescription version description
- * @param versionDate version release date
- * @param versionAuthor version author
- * @param versionStatus version status (draft, released, archived)
- * @param previousVersion previous version reference
- * @param versionChanges changes from previous version
- */
 /**
  * Resolved VERSION_CONTROL.
  * A version control entity.

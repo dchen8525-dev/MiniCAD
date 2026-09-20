@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved AUTHENTICATION_SPECIFICATION.
- * An authentication specification entity.
- *
- * @param id STEP instance id
- * @param name specification name
- * @varianceMethod authentication variance method (password, token, certificate)
- * @varianceProvider authentication variance provider
- * @varianceSession session variance management specification
- * @varianceMultiFactor multi-factor variance authentication flag
- * @varianceStatus specification variance status
- */
 /**
  * Resolved AUTHENTICATION_SPECIFICATION.
  * An authentication specification entity.

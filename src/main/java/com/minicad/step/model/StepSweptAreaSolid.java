@@ -1,21 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepProfileDef;
-import com.minicad.step.model.StepAxis2Placement3D;
 import java.util.Objects;
-/**
- * Minimal parse-only swept area solid.
- *
- * @param id step id
- * @param name step label
- * @param sweptArea profile definition to sweep
- * @param position solid placement
- * @param sweepReference extrusion direction or revolution axis
- * @param parameter depth or angle in STEP order
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal parse-only swept area solid.
  *

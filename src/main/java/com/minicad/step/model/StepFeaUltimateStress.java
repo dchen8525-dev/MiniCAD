@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FEA_ULTIMATE_STRESS.
- * Ultimate stress property for FEA.
- */
 /**
  * Resolved FEA_ULTIMATE_STRESS.
  * Ultimate stress property for FEA.

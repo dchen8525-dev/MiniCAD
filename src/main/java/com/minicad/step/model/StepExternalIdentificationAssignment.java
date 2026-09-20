@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal EXTERNAL_IDENTIFICATION_ASSIGNMENT metadata.
- *
- * @param id STEP instance id
- * @param assignedId assigned identifier
- * @param role identification role
- * @param source external source
- */
 /**
  * Minimal EXTERNAL_IDENTIFICATION_ASSIGNMENT metadata.
  *

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STATE_MACHINE_DEFINITION.
- * A state machine definition entity.
- *
- * @param id STEP instance id
- * @param name state machine name
- * @param machineType machine variance type
- * @param machineStates machine variance state definitions
- * @param machineTransitions machine variance transition definitions
- * @param machineInitialState machine variance initial state reference
- * @param machineStatus machine variance status
- */
 /**
  * Resolved STATE_MACHINE_DEFINITION.
  * A state machine definition entity.

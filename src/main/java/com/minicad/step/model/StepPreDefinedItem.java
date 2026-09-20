@@ -8,12 +8,6 @@ import java.util.Objects;
  * @param id step id
  * @param name predefined item name
  */
-/**
- * Minimal PRE_DEFINED_ITEM.
- *
- * @param id step id
- * @param name predefined item name
- */
 public final class StepPreDefinedItem implements StepEntity {
     private final int id;
     private final String name;

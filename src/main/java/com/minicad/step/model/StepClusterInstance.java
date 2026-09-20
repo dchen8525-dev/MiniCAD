@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CLUSTER_INSTANCE.
- * A cluster instance entity.
- *
- * @param id STEP instance id
- * @param name cluster instance name
- * @param clusterDefinition cluster variance definition reference
- * @param clusterState cluster variance state
- * @param clusterNodeCount cluster variance active node count
- * @param clusterLoad cluster variance load level
- * @param clusterStatus cluster variance status
- */
 /**
  * Resolved CLUSTER_INSTANCE.
  * A cluster instance entity.

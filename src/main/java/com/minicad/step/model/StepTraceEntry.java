@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRACE_ENTRY.
- * A trace entry entity.
- *
- * @param id STEP instance id
- * @param name entry name
- * @param entryType entry variance type
- * @param entryOperation entry variance operation name
- * @param entryDetails entry variance trace details
- * @param entryTimestamp entry variance timestamp
- * @param entryDuration entry variance duration
- * @param entryStatus entry variance status
- */
 /**
  * Resolved TRACE_ENTRY.
  * A trace entry entity.

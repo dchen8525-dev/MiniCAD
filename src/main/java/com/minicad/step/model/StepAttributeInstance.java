@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ATTRIBUTE_INSTANCE.
- * An attribute instance entity.
- *
- * @param id STEP instance id
- * @param name attribute instance name
- * @param attributeDefinition attribute variance definition reference
- * @param attributeValue attribute variance current value
- * @param attributeStatus attribute variance status
- */
 /**
  * Resolved ATTRIBUTE_INSTANCE.
  * An attribute instance entity.

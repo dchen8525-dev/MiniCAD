@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved EDGE_WIRE.
- * A wire formed by a sequence of edges.
- *
- * @param id STEP instance id
- * @param name wire name
- * @param edges ordered list of edges forming the wire
- */
 /**
  * Resolved EDGE_WIRE.
  * A wire formed by a sequence of edges.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved UPGRADE_RECORD.
- * An upgrade record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceEquipment upgraded variance equipment
- * @varianceFrom upgrade variance from version
- * @varianceTo upgrade variance to version
- * @varianceDate upgrade variance date
- * @varianceChanges upgrade variance changes
- * @varianceStatus record variance status
- */
 /**
  * Resolved UPGRADE_RECORD.
  * An upgrade record entity.

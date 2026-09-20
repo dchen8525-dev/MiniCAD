@@ -1,22 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepRepresentation;
 import java.util.Objects;
 
-/**
- * Minimal chain-based item identified representation usage.
- *
- * @param id STEP instance id
- * @param name usage name
- * @param description usage description
- * @param definition usage definition/select target
- * @param nodes representation chain nodes
- * @param undirectedLinks chain links
- * @param identifiedItem identified item reference
- */
 /**
  * Minimal chain-based item identified representation usage.
  *

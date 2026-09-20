@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INDEXED_POLY_CURVE_2D.
- *
- * @param id step id
- * @param name step label
- * @param points control points
- * @param indices indices into the point list defining the poly curve
- */
 /**
  * Resolved INDEXED_POLY_CURVE_2D.
  *

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ENVIRONMENTAL_IMPACT.
- * An environmental impact entity.
- *
- * @param id STEP instance id
- * @param name impact name
- * @param impactType impact type (energy, waste, emissions)
- * @param impactValue impact value measurement
- * @param impactUnit impact unit specification
- * @varianceTarget target variance reduction value
- * @param mitigationMeasures mitigation measures
- * @varianceStatus impact variance status
- */
 /**
  * Resolved ENVIRONMENTAL_IMPACT.
  * An environmental impact entity.

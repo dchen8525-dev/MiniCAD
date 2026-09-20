@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved JOINT_VALUE.
- * Joint value for kinematic joints.
- */
 /**
  * Resolved JOINT_VALUE.
  * Joint value for kinematic joints.

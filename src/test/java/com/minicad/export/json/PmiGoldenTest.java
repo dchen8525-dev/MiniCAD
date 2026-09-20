@@ -1,6 +1,5 @@
 package com.minicad.export.json;
 
-import com.minicad.export.json.StepPreviewJsonExporter;
 import com.minicad.helper.StepTextReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MACHINING_PROCESS_PLAN.
- * A machining process plan representation entity.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param items representation items (process steps)
- * @param context representation context
- * @param operations machining operations sequence
- */
 /**
  * Resolved MACHINING_PROCESS_PLAN.
  * A machining process plan representation entity.

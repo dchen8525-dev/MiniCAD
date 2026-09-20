@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WELD_JOINT.
- * A weld joint entity.
- *
- * @param id STEP instance id
- * @param name joint name
- * @param jointType joint variance type
- * @param jointGeometry joint variance geometry reference
- * @param jointParts joint variance parts to join
- * @param jointStatus joint variance status
- */
 /**
  * Resolved WELD_JOINT.
  * A weld joint entity.

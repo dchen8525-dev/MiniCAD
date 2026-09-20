@@ -6,10 +6,6 @@ import java.util.Objects;
  * Parsed HEADER section FileDescription entry.
  * Contains protocol names and implementation level.
  */
-/**
- * Parsed HEADER section FileDescription entry.
- * Contains protocol names and implementation level.
- */
 public final class StepFileDescription {
     private final List<String> description;
     private final String implementationLevel;

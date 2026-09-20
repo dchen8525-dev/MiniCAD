@@ -1,17 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepPersonAndOrganization;
 import java.util.Objects;
-/**
- * Minimal APPROVAL_PERSON_ORGANIZATION assignment.
- *
- * @param id STEP instance id
- * @param personOrganization assigned person and organization
- * @param authorizedApproval approval
- * @param role approval role
- */
 /**
  * Minimal APPROVAL_PERSON_ORGANIZATION assignment.
  *

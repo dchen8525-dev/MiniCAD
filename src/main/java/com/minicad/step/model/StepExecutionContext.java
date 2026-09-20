@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved EXECUTION_CONTEXT.
- * An execution context entity.
- *
- * @param id STEP instance id
- * @param name context name
- * @param contextType context variance type
- * @param contextVariables context variance variable values
- * @param contextParent context variance parent context reference
- * @param contextDepth context variance nesting depth
- * @param contextStatus context variance status
- */
 /**
  * Resolved EXECUTION_CONTEXT.
  * An execution context entity.

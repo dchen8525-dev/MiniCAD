@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ELEMENT_VOLUME_2D.
- * A 2D finite element volume (shell/plate element).
- */
 /**
  * Resolved ELEMENT_VOLUME_2D.
  * A 2D finite element volume (shell/plate element).

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ELECTRICAL_FEATURE.
- * An electrical feature entity.
- *
- * @param id STEP instance id
- * @param name electrical name
- * @param electricalType electrical feature type (connector, wire, terminal)
- * @param electricalGeometry electrical geometry representation
- * @param voltageRating voltage rating specification
- * @param currentRating current rating specification
- * @param wireGauge wire gauge specification
- * @variancePins variance pins count for connectors
- */
 /**
  * Resolved ELECTRICAL_FEATURE.
  * An electrical feature entity.

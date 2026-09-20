@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CHANGE_HISTORY.
- * A change history entity.
- *
- * @param id STEP instance id
- * @param name history name
- * @varianceItem changed variance item
- * @varianceChanges change variance entries
- * @varianceCurrent current variance state
- * @varianceBaseline baseline variance reference
- * @varianceStatus history variance status
- */
 /**
  * Resolved CHANGE_HISTORY.
  * A change history entity.

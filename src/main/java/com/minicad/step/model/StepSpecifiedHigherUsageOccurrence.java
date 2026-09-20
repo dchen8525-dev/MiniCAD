@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SPECIFIED_HIGHER_USAGE_OCCURRENCE.
- * Higher-level product usage occurrence.
- */
 /**
  * Resolved SPECIFIED_HIGHER_USAGE_OCCURRENCE.
  * Higher-level product usage occurrence.

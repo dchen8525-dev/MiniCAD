@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FACETTED_BREP.
- * A faceted B-rep defined by a closed shell of planar faces.
- *
- * @param id STEP id
- * @param name STEP label
- * @param outer the outer closed shell
- */
 /**
  * Resolved FACETTED_BREP.
  * A faceted B-rep defined by a closed shell of planar faces.

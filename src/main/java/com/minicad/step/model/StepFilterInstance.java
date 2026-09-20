@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FILTER_INSTANCE.
- * A filter instance entity.
- *
- * @param id STEP instance id
- * @param name filter instance name
- * @param filterDefinition filter variance definition reference
- * @param filterState filter variance state
- * @param filterMatchCount filter variance match count
- * @param filterRejectCount filter variance reject count
- * @param filterStatus filter variance status
- */
 /**
  * Resolved FILTER_INSTANCE.
  * A filter instance entity.

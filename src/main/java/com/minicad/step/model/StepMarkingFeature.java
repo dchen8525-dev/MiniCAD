@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MARKING_FEATURE.
- * A marking feature entity.
- *
- * @param id STEP instance id
- * @param name marking name
- * @param markingType marking type (laser, stamp, ink, engrave)
- * @param markingGeometry marking geometry representation
- * @param markingContent marking content text/symbol
- * @param markingDepth marking depth for engraving
- * @param markingPosition marking position placement
- */
 /**
  * Resolved MARKING_FEATURE.
  * A marking feature entity.

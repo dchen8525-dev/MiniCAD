@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LIBRARY_INSTANCE.
- * A library instance entity.
- *
- * @param id STEP instance id
- * @param name library instance name
- * @param libraryDefinition library variance definition reference
- * @param libraryState library variance state
- * @param libraryVersion library variance version
- * @param libraryLoaded library variance loaded flag
- * @param libraryStatus library variance status
- */
 /**
  * Resolved LIBRARY_INSTANCE.
  * A library instance entity.

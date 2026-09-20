@@ -1,19 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepProductDefinitionShape;
 import java.util.Objects;
-/**
- * Minimal shape aspect.
- *
- * @param id STEP instance id
- * @param name aspect name
- * @param description aspect description
- * @param ofShape owning product definition shape
- * @param productDefinitional STEP LOGICAL value as text
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal shape aspect.
  *

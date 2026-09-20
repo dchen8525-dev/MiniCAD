@@ -3,7 +3,6 @@ package com.minicad.step.model;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.minicad.helper.StepTextReader;
-import com.minicad.step.model.StepEntity;
 import com.minicad.step.semantic.StepEntityResolver;
 import com.minicad.step.syntax.StepFile;
 import com.minicad.step.syntax.StepParser;

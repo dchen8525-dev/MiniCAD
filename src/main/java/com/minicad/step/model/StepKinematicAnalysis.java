@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved KINEMATIC_ANALYSIS.
- * A kinematic analysis entity.
- *
- * @param id STEP instance id
- * @param name analysis name
- * @param mechanism reference kinematic structure
- * @param inputMotion input motion parameters
- * @param outputMotion output motion results
- * @param motionRange motion range limits
- * @param kinematicConstraints kinematic constraints
- */
 /**
  * Resolved KINEMATIC_ANALYSIS.
  * A kinematic analysis entity.

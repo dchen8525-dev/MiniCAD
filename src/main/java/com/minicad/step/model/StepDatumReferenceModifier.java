@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DATUM_REFERENCE_MODIFIER.
- * A modifier applied to a datum reference (e.g., MMB, LMB).
- */
 /**
  * Resolved DATUM_REFERENCE_MODIFIER.
  * A modifier applied to a datum reference (e.g., MMB, LMB).

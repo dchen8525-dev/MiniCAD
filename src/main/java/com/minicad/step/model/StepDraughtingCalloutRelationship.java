@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal draughting callout relationship.
- *
- * @param id STEP instance id
- * @param name relationship name
- * @param description relationship description
- * @param relatingCallout source callout
- * @param relatedCallout target callout
- */
 /**
  * Minimal draughting callout relationship.
  *

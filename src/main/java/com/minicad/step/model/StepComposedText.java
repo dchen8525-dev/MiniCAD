@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMPOSED_TEXT.
- * Composed text with extent information.
- *
- * @param id STEP instance id
- * @param name text name
- * @param collection collection of text elements
- * @param extent bounding extent
- */
 /**
  * Resolved COMPOSED_TEXT.
  * Composed text with extent information.

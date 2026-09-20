@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COATING_REPRESENTATION_ITEM.
- * A coating representation item entity.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param coatingType coating variance type
- * @param coatingThickness coating variance thickness
- * @param coatingUnit coating variance unit reference
- * @param coatingStatus coating variance status
- */
 /**
  * Resolved COATING_REPRESENTATION_ITEM.
  * A coating representation item entity.

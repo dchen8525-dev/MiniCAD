@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PROCESS_RECORD.
- * A process record entity.
- *
- * @param id STEP instance id
- * @param name process name
- * @param processType process variance type
- * @param processTarget process variance target reference
- * @param processStartTime process variance start time
- * @param processEndTime process variance end time
- * @param processResult process variance result
- * @param processDetails process variance details
- * @param processStatus process variance status
- */
 /**
  * Resolved PROCESS_RECORD.
  * A process record entity.

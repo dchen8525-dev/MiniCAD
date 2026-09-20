@@ -1,17 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepUncertaintyMeasureWithUnit;
 import java.util.Objects;
 
-/**
- * Minimal global uncertainty assigned context.
- *
- * @param id STEP instance id
- * @param uncertainties referenced uncertainty entities
- */
 /**
  * Minimal global uncertainty assigned context.
  *

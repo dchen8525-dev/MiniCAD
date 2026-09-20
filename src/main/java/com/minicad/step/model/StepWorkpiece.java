@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WORKPIECE.
- * A workpiece entity.
- *
- * @param id STEP instance id
- * @param name workpiece name
- * @param workpieceGeometry workpiece geometry representation
- * @param rawMaterial raw material specification
- * @param stockDimensions stock dimensions (raw stock size)
- * @param features machining features on workpiece
- * @param setupReference setup reference coordinate system
- * @param workpieceType workpiece type (raw, in-process, finished)
- */
 /**
  * Resolved WORKPIECE.
  * A workpiece entity.

@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SHAPE_DIMENSION_REPRESENTATION_WITH_TOLERANCE.
- * A shape dimension representation with tolerance entity.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param items representation items
- * * @param context representation context
- * @param tolerance tolerance associated with the dimension
- */
 /**
  * Resolved SHAPE_DIMENSION_REPRESENTATION_WITH_TOLERANCE.
  * A shape dimension representation with tolerance entity.

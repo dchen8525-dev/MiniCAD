@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal PRE_DEFINED_CURVE_FONT.
- *
- * @param id step id
- * @param name predefined font name
- */
 /**
  * Minimal PRE_DEFINED_CURVE_FONT.
  *

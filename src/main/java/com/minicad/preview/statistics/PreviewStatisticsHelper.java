@@ -27,8 +27,6 @@ import com.minicad.step.model.StepSurfaceCurveSweptAreaSolid;
 import com.minicad.step.model.StepSweptAreaSolid;
 import com.minicad.step.model.StepSweptDiskSolid;
 import com.minicad.step.model.StepBlockVolume;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Helper methods for preview statistics and summarization.

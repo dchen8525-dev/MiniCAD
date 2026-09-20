@@ -9,10 +9,6 @@ import java.util.Objects;
  * Parsed HEADER section FileName entry.
  * Contains file name, timestamp, author, organization, etc.
  */
-/**
- * Parsed HEADER section FileName entry.
- * Contains file name, timestamp, author, organization, etc.
- */
 public final class StepFileName {
     private final String name;
     private final String timeStamp;

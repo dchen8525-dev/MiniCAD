@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INTERFACE_INSTANCE.
- * An interface instance entity.
- *
- * @param id STEP instance id
- * @param name interface instance name
- * @param interfaceDefinition interface variance definition reference
- * @param interfaceLocation interface variance location reference
- * @param interfaceState interface variance state
- * @param interfaceConnections interface variance connections
- * @param interfaceStatus interface variance status
- */
 /**
  * Resolved INTERFACE_INSTANCE.
  * An interface instance entity.

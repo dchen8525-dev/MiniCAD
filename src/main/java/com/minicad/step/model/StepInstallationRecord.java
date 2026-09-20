@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INSTALLATION_RECORD.
- * An installation record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceEquipment installed variance equipment
- * @varianceLocation installation variance location
- * @varianceDate installation variance date
- * @varianceInstaller installer variance person/team
- * @varianceChecks installation variance verification checks
- * @varianceStatus record variance status
- */
 /**
  * Resolved INSTALLATION_RECORD.
  * An installation record entity.

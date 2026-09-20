@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ROLE_ENTRY.
- * A role entry entity.
- *
- * @param id STEP instance id
- * @param name entry name
- * @param entryType entry variance type
- * @param entryRole entry variance role reference
- * @param entryHolder entry variance holder reference
- * @param entryGranted entry variance granted flag
- * @param entryTimestamp entry variance timestamp
- * @param entryStatus entry variance status
- */
 /**
  * Resolved ROLE_ENTRY.
  * A role entry entity.

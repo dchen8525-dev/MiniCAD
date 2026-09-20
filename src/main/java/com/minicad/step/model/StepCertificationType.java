@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal CERTIFICATION_TYPE metadata.
- *
- * @param id STEP instance id
- * @param description type description
- */
 /**
  * Minimal CERTIFICATION_TYPE metadata.
  *

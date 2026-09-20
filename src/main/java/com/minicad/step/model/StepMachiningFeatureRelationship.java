@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MACHINING_FEATURE_RELATIONSHIP.
- * A machining feature relationship entity.
- *
- * @param id STEP instance id
- * @param name relationship name
- * @param relatingFeature relating machining feature
- * @param relatedFeature related machining feature
- * @param relationshipType relationship type classification
- * @param description relationship description
- */
 /**
  * Resolved MACHINING_FEATURE_RELATIONSHIP.
  * A machining feature relationship entity.

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SPHERICAL_JOINT.
- * A spherical (ball) joint between two links.
- */
 /**
  * Resolved SPHERICAL_JOINT.
  * A spherical (ball) joint between two links.

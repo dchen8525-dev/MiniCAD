@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SESSION_INSTANCE.
- * A session instance entity.
- *
- * @param id STEP instance id
- * @param name session instance name
- * @param sessionDefinition session variance definition reference
- * @param sessionState session variance state
- * @param sessionUser session variance user reference
- * @param sessionStartTime session variance start time
- * @param sessionLastActivity session variance last activity time
- * @param sessionStatus session variance status
- */
 /**
  * Resolved SESSION_INSTANCE.
  * A session instance entity.

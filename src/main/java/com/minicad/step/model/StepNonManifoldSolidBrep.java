@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved NON_MANIFOLD_SOLID_BREP.
- * A B-rep solid whose boundary may be a non-manifold shell.
- *
- * @param id STEP instance id
- * @param name solid name
- * @param outer the surface (open or closed shell) forming the boundary
- */
 /**
  * Resolved NON_MANIFOLD_SOLID_BREP.
  * A B-rep solid whose boundary may be a non-manifold shell.

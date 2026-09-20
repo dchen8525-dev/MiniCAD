@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved BUY_FROM_USAGE_OPTION.
- */
 /**
  * Resolved BUY_FROM_USAGE_OPTION.
  */

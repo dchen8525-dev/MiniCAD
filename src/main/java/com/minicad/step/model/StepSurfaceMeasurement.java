@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SURFACE_MEASUREMENT.
- * A surface measurement entity.
- *
- * @param id STEP instance id
- * @param name measurement name
- * @param surfaceGeometry surface being measured
- * @param roughnessParameters roughness parameters (Ra, Rz, Rq)
- * @param measuredValues measured roughness values
- * @param measurementMethod measurement method specification
- * @param measurementArea measurement area/location
- * @param passFailStatus pass/fail status result
- */
 /**
  * Resolved SURFACE_MEASUREMENT.
  * A surface measurement entity.

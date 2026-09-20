@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRACKING_INFORMATION.
- * A tracking information entity.
- *
- * @param id STEP instance id
- * @param name tracking name
- * @param trackingId tracking identifier/number
- * @param trackingItems items being tracked
- * @varianceLocation current variance location
- * @varianceStatus tracking variance status
- * @varianceHistory tracking variance history events
- * @param trackingService tracking service reference
- */
 /**
  * Resolved TRACKING_INFORMATION.
  * A tracking information entity.

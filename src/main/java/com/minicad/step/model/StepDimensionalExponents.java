@@ -1,10 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal DIMENSIONAL_EXPONENTS unit-dimension metadata.
- */
 /**
  * Minimal DIMENSIONAL_EXPONENTS unit-dimension metadata.
  */

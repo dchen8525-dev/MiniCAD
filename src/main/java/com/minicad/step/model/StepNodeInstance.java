@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved NODE_INSTANCE.
- * A node instance entity.
- *
- * @param id STEP instance id
- * @param name node instance name
- * @param nodeDefinition node variance definition reference
- * @param nodeState node variance state
- * @param nodeAddress node variance address/identifier
- * @param nodeLoad node variance load percentage
- * @param nodeStatus node variance status
- */
 /**
  * Resolved NODE_INSTANCE.
  * A node instance entity.

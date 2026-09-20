@@ -11,13 +11,6 @@ import java.util.Objects;
  * @param basisSurface wrapped basis surface
  * @param distance offset distance (positive offsets along normal direction)
  */
-/**
- * Minimal offset surface wrapper around another supported surface geometry.
- * An offset surface is parallel to the basis surface at a constant distance.
- *
- * @param basisSurface wrapped basis surface
- * @param distance offset distance (positive offsets along normal direction)
- */
 public final class OffsetSurface3 implements SurfaceGeometry {
     private final SurfaceGeometry basisSurface;
     private final double distance;

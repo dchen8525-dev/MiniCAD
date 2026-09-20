@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INSPECTION_CRITERIA.
- * An inspection criteria entity.
- *
- * @param id STEP instance id
- * @param name criteria name
- * @param criteriaItems list of criteria items
- * @param criteriaContext criteria context
- * @param toleranceLimits tolerance limits for each criterion
- * @param measurementMethod measurement method specifications
- */
 /**
  * Resolved INSPECTION_CRITERIA.
  * An inspection criteria entity.

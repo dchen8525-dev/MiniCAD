@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved OPERATOR_QUALIFICATION.
- * An operator qualification entity.
- *
- * @param id STEP instance id
- * @param name qualification name
- * @param operatorId operator identifier
- * @param qualificationType qualification type (skill, certification, training)
- * @varianceLevel qualification variance level
- * @param qualificationDate qualification date
- * @param expirationDate expiration date
- * @varianceOperations qualified variance operations
- * @param qualificationStatus qualification status
- */
 /**
  * Resolved OPERATOR_QUALIFICATION.
  * An operator qualification entity.

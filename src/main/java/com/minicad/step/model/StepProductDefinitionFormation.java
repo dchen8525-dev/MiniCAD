@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal product definition formation.
- *
- * @param id STEP instance id
- * @param name formation name
- * @param description optional description
- * @param ofProduct referenced product
- */
 /**
  * Minimal product definition formation.
  *

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SHIPPING_RECORD.
- * A shipping record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceItems shipped variance items
- * @varianceQuantities shipped variance quantities
- * @varianceCustomer customer variance reference
- * @varianceDate shipping variance date
- * @varianceCarrier carrier variance reference
- * @varianceTracking tracking variance number
- * @varianceStatus shipping variance status
- */
 /**
  * Resolved SHIPPING_RECORD.
  * A shipping record entity.

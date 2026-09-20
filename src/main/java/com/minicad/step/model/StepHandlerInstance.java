@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved HANDLER_INSTANCE.
- * A handler instance entity.
- *
- * @param id STEP instance id
- * @param name handler instance name
- * @param handlerDefinition handler variance definition reference
- * @param handlerState handler variance state
- * @param handlerTriggered handler variance triggered flag
- * @param handlerExecutionTime handler variance execution time
- * @param handlerStatus handler variance status
- */
 /**
  * Resolved HANDLER_INSTANCE.
  * A handler instance entity.

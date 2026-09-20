@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal TEXT_STYLE_WITH_JUSTIFICATION.
- *
- * @param id STEP instance id
- * @param name style name
- * @param characterAppearance character appearance definition
- * @param justification justification token
- */
 /**
  * Minimal TEXT_STYLE_WITH_JUSTIFICATION.
  *

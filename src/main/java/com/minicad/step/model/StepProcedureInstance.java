@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PROCEDURE_INSTANCE.
- * A procedure instance entity.
- *
- * @param id STEP instance id
- * @param name procedure instance name
- * @param procedureDefinition procedure variance definition reference
- * @param procedureState procedure variance state
- * @param procedureCurrentStep procedure variance current step
- * @param procedureCompletedSteps procedure variance completed steps
- * @param procedureStatus procedure variance status
- */
 /**
  * Resolved PROCEDURE_INSTANCE.
  * A procedure instance entity.

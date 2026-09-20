@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved WORK_ITEM.
- * A work item in AP203 configuration management.
- */
 /**
  * Resolved WORK_ITEM.
  * A work item in AP203 configuration management.

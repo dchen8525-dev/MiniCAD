@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SYSTEM_ARCHITECTURE.
- * A system architecture entity.
- *
- * @param id STEP instance id
- * @param name architecture name
- * @varianceComponents architecture variance components
- * @varianceConnections architecture variance connections
- * @varianceInterfaces architecture variance interfaces
- * @varianceHierarchy architecture variance hierarchy/levels
- * @varianceType architecture variance type (functional, physical, logical)
- * @varianceStatus architecture variance status
- */
 /**
  * Resolved SYSTEM_ARCHITECTURE.
  * A system architecture entity.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TEAM_INFORMATION.
- * A team information entity.
- *
- * @param id STEP instance id
- * @param name team name
- * @param teamId team identifier
- * @varianceMembers team variance members
- * @param teamLead team lead reference
- * @varianceResponsibilities team variance responsibilities
- * @varianceAuthority team variance authority level
- * @varianceStatus team variance status
- */
 /**
  * Resolved TEAM_INFORMATION.
  * A team information entity.

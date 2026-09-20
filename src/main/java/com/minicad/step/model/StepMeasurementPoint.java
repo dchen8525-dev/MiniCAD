@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MEASUREMENT_POINT.
- * A measurement point entity.
- *
- * @param id STEP instance id
- * @param name point name
- * @param pointPosition measurement point position geometry
- * @param measurementType measurement type (dimensional, geometric, surface)
- * @param measurementDirection measurement direction vector
- * @param toleranceReference tolerance reference for this point
- * @param nominalValue nominal value for measurement
- * @param measurementSequence measurement sequence order
- */
 /**
  * Resolved MEASUREMENT_POINT.
  * A measurement point entity.

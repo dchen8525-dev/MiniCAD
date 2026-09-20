@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SIGNATURE_RECORD.
- * A signature record entity.
- *
- * @param id STEP instance id
- * @param name signature name
- * @param signatureType signature variance type
- * @param signatureValue signature variance value/hash
- * @param signatureSigner signature variance signer reference
- * @param signatureTimestamp signature variance timestamp
- * @param signatureValid signature variance valid flag
- * @param signatureStatus signature variance status
- */
 /**
  * Resolved SIGNATURE_RECORD.
  * A signature record entity.

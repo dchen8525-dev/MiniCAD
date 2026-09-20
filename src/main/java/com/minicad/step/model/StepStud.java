@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STUD.
- * Represents a stud/protrusion feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name stud name
- * @param profile profile definition
- * @param height stud height
- * @param direction stud direction
- */
 /**
  * Resolved STUD.
  * Represents a stud/protrusion feature in manufacturing.

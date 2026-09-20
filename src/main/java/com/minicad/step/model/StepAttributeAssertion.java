@@ -1,17 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepRepresentation;
-import com.minicad.step.model.StepPropertyDefinition;
 import java.util.Objects;
-/**
- * Minimal attribute assertion link.
- *
- * @param id STEP instance id
- * @param definition property definition
- * @param usedRepresentation referenced representation
- */
 /**
  * Minimal attribute assertion link.
  *

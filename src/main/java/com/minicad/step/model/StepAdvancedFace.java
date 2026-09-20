@@ -2,19 +2,8 @@ package com.minicad.step.model;
 
 import java.util.List;
 
-import com.minicad.step.model.StepEntity;
-import com.minicad.step.model.StepFaceEntity;
 import java.util.Objects;
 
-/**
- * Resolved ADVANCED_FACE.
- *
- * @param id step id
- * @param name step label
- * @param bounds face bounds
- * @param faceGeometry supporting surface
- * @param sameSense orientation flag
- */
 /**
  * Resolved ADVANCED_FACE.
  *

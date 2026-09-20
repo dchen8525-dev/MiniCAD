@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONFIGURATION_INSTANCE.
- * A configuration instance entity.
- *
- * @param id STEP instance id
- * @param name configuration instance name
- * @param configurationDefinition configuration variance definition reference
- * @param configurationState configuration variance state
- * @param configurationValues configuration variance current values
- * @param configurationApplied configuration variance applied flag
- * @param configurationStatus configuration variance status
- */
 /**
  * Resolved CONFIGURATION_INSTANCE.
  * A configuration instance entity.

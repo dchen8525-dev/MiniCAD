@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved PLANE_ANGLE_UNIT_WITH_UNIT.
- */
 /**
  * Resolved PLANE_ANGLE_UNIT_WITH_UNIT.
  */

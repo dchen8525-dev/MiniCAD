@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal edge marker.
- *
- * @param id STEP instance id
- * @param name inherited topological-representation-item name when available
- */
 /**
  * Minimal edge marker.
  *

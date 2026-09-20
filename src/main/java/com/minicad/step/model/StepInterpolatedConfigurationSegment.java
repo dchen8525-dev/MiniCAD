@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved INTERPOLATED_CONFIGURATION_SEGMENT.
- * Interpolated configuration segment.
- */
 /**
  * Resolved INTERPOLATED_CONFIGURATION_SEGMENT.
  * Interpolated configuration segment.

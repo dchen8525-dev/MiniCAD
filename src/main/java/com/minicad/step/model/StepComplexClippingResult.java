@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMPLEX_CLIPPING_RESULT.
- * A clipping result from a complex tree of boolean operations.
- *
- * @param id STEP instance id
- * @param name result name
- * @param firstOperand first operand
- * @param secondOperand second operand
- * @param operator boolean operator
- */
 /**
  * Resolved COMPLEX_CLIPPING_RESULT.
  * A clipping result from a complex tree of boolean operations.

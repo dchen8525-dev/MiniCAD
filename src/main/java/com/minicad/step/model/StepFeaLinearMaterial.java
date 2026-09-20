@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FEA_LINEAR_MATERIAL.
- * A linear material definition for FEA.
- */
 /**
  * Resolved FEA_LINEAR_MATERIAL.
  * A linear material definition for FEA.

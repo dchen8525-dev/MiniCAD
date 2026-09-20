@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved MILESTONE_DEFINITION.
- * A milestone definition entity.
- *
- * @param id STEP instance id
- * @param name milestone name
- * @param milestoneType milestone variance type
- * @param milestoneDescription milestone variance description
- * @param milestoneTarget milestone variance target date
- * @param milestoneStatus milestone variance status
- */
 /**
  * Resolved MILESTONE_DEFINITION.
  * A milestone definition entity.

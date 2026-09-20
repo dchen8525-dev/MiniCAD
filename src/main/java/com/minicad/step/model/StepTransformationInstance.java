@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRANSFORMATION_INSTANCE.
- * A transformation instance entity.
- *
- * @param id STEP instance id
- * @param name transformation instance name
- * @param transformationDefinition transformation variance definition reference
- * @param transformationState transformation variance state
- * @param transformationInputData transformation variance input data
- * @param transformationOutputData transformation variance output data
- * @param transformationStatus transformation variance status
- */
 /**
  * Resolved TRANSFORMATION_INSTANCE.
  * A transformation instance entity.

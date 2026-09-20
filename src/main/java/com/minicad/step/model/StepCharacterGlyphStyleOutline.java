@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal CHARACTER_GLYPH_STYLE_OUTLINE.
- *
- * @param id STEP instance id
- * @param outlineStyle referenced curve style
- */
 /**
  * Minimal CHARACTER_GLYPH_STYLE_OUTLINE.
  *

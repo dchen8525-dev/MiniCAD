@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved OUTAGE_RECORD.
- * An outage record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceSystem affected variance system
- * @varianceCause outage variance cause
- * @varianceStartTime start variance time
- * @varianceEndTime end variance time
- * @varianceDuration outage variance duration
- * @varianceImpact impact variance description
- * @varianceStatus record variance status
- */
 /**
  * Resolved OUTAGE_RECORD.
  * An outage record entity.

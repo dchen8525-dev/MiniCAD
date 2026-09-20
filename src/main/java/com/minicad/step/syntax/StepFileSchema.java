@@ -9,10 +9,6 @@ import java.util.Objects;
  * Parsed HEADER section FileSchema entry.
  * Contains the schema names declared in the STEP file.
  */
-/**
- * Parsed HEADER section FileSchema entry.
- * Contains the schema names declared in the STEP file.
- */
 public final class StepFileSchema {
     private final List<String> schemaNames;
 

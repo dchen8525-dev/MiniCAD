@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PROJECT_INFORMATION.
- * A project information entity.
- *
- * @param id STEP instance id
- * @param name project name
- * @param projectId project identifier
- * @param projectType project type (design, manufacturing, research)
- * @varianceMembers project variance team members
- * @varianceStart project variance start date
- * @varianceEnd project variance end date
- * @varianceBudget project variance budget
- * @varianceStatus project variance status
- */
 /**
  * Resolved PROJECT_INFORMATION.
  * A project information entity.

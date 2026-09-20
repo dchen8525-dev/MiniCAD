@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved REPORT_DEFINITION.
- * A report definition entity.
- *
- * @param id STEP instance id
- * @param name report name
- * @param reportType report variance type
- * @param reportTemplate report variance template reference
- * @param reportSections report variance sections
- * @param reportParameters report variance parameters
- * @param reportStatus report variance status
- */
 /**
  * Resolved REPORT_DEFINITION.
  * A report definition entity.

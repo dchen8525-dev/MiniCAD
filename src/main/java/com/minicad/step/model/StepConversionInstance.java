@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CONVERSION_INSTANCE.
- * A conversion instance entity.
- *
- * @param id STEP instance id
- * @param name conversion instance name
- * @param conversionDefinition conversion variance definition reference
- * @param conversionInput conversion variance input value
- * @param conversionOutput conversion variance output value
- * @param conversionStatus conversion variance status
- */
 /**
  * Resolved CONVERSION_INSTANCE.
  * A conversion instance entity.

@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal annotation fill area occurrence.
- *
- * @param id STEP instance id
- * @param name occurrence name
- * @param styles style assignments
- * @param item referenced fill area
- * @param fillStyleTarget target point for fill styling
- */
 /**
  * Minimal annotation fill area occurrence.
  *

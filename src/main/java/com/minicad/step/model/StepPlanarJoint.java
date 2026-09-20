@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved PLANAR_JOINT.
- * A planar joint between two links.
- */
 /**
  * Resolved PLANAR_JOINT.
  * A planar joint between two links.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved NOTIFICATION_INSTANCE.
- * A notification instance entity.
- *
- * @param id STEP instance id
- * @param name notification instance name
- * @param notificationDefinition notification variance definition reference
- * @param notificationSubject notification variance subject
- * @param notificationBody notification variance body content
- * @param notificationRecipients notification variance actual recipients
- * @param notificationSentTime notification variance sent time
- * @param notificationStatus notification variance status
- */
 /**
  * Resolved NOTIFICATION_INSTANCE.
  * A notification instance entity.

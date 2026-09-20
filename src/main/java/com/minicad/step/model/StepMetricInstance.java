@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved METRIC_INSTANCE.
- * A metric instance entity.
- *
- * @param id STEP instance id
- * @param name metric instance name
- * @param metricDefinition metric variance definition reference
- * @param metricValue metric variance current value
- * @param metricTrend metric variance trend direction
- * @param metricHistory metric variance historical values
- * @param metricStatus metric variance status
- */
 /**
  * Resolved METRIC_INSTANCE.
  * A metric instance entity.

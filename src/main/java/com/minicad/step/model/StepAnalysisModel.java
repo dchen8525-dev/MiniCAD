@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ANALYSIS_MODEL.
- * An analysis model entity.
- *
- * @param id STEP instance id
- * @param name model name
- * @param modelType analysis model type (structural, thermal, fluid)
- * @param modelGeometry geometry for analysis
- * @param mesh mesh representation
- * @param boundaryConditions boundary conditions
- * @param loads applied loads
- * @param materialProperties material properties for analysis
- */
 /**
  * Resolved ANALYSIS_MODEL.
  * An analysis model entity.

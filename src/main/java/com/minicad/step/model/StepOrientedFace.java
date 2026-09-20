@@ -2,7 +2,6 @@ package com.minicad.step.model;
 
 import java.util.List;
 
-import com.minicad.step.model.StepFaceEntity;
 import java.util.Objects;
 
 /**

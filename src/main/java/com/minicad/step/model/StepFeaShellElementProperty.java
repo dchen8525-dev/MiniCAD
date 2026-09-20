@@ -1,12 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FEA_SHELL_ELEMENT_PROPERTY.
- */
 /**
  * Resolved FEA_SHELL_ELEMENT_PROPERTY.
  */

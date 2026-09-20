@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal RGB colour definition.
- *
- * @param id STEP instance id
- * @param name colour name
- * @param red red channel in [0, 1]
- * @param green green channel in [0, 1]
- * @param blue blue channel in [0, 1]
- */
 /**
  * Minimal RGB colour definition.
  *

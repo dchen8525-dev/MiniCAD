@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMPOSITE_CURVE_ON_SURFACE.
- *
- * @param id STEP instance id
- * @param name composite curve name
- * @param segments ordered segments
- * @param selfIntersect self intersect flag
- */
 /**
  * Resolved COMPOSITE_CURVE_ON_SURFACE.
  *

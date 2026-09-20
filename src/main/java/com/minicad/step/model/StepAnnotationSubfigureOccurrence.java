@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal annotation subfigure occurrence.
- *
- * @param id STEP instance id
- * @param name occurrence name
- * @param styles assigned styles
- * @param item referenced supported annotation content or occurrence
- */
 /**
  * Minimal annotation subfigure occurrence.
  *

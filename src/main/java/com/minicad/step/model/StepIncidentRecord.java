@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INCIDENT_RECORD.
- * An incident record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceSystem affected variance system
- * @varianceType incident variance type
- * @varianceSeverity severity variance level
- * @varianceStartTime start variance time
- * @varianceEndTime end variance time
- * @varianceResolution resolution variance action
- * @varianceStatus record variance status
- */
 /**
  * Resolved INCIDENT_RECORD.
  * An incident record entity.

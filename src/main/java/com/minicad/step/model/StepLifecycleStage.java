@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LIFECYCLE_STAGE.
- * A lifecycle stage entity.
- *
- * @param id STEP instance id
- * @param name stage name
- * @param stageType lifecycle stage type (design, manufacturing, service, disposal)
- * @param stageDescription stage description
- * @param stageStartDate stage start date
- * @param stageEndDate stage end date
- * @param stageOwner stage owner/responsible party
- * @param stageRequirements stage-specific requirements
- */
 /**
  * Resolved LIFECYCLE_STAGE.
  * A lifecycle stage entity.

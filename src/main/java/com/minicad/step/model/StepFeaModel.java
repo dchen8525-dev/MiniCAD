@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved FEA_MODEL.
- * A finite element analysis model.
- */
 /**
  * Resolved FEA_MODEL.
  * A finite element analysis model.

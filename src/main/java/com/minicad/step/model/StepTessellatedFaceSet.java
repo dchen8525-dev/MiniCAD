@@ -1,20 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepCartesianPoint;
 import java.util.Objects;
 
-/**
- * Resolved TESSELLATED_FACE_SET.
- * A set of tessellated (triangular) faces.
- *
- * @param id STEP instance id
- * @param name face set name
- * @param coordinates list of vertex coordinates
- * @param faceIndices list of face index triplets
- */
 /**
  * Resolved TESSELLATED_FACE_SET.
  * A set of tessellated (triangular) faces.

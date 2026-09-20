@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved UNIVERSAL_PAIR.
- * A universal (Hooke's joint) kinematic pair allowing rotation about two intersecting axes.
- */
 /**
  * Resolved UNIVERSAL_PAIR.
  * A universal (Hooke's joint) kinematic pair allowing rotation about two intersecting axes.

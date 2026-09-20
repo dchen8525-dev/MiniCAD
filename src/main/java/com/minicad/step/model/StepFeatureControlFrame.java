@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FEATURE_CONTROL_FRAME.
- * A GD&T feature control frame containing tolerances and datum references.
- *
- * @param id STEP instance id
- * @param name frame name
- * @param datumSystem datum references
- * @param tolerance the geometric tolerance value
- */
 /**
  * Resolved FEATURE_CONTROL_FRAME.
  * A GD&T feature control frame containing tolerances and datum references.

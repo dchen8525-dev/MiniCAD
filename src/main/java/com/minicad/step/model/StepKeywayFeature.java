@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved KEYWAY_FEATURE.
- * A keyway feature entity.
- *
- * @param id STEP instance id
- * @param name keyway name
- * @param keywayType keyway type classification
- * @param keywayWidth keyway width
- * @param keywayDepth keyway depth
- * @param keywayLength keyway length
- * @param keywayPosition keyway position placement
- * @param shaftDiameter reference shaft diameter
- */
 /**
  * Resolved KEYWAY_FEATURE.
  * A keyway feature entity.

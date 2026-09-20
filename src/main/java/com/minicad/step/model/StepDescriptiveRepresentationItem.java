@@ -9,13 +9,6 @@ import java.util.Objects;
  * @param name item name
  * @param description descriptive text
  */
-/**
- * Minimal descriptive representation item.
- *
- * @param id STEP instance id
- * @param name item name
- * @param description descriptive text
- */
 public final class StepDescriptiveRepresentationItem implements StepEntity {
     private final int id;
     private final String name;

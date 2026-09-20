@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal uncertainty measure with unit.
- *
- * @param id STEP instance id
- * @param valueComponent numeric value
- * @param unitComponent referenced unit entity
- * @param name uncertainty name
- * @param description uncertainty description
- */
 /**
  * Minimal uncertainty measure with unit.
  *

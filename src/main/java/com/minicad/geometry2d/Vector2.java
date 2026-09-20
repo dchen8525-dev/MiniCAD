@@ -11,12 +11,6 @@ import java.util.Objects;
  * @param x x component
  * @param y y component
  */
-/**
- * Immutable 2D vector.
- *
- * @param x x component
- * @param y y component
- */
 public final class Vector2 {
     private final double x;
     private final double y;

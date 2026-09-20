@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved TEXT_FILE_REPRESENTATION.
- */
 /**
  * Resolved TEXT_FILE_REPRESENTATION.
  */

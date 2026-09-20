@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved TORUS_VOLUME.
- * A CSG torus primitive volume.
- */
 /**
  * Resolved TORUS_VOLUME.
  * A CSG torus primitive volume.

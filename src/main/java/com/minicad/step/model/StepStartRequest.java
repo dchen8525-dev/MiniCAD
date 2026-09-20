@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved START_REQUEST.
- * A start request in AP203 configuration management.
- */
 /**
  * Resolved START_REQUEST.
  * A start request in AP203 configuration management.

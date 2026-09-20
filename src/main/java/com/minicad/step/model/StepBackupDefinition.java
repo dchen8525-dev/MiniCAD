@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BACKUP_DEFINITION.
- * A backup definition entity.
- *
- * @param id STEP instance id
- * @param name backup name
- * @param backupType backup variance type
- * @param backupSource backup variance source reference
- * @param backupTarget backup variance target reference
- * @param backupSchedule backup variance schedule
- * @param backupRetention backup variance retention period
- * @param backupStatus backup variance status
- */
 /**
  * Resolved BACKUP_DEFINITION.
  * A backup definition entity.

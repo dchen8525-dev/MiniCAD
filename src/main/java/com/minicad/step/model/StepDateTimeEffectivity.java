@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved DATE_TIME_EFFECTIVITY.
- */
 /**
  * Resolved DATE_TIME_EFFECTIVITY.
  */

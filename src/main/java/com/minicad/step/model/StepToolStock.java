@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TOOL_STOCK.
- * A tool stock entity.
- *
- * @param id STEP instance id
- * @param name stock name
- * @param toolType tool type classification
- * @varianceQuantity stock variance quantity available
- * @varianceCondition tool variance condition (new, used, reconditioned)
- * @varianceLocation stock variance location
- * @varianceCost unit variance cost
- * @varianceLife tool variance expected life
- * @varianceStatus stock variance status
- */
 /**
  * Resolved TOOL_STOCK.
  * A tool stock entity.

@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved TOLERANCE_ZONE_FORM.
- * Defines the shape of a tolerance zone (e.g., cylindrical, spherical, planar).
- *
- * @param id STEP instance id
- * @param name form name
- * @param zoneShape the shape description for the tolerance zone
- */
 /**
  * Resolved TOLERANCE_ZONE_FORM.
  * Defines the shape of a tolerance zone (e.g., cylindrical, spherical, planar).

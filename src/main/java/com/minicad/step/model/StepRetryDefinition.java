@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RETRY_DEFINITION.
- * A retry definition entity.
- *
- * @param id STEP instance id
- * @param name retry name
- * @param retryType retry variance type
- * @param retryMaxAttempts retry variance max attempts
- * @param retryDelay retry variance delay between attempts
- * @param retryBackoff retry variance backoff strategy
- * @param retryStatus retry variance status
- */
 /**
  * Resolved RETRY_DEFINITION.
  * A retry definition entity.

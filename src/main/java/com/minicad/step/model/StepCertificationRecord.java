@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CERTIFICATION_RECORD.
- * A certification record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @variancePerson certified variance person
- * @param certificationType certification type (skill, quality, safety)
- * @varianceLevel certification variance level
- * @varianceDate certification variance date
- * @varianceExpiration expiration variance date
- * @varianceAuthority certification variance authority
- * @varianceStatus certification variance status
- */
 /**
  * Resolved CERTIFICATION_RECORD.
  * A certification record entity.

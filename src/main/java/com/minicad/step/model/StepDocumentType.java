@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal DOCUMENT_TYPE metadata.
- *
- * @param id STEP instance id
- * @param productDataType document kind label
- */
 /**
  * Minimal DOCUMENT_TYPE metadata.
  *

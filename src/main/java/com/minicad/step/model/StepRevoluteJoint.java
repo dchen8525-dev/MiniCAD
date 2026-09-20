@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved REVOLUTE_JOINT.
- * A revolute (rotational) joint between two links.
- */
 /**
  * Resolved REVOLUTE_JOINT.
  * A revolute (rotational) joint between two links.

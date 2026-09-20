@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SIGNAL_INSTANCE.
- * A signal instance entity.
- *
- * @param id STEP instance id
- * @param name signal instance name
- * @param signalDefinition signal variance definition reference
- * @param signalSource signal variance source reference
- * @param signalValue signal variance current value
- * @param signalHistory signal variance history samples
- * @param signalStatus signal variance status
- */
 /**
  * Resolved SIGNAL_INSTANCE.
  * A signal instance entity.

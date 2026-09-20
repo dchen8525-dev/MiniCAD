@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal ANNOTATION_OCCURRENCE_RELATIONSHIP.
- *
- * @param id STEP instance id
- * @param entityName STEP entity name
- * @param name relationship name
- * @param description relationship description
- * @param relatingAnnotationOccurrence source occurrence
- * @param relatedAnnotationOccurrence target occurrence
- */
 /**
  * Minimal ANNOTATION_OCCURRENCE_RELATIONSHIP.
  *

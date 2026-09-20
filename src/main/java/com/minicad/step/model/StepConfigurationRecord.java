@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONFIGURATION_RECORD.
- * A configuration record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceItem configured variance item
- * @varianceSettings configuration variance settings
- * @varianceDate configuration variance date
- * @varianceReason configuration variance reason
- * @variancePrevious previous variance configuration
- * @varianceStatus record variance status
- */
 /**
  * Resolved CONFIGURATION_RECORD.
  * A configuration record entity.

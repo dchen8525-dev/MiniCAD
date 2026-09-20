@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CALLBACK_INSTANCE.
- * A callback instance entity.
- *
- * @param id STEP instance id
- * @param name callback instance name
- * @param callbackDefinition callback variance definition reference
- * @param callbackState callback variance state
- * @param callbackResult callback variance result
- * @param callbackExecuted callback variance executed flag
- * @param callbackStatus callback variance status
- */
 /**
  * Resolved CALLBACK_INSTANCE.
  * A callback instance entity.

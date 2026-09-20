@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MAPPING_INSTANCE.
- * A mapping instance entity.
- *
- * @param id STEP instance id
- * @param name mapping instance name
- * @param mappingDefinition mapping variance definition reference
- * @param mappingInput mapping variance input data
- * @param mappingOutput mapping variance output data
- * @param mappingStatus mapping variance status
- */
 /**
  * Resolved MAPPING_INSTANCE.
  * A mapping instance entity.

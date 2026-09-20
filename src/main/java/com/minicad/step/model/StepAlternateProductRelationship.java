@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ALTERNATE_PRODUCT_RELATIONSHIP.
- * Alternate product relationship.
- */
 /**
  * Resolved ALTERNATE_PRODUCT_RELATIONSHIP.
  * Alternate product relationship.

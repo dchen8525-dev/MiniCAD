@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal BOX_DOMAIN.
- *
- * @param id step id
- * @param corner box corner point
- * @param dimensions box dimensions in STEP order
- */
 /**
  * Minimal BOX_DOMAIN.
  *

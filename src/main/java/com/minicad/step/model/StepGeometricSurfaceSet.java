@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal geometric surface set for surface collections.
- *
- * @param id STEP instance id
- * @param name set name
- * @param elements supported geometric surface elements
- */
 /**
  * Minimal geometric surface set for surface collections.
  *

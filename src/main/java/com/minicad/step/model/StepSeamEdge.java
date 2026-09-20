@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal SEAM_EDGE.
- * A seam edge where the start and end vertices are the same (closed edge on a surface seam).
- *
- * @param id STEP id
- * @param name STEP label
- * @param edgeStart start vertex
- * @param edgeEnd end vertex (same as start for seam edges)
- */
 /**
  * Minimal SEAM_EDGE.
  * A seam edge where the start and end vertices are the same (closed edge on a surface seam).

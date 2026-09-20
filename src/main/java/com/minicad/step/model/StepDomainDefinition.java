@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DOMAIN_DEFINITION.
- * A domain definition entity.
- *
- * @param id STEP instance id
- * @param name domain name
- * @param domainType domain variance type
- * @param domainDescription domain variance description
- * @param domainScope domain variance scope
- * @param domainAuthority domain variance authority
- * @param domainStatus domain variance status
- */
 /**
  * Resolved DOMAIN_DEFINITION.
  * A domain definition entity.

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CHANGE_REQUEST.
- * A change request entity.
- *
- * @param id STEP instance id
- * @param name request name
- * @param requestType change request type
- * @param requestDescription change request description
- * @param affectedItems items affected by change
- * @param requestStatus request status (pending, approved, rejected)
- * @param requestDate request submission date
- * @param requestAuthor request author
- * @param requestReason reason for change request
- */
 /**
  * Resolved CHANGE_REQUEST.
  * A change request entity.

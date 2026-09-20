@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LOCATION_DEFINITION.
- * A location definition entity.
- *
- * @param id STEP instance id
- * @param name location name
- * @param locationType location variance type
- * @param locationAddress location variance address
- * @param locationCoordinates location variance coordinates
- * @param locationDescription location variance description
- * @param locationStatus location variance status
- */
 /**
  * Resolved LOCATION_DEFINITION.
  * A location definition entity.

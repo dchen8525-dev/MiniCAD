@@ -12,13 +12,6 @@ import java.util.Objects;
  * @param position placement (axis is symmetry axis)
  * @param focalLength focal distance, must be positive
  */
-/**
- * Minimal paraboloid surface (rotationally symmetric).
- * Parametrized as z = (x^2 + y^2) / (4*f) in local coordinates.
- *
- * @param position placement (axis is symmetry axis)
- * @param focalLength focal distance, must be positive
- */
 public final class ParaboloidSurface implements SurfaceGeometry {
     private final Axis2Placement3D position;
     private final double focalLength;

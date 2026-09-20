@@ -1,18 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepCartesianTransformationOperator;
 import java.util.Objects;
-/**
- * Minimal parse-only POINT_REPLICA, CURVE_REPLICA or SURFACE_REPLICA.
- *
- * @param id STEP instance id
- * @param name replica name
- * @param parent replicated geometric item
- * @param transformation transformation operator
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal parse-only POINT_REPLICA, CURVE_REPLICA or SURFACE_REPLICA.
  *

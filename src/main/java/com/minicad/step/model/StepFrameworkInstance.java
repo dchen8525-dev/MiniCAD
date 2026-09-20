@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FRAMEWORK_INSTANCE.
- * A framework instance entity.
- *
- * @param id STEP instance id
- * @param name framework instance name
- * @param frameworkDefinition framework variance definition reference
- * @param frameworkState framework variance state
- * @param frameworkVersion framework variance version
- * @param frameworkConfig framework variance configuration
- * @param frameworkStatus framework variance status
- */
 /**
  * Resolved FRAMEWORK_INSTANCE.
  * A framework instance entity.

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved EXECUTION_RECORD.
- * An execution record entity.
- *
- * @param id STEP instance id
- * @param name execution name
- * @param executionType execution variance type
- * @param executionTarget execution variance target reference
- * @param executionStartTime execution variance start time
- * @param executionEndTime execution variance end time
- * @param executionResult execution variance result
- * @param executionDetails execution variance details
- * @param executionStatus execution variance status
- */
 /**
  * Resolved EXECUTION_RECORD.
  * An execution record entity.

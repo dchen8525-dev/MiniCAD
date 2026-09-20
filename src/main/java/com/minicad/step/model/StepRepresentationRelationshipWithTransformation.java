@@ -1,19 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepRepresentation;
 import java.util.Objects;
-/**
- * Minimal representation relationship with transformation.
- *
- * @param id STEP instance id
- * @param name relationship name
- * @param description optional description
- * @param rep1 relating representation
- * @param rep2 related representation
- * @param transformationOperator linked item-defined transformation
- */
 /**
  * Minimal representation relationship with transformation.
  *

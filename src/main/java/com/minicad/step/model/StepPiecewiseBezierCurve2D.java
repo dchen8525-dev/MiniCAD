@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PIECEWISE_BEZIER_CURVE_2D.
- *
- * @param id step id
- * @param name step label
- * @param degree degree of the curve
- * @param controlPoints control points in 2D
- */
 /**
  * Resolved PIECEWISE_BEZIER_CURVE_2D.
  *

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PRODUCTION_PLAN.
- * A production plan entity.
- *
- * @param id STEP instance id
- * @param name plan name
- * @varianceProducts planned variance products
- * @varianceQuantities production variance quantities
- * @varianceSchedule production variance schedule
- * @varianceResources required variance resources
- * @variancePeriod planning variance period
- * @varianceStatus plan variance status
- */
 /**
  * Resolved PRODUCTION_PLAN.
  * A production plan entity.

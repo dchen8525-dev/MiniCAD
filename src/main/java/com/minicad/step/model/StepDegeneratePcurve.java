@@ -1,17 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepRepresentation;
 import java.util.Objects;
-/**
- * Minimal resolved DEGENERATE_PCURVE.
- *
- * @param id STEP id
- * @param name STEP label
- * @param basisSurface basis surface
- * @param referenceToCurve referenced definitional representation
- */
 /**
  * Minimal resolved DEGENERATE_PCURVE.
  *

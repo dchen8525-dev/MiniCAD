@@ -1,24 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INVENTORY_TRANSACTION.
- * An inventory transaction entity.
- *
- * @param id STEP instance id
- * @param name transaction name
- * @param transactionType transaction type (receive, issue, transfer, adjust)
- * @varianceItem transaction variance item
- * @varianceQuantity transaction variance quantity
- * @varianceFrom source variance location
- * @varianceTo destination variance location
- * @varianceDate transaction variance date
- * @varianceReason transaction variance reason
- * @varianceStatus transaction variance status
- */
 /**
  * Resolved INVENTORY_TRANSACTION.
  * An inventory transaction entity.

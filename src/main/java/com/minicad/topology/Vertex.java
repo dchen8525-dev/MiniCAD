@@ -9,11 +9,6 @@ import java.util.Objects;
  *
  * @param point vertex geometry
  */
-/**
- * Topological vertex backed by a 3D point.
- *
- * @param point vertex geometry
- */
 public final class Vertex {
     private final CartesianPoint point;
 

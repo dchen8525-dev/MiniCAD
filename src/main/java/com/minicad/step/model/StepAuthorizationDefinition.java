@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved AUTHORIZATION_DEFINITION.
- * An authorization definition entity.
- *
- * @param id STEP instance id
- * @param name authorization name
- * @param authorizationType authorization variance type
- * @param authorizationPermissions authorization variance permissions
- * @param authorizationRoles authorization variance roles
- * @param authorizationConstraints authorization variance constraints
- * @param authorizationStatus authorization variance status
- */
 /**
  * Resolved AUTHORIZATION_DEFINITION.
  * An authorization definition entity.

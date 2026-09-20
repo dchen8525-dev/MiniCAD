@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STREAM_DEFINITION.
- * A stream definition entity.
- *
- * @param id STEP instance id
- * @param name stream name
- * @param streamType stream variance type
- * @param streamDirection stream variance direction
- * @param streamFormat stream variance format
- * @param streamBufferSize stream variance buffer size
- * @param streamStatus stream variance status
- */
 /**
  * Resolved STREAM_DEFINITION.
  * A stream definition entity.

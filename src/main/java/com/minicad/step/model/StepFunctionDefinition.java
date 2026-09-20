@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FUNCTION_DEFINITION.
- * A function definition entity.
- *
- * @param id STEP instance id
- * @param name function name
- * @param functionType function variance type
- * @param functionDescription function variance description
- * @param functionInputs function variance inputs
- * @param functionOutputs function variance outputs
- * @param functionStatus function variance status
- */
 /**
  * Resolved FUNCTION_DEFINITION.
  * A function definition entity.

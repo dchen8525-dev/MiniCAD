@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONNECTED_EDGE_SET.
- *
- * @param id STEP id
- * @param name STEP label
- * @param edges member edges
- */
 /**
  * Resolved CONNECTED_EDGE_SET.
  *

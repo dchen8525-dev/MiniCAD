@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved STACK_INSTANCE.
- * A stack instance entity.
- *
- * @param id STEP instance id
- * @param name stack instance name
- * @param stackDefinition stack variance definition reference
- * @param stackState stack variance state
- * @param stackDepth stack variance current depth
- * @param stackStatus stack variance status
- */
 /**
  * Resolved STACK_INSTANCE.
  * A stack instance entity.

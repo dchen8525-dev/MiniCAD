@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STORAGE_INSTANCE.
- * A storage instance entity.
- *
- * @param id STEP instance id
- * @param name storage instance name
- * @param storageDefinition storage variance definition reference
- * @param storageState storage variance state
- * @param storageUsed storage variance used space
- * @param storageAvailable storage variance available space
- * @param storageStatus storage variance status
- */
 /**
  * Resolved STORAGE_INSTANCE.
  * A storage instance entity.

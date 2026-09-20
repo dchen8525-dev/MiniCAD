@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ENCRYPTION_SPECIFICATION.
- * An encryption specification entity.
- *
- * @param id STEP instance id
- * @param name specification name
- * @varianceAlgorithm encryption variance algorithm
- * @varianceKeySize key variance size
- * @varianceMode encryption variance mode
- * @varianceKeyManagement key variance management specification
- * @varianceStatus specification variance status
- */
 /**
  * Resolved ENCRYPTION_SPECIFICATION.
  * An encryption specification entity.

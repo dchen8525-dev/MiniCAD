@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SUBEDGE.
- *
- * @param id STEP id
- * @param name STEP label
- * @param start start vertex
- * @param end end vertex
- * @param parentEdge parent edge or subedge
- */
 /**
  * Resolved SUBEDGE.
  *

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved VELOCITY_BOUNDARY_CONDITION.
- * Velocity boundary condition for FEA.
- */
 /**
  * Resolved VELOCITY_BOUNDARY_CONDITION.
  * Velocity boundary condition for FEA.

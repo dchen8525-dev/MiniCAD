@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SPECIFIC_HIGHER_USAGE_OCCURRENCE.
- * A specific higher usage occurrence (SHUO) in assembly structure.
- */
 /**
  * Resolved SPECIFIC_HIGHER_USAGE_OCCURRENCE.
  * A specific higher usage occurrence (SHUO) in assembly structure.

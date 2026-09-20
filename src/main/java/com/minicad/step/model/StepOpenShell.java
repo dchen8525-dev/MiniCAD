@@ -1,18 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepFaceEntity;
 import java.util.Objects;
 
-/**
- * Resolved OPEN_SHELL.
- *
- * @param id step id
- * @param name step label
- * @param faces shell faces
- */
 /**
  * Resolved OPEN_SHELL.
  *

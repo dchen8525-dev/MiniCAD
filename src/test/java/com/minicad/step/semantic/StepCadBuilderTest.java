@@ -1,6 +1,5 @@
 package com.minicad.step.semantic;
 import com.minicad.step.model.StepFacetedBrepAndBrepWithVoids;
-import com.minicad.step.semantic.StepEntityResolver;
 
 import com.minicad.common.GeometryException;
 import com.minicad.common.StepResolutionException;

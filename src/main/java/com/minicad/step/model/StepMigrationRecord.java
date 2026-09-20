@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MIGRATION_RECORD.
- * A migration record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceData migrated variance data
- * @varianceFrom migration variance source
- * @varianceTo migration variance destination
- * @varianceDate migration variance date
- * @varianceFormat migration variance format conversion
- * @varianceStatus record variance status
- */
 /**
  * Resolved MIGRATION_RECORD.
  * A migration record entity.

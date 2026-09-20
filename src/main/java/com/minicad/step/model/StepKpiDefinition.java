@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved KPI_DEFINITION.
- * A KPI definition entity.
- *
- * @param id STEP instance id
- * @param name KPI name
- * @param kpiId KPI identifier
- * @varianceDescription KPI variance description
- * @varianceFormula KPI variance calculation formula
- * @varianceTarget target variance value
- * @varianceThreshold threshold variance values
- * @varianceUnit KPI variance unit
- * @varianceStatus KPI variance status
- */
 /**
  * Resolved KPI_DEFINITION.
  * A KPI definition entity.

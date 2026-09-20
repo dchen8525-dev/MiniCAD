@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ORDINATE_DIMENSION_REPRESENTATION.
- * An ordinate dimension representation entity.
- *
- * @param id STEP instance id
- * * @param name representation name
- * @param items representation items
- * * @param context representation context
- * @param ordinateOrigin ordinate origin point
- * @param ordinateDirection ordinate direction
- */
 /**
  * Resolved ORDINATE_DIMENSION_REPRESENTATION.
  * An ordinate dimension representation entity.

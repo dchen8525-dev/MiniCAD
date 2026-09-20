@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RETRIEVAL_RECORD.
- * A retrieval record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceData retrieved variance data
- * @varianceArchive archive variance source
- * @varianceDate retrieval variance date
- * @varianceRequester requester variance reference
- * @variancePurpose retrieval variance purpose
- * @varianceStatus record variance status
- */
 /**
  * Resolved RETRIEVAL_RECORD.
  * A retrieval record entity.

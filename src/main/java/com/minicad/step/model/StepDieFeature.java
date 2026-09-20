@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DIE_FEATURE.
- * A die feature entity.
- *
- * @param id STEP instance id
- * @param name die name
- * @param dieType die type classification (stamping, forging, extrusion)
- * @param dieGeometry die geometry representation
- * @param dieSurface die working surface
- * @param dieClearance die clearance specification
- * @param dieMaterial die material specification
- */
 /**
  * Resolved DIE_FEATURE.
  * A die feature entity.

@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved SWEPT_PROFILE_AREA_OUTLINE.
- */
 /**
  * Resolved SWEPT_PROFILE_AREA_OUTLINE.
  */

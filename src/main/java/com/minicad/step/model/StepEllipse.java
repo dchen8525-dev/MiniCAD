@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ELLIPSE.
- *
- * @param id step id
- * @param name step label
- * @param position ellipse placement
- * @param semiAxis1 local X semi-axis
- * @param semiAxis2 local Y semi-axis
- */
 /**
  * Resolved ELLIPSE.
  *

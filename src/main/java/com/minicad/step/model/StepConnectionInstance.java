@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONNECTION_INSTANCE.
- * A connection instance entity.
- *
- * @param id STEP instance id
- * @param name connection instance name
- * @param connectionDefinition connection variance definition reference
- * @param connectionState connection variance state
- * @param connectionLatency connection variance latency
- * @param connectionThroughput connection variance throughput
- * @param connectionStatus connection variance status
- */
 /**
  * Resolved CONNECTION_INSTANCE.
  * A connection instance entity.

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved PARABOLOID_SURFACE.
- * A quadric surface defined by a paraboloid shape.
- */
 /**
  * Resolved PARABOLOID_SURFACE.
  * A quadric surface defined by a paraboloid shape.

@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal draughting annotation occurrence.
- *
- * @param id STEP instance id
- * @param name occurrence name
- * @param styles assigned styles
- * @param item styled target item
- */
 /**
  * Minimal draughting annotation occurrence.
  *

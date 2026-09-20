@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CNC_PROGRAM.
- * A CNC program entity.
- *
- * @param id STEP instance id
- * @param name program name
- * @param programType program type (turning, milling, drilling)
- * @param toolpaths toolpath sequence
- * @param machiningOperations machining operations
- * @param programCode program code/G-code reference
- * @param postProcessor post-processor specification
- * @param machineTarget target CNC machine
- */
 /**
  * Resolved CNC_PROGRAM.
  * A CNC program entity.

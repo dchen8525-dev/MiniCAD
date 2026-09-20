@@ -10,13 +10,6 @@ import java.util.Objects;
  * @param name step label
  * @param edges oriented edges in loop order
  */
-/**
- * Resolved EDGE_LOOP.
- *
- * @param id step id
- * @param name step label
- * @param edges oriented edges in loop order
- */
 public final class StepEdgeLoop implements StepLoop {
     private final int id;
     private final String name;

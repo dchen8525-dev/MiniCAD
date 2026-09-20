@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal application context.
- *
- * @param id STEP instance id
- * @param application application domain text
- */
 /**
  * Minimal application context.
  *

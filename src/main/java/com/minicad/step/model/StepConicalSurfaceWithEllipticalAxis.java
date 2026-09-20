@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CONICAL_SURFACE_WITH_ELLIPTICAL_AXIS.
- * A conical surface with an elliptical cross-section.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param position axis placement
- * @param semiAngle semi-angle of the cone
- * @param semiAxisA first semi-axis of the ellipse at base
- * @param semiAxisB second semi-axis of the ellipse at base
- */
 /**
  * Resolved CONICAL_SURFACE_WITH_ELLIPTICAL_AXIS.
  * A conical surface with an elliptical cross-section.

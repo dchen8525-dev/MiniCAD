@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved CSG_PRIMITIVE_3D.
- */
 /**
  * Resolved CSG_PRIMITIVE_3D.
  */

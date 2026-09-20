@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RULE_INSTANCE.
- * A rule instance entity.
- *
- * @param id STEP instance id
- * @param name rule instance name
- * @param ruleDefinition rule variance definition reference
- * @param ruleState rule variance state
- * @param ruleResult rule variance current result
- * @param ruleApplicationCount rule variance application count
- * @param ruleStatus rule variance status
- */
 /**
  * Resolved RULE_INSTANCE.
  * A rule instance entity.

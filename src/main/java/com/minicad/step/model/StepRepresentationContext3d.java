@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved REPRESENTATION_CONTEXT_3D.
- * A 3D representation context.
- */
 /**
  * Resolved REPRESENTATION_CONTEXT_3D.
  * A 3D representation context.

@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal EFFECTIVITY_RELATIONSHIP metadata.
- *
- * @param id STEP instance id
- * @param name relationship name
- * @param description relationship description
- * @param relatingEffectivity relating effectivity
- * @param relatedEffectivity related effectivity
- */
 /**
  * Minimal EFFECTIVITY_RELATIONSHIP metadata.
  *

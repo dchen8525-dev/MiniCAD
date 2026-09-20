@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INTEGRATION_DEFINITION.
- * An integration definition entity.
- *
- * @param id STEP instance id
- * @param name integration name
- * @param integrationType integration variance type
- * @param integrationSource integration variance source system
- * @param integrationTarget integration variance target system
- * @param integrationProtocol integration variance protocol
- * @param integrationParameters integration variance parameters
- * @param integrationStatus integration variance status
- */
 /**
  * Resolved INTEGRATION_DEFINITION.
  * An integration definition entity.

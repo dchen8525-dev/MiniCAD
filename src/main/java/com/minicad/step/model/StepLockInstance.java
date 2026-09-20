@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LOCK_INSTANCE.
- * A lock instance entity.
- *
- * @param id STEP instance id
- * @param name lock instance name
- * @param lockDefinition lock variance definition reference
- * @param lockState lock variance state
- * @param lockHolder lock variance holder reference
- * @param lockAcquiredTime lock variance acquired time
- * @param lockStatus lock variance status
- */
 /**
  * Resolved LOCK_INSTANCE.
  * A lock instance entity.

@@ -9,12 +9,6 @@ import java.util.Objects;
  * @param x x coordinate
  * @param y y coordinate
  */
-/**
- * Immutable 2D point.
- *
- * @param x x coordinate
- * @param y y coordinate
- */
 public final class Point2 {
     private final double x;
     private final double y;

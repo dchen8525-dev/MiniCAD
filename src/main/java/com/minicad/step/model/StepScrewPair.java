@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SCREW_PAIR.
- * A screw kinematic pair coupling rotation and translation along a helical path.
- */
 /**
  * Resolved SCREW_PAIR.
  * A screw kinematic pair coupling rotation and translation along a helical path.

@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CHAMFER_DEFINITION.
- * A chamfer definition entity.
- *
- * @param id STEP instance id
- * @param name chamfer name
- * @param edges edges being chamfered
- * @param angle chamfer angle
- * @param width chamfer width
- */
 /**
  * Resolved CHAMFER_DEFINITION.
  * A chamfer definition entity.

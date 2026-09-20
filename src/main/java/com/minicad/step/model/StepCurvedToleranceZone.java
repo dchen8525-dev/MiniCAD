@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CURVED_TOLERANCE_ZONE.
- * A curved tolerance zone definition.
- *
- * @param id STEP instance id
- * @param name zone name
- * @param definingTolerance the geometric tolerance defining this zone
- * @param zoneForm the form of the tolerance zone
- * @param zoneCurve the curve defining the tolerance zone shape
- */
 /**
  * Resolved CURVED_TOLERANCE_ZONE.
  * A curved tolerance zone definition.

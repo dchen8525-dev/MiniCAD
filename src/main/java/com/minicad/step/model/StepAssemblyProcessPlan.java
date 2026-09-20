@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ASSEMBLY_PROCESS_PLAN.
- * An assembly process plan representation entity.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param items representation items (assembly steps)
- * @param context representation context
- * @param assemblySequence assembly sequence operations
- */
 /**
  * Resolved ASSEMBLY_PROCESS_PLAN.
  * An assembly process plan representation entity.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SHAFT_FEATURE.
- * A shaft feature entity.
- *
- * @param id STEP instance id
- * @param name shaft name
- * @param shaftDiameter shaft diameter
- * @param shaftLength shaft length
- * @param shaftType shaft type classification (solid, hollow, stepped)
- * @param features features on the shaft (keyways, threads, grooves)
- * @param shaftMaterial shaft material specification
- * @param surfaceTreatment surface treatment specification
- */
 /**
  * Resolved SHAFT_FEATURE.
  * A shaft feature entity.

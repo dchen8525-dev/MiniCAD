@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved MAKE_FROM_BUILD_ASSEMBLY.
- * Manufacturing assembly definition.
- */
 /**
  * Resolved MAKE_FROM_BUILD_ASSEMBLY.
  * Manufacturing assembly definition.

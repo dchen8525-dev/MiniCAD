@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal COORDINATED_UNIVERSAL_TIME_OFFSET metadata.
- *
- * @param id STEP instance id
- * @param hourOffset hour offset from UTC
- * @param minuteOffset optional minute offset from UTC
- * @param sense offset direction enumeration
- */
 /**
  * Minimal COORDINATED_UNIVERSAL_TIME_OFFSET metadata.
  *

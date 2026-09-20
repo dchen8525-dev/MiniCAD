@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SEQUENCE_DEFINITION.
- * A sequence definition entity.
- *
- * @param id STEP instance id
- * @param name sequence name
- * @param sequenceType sequence variance type
- * @param sequenceItems sequence variance item definitions
- * @param sequenceOrder sequence variance ordering policy
- * @param sequenceStatus sequence variance status
- */
 /**
  * Resolved SEQUENCE_DEFINITION.
  * A sequence definition entity.

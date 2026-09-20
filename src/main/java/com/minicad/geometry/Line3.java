@@ -12,13 +12,6 @@ import java.util.Objects;
  * @param direction unit direction of the line
  * @param parameterScale world-space distance covered by one unit of line parameter
  */
-/**
- * Infinite 3D line defined by an origin and a unit direction.
- *
- * @param origin point on the line
- * @param direction unit direction of the line
- * @param parameterScale world-space distance covered by one unit of line parameter
- */
 public final class Line3 implements Curve3 {
     private final CartesianPoint origin;
     private final Direction3 direction;

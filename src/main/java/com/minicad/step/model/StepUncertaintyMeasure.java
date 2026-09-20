@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved UNCERTAINTY_MEASURE.
- * An uncertainty measure with unit.
- */
 /**
  * Resolved UNCERTAINTY_MEASURE.
  * An uncertainty measure with unit.

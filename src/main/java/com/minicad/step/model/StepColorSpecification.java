@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved COLOR_SPECIFICATION.
- * A color specification with RGB or named values.
- *
- * @param id STEP instance id
- * @param name color name
- * @param red red component (0-1)
- * @param green green component (0-1)
- * @param blue blue component (0-1)
- */
 /**
  * Resolved COLOR_SPECIFICATION.
  * A color specification with RGB or named values.

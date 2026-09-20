@@ -1,24 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INSPECTION_REPORT.
- * An inspection report entity.
- *
- * @param id STEP instance id
- * @param name report name
- * @param reportId report identifier
- * @param inspectionType inspection type (dimensional, visual, functional)
- * @varianceItems inspected variance items
- * @varianceResults inspection variance results
- * @varianceDefects found variance defects
- * @param inspectionDate inspection date
- * @param inspector inspector reference
- * @param reportStatus report status
- */
 /**
  * Resolved INSPECTION_REPORT.
  * An inspection report entity.

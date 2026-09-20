@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal context-dependent shape representation link used for assembly occurrences.
- *
- * @param id STEP instance id
- * @param representationRelationship linked representation relationship entity
- * @param representedProductRelation linked product definition relationship or shape
- */
 /**
  * Minimal context-dependent shape representation link used for assembly occurrences.
  *

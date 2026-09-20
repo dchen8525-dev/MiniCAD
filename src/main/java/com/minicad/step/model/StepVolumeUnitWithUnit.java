@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved VOLUME_UNIT_WITH_UNIT.
- */
 /**
  * Resolved VOLUME_UNIT_WITH_UNIT.
  */

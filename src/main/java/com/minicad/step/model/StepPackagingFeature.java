@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PACKAGING_FEATURE.
- * A packaging feature entity.
- *
- * @param id STEP instance id
- * @param name packaging name
- * @param packagingType packaging type (box, pallet, crate)
- * @param packagingGeometry packaging geometry representation
- * @param packagingMaterial packaging material specification
- * @param packagingWeight packaging weight
- * @param packagingDimensions packaging dimensions (L, W, H)
- * @param packagingStandard packaging standard reference
- */
 /**
  * Resolved PACKAGING_FEATURE.
  * A packaging feature entity.

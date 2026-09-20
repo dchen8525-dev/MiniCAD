@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SHAPE_DIMENSION_REPRESENTATION.
- * A representation of dimensional information for a shape.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param items dimension items
- * @param context representation context
- */
 /**
  * Resolved SHAPE_DIMENSION_REPRESENTATION.
  * A representation of dimensional information for a shape.

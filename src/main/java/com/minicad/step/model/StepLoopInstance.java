@@ -1,19 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved LOOP_INSTANCE.
- * A loop instance entity.
- *
- * @param id STEP instance id
- * @param name loop instance name
- * @param loopDefinition loop variance definition reference
- * @param loopState loop variance state
- * @param loopIteration loop variance current iteration
- * @param loopCompleted loop variance completed flag
- * @param loopStatus loop variance status
- */
 /**
  * Resolved LOOP_INSTANCE.
  * A loop instance entity.

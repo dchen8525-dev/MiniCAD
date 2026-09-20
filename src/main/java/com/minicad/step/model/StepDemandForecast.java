@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DEMAND_FORECAST.
- * A demand forecast entity.
- *
- * @param id STEP instance id
- * @param name forecast name
- * @varianceProducts forecast variance products
- * @varianceForecast forecast variance quantities by period
- * @varianceHistory historical variance data
- * @varianceMethod forecast variance method
- * @varianceAccuracy forecast variance accuracy
- * @varianceStatus forecast variance status
- */
 /**
  * Resolved DEMAND_FORECAST.
  * A demand forecast entity.

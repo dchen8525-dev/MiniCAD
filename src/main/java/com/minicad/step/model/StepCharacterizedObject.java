@@ -10,14 +10,6 @@ import java.util.Objects;
  * @param description object description
  * @param entityName concrete STEP entity name
  */
-/**
- * Minimal CHARACTERIZED_OBJECT/FEATURE_DEFINITION metadata.
- *
- * @param id STEP instance id
- * @param name object name
- * @param description object description
- * @param entityName concrete STEP entity name
- */
 public final class StepCharacterizedObject implements StepEntity {
     private final int id;
     private final String name;

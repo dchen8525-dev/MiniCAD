@@ -14,12 +14,6 @@ import java.util.Objects;
  * @param outerShell outer closed shell
  * @param voidShells inner closed void shells
  */
-/**
- * Minimal solid wrapping a closed shell.
- *
- * @param outerShell outer closed shell
- * @param voidShells inner closed void shells
- */
 public final class Solid {
     private final Shell outerShell;
     private final List<Shell> voidShells;

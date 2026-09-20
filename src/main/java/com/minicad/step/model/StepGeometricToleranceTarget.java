@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved GEOMETRIC_TOLERANCE_TARGET.
- * Specifies the target of a geometric tolerance application.
- */
 /**
  * Resolved GEOMETRIC_TOLERANCE_TARGET.
  * Specifies the target of a geometric tolerance application.

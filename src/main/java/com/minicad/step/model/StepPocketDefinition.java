@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved POCKET_DEFINITION.
- * A pocket definition entity.
- *
- * @param id STEP instance id
- * @param name pocket name
- * @param profile profile definition
- * @param depth pocket depth
- * @param direction pocket direction
- * @param floorType floor type
- */
 /**
  * Resolved POCKET_DEFINITION.
  * A pocket definition entity.

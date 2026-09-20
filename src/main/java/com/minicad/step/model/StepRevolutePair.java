@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved REVOLUTE_PAIR.
- * A revolute (hinge) kinematic pair allowing rotation about one axis.
- */
 /**
  * Resolved REVOLUTE_PAIR.
  * A revolute (hinge) kinematic pair allowing rotation about one axis.

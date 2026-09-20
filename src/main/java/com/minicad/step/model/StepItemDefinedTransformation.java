@@ -1,18 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepAxis2Placement3D;
 import java.util.Objects;
-/**
- * Minimal item-defined transformation between two placement items.
- *
- * @param id STEP instance id
- * @param name transformation name
- * @param description optional description
- * @param transformItem1 source placement item
- * @param transformItem2 target placement item
- */
 /**
  * Minimal item-defined transformation between two placement items.
  *

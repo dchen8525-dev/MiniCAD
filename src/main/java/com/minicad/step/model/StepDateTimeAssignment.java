@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal DATE_TIME_ASSIGNMENT metadata.
- *
- * @param id STEP instance id
- * @param assignedDateAndTime assigned timestamp
- * @param role assignment role
- */
 /**
  * Minimal DATE_TIME_ASSIGNMENT metadata.
  *

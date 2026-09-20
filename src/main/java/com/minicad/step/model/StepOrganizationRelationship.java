@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal ORGANIZATION_RELATIONSHIP metadata.
- *
- * @param id STEP instance id
- * @param name relationship name
- * @param description relationship description
- * @param relatingOrganization source organization
- * @param relatedOrganization target organization
- */
 /**
  * Minimal ORGANIZATION_RELATIONSHIP metadata.
  *

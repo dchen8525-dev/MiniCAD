@@ -16,14 +16,6 @@ import java.util.Objects;
  * @param semiAxisA semi-major axis (transverse axis)
  * @param semiAxisB semi-minor axis (conjugate axis)
  */
-/**
- * Minimal 3D hyperbola representation.
- * A hyperbola is a conic section defined by two semi-axes.
- *
- * @param position hyperbola placement (center at origin, transverse axis along local X)
- * @param semiAxisA semi-major axis (transverse axis)
- * @param semiAxisB semi-minor axis (conjugate axis)
- */
 public final class Hyperbola3 implements Curve3 {
     private final Axis2Placement3D position;
     private final double semiAxisA;

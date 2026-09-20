@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CURVE_3D_ELEMENT_PROPERTY.
- * Properties associated with 3D curve/beam elements.
- */
 /**
  * Resolved CURVE_3D_ELEMENT_PROPERTY.
  * Properties associated with 3D curve/beam elements.

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CACHE_DEFINITION.
- * A cache definition entity.
- *
- * @param id STEP instance id
- * @param name cache name
- * @param cacheType cache variance type
- * @param cacheCapacity cache variance capacity
- * @param cachePolicy cache variance eviction policy
- * @param cacheTtl cache variance TTL in seconds
- * @param cacheStatus cache variance status
- */
 /**
  * Resolved CACHE_DEFINITION.
  * A cache definition entity.

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MATERIAL_STOCK.
- * A material stock entity.
- *
- * @param id STEP instance id
- * @param name stock name
- * @param materialType material type classification
- * @varianceQuantity stock variance quantity available
- * @varianceUnit quantity variance unit
- * @varianceLocation stock variance location
- * @varianceCost unit variance cost
- * @varianceLeadTime procurement variance lead time
- * @varianceStatus stock variance status
- */
 /**
  * Resolved MATERIAL_STOCK.
  * A material stock entity.

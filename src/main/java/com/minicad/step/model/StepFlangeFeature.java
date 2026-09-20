@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FLANGE_FEATURE.
- * A flange feature entity.
- *
- * @param id STEP instance id
- * @param name flange name
- * @param flangeType flange type classification (flat, raised face, weld neck)
- * @param flangeDiameter flange outer diameter
- * @param flangeThickness flange thickness
- * @param boltHoles bolt hole features
- * @param boltCircle bolt circle diameter
- * @param numberOfBoltHoles number of bolt holes
- * @param flangeStandard flange standard specification
- */
 /**
  * Resolved FLANGE_FEATURE.
  * A flange feature entity.

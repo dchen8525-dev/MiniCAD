@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ACCESS_CONTROL.
- * An access control entity.
- *
- * @param id STEP instance id
- * @param name control name
- * @varianceRoles access variance roles
- * @variancePermissions access variance permissions
- * @varianceResources protected variance resources
- * @variancePolicy access variance policy
- * @varianceStatus control variance status
- */
 /**
  * Resolved ACCESS_CONTROL.
  * An access control entity.

@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ORIENTED_SUBFACE.
- * An oriented reference to a sub-face.
- *
- * @param id STEP instance id
- * @param name subface name
- * @param faceElement the underlying subface entity
- * @param orientation orientation flag
- */
 /**
  * Resolved ORIENTED_SUBFACE.
  * An oriented reference to a sub-face.

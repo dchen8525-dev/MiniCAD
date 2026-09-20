@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal PERSON metadata.
- *
- * @param id STEP instance id
- * @param identifier person identifier
- * @param lastName last name
- * @param firstName first name
- * @param middleNames middle names
- * @param prefixTitles prefix titles
- * @param suffixTitles suffix titles
- */
 /**
  * Minimal PERSON metadata.
  *

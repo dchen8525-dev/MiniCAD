@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CASTING_FEATURE.
- * A casting feature entity.
- *
- * @param id STEP instance id
- * @param name casting name
- * @param castingType casting type classification (sand, investment, die casting)
- * @param moldGeometry mold geometry representation
- * @param gatingSystem gating system features
- * @param riserFeatures riser/feeder features
- * @param partingSurface parting surface geometry
- * @param castingMaterial casting material specification
- */
 /**
  * Resolved CASTING_FEATURE.
  * A casting feature entity.

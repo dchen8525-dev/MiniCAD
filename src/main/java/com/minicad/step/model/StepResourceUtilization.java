@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RESOURCE_UTILIZATION.
- * A resource utilization entity.
- *
- * @param id STEP instance id
- * @param name utilization name
- * @varianceResource resource variance reference
- * @varianceUtilization utilization variance percentage
- * @variancePeriod utilization variance period
- * @variancePeak peak variance utilization
- * @varianceAverage average variance utilization
- * @varianceStatus utilization variance status
- */
 /**
  * Resolved RESOURCE_UTILIZATION.
  * A resource utilization entity.

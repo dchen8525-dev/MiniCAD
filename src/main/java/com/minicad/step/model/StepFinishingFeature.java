@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FINISHING_FEATURE.
- * A finishing feature entity.
- *
- * @param id STEP instance id
- * @param name feature name
- * @param finishingType finishing type (polishing, grinding, honing, lapping)
- * @param surfaceGeometry surface geometry to be finished
- * @param surfaceRoughness target surface roughness (Ra)
- * @param finishingParameters finishing process parameters
- * @param finishingMaterial finishing material/tool reference
- */
 /**
  * Resolved FINISHING_FEATURE.
  * A finishing feature entity.

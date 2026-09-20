@@ -14,13 +14,6 @@ import java.util.Objects;
  * @param semiAxis1 semi-axis along local X
  * @param semiAxis2 semi-axis along local Y
  */
-/**
- * Minimal 3D ellipse representation.
- *
- * @param position ellipse placement
- * @param semiAxis1 semi-axis along local X
- * @param semiAxis2 semi-axis along local Y
- */
 public final class Ellipse3 implements Curve3 {
     private final Axis2Placement3D position;
     private final double semiAxis1;

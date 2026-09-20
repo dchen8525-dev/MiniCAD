@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RESTORE_RECORD.
- * A restore record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceData restored variance data
- * @varianceSource restore variance source/backup
- * @varianceDate restore variance date
- * @varianceVerified verification variance status
- * @varianceStatus record variance status
- */
 /**
  * Resolved RESTORE_RECORD.
  * A restore record entity.

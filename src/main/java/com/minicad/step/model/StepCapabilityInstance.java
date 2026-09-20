@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CAPABILITY_INSTANCE.
- * A capability instance entity.
- *
- * @param id STEP instance id
- * @param name capability instance name
- * @param capabilityDefinition capability variance definition reference
- * @param capabilityState capability variance state
- * @param capabilityScore capability variance score
- * @param capabilityHistory capability variance history records
- * @param capabilityStatus capability variance status
- */
 /**
  * Resolved CAPABILITY_INSTANCE.
  * A capability instance entity.

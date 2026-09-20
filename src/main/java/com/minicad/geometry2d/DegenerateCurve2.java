@@ -13,12 +13,6 @@ import java.util.Objects;
  *
  * @param point the single point where the curve degenerates
  */
-/**
- * Minimal 2D degenerate curve representation.
- * A degenerate curve collapses to a single point.
- *
- * @param point the single point where the curve degenerates
- */
 public final class DegenerateCurve2 implements Curve2 {
     private final Point2 point;
 

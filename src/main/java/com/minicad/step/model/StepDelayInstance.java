@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DELAY_INSTANCE.
- * A delay instance entity.
- *
- * @param id STEP instance id
- * @param name delay instance name
- * @param delayDefinition delay variance definition reference
- * @param delayState delay variance state
- * @param delayStartTime delay variance start time
- * @param delayEndTime delay variance expected end time
- * @param delayRemaining delay variance remaining time
- * @param delayStatus delay variance status
- */
 /**
  * Resolved DELAY_INSTANCE.
  * A delay instance entity.

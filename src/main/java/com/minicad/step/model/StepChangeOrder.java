@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CHANGE_ORDER.
- * A change order entity.
- *
- * @param id STEP instance id
- * @param name order name
- * @param orderNumber change order number
- * @param changeRequest reference change request
- * @param affectedItems items affected by change order
- * @param orderStatus order status (issued, implemented, closed)
- * @varianceDate variance/implementation date
- * @param orderApprover order approver reference
- * @param implementationPlan implementation plan reference
- */
 /**
  * Resolved CHANGE_ORDER.
  * A change order entity.

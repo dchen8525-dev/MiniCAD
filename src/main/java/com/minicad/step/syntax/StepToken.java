@@ -9,13 +9,6 @@ import java.util.Objects;
  * @param text source text for the token
  * @param position zero-based character position
  */
-/**
- * Single token produced by the minimal STEP tokenizer.
- *
- * @param type token kind
- * @param text source text for the token
- * @param position zero-based character position
- */
 public final class StepToken {
     private final StepTokenType type;
     private final String text;

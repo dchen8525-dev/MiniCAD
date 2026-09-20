@@ -28,14 +28,6 @@ import java.util.function.Predicate;
  * @param curve underlying curve geometry
  * @param sameSense whether the topological direction matches the curve direction
  */
-/**
- * Minimal topological edge backed by a supported 3D curve.
- *
- * @param start start vertex
- * @param end end vertex
- * @param curve underlying curve geometry
- * @param sameSense whether the topological direction matches the curve direction
- */
 public final class Edge {
     private final Vertex start;
     private final Vertex end;

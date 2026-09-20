@@ -11,12 +11,6 @@ import java.util.Objects;
  * @param origin point on the plane
  * @param normal unit plane normal
  */
-/**
- * Infinite 3D plane defined by a point and a unit normal.
- *
- * @param origin point on the plane
- * @param normal unit plane normal
- */
 public final class Plane implements SurfaceGeometry {
     private final CartesianPoint origin;
     private final Direction3 normal;

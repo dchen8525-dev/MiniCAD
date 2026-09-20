@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INSPECTION_RESULT.
- * An inspection result entity.
- *
- * @param id STEP instance id
- * @param name result name
- * @param inspectionItem inspected item reference
- * @param measuredValues measured values
- * @param nominalValues nominal values
- * @param deviationValues deviation from nominal
- * @param passFailStatus pass/fail status for each check
- * @param inspector inspector person/organization
- * @param inspectionDate date of inspection
- */
 /**
  * Resolved INSPECTION_RESULT.
  * An inspection result entity.

@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TOOLPATH_SPEED_PROFILE.
- * A toolpath speed profile representation entity.
- *
- * @param id STEP instance id
- * @param name profile name
- * @param speedValues speed values along the toolpath
- * @param feedValues feed values along the toolpath
- * @param positionPoints position points for profile values
- */
 /**
  * Resolved TOOLPATH_SPEED_PROFILE.
  * A toolpath speed profile representation entity.

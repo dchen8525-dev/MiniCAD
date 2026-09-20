@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DRAWING_REFERENCE.
- * A drawing reference entity.
- *
- * @param id STEP instance id
- * @param name reference name
- * @param drawingId drawing identifier/number
- * @param drawingType drawing type (assembly, detail, schematic)
- * @param drawingRevision drawing revision
- * @param drawingScale drawing scale factor
- * @param drawingStatus drawing status
- * @param drawingAuthor drawing author reference
- */
 /**
  * Resolved DRAWING_REFERENCE.
  * A drawing reference entity.

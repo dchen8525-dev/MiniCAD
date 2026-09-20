@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal APPLIED_LANGUAGE_ASSIGNMENT metadata.
- *
- * @param id STEP instance id
- * @param assignedLanguage assigned language
- * @param items assigned target items
- */
 /**
  * Minimal APPLIED_LANGUAGE_ASSIGNMENT metadata.
  *

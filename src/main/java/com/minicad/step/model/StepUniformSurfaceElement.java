@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved UNIFORM_SURFACE_ELEMENT.
- * A uniform surface finite element.
- */
 /**
  * Resolved UNIFORM_SURFACE_ELEMENT.
  * A uniform surface finite element.

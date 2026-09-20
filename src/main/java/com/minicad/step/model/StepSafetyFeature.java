@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SAFETY_FEATURE.
- * A safety feature entity.
- *
- * @param id STEP instance id
- * @param name safety name
- * @param safetyType safety type (guard, interlock, emergency stop, warning)
- * @param safetyGeometry safety geometry representation
- * @param safetyZone safety zone specification
- * @param safetyClass safety classification level
- * @param safetyStandard safety standard reference
- */
 /**
  * Resolved SAFETY_FEATURE.
  * A safety feature entity.

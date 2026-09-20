@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DESIGN_VALIDATION.
- * A design validation entity.
- *
- * @param id STEP instance id
- * @param name validation name
- * @param validationType validation type (analysis, test, inspection)
- * @param validationCriteria validation criteria reference
- * @param validationResults validation results
- * @param validationStatus validation status (passed, failed, pending)
- * @param validationDate validation execution date
- * @param validationReport validation report reference
- */
 /**
  * Resolved DESIGN_VALIDATION.
  * A design validation entity.

@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SURFACE_OF_LINEAR_EXTRUSION.
- *
- * @param id step id
- * @param name step label
- * @param sweptCurve directrix curve
- * @param extrusionAxis extrusion vector
- */
 /**
  * Resolved SURFACE_OF_LINEAR_EXTRUSION.
  *

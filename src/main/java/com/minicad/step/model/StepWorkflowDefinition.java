@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WORKFLOW_DEFINITION.
- * A workflow definition entity.
- *
- * @param id STEP instance id
- * @param name workflow name
- * @param workflowType workflow variance type
- * @param workflowSteps workflow variance steps
- * @param workflowConditions workflow variance conditions
- * @param workflowRules workflow variance rules
- * @param workflowStatus workflow variance status
- */
 /**
  * Resolved WORKFLOW_DEFINITION.
  * A workflow definition entity.

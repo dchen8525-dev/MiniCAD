@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved STRUCT_ANALYSIS_MODEL.
- * A structural analysis model (AP209).
- */
 /**
  * Resolved STRUCT_ANALYSIS_MODEL.
  * A structural analysis model (AP209).

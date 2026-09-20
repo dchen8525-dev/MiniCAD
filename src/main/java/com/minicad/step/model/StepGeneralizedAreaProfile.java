@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved GENERALIZED_AREA_PROFILE.
- */
 /**
  * Resolved GENERALIZED_AREA_PROFILE.
  */

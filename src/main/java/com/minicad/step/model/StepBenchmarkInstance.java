@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BENCHMARK_INSTANCE.
- * A benchmark instance entity.
- *
- * @param id STEP instance id
- * @param name benchmark instance name
- * @param benchmarkDefinition benchmark variance definition reference
- * @param benchmarkValues benchmark variance measured values
- * @param benchmarkScore benchmark variance score/rating
- * @param benchmarkStatus benchmark variance status
- */
 /**
  * Resolved BENCHMARK_INSTANCE.
  * A benchmark instance entity.

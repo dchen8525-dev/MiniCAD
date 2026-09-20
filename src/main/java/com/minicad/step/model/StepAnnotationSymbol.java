@@ -1,17 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepSymbolRepresentationMap;
 import java.util.Objects;
-/**
- * Minimal ANNOTATION_SYMBOL.
- *
- * @param id STEP instance id
- * @param name symbol name
- * @param mappingSource symbol representation map
- * @param mappingTarget placement target
- */
 /**
  * Minimal ANNOTATION_SYMBOL.
  *

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WAIT_DEFINITION.
- * A wait definition entity.
- *
- * @param id STEP instance id
- * @param name wait name
- * @param waitType wait variance type
- * @param waitCondition wait variance condition
- * @param waitTimeout wait variance timeout
- * @param waitAction wait variance action on timeout
- * @param waitStatus wait variance status
- */
 /**
  * Resolved WAIT_DEFINITION.
  * A wait definition entity.

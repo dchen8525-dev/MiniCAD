@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved SURFACE_ELEMENT.
- * A 2D surface finite element.
- */
 /**
  * Resolved SURFACE_ELEMENT.
  * A 2D surface finite element.

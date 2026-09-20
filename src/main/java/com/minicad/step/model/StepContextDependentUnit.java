@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal context-dependent unit definition.
- *
- * @param id STEP instance id
- * @param name unit label
- * @param unitKind derived unit kind such as LENGTH_UNIT
- */
 /**
  * Minimal context-dependent unit definition.
  *

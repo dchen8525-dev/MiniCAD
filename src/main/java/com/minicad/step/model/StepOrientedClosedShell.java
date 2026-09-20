@@ -1,21 +1,11 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.minicad.step.model.StepFaceEntity;
 import java.util.Objects;
 
-/**
- * Resolved ORIENTED_CLOSED_SHELL.
- *
- * @param id STEP id
- * @param name STEP label
- * @param closedShellElement referenced base closed shell
- * @param orientation orientation flag
- */
 /**
  * Resolved ORIENTED_CLOSED_SHELL.
  *

@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MARKING.
- * Represents a marking feature in manufacturing (etching, engraving).
- *
- * @param id STEP instance id
- * @param name marking name
- * @param profile profile definition (text, symbol, etc)
- * @param depth marking depth
- * @param direction marking direction
- */
 /**
  * Resolved MARKING.
  * Represents a marking feature in manufacturing (etching, engraving).

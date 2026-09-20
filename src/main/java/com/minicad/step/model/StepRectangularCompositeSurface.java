@@ -1,19 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved RECTANGULAR_COMPOSITE_SURFACE.
- * A composite surface formed by combining rectangular surface patches.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param parentSurface the parent surface
- * @param u1 first u parameter boundary
- * @param u2 second u parameter boundary
- * @param v1 first v parameter boundary
- * @param v2 second v parameter boundary
- */
 /**
  * Resolved RECTANGULAR_COMPOSITE_SURFACE.
  * A composite surface formed by combining rectangular surface patches.

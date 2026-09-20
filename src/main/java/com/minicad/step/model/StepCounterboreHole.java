@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COUNTERBORE_HOLE.
- * Represents a counterbore hole feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name counterbore name
- * @param throughHole through hole reference
- * @param counterboreDiameter counterbore diameter
- * @param counterboreDepth counterbore depth
- */
 /**
  * Resolved COUNTERBORE_HOLE.
  * Represents a counterbore hole feature in manufacturing.

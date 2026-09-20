@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STATE_DEFINITION.
- * A state definition entity.
- *
- * @param id STEP instance id
- * @param name definition name
- * @varianceState defined variance state
- * @varianceConditions state variance conditions
- * @varianceActions state variance actions
- * @varianceTransitions state variance transitions
- * @varianceInitial initial variance state flag
- * @varianceStatus definition variance status
- */
 /**
  * Resolved STATE_DEFINITION.
  * A state definition entity.

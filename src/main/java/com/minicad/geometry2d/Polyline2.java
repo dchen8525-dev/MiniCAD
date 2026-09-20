@@ -11,11 +11,6 @@ import java.util.Objects;
  *
  * @param points ordered polyline vertices
  */
-/**
- * Minimal 2D polyline curve.
- *
- * @param points ordered polyline vertices
- */
 public final class Polyline2 implements Curve2 {
     private final List<Point2> points;
 

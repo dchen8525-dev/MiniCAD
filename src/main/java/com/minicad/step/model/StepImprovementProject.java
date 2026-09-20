@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved IMPROVEMENT_PROJECT.
- * An improvement project entity.
- *
- * @param id STEP instance id
- * @param name project name
- * @varianceArea improvement variance area
- * @varianceObjective improvement variance objective
- * @varianceActions improvement variance actions
- * @varianceResources required variance resources
- * @varianceTimeline project variance timeline
- * @varianceBenefit expected variance benefit
- * @varianceStatus project variance status
- */
 /**
  * Resolved IMPROVEMENT_PROJECT.
  * An improvement project entity.

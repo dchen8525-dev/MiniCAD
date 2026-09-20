@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SCHEDULER_INSTANCE.
- * A scheduler instance entity.
- *
- * @param id STEP instance id
- * @param name scheduler instance name
- * @param schedulerDefinition scheduler variance definition reference
- * @param schedulerState scheduler variance state
- * @param schedulerActiveJobs scheduler variance active job count
- * @param schedulerPendingJobs scheduler variance pending job count
- * @param schedulerCompletedJobs scheduler variance completed job count
- * @param schedulerStatus scheduler variance status
- */
 /**
  * Resolved SCHEDULER_INSTANCE.
  * A scheduler instance entity.

@@ -1,12 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INDEXED_POLY_CURVE / INDEXED_POLYCURVE (MiniCAD alias).
- */
 /**
  * Resolved INDEXED_POLY_CURVE / INDEXED_POLYCURVE (MiniCAD alias).
  */

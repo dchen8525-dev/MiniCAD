@@ -1,18 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepConnectedEdgeSet;
 import java.util.Objects;
 
-/**
- * Resolved EDGE_BASED_WIREFRAME_MODEL.
- *
- * @param id STEP id
- * @param name STEP label
- * @param boundaries connected edge sets
- */
 /**
  * Resolved EDGE_BASED_WIREFRAME_MODEL.
  *

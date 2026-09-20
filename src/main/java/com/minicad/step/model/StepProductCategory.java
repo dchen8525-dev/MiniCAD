@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal PRODUCT_CATEGORY metadata.
- *
- * @param id STEP instance id
- * @param name category name
- * @param description category description
- */
 /**
  * Minimal PRODUCT_CATEGORY metadata.
  *

@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal shape aspect relationship.
- *
- * @param id STEP instance id
- * @param name relationship name
- * @param description relationship description
- * @param relatingShapeAspect source shape aspect (or subtype)
- * @param relatedShapeAspect target shape aspect (or subtype)
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal shape aspect relationship.
  *

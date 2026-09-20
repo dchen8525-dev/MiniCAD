@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ACTUATED_KINEMATIC_PAIR.
- * A kinematic pair with an actuator providing driven motion.
- */
 /**
  * Resolved ACTUATED_KINEMATIC_PAIR.
  * A kinematic pair with an actuator providing driven motion.

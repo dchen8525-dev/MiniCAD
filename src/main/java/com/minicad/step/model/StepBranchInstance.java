@@ -1,19 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved BRANCH_INSTANCE.
- * A branch instance entity.
- *
- * @param id STEP instance id
- * @param name branch instance name
- * @param branchDefinition branch variance definition reference
- * @param branchState branch variance state
- * @param branchResult branch variance result (true/false)
- * @param branchTakenPath branch variance taken path reference
- * @param branchStatus branch variance status
- */
 /**
  * Resolved BRANCH_INSTANCE.
  * A branch instance entity.

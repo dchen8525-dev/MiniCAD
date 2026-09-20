@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal POINT_STYLE.
- *
- * @param id STEP instance id
- * @param name style name
- * @param marker referenced point marker
- * @param markerSize marker size
- * @param colour referenced colour
- */
 /**
  * Minimal POINT_STYLE.
  *

@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STEP.
- * Represents a step feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name step name
- * @param profile profile definition
- * @param depth step depth
- * @param direction step direction
- */
 /**
  * Resolved STEP.
  * Represents a step feature in manufacturing.

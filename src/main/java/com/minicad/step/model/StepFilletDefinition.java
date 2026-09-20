@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FILLET_DEFINITION.
- * A fillet definition entity.
- *
- * @param id STEP instance id
- * @param name fillet name
- * @param edges edges being filleted
- * @param radius fillet radius
- */
 /**
  * Resolved FILLET_DEFINITION.
  * A fillet definition entity.

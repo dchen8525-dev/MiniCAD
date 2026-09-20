@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BEARING_FEATURE.
- * A bearing feature entity.
- *
- * @param id STEP instance id
- * @param name bearing name
- * @param bearingType bearing type classification (ball, roller, needle, plain)
- * @param boreDiameter bore (inner) diameter
- * @param outerDiameter outer diameter
- * @param bearingWidth bearing width
- * @param numberOfElements number of bearing elements (balls, rollers)
- * @param bearingStandard bearing standard specification
- * @param bearingPlacement bearing position placement
- */
 /**
  * Resolved BEARING_FEATURE.
  * A bearing feature entity.

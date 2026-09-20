@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LINEAR_DIMENSION_REPRESENTATION.
- * A linear dimension representation entity.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param items representation items
- * * @param context representation context
- * @param lengthValue length value
- * @param lengthUnit length unit
- */
 /**
  * Resolved LINEAR_DIMENSION_REPRESENTATION.
  * A linear dimension representation entity.

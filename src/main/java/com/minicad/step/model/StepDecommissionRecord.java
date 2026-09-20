@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DECOMMISSION_RECORD.
- * A decommission record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceEquipment decommissioned variance equipment
- * @varianceReason decommission variance reason
- * @varianceDate decommission variance date
- * @varianceDisposition disposition variance action
- * @varianceDocumentation documentation variance reference
- * @varianceStatus record variance status
- */
 /**
  * Resolved DECOMMISSION_RECORD.
  * A decommission record entity.

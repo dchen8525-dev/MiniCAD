@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved TOROIDAL_SURFACE_WITH_CYLINDRICAL_AXIS.
- * A toroidal surface where the axis is defined by a cylindrical axis placement.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param position axis placement
- * @param majorRadius major radius of the torus
- * @param minorRadius minor radius of the torus
- */
 /**
  * Resolved TOROIDAL_SURFACE_WITH_CYLINDRICAL_AXIS.
  * A toroidal surface where the axis is defined by a cylindrical axis placement.

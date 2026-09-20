@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SIGNAL_DEFINITION.
- * A signal definition entity.
- *
- * @param id STEP instance id
- * @param name definition name
- * @varianceSignal defined variance signal
- * @varianceType signal variance type (analog, digital, discrete)
- * @varianceRange signal variance range (min/max)
- * @varianceUnit signal variance unit
- * @varianceFrequency signal variance frequency
- * @varianceStatus definition variance status
- */
 /**
  * Resolved SIGNAL_DEFINITION.
  * A signal definition entity.

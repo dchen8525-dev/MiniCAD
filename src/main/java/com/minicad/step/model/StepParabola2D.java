@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved PARABOLA 2D.
- *
- * @param id step id
- * @param name step label
- * @param position placement of the parabola
- * @param focalDist focal distance of the parabola
- */
 /**
  * Resolved PARABOLA 2D.
  *

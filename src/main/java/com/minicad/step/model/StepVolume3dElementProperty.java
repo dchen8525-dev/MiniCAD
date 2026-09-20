@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved VOLUME_3D_ELEMENT_PROPERTY.
- * Properties associated with 3D volume elements (material, thickness, etc.).
- */
 /**
  * Resolved VOLUME_3D_ELEMENT_PROPERTY.
  * Properties associated with 3D volume elements (material, thickness, etc.).

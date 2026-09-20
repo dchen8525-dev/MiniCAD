@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SPOTFACE_HOLE_DEFINITION.
- * A spotface hole definition entity.
- *
- * @param id STEP instance id
- * @param name hole name
- * @param throughHoleReference reference to the through hole
- * @param spotfaceDiameter diameter of the spotface
- * @param spotfaceDepth depth of the spotface
- */
 /**
  * Resolved SPOTFACE_HOLE_DEFINITION.
  * A spotface hole definition entity.

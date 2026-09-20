@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PROTRUSION.
- * Represents a protrusion feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name protrusion name
- * @param profile profile definition
- * @param height protrusion height
- * @param direction protrusion direction
- * @param taperAngle optional taper angle
- */
 /**
  * Resolved PROTRUSION.
  * Represents a protrusion feature in manufacturing.

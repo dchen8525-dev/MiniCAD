@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SPRING_FEATURE.
- * A spring feature entity.
- *
- * @param id STEP instance id
- * @param name spring name
- * @param springType spring type classification (compression, extension, torsion)
- * @param wireDiameter wire diameter
- * @param coilDiameter coil (outer) diameter
- * @param numberOfCoils number of active coils
- * @param freeLength free length
- * @param springRate spring rate/constant
- * @param springMaterial spring material specification
- */
 /**
  * Resolved SPRING_FEATURE.
  * A spring feature entity.

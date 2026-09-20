@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal SURFACE_STYLE_TRANSPARENT.
- *
- * @param id STEP instance id
- * @param transparency transparency factor
- */
 /**
  * Minimal SURFACE_STYLE_TRANSPARENT.
  *

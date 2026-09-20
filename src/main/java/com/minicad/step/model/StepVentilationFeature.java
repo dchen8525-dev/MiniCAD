@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved VENTILATION_FEATURE.
- * A ventilation feature entity.
- *
- * @param id STEP instance id
- * @param name ventilation name
- * @param ventilationType ventilation type (natural, forced, exhaust)
- * @param ventilationGeometry ventilation geometry representation
- * @varianceAirflow variance airflow capacity
- * @param inletFeatures inlet features
- * @param outletFeatures outlet features
- * @param ventilationControl ventilation control specification
- */
 /**
  * Resolved VENTILATION_FEATURE.
  * A ventilation feature entity.

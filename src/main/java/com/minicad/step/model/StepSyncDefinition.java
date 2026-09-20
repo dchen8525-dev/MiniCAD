@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SYNC_DEFINITION.
- * A sync definition entity.
- *
- * @param id STEP instance id
- * @param name sync name
- * @param syncType sync variance type
- * @param syncDirection sync variance direction
- * @param syncInterval sync variance interval
- * @param syncConflictResolution sync variance conflict resolution policy
- * @param syncStatus sync variance status
- */
 /**
  * Resolved SYNC_DEFINITION.
  * A sync definition entity.

@@ -1,19 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepAxis2Placement2D;
 import java.util.Objects;
-/**
- * Resolved CENTERED_CIRCLE_PROFILE_DEF.
- * A circular profile with explicit center offset.
- *
- * @param id STEP instance id
- * @param name profile name
- * @param position placement for the profile
- * @param radius circle radius
- * @param centerOffset center offset distance
- */
 /**
  * Resolved CENTERED_CIRCLE_PROFILE_DEF.
  * A circular profile with explicit center offset.

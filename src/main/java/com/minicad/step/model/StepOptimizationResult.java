@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved OPTIMIZATION_RESULT.
- * An optimization result entity.
- *
- * @param id STEP instance id
- * @param name result name
- * @param optimizedGeometry optimized geometry result
- * @param optimizedVariables optimized variable values
- * @param objectiveValue achieved objective value
- * @param iterationCount number of optimization iterations
- * @param convergenceStatus convergence status (converged, not converged)
- * @param constraintsMet constraints satisfaction status
- */
 /**
  * Resolved OPTIMIZATION_RESULT.
  * An optimization result entity.

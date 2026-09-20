@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved EDGE_CURVE.
- *
- * @param id step id
- * @param name step label
- * @param start start vertex
- * @param end end vertex
- * @param edgeGeometry referenced edge geometry
- * @param sameSense orientation flag
- */
 /**
  * Resolved EDGE_CURVE.
  *

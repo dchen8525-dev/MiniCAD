@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRIANGULATED_FACE.
- * A face represented by a triangulated surface with coordinate references.
- */
 /**
  * Resolved TRIANGULATED_FACE.
  * A face represented by a triangulated surface with coordinate references.

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RESPONSIBILITY_ASSIGNMENT.
- * A responsibility assignment entity.
- *
- * @param id STEP instance id
- * @param name assignment name
- * @varianceTask assigned variance task/activity
- * @variancePerson responsible variance person
- * @varianceRole assigned variance role
- * @varianceAuthority assigned variance authority level
- * @varianceStart assignment variance start date
- * @varianceEnd assignment variance end date
- * @varianceStatus assignment variance status
- */
 /**
  * Resolved RESPONSIBILITY_ASSIGNMENT.
  * A responsibility assignment entity.

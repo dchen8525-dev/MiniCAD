@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CUTOUT.
- * Represents a cutout feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name cutout name
- * @param profile profile definition
- * @param depth cutout depth
- * @param direction cutout direction
- */
 /**
  * Resolved CUTOUT.
  * Represents a cutout feature in manufacturing.

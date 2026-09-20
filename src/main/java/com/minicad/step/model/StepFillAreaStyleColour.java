@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal fill area style colour.
- *
- * @param id STEP instance id
- * @param name style name
- * @param colour referenced colour
- */
 /**
  * Minimal fill area style colour.
  *

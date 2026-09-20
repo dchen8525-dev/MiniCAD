@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal draughting callout containing PMI text and optional leader geometry.
- *
- * @param id STEP instance id
- * @param name callout name
- * @param contents callout contents
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal draughting callout containing PMI text and optional leader geometry.
  *

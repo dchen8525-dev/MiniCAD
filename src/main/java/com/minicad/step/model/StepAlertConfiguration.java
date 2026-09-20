@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ALERT_CONFIGURATION.
- * An alert configuration entity.
- *
- * @param id STEP instance id
- * @param name configuration name
- * @varianceCondition alert variance condition
- * @varianceThreshold threshold variance value
- * @varianceActions alert variance actions
- * @varianceRecipients alert variance recipients
- * @varianceSeverity alert variance severity level
- * @varianceStatus configuration variance status
- */
 /**
  * Resolved ALERT_CONFIGURATION.
  * An alert configuration entity.

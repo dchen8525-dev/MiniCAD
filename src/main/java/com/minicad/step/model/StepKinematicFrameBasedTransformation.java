@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved KINEMATIC_FRAME_BASED_TRANSFORMATION.
- * A transformation defined by the relative positioning of kinematic frames.
- */
 /**
  * Resolved KINEMATIC_FRAME_BASED_TRANSFORMATION.
  * A transformation defined by the relative positioning of kinematic frames.

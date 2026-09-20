@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved NODE.
- * A finite element analysis node (grid point).
- */
 /**
  * Resolved NODE.
  * A finite element analysis node (grid point).

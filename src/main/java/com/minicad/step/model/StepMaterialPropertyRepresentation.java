@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MATERIAL_PROPERTY_REPRESENTATION.
- * A material property representation entity.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param propertyName property variance name
- * @param propertyValue property variance value
- * @param propertyUnit property variance unit reference
- * @param propertyStatus property variance status
- */
 /**
  * Resolved MATERIAL_PROPERTY_REPRESENTATION.
  * A material property representation entity.

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SURFACE_QUALITY.
- * A surface quality entity.
- *
- * @param id STEP instance id
- * @param name quality name
- * @param surface surface reference
- * @param roughnessValues surface roughness values (Ra, Rz, etc.)
- * @param qualityGrade quality grade classification
- * @param measurementMethod measurement method
- * @param direction measurement direction
- */
 /**
  * Resolved SURFACE_QUALITY.
  * A surface quality entity.

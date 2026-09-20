@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved OPTIMIZATION_CRITERIA.
- * An optimization criteria entity.
- *
- * @param id STEP instance id
- * @param name criteria name
- * @param objectiveType objective type (minimize, maximize)
- * @param objectiveVariable variable to optimize (weight, stress, displacement)
- * @param constraints optimization constraints
- * @param constraintValues constraint limit values
- * @param targetValue target objective value
- */
 /**
  * Resolved OPTIMIZATION_CRITERIA.
  * An optimization criteria entity.

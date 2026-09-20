@@ -9,12 +9,6 @@ import java.util.Objects;
  * @param name entry name
  * @param parameters entry parameters
  */
-/**
- * Raw header entry from the STEP HEADER section.
- *
- * @param name entry name
- * @param parameters entry parameters
- */
 public final class StepHeaderEntry {
     private final String name;
     private final List<StepValue> parameters;

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CALCULATION_RECORD.
- * A calculation record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @param calculationType calculation type (stress, deflection, thermal)
- * @param inputParameters calculation input parameters
- * @varianceResults calculation variance results
- * @param calculationMethod calculation method used
- * @varianceUnits calculation variance units
- * @varianceAssumptions calculation variance assumptions
- */
 /**
  * Resolved CALCULATION_RECORD.
  * A calculation record entity.

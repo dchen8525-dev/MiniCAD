@@ -1,18 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepOrientedEdge;
 import java.util.Objects;
 
-/**
- * Resolved OPEN_PATH.
- *
- * @param id STEP id
- * @param name STEP label
- * @param edges oriented edges in path order
- */
 /**
  * Resolved OPEN_PATH.
  *

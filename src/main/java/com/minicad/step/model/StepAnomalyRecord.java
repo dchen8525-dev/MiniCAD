@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ANOMALY_RECORD.
- * An anomaly record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceSystem affected variance system
- * @varianceType anomaly variance type
- * @varianceDetection detection variance method
- * @varianceDate anomaly variance date
- * @varianceInvestigation investigation variance result
- * @varianceAction action variance taken
- * @varianceStatus record variance status
- */
 /**
  * Resolved ANOMALY_RECORD.
  * An anomaly record entity.

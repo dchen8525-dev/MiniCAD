@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CHAMFER_EDGE.
- * A chamfer edge entity.
- *
- * @param id STEP instance id
- * @param name edge name
- * @param originalEdge original edge being chamfered
- * @param chamferAngle chamfer angle in degrees
- * @param chamferWidth chamfer width/distance
- * @param adjacentFaces adjacent faces for chamfer
- * @param chamferType chamfer type classification (symmetric, asymmetric)
- */
 /**
  * Resolved CHAMFER_EDGE.
  * A chamfer edge entity.

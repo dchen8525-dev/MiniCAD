@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DIMENSIONAL_LOCATION_WITH_PATH.
- * A dimensional location that includes a path definition for the measurement route.
- */
 /**
  * Resolved DIMENSIONAL_LOCATION_WITH_PATH.
  * A dimensional location that includes a path definition for the measurement route.

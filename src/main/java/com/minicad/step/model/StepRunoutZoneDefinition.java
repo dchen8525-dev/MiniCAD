@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved RUNOUT_ZONE_DEFINITION.
- * Defines the orientation and form of a runout tolerance zone.
- */
 /**
  * Resolved RUNOUT_ZONE_DEFINITION.
  * Defines the orientation and form of a runout tolerance zone.

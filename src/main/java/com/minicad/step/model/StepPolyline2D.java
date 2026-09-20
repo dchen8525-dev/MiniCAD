@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved POLYLINE_2D.
- *
- * @param id step id
- * @param name step label
- * @param points ordered list of points defining the polyline
- */
 /**
  * Resolved POLYLINE_2D.
  *

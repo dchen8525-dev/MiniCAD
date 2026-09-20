@@ -16,14 +16,6 @@ import java.util.Objects;
  * @param xAxisIntercept x-coordinate where the clothoid intersects the x-axis
  * @param curvature curvature parameter (rate of curvature change per unit length)
  */
-/**
- * Minimal 3D clothoid (Euler spiral / transition curve) representation.
- * The clothoid is defined by its curvature varying linearly with arc length.
- *
- * @param position clothoid placement (start point and local coordinate system)
- * @param xAxisIntercept x-coordinate where the clothoid intersects the x-axis
- * @param curvature curvature parameter (rate of curvature change per unit length)
- */
 public final class Clothoid3 implements Curve3 {
     private final Axis2Placement3D position;
     private final double xAxisIntercept;

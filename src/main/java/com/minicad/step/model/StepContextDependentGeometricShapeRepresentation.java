@@ -1,12 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONTEXT_DEPENDENT_GEOMETRIC_SHAPE_REPRESENTATION.
- */
 /**
  * Resolved CONTEXT_DEPENDENT_GEOMETRIC_SHAPE_REPRESENTATION.
  */

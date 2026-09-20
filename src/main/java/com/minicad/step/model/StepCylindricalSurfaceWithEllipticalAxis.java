@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CYLINDRICAL_SURFACE_WITH_ELLIPTICAL_AXIS.
- * A cylindrical surface with an elliptical cross-section.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param position axis placement
- * @param semiAxisA first semi-axis of the ellipse
- * @param semiAxisB second semi-axis of the ellipse
- */
 /**
  * Resolved CYLINDRICAL_SURFACE_WITH_ELLIPTICAL_AXIS.
  * A cylindrical surface with an elliptical cross-section.

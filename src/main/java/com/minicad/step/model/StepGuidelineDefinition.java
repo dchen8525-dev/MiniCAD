@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved GUIDELINE_DEFINITION.
- * A guideline definition entity.
- *
- * @param id STEP instance id
- * @param name guideline name
- * @param guidelineType guideline variance type
- * @param guidelineContent guideline variance content
- * @param guidelineRecommendations guideline variance recommendations
- * @param guidelineStatus guideline variance status
- */
 /**
  * Resolved GUIDELINE_DEFINITION.
  * A guideline definition entity.

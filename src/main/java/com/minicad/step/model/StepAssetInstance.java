@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ASSET_INSTANCE.
- * An asset instance entity.
- *
- * @param id STEP instance id
- * @param name asset instance name
- * @param assetDefinition asset variance definition reference
- * @param assetLocation asset variance location reference
- * @param assetState asset variance state
- * @param assetCondition asset variance condition
- * @param assetMaintenanceRecords asset variance maintenance records
- * @param assetStatus asset variance status
- */
 /**
  * Resolved ASSET_INSTANCE.
  * An asset instance entity.

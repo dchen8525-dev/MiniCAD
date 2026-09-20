@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FEATURE_PATTERN.
- * Represents a feature pattern definition in manufacturing.
- *
- * @param id STEP instance id
- * @param name pattern name
- * @param baseFeature base feature being patterned
- * @param patternType pattern type (linear, circular, mirror, etc)
- * @param parameters pattern parameters (spacing, count, angle, etc)
- */
 /**
  * Resolved FEATURE_PATTERN.
  * Represents a feature pattern definition in manufacturing.

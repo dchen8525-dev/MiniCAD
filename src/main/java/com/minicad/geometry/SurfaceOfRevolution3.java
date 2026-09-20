@@ -12,13 +12,6 @@ import java.util.Objects;
  * @param axisOrigin point on revolution axis
  * @param axisDirection revolution axis direction
  */
-/**
- * Minimal surface of revolution representation.
- *
- * @param sweptCurve generatrix curve
- * @param axisOrigin point on revolution axis
- * @param axisDirection revolution axis direction
- */
 public final class SurfaceOfRevolution3 implements SurfaceGeometry {
     private final Curve3 sweptCurve;
     private final CartesianPoint axisOrigin;

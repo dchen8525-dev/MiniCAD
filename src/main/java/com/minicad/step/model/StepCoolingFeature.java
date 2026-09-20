@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COOLING_FEATURE.
- * A cooling feature entity.
- *
- * @param id STEP instance id
- * @param name cooling name
- * @param coolingType cooling type (air, liquid, refrigeration)
- * @param coolingGeometry cooling geometry representation
- * @param coolingCapacity cooling capacity specification
- * @param coolantType coolant type specification
- * @param coolingChannels cooling channel features
- * @param operatingTemperature operating temperature range
- */
 /**
  * Resolved COOLING_FEATURE.
  * A cooling feature entity.

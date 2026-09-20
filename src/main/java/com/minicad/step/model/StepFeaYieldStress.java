@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FEA_YIELD_STRESS.
- * Yield stress property for FEA.
- */
 /**
  * Resolved FEA_YIELD_STRESS.
  * Yield stress property for FEA.

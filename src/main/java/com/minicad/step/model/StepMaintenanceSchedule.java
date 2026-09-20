@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MAINTENANCE_SCHEDULE.
- * A maintenance schedule entity.
- *
- * @param id STEP instance id
- * @param name schedule name
- * @param maintenanceType maintenance type (preventive, corrective, predictive)
- * @param maintenanceItems items to be maintained
- * @varianceInterval maintenance variance interval
- * @param maintenanceTasks maintenance tasks specification
- * @varianceResources required variance resources
- * @param scheduleStatus schedule status
- */
 /**
  * Resolved MAINTENANCE_SCHEDULE.
  * A maintenance schedule entity.

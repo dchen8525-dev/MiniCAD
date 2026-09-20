@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LUBRICATION_FEATURE.
- * A lubrication feature entity.
- *
- * @param id STEP instance id
- * @param name lubrication name
- * @param lubricationType lubrication type (oil, grease, spray)
- * @param lubricationPoints lubrication point locations
- * @param lubricationMethod lubrication method specification
- * @param lubricationInterval lubrication interval/frequency
- * @param lubricantType lubricant type specification
- */
 /**
  * Resolved LUBRICATION_FEATURE.
  * A lubrication feature entity.

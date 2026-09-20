@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved FEATURE_ELEMENT_DEFINITION.
- */
 /**
  * Resolved FEATURE_ELEMENT_DEFINITION.
  */

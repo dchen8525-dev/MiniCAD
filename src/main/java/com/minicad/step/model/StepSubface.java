@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SUBFACE.
- * A sub-face of a connected face set.
- *
- * @param id STEP instance id
- * @param name subface name
- * @param faceElement the underlying face entity
- */
 /**
  * Resolved SUBFACE.
  * A sub-face of a connected face set.

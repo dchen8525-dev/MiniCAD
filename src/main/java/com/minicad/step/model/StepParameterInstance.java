@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PARAMETER_INSTANCE.
- * A parameter instance entity.
- *
- * @param id STEP instance id
- * @param name parameter instance name
- * @param parameterDefinition parameter variance definition reference
- * @param parameterValue parameter variance current value
- * @param parameterHistory parameter variance value history
- * @param parameterStatus parameter variance status
- */
 /**
  * Resolved PARAMETER_INSTANCE.
  * A parameter instance entity.

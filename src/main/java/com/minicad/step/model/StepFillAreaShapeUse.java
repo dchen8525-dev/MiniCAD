@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FILL_AREA_SHAPE_USE.
- * A fill area shape use entity.
- */
 /**
  * Resolved FILL_AREA_SHAPE_USE.
  * A fill area shape use entity.

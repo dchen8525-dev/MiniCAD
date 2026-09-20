@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DISPLACEMENT_BOUNDARY_CONDITION.
- * Displacement boundary condition for FEA.
- */
 /**
  * Resolved DISPLACEMENT_BOUNDARY_CONDITION.
  * Displacement boundary condition for FEA.

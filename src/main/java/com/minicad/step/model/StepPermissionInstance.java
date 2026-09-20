@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PERMISSION_INSTANCE.
- * A permission instance entity.
- *
- * @param id STEP instance id
- * @param name permission instance name
- * @param permissionDefinition permission variance definition reference
- * @param permissionHolder permission variance holder reference
- * @param permissionState permission variance state
- * @param permissionUsedCount permission variance usage count
- * @param permissionStatus permission variance status
- */
 /**
  * Resolved PERMISSION_INSTANCE.
  * A permission instance entity.

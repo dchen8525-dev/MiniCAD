@@ -2,16 +2,8 @@ package com.minicad.step.model;
 
 import java.util.List;
 
-import com.minicad.step.model.StepCartesianPoint;
 import java.util.Objects;
 
-/**
- * Resolved POLY_LOOP.
- *
- * @param id STEP instance id
- * @param name loop name
- * @param polygon polygon points
- */
 /**
  * Resolved POLY_LOOP.
  *

@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal annotation text occurrence for presentation PMI.
- *
- * @param id STEP instance id
- * @param name occurrence name
- * @param text annotation text
- * @param position anchor point
- */
 /**
  * Minimal annotation text occurrence for presentation PMI.
  *

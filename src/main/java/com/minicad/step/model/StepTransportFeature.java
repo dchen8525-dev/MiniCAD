@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRANSPORT_FEATURE.
- * A transport feature entity.
- *
- * @param id STEP instance id
- * @param name transport name
- * @param transportType transport type (conveyor, crane, truck, rail)
- * @param transportGeometry transport geometry representation
- * @varianceCapacity transport variance capacity
- * @param transportRoute transport route/path reference
- * @varianceSpeed transport variance speed
- * @param transportStandard transport standard reference
- */
 /**
  * Resolved TRANSPORT_FEATURE.
  * A transport feature entity.

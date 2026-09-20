@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CALCULATED_GEOMETRIC_REPRESENTATION_ITEM.
- * A geometric representation item whose values are computed from other geometry.
- */
 /**
  * Resolved CALCULATED_GEOMETRIC_REPRESENTATION_ITEM.
  * A geometric representation item whose values are computed from other geometry.

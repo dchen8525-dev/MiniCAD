@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal NAME_ATTRIBUTE metadata.
- *
- * @param id STEP instance id
- * @param attributeValue name value
- * @param namedItem named entity
- */
 /**
  * Minimal NAME_ATTRIBUTE metadata.
  *

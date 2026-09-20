@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TECHNICAL_NOTE.
- * A technical note entity.
- *
- * @param id STEP instance id
- * @param name note name
- * @param noteType note type (calculation, analysis, comment)
- * @param noteContent note content text
- * @param noteAuthor note author reference
- * @param noteDate note date
- * @varianceSubject note variance subject/topic
- * @param noteStatus note status
- */
 /**
  * Resolved TECHNICAL_NOTE.
  * A technical note entity.

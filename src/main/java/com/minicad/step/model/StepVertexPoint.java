@@ -1,16 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepCartesianPoint;
 import java.util.Objects;
-/**
- * Resolved VERTEX_POINT.
- *
- * @param id step id
- * @param name step label
- * @param point referenced point geometry
- */
 /**
  * Resolved VERTEX_POINT.
  *

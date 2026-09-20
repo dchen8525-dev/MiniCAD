@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved QUERY_DEFINITION.
- * A query definition entity.
- *
- * @param id STEP instance id
- * @param name query name
- * @param queryType query variance type
- * @param queryExpression query variance expression
- * @param queryParameters query variance parameters
- * @param queryReturnType query variance return type
- * @param queryStatus query variance status
- */
 /**
  * Resolved QUERY_DEFINITION.
  * A query definition entity.

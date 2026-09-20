@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved COMPOSITE_CURVE_SEGMENT.
- *
- * @param id STEP id
- * @param transition transition-code enum
- * @param sameSense same-sense flag
- * @param parentCurve parent curve
- */
 /**
  * Resolved COMPOSITE_CURVE_SEGMENT.
  *

@@ -1,20 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved TASK_INSTANCE.
- * A task instance entity.
- *
- * @param id STEP instance id
- * @param name task instance name
- * @param taskDefinition task variance definition reference
- * @param taskState task variance current state
- * @param taskAssignee task variance assignee reference
- * @param taskStartTime task variance start time
- * @param taskEndTime task variance end time
- * @param taskStatus task variance status
- */
 /**
  * Resolved TASK_INSTANCE.
  * A task instance entity.

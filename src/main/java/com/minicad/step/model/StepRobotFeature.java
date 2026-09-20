@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ROBOT_FEATURE.
- * A robot feature entity.
- *
- * @param id STEP instance id
- * @param name robot name
- * @param robotType robot type (articulated, SCARA, cartesian)
- * @param robotGeometry robot geometry representation
- * @param numberOfAxes number of robot axes
- * @param reachRange robot reach range specification
- * @param payloadCapacity robot payload capacity
- * @varianceSpeed robot variance speed specification
- */
 /**
  * Resolved ROBOT_FEATURE.
  * A robot feature entity.

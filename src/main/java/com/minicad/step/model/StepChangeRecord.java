@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CHANGE_RECORD.
- * A change record entity.
- *
- * @param id STEP instance id
- * @param name change name
- * @param changeType change variance type
- * @param changeDescription change variance description
- * @param changeTarget change variance target reference
- * @param changeReason change variance reason
- * @param changeTimestamp change variance timestamp
- * @param changeStatus change variance status
- */
 /**
  * Resolved CHANGE_RECORD.
  * A change record entity.

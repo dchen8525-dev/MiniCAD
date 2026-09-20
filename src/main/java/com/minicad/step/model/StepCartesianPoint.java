@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CARTESIAN_POINT.
- *
- * @param id step id
- * @param name step label
- * @param coordinates 2D or 3D coordinates
- */
 /**
  * Resolved CARTESIAN_POINT.
  *

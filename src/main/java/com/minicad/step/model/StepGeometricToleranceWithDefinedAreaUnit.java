@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved GEOMETRIC_TOLERANCE_WITH_DEFINED_AREA_UNIT.
- * A geometric tolerance with a defined area unit for spatial application.
- */
 /**
  * Resolved GEOMETRIC_TOLERANCE_WITH_DEFINED_AREA_UNIT.
  * A geometric tolerance with a defined area unit for spatial application.

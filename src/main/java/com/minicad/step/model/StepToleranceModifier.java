@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TOLERANCE_MODIFIER.
- * A tolerance modifier entity.
- *
- * @param id STEP instance id
- * @param name modifier name
- * @param modifierType modifier type (M, L, S, etc.)
- * @param modifierValue modifier value if applicable
- * @param appliedTolerance tolerance the modifier applies to
- */
 /**
  * Resolved TOLERANCE_MODIFIER.
  * A tolerance modifier entity.

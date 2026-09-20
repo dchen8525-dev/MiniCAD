@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SLOT_DEFINITION.
- * A slot definition entity.
- *
- * @param id STEP instance id
- * @param name slot name
- * @param profile profile definition
- * @param depth slot depth
- * @param direction slot direction
- * @param length slot length
- * @param bottomType bottom type
- */
 /**
  * Resolved SLOT_DEFINITION.
  * A slot definition entity.

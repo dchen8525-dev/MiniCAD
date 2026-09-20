@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal parse-only CSG primitive solid.
- *
- * @param id step id
- * @param name step label
- * @param position primitive placement
- * @param dimensions primitive numeric parameters in STEP order
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal parse-only CSG primitive solid.
  *

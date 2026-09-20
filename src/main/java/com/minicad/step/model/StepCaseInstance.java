@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CASE_INSTANCE.
- * A case instance entity.
- *
- * @param id STEP instance id
- * @param name case instance name
- * @param caseDefinition case variance definition reference
- * @param caseState case variance state
- * @param caseActualOutputs case variance actual outputs
- * @param caseResult case variance result (pass/fail)
- * @param caseStatus case variance status
- */
 /**
  * Resolved CASE_INSTANCE.
  * A case instance entity.

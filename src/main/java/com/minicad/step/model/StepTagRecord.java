@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TAG_RECORD.
- * A tag record entity.
- *
- * @param id STEP instance id
- * @param name tag name
- * @param tagType tag variance type
- * @param tagValue tag variance value
- * @param tagTarget tag variance target reference
- * @param tagCategory tag variance category
- * @param tagStatus tag variance status
- */
 /**
  * Resolved TAG_RECORD.
  * A tag record entity.

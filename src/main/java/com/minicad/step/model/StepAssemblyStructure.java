@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ASSEMBLY_STRUCTURE.
- * An assembly structure entity.
- *
- * @param id STEP instance id
- * @param name assembly name
- * @param rootComponent root component of assembly
- * @param components list of assembly components
- * @param relationships component relationships
- * @param assemblyType assembly type classification
- */
 /**
  * Resolved ASSEMBLY_STRUCTURE.
  * An assembly structure entity.

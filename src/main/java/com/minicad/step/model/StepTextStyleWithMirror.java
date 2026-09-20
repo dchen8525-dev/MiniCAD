@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal TEXT_STYLE_WITH_MIRROR.
- *
- * @param id STEP instance id
- * @param name style name
- * @param characterAppearance character appearance definition
- * @param mirrorPlacement mirror axis placement
- */
 /**
  * Minimal TEXT_STYLE_WITH_MIRROR.
  *

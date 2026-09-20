@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LAYERED_ITEM.
- * An item assigned to presentation layers.
- *
- * @param id STEP instance id
- * @param name item name
- * @param assignment layers assignment reference
- */
 /**
  * Resolved LAYERED_ITEM.
  * An item assigned to presentation layers.

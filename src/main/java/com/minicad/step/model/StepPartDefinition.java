@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved PART_DEFINITION.
- * A part definition entity.
- *
- * @param id STEP instance id
- * @param name part name
- * @param partId part identifier
- * @param partType part type classification
- * @param geometryDefinition geometry definition reference
- * @param material material reference
- */
 /**
  * Resolved PART_DEFINITION.
  * A part definition entity.

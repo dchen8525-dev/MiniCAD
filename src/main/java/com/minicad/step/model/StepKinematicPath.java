@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved KINEMATIC_PATH.
- * A path through a kinematic mechanism defining the chain of pairs.
- */
 /**
  * Resolved KINEMATIC_PATH.
  * A path through a kinematic mechanism defining the chain of pairs.

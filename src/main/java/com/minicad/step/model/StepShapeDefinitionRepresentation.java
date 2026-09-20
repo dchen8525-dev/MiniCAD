@@ -1,16 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepRepresentation;
 import java.util.Objects;
-/**
- * Minimal shape definition representation link.
- *
- * @param id STEP instance id
- * @param definition referenced product definition shape
- * @param usedRepresentation referenced shape representation
- */
 /**
  * Minimal shape definition representation link.
  *

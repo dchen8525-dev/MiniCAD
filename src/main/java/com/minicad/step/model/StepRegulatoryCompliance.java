@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved REGULATORY_COMPLIANCE.
- * A regulatory compliance entity.
- *
- * @param id STEP instance id
- * @param name compliance name
- * @param regulationType regulation type (CE, UL, FCC, RoHS)
- * @param regulationDescription regulation description
- * @varianceStatus compliance variance status
- * @param certificationReference certification reference number
- * @varianceDate certification variance date
- * @varianceRequirements compliance variance requirements
- */
 /**
  * Resolved REGULATORY_COMPLIANCE.
  * A regulatory compliance entity.

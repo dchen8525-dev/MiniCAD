@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved RANGE_DIMENSIONAL_SIZE.
- * Dimensional size with range bounds.
- */
 /**
  * Resolved RANGE_DIMENSIONAL_SIZE.
  * Dimensional size with range bounds.

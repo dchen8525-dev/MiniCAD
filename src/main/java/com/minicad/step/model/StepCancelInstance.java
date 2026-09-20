@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CANCEL_INSTANCE.
- * A cancel instance entity.
- *
- * @param id STEP instance id
- * @param name cancel instance name
- * @param cancelDefinition cancel variance definition reference
- * @param cancelState cancel variance state
- * @param cancelTime cancel variance cancellation time
- * @param cancelReason cancel variance reason
- * @param cancelStatus cancel variance status
- */
 /**
  * Resolved CANCEL_INSTANCE.
  * A cancel instance entity.

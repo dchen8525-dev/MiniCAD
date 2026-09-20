@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal semantic representation context.
- *
- * @param id STEP instance id
- * @param contextIdentifier context identifier
- * @param contextType context type
- */
 /**
  * Minimal semantic representation context.
  *

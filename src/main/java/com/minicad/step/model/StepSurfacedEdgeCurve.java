@@ -1,18 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SURFACED_EDGE_CURVE.
- * An edge curve with associated surface geometry.
- *
- * @param id STEP instance id
- * @param name edge name
- * @param edgeGeometry the underlying curve
- * @param surface1 first associated surface
- * @param surface2 second associated surface
- * @param sameSurface flag indicating surfaces are identical
- */
 /**
  * Resolved SURFACED_EDGE_CURVE.
  * An edge curve with associated surface geometry.

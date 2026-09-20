@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved BUCKLING_ANALYSIS.
- * Buckling analysis type for FEA.
- */
 /**
  * Resolved BUCKLING_ANALYSIS.
  * Buckling analysis type for FEA.

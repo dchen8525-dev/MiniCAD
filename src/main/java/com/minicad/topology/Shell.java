@@ -13,12 +13,6 @@ import java.util.Objects;
  * @param faces faces of the shell
  * @param closed whether the shell is declared closed
  */
-/**
- * Minimal shell made of planar faces.
- *
- * @param faces faces of the shell
- * @param closed whether the shell is declared closed
- */
 public final class Shell {
     private final List<Face> faces;
     private final boolean closed;

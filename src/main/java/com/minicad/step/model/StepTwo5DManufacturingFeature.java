@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TWO5D_MANUFACTURING_FEATURE.
- * Represents a 2.5D manufacturing feature (hole, slot, step, etc).
- *
- * @param id STEP instance id
- * @param name feature name
- * @param featureType type of manufacturing feature
- * @param profile profile definition
- * @param depth feature depth
- * @param direction direction of feature
- */
 /**
  * Resolved TWO5D_MANUFACTURING_FEATURE.
  * Represents a 2.5D manufacturing feature (hole, slot, step, etc).

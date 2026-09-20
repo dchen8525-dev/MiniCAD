@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved AXIS1_PLACEMENT.
- *
- * @param id step id
- * @param name step label
- * @param location origin point
- * @param axis axis direction
- */
 /**
  * Resolved AXIS1_PLACEMENT.
  *

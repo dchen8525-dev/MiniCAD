@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMMAND_INSTANCE.
- * A command instance entity.
- *
- * @param id STEP instance id
- * @param name command instance name
- * @param commandDefinition command variance definition reference
- * @param commandState command variance state
- * @param commandParameters command variance parameter values
- * @param commandResult command variance result
- * @param commandStatus command variance status
- */
 /**
  * Resolved COMMAND_INSTANCE.
  * A command instance entity.

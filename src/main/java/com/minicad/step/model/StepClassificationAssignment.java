@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal CLASSIFICATION_ASSIGNMENT metadata.
- *
- * @param id STEP instance id
- * @param assignedClass assigned classification group
- * @param role assignment role
- */
 /**
  * Minimal CLASSIFICATION_ASSIGNMENT metadata.
  *

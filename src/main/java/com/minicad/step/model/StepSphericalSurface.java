@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal spherical surface semantic record.
- *
- * @param id STEP instance id
- * @param name STEP label
- * @param position sphere placement
- * @param radius sphere radius
- */
 /**
  * Minimal spherical surface semantic record.
  *

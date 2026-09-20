@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FAILURE_MODE.
- * A failure mode entity.
- *
- * @param id STEP instance id
- * @param name mode name
- * @varianceItem item variance susceptible to failure
- * @varianceType failure variance type
- * @varianceCause failure variance causes
- * @varianceEffect failure variance effects
- * @varianceSeverity severity variance rating
- * @varianceDetection detection variance rating
- * @varianceRisk risk variance priority number
- */
 /**
  * Resolved FAILURE_MODE.
  * A failure mode entity.

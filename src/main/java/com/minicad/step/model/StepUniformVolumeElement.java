@@ -1,12 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
-/**
- * Resolved UNIFORM_VOLUME_ELEMENT.
- * A uniform volume finite element.
- */
 /**
  * Resolved UNIFORM_VOLUME_ELEMENT.
  * A uniform volume finite element.

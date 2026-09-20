@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SHAPE_REPRESENTATION_TRANSFORMATION.
- * A transformation between shape representations.
- */
 /**
  * Resolved SHAPE_REPRESENTATION_TRANSFORMATION.
  * A transformation between shape representations.

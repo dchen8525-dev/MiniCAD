@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MATERIAL_TEST.
- * A material test entity.
- *
- * @param id STEP instance id
- * @param name test name
- * @param testType material test type (tensile, hardness, impact)
- * @param testSample test sample reference
- * @param testParameters test parameters
- * @param testResults test result values
- * @param testStandard test standard reference
- * @param testDate test execution date
- * @param testStatus test status result
- */
 /**
  * Resolved MATERIAL_TEST.
  * A material test entity.

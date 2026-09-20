@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FEA_CONSTANT_FUNCTION_3D.
- * A constant scalar or vector function in 3D FEA space.
- */
 /**
  * Resolved FEA_CONSTANT_FUNCTION_3D.
  * A constant scalar or vector function in 3D FEA space.

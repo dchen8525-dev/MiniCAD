@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal CURVE_BOUNDED_SURFACE parse-only surface.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param basisSurface surface being bounded
- * @param boundaries boundary curves
- * @param implicitOuter whether an implicit outer boundary is present
- */
 /**
  * Minimal CURVE_BOUNDED_SURFACE parse-only surface.
  *

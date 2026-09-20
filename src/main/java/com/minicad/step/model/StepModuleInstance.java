@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MODULE_INSTANCE.
- * A module instance entity.
- *
- * @param id STEP instance id
- * @param name module instance name
- * @param moduleDefinition module variance definition reference
- * @param moduleState module variance state
- * @param moduleVersion module variance version
- * @param moduleConfig module variance configuration
- * @param moduleStatus module variance status
- */
 /**
  * Resolved MODULE_INSTANCE.
  * A module instance entity.

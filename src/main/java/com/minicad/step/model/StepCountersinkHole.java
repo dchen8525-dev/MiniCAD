@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COUNTERSINK_HOLE.
- * Represents a countersink hole feature in manufacturing.
- *
- * @param id STEP instance id
- * @param name countersink name
- * @param throughHole through hole reference
- * @param countersinkDiameter countersink diameter
- * @param countersinkAngle countersink angle
- */
 /**
  * Resolved COUNTERSINK_HOLE.
  * Represents a countersink hole feature in manufacturing.

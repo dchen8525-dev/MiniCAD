@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RESOURCE_INSTANCE.
- * A resource instance entity.
- *
- * @param id STEP instance id
- * @param name resource instance name
- * @param resourceDefinition resource variance definition reference
- * @param resourceLocation resource variance location reference
- * @param resourceState resource variance state
- * @param resourceAllocation resource variance allocation percentage
- * @param resourceSchedule resource variance schedule entries
- * @param resourceStatus resource variance status
- */
 /**
  * Resolved RESOURCE_INSTANCE.
  * A resource instance entity.

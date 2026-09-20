@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RESTORE_DEFINITION.
- * A restore definition entity.
- *
- * @param id STEP instance id
- * @param name restore name
- * @param restoreType restore variance type
- * @param restoreSource restore variance source backup reference
- * @param restoreTarget restore variance target reference
- * @param restoreOptions restore variance options
- * @param restoreStatus restore variance status
- */
 /**
  * Resolved RESTORE_DEFINITION.
  * A restore definition entity.

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FEA_AXIS_2_PLACEMENT_3D.
- * A 3D axis placement for finite element coordinate systems.
- */
 /**
  * Resolved FEA_AXIS_2_PLACEMENT_3D.
  * A 3D axis placement for finite element coordinate systems.

@@ -12,11 +12,6 @@ import java.util.Objects;
  *
  * @param segments ordered component curves
  */
-/**
- * Minimal composite 2D curve backed by multiple supported segments.
- *
- * @param segments ordered component curves
- */
 public final class CompositeCurve2 implements Curve2 {
     private final List<Curve2> segments;
 

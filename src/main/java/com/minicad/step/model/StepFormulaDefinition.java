@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FORMULA_DEFINITION.
- * A formula definition entity.
- *
- * @param id STEP instance id
- * @param name formula name
- * @param formulaType formula variance type
- * @param formulaExpression formula variance expression
- * @param formulaVariables formula variance variables used
- * @param formulaUnit formula variance result unit
- * @param formulaStatus formula variance status
- */
 /**
  * Resolved FORMULA_DEFINITION.
  * A formula definition entity.

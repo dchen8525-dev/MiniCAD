@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal surface style fill area wrapper.
- *
- * @param id STEP instance id
- * @param fillStyle referenced fill style
- */
 /**
  * Minimal surface style fill area wrapper.
  *

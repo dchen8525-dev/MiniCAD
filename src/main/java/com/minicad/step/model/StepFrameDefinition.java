@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FRAME_DEFINITION.
- * A frame definition entity.
- *
- * @param id STEP instance id
- * @param name frame name
- * @param frameType frame variance type
- * @param frameFormat frame variance format
- * @param frameSize frame variance size
- * @param frameDuration frame variance duration
- * @param frameStatus frame variance status
- */
 /**
  * Resolved FRAME_DEFINITION.
  * A frame definition entity.

@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COMPOSITE_CURVE_ON_SURFACE_3D.
- * A composite curve that lies on a 3D surface.
- *
- * @param id STEP instance id
- * @param name curve name
- * @param segments composite curve segments
- * @param surface the surface on which the curve lies
- * @param selfIntersect whether the curve self-intersects
- */
 /**
  * Resolved COMPOSITE_CURVE_ON_SURFACE_3D.
  * A composite curve that lies on a 3D surface.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FIXTURE_FEATURE.
- * A fixture feature entity.
- *
- * @param id STEP instance id
- * @param name fixture name
- * @param fixtureType fixture type (clamping, supporting, locating)
- * @param fixtureGeometry fixture geometry representation
- * @param clampingPoints clamping point locations
- * @param supportingPoints supporting point locations
- * @param fixtureForce fixture force specification
- * @param fixtureMaterial fixture material reference
- */
 /**
  * Resolved FIXTURE_FEATURE.
  * A fixture feature entity.

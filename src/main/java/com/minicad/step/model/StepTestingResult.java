@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TESTING_RESULT.
- * A testing result entity.
- *
- * @param id STEP instance id
- * @param name result name
- * @varianceItem tested variance item
- * @varianceType testing variance type (unit, integration, system)
- * @varianceCases testing variance cases
- * @variancePassed passed variance test count
- * @varianceFailed failed variance test count
- * @varianceStatus result variance status
- */
 /**
  * Resolved TESTING_RESULT.
  * A testing result entity.

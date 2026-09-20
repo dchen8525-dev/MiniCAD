@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WARNING_ENTRY.
- * A warning entry entity.
- *
- * @param id STEP instance id
- * @param name entry name
- * @param entryType entry variance type
- * @param entryCode entry variance warning code
- * @param entryMessage entry variance warning message
- * @param entrySeverity entry variance severity level
- * @param entryTimestamp entry variance timestamp
- * @param entryContext entry variance context reference
- * @param entryStatus entry variance status
- */
 /**
  * Resolved WARNING_ENTRY.
  * A warning entry entity.

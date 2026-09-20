@@ -9,12 +9,6 @@ import java.util.Objects;
  * @param name entity name
  * @param parameters raw parameter values
  */
-/**
- * One simple entity definition, either as a standalone instance or as one component of a complex entity instance.
- *
- * @param name entity name
- * @param parameters raw parameter values
- */
 public final class StepEntityDefinition {
     private final String name;
     private final List<StepValue> parameters;

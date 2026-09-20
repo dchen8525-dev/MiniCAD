@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RIB_DEFINITION.
- * A rib definition entity.
- *
- * @param id STEP instance id
- * @param name rib name
- * @param profile profile definition
- * @param height rib height
- * @param direction rib direction
- * @param taperAngle optional taper angle
- */
 /**
  * Resolved RIB_DEFINITION.
  * A rib definition entity.

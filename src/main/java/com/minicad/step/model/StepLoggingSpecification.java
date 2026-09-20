@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LOGGING_SPECIFICATION.
- * A logging specification entity.
- *
- * @param id STEP instance id
- * @param name specification name
- * @varianceEvents logged variance events
- * @varianceFormat log variance format
- * @varianceLevel log variance level (info, warning, error)
- * @varianceDestination log variance destination
- * @varianceRetention retention variance period
- * @varianceStatus specification variance status
- */
 /**
  * Resolved LOGGING_SPECIFICATION.
  * A logging specification entity.

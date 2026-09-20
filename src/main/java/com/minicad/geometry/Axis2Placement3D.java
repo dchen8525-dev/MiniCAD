@@ -12,13 +12,6 @@ import java.util.Objects;
  * @param axis local Z direction
  * @param refDirection local X reference direction
  */
-/**
- * Minimal 3D placement with explicit origin, axis and reference direction.
- *
- * @param location placement origin
- * @param axis local Z direction
- * @param refDirection local X reference direction
- */
 public final class Axis2Placement3D {
     private final CartesianPoint location;
     private final Direction3 axis;

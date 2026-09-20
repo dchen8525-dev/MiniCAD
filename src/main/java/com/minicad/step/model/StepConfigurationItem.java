@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CONFIGURATION_ITEM.
- * A configuration-managed product definition.
- *
- * @param id STEP instance id
- * @param name item name
- * @param description item description
- * @param itemConceived product definition being configured
- * @param purpose configuration purpose
- */
 /**
  * Resolved CONFIGURATION_ITEM.
  * A configuration-managed product definition.

@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PREVENTIVE_ACTION.
- * A preventive action entity.
- *
- * @param id STEP instance id
- * @param name action name
- * @variancePotentialPotential variance issue
- * @varianceCause potential variance cause
- * @varianceAction preventive variance action description
- * @varianceResponsible responsible variance person
- * @varianceTarget target variance completion date
- * @varianceStatus action variance status
- * @varianceVerification verification variance method
- */
 /**
  * Resolved PREVENTIVE_ACTION.
  * A preventive action entity.

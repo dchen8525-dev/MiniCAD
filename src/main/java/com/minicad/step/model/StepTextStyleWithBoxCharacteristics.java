@@ -1,17 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal TEXT_STYLE_WITH_BOX_CHARACTERISTICS.
- *
- * @param id STEP instance id
- * @param name style name
- * @param characterAppearance character appearance definition
- * @param boxCharacteristics raw box characteristic literals
- */
 /**
  * Minimal TEXT_STYLE_WITH_BOX_CHARACTERISTICS.
  *

@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal CURVE_STYLE.
- *
- * @param id step id
- * @param name style name
- * @param curveFont referenced font
- * @param curveWidth stroke width
- * @param colour referenced colour
- */
 /**
  * Minimal CURVE_STYLE.
  *

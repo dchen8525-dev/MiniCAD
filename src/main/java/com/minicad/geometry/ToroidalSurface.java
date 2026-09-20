@@ -12,13 +12,6 @@ import java.util.Objects;
  * @param majorRadius distance from axis to tube center
  * @param minorRadius tube radius
  */
-/**
- * Minimal toroidal surface representation.
- *
- * @param position torus placement
- * @param majorRadius distance from axis to tube center
- * @param minorRadius tube radius
- */
 public final class ToroidalSurface implements SurfaceGeometry {
     private final Axis2Placement3D position;
     private final double majorRadius;

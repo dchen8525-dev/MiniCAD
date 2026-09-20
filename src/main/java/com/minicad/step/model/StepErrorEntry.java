@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ERROR_ENTRY.
- * An error entry entity.
- *
- * @param id STEP instance id
- * @param name entry name
- * @param entryType entry variance type
- * @param entryCode entry variance error code
- * @param entryMessage entry variance error message
- * @param entrySeverity entry variance severity level
- * @param entryTimestamp entry variance timestamp
- * @param entryContext entry variance context reference
- * @param entryStatus entry variance status
- */
 /**
  * Resolved ERROR_ENTRY.
  * An error entry entity.

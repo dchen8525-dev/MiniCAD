@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CUBIC_BEZIER_TRIANGULATED_FACE.
- * A triangulated face where edges are represented by cubic Bezier curves.
- */
 /**
  * Resolved CUBIC_BEZIER_TRIANGULATED_FACE.
  * A triangulated face where edges are represented by cubic Bezier curves.

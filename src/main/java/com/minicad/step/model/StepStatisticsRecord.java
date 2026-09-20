@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STATISTICS_RECORD.
- * A statistics record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceSubject statistics variance subject
- * @varianceMetrics statistical variance metrics
- * @varianceValues statistical variance values
- * @variancePeriod statistics variance period
- * @varianceTrend trend variance analysis
- * @varianceStatus record variance status
- */
 /**
  * Resolved STATISTICS_RECORD.
  * A statistics record entity.

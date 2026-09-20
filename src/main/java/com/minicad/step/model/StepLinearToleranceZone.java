@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved LINEAR_TOLERANCE_ZONE.
- * A linear tolerance zone definition.
- *
- * @param id STEP instance id
- * @param name zone name
- * @param definingTolerance the geometric tolerance defining this zone
- * @param zoneForm the form of the tolerance zone
- * @param zoneLength length of the tolerance zone
- */
 /**
  * Resolved LINEAR_TOLERANCE_ZONE.
  * A linear tolerance zone definition.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LOG_ENTRY.
- * A log entry entity.
- *
- * @param id STEP instance id
- * @param name entry name
- * @param entryType entry variance type
- * @param entryLevel entry variance level
- * @param entryMessage entry variance message
- * @param entryTimestamp entry variance timestamp
- * @param entryContext entry variance context reference
- * @param entryStatus entry variance status
- */
 /**
  * Resolved LOG_ENTRY.
  * A log entry entity.

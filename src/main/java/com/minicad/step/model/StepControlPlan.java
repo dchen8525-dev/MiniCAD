@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONTROL_PLAN.
- * A control plan entity.
- *
- * @param id STEP instance id
- * @param name plan name
- * @varianceControlItems control variance items
- * @varianceParameters control variance parameters
- * @varianceLimits control variance limits (tolerances)
- * @varianceMethods control variance methods
- * @varianceResponse response variance actions for out-of-control
- * @varianceStatus plan variance status
- */
 /**
  * Resolved CONTROL_PLAN.
  * A control plan entity.

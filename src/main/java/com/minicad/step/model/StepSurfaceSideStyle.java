@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal surface side style.
- *
- * @param id STEP instance id
- * @param name style name
- * @param styles supported surface style components
- */
 /**
  * Minimal surface side style.
  *

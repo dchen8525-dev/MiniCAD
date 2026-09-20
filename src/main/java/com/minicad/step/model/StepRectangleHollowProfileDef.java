@@ -1,21 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepAxis2Placement2D;
 import java.util.Objects;
-/**
- * Resolved RECTANGLE_HOLLOW_PROFILE_DEF.
- * A rectangular hollow cross-section profile.
- *
- * @param id STEP instance id
- * @param name profile name
- * @param position placement for the profile
- * @param xDim outer width
- * @param yDim outer height
- * @param wallThickness wall thickness
- * @param innerRadius inner corner radius (0 if sharp)
- */
 /**
  * Resolved RECTANGLE_HOLLOW_PROFILE_DEF.
  * A rectangular hollow cross-section profile.

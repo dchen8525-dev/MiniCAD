@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PNEUMATIC_FEATURE.
- * A pneumatic feature entity.
- *
- * @param id STEP instance id
- * @param name pneumatic name
- * @param pneumaticType pneumatic feature type (compressor, valve, cylinder, line)
- * @param pneumaticGeometry pneumatic geometry representation
- * @param variancePressure variance pressure rating
- * @varianceFlow variance flow rate
- * @param portSize port size specification
- * @varianceConnections variance connections count
- */
 /**
  * Resolved PNEUMATIC_FEATURE.
  * A pneumatic feature entity.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved JOB_DEFINITION.
- * A job definition entity.
- *
- * @param id STEP instance id
- * @param name job name
- * @param jobType job variance type
- * @param jobPriority job variance priority
- * @param jobSchedule job variance schedule
- * @param jobTasks job variance task definitions
- * @param jobDependencies job variance dependencies
- * @param jobStatus job variance status
- */
 /**
  * Resolved JOB_DEFINITION.
  * A job definition entity.

@@ -16,14 +16,6 @@ import java.util.Objects;
  * @param axisDirection axis direction (from vertex towards focus)
  * @param focalDistance distance from vertex to focus
  */
-/**
- * Minimal 2D parabola representation.
- * A parabola is a conic section defined by a focus and directrix.
- *
- * @param vertex parabola vertex
- * @param axisDirection axis direction (from vertex towards focus)
- * @param focalDistance distance from vertex to focus
- */
 public final class Parabola2 implements Curve2 {
     private final Point2 vertex;
     private final Direction2 axisDirection;

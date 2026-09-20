@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved VALIDATION_DEFINITION.
- * A validation definition entity.
- *
- * @param id STEP instance id
- * @param name validation name
- * @param validationType validation variance type
- * @param validationCriteria validation variance criteria
- * @param validationRules validation variance rules
- * @param validationScope validation variance scope
- * @param validationStatus validation variance status
- */
 /**
  * Resolved VALIDATION_DEFINITION.
  * A validation definition entity.

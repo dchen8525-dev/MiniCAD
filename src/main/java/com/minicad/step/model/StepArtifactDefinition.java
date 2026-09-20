@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ARTIFACT_DEFINITION.
- * An artifact definition entity.
- *
- * @param id STEP instance id
- * @param name artifact name
- * @param artifactType artifact variance type
- * @param artifactDescription artifact variance description
- * @param artifactSource artifact variance source reference
- * @param artifactFormat artifact variance format
- * @param artifactStatus artifact variance status
- */
 /**
  * Resolved ARTIFACT_DEFINITION.
  * An artifact definition entity.

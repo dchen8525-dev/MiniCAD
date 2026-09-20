@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MACHINING_SETUP.
- * A machining setup entity.
- *
- * @param id STEP instance id
- * @param name setup name
- * @param workpiece workpiece definition
- * @param fixture fixture definition
- * @param toolList machining tools used
- * @param machineSetup machine setup configuration
- */
 /**
  * Resolved MACHINING_SETUP.
  * A machining setup entity.

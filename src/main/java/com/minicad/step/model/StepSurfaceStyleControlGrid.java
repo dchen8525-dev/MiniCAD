@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal SURFACE_STYLE_CONTROL_GRID.
- *
- * @param id STEP instance id
- * @param style referenced curve style
- */
 /**
  * Minimal SURFACE_STYLE_CONTROL_GRID.
  *

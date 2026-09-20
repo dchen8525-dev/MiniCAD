@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal application protocol definition metadata.
- *
- * @param id STEP instance id
- * @param status protocol status text
- * @param schemaName interpreted model schema name
- * @param year protocol year
- * @param application application context
- */
 /**
  * Minimal application protocol definition metadata.
  *

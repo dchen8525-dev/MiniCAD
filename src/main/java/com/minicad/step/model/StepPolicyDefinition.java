@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved POLICY_DEFINITION.
- * A policy definition entity.
- *
- * @param id STEP instance id
- * @param name policy name
- * @param policyType policy variance type
- * @param policyScope policy variance scope
- * @param policyRules policy variance rules
- * @param policyEnforcement policy variance enforcement level
- * @param policyStatus policy variance status
- */
 /**
  * Resolved POLICY_DEFINITION.
  * A policy definition entity.

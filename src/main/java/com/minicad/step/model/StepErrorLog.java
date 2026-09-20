@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ERROR_LOG.
- * An error log entity.
- *
- * @param id STEP instance id
- * @param name log name
- * @param logType log variance type
- * @param logEntries log variance entry list
- * @param logStartTime log variance start time
- * @param logEndTime log variance end time
- * @param logStatus log variance status
- */
 /**
  * Resolved ERROR_LOG.
  * An error log entity.

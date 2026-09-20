@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CYLINDRICAL_SURFACE.
- *
- * @param id step id
- * @param name step label
- * @param position axis placement
- * @param radius radius
- */
 /**
  * Resolved CYLINDRICAL_SURFACE.
  *

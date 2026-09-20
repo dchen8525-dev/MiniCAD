@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BASELINE_INSTANCE.
- * A baseline instance entity.
- *
- * @param id STEP instance id
- * @param name baseline instance name
- * @param baselineDefinition baseline variance definition reference
- * @param baselineActualValues baseline variance actual values
- * @param baselineVariance baseline variance deviation from baseline
- * @param baselineStatus baseline variance status
- */
 /**
  * Resolved BASELINE_INSTANCE.
  * A baseline instance entity.

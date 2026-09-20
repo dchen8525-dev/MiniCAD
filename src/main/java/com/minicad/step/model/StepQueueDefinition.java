@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved QUEUE_DEFINITION.
- * A queue definition entity.
- *
- * @param id STEP instance id
- * @param name queue name
- * @param queueType queue variance type
- * @param queueCapacity queue variance capacity
- * @param queuePolicy queue variance policy
- * @param queuePriority queue variance priority support
- * @param queueStatus queue variance status
- */
 /**
  * Resolved QUEUE_DEFINITION.
  * A queue definition entity.

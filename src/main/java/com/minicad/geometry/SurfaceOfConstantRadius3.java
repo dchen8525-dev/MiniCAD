@@ -12,14 +12,6 @@ import java.util.Objects;
  * @param sweptSurface the base surface being swept
  * @param radius the constant radius
  */
-/**
- * Minimal surface of constant radius representation.
- * A surface swept by maintaining a constant radius along a path.
- * This can represent pipe-like surfaces with constant cross-section radius.
- *
- * @param sweptSurface the base surface being swept
- * @param radius the constant radius
- */
 public final class SurfaceOfConstantRadius3 implements SurfaceGeometry {
     private final SurfaceGeometry sweptSurface;
     private final double radius;

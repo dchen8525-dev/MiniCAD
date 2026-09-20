@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved FACE_BOUND or FACE_OUTER_BOUND.
- *
- * @param id step id
- * @param name step label
- * @param loop referenced loop
- * @param orientation orientation flag
- * @param outer whether this is the outer bound
- */
 /**
  * Resolved FACE_BOUND or FACE_OUTER_BOUND.
  *

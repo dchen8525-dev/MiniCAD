@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved VALUE_REASON_PAIR.
- * A value-reason pair for classification.
- */
 /**
  * Resolved VALUE_REASON_PAIR.
  * A value-reason pair for classification.

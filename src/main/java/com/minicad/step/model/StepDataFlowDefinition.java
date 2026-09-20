@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DATA_FLOW_DEFINITION.
- * A data flow definition entity.
- *
- * @param id STEP instance id
- * @param name data flow name
- * @param flowType flow variance type
- * @param flowDirection flow variance direction
- * @param flowSource flow variance source reference
- * @param flowTarget flow variance target reference
- * @param flowProtocol flow variance protocol
- * @param flowStatus flow variance status
- */
 /**
  * Resolved DATA_FLOW_DEFINITION.
  * A data flow definition entity.

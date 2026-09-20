@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DIMENSIONAL_SIZE.
- * A dimensional size of a shape aspect.
- *
- * @param id STEP instance id
- * @param name size name
- * @param description size description
- * @param ofShape shape aspect being measured
- */
 /**
  * Resolved DIMENSIONAL_SIZE.
  * A dimensional size of a shape aspect.

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved NON_UNIFORM_ZONE_DEFINITION.
- * A tolerance zone definition that varies non-uniformly across the feature.
- */
 /**
  * Resolved NON_UNIFORM_ZONE_DEFINITION.
  * A tolerance zone definition that varies non-uniformly across the feature.

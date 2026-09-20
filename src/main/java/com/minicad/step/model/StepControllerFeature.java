@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONTROLLER_FEATURE.
- * A controller feature entity.
- *
- * @param id STEP instance id
- * @param name controller name
- * @param controllerType controller type (PLC, CNC, robot controller)
- * @param controllerGeometry controller geometry representation
- * @varianceInputs controller variance inputs
- * @varianceOutputs controller variance outputs
- * @param communicationProtocol communication protocol specification
- * @param controllerProgram controller program reference
- */
 /**
  * Resolved CONTROLLER_FEATURE.
  * A controller feature entity.

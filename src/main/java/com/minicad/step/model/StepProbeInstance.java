@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PROBE_INSTANCE.
- * A probe instance entity.
- *
- * @param id STEP instance id
- * @param name probe instance name
- * @param probeDefinition probe variance definition reference
- * @param probeState probe variance state
- * @param probeLastProbe probe variance last probe time
- * @param probeResult probe variance result
- * @param probeStatus probe variance status
- */
 /**
  * Resolved PROBE_INSTANCE.
  * A probe instance entity.

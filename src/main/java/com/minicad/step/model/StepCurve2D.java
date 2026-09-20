@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CURVE_2D.
- * A 2D curve defined by a placement and parametric equation.
- *
- * @param id step id
- * @param name step label
- * @param position the 2D placement
- * @param equation the parametric equation coefficients
- */
 /**
  * Resolved CURVE_2D.
  * A 2D curve defined by a placement and parametric equation.

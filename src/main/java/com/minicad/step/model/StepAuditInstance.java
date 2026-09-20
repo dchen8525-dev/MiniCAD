@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved AUDIT_INSTANCE.
- * An audit instance entity.
- *
- * @param id STEP instance id
- * @param name audit instance name
- * @param auditDefinition audit variance definition reference
- * @param auditStartTime audit variance start time
- * @param auditEndTime audit variance end time
- * @param auditFindings audit variance findings count
- * @param auditPassed audit variance passed flag
- * @param auditStatus audit variance status
- */
 /**
  * Resolved AUDIT_INSTANCE.
  * An audit instance entity.

@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal ORIENTED_CURVE parse-only curve wrapper.
- *
- * @param id STEP instance id
- * @param name curve name
- * @param curveElement referenced curve
- * @param orientation orientation sense
- */
 /**
  * Minimal ORIENTED_CURVE parse-only curve wrapper.
  *

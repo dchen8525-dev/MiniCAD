@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved MODAL_ANALYSIS.
- * Modal analysis type for FEA.
- */
 /**
  * Resolved MODAL_ANALYSIS.
  * Modal analysis type for FEA.

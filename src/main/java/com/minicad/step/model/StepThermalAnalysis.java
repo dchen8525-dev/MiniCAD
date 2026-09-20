@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved THERMAL_ANALYSIS.
- * Thermal analysis type for FEA.
- */
 /**
  * Resolved THERMAL_ANALYSIS.
  * Thermal analysis type for FEA.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SHEET_METAL_BEND.
- * A sheet metal bend entity.
- *
- * @param id STEP instance id
- * @param name bend name
- * @param bendLine bend line geometry
- * @param bendAngle bend angle in degrees
- * @param bendRadius bend radius
- * @param bendDirection bend direction (up, down)
- * @param bendAllowance bend allowance factor
- * @param kFactor k-factor for bend calculation
- */
 /**
  * Resolved SHEET_METAL_BEND.
  * A sheet metal bend entity.

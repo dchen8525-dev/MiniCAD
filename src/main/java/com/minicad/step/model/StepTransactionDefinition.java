@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRANSACTION_DEFINITION.
- * A transaction definition entity.
- *
- * @param id STEP instance id
- * @param name transaction name
- * @param transactionType transaction variance type
- * @param transactionIsolation transaction variance isolation level
- * @param transactionTimeout transaction variance timeout
- * @param transactionOperations transaction variance operations
- * @param transactionStatus transaction variance status
- */
 /**
  * Resolved TRANSACTION_DEFINITION.
  * A transaction definition entity.

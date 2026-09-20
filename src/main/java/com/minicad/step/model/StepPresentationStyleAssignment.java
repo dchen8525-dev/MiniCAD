@@ -1,15 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal presentation style assignment.
- *
- * @param id STEP instance id
- * @param styles referenced presentation styles
- */
 /**
  * Minimal presentation style assignment.
  *

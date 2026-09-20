@@ -13,14 +13,6 @@ import java.util.Objects;
  * @param radius radius at z=0 (waist)
  * @param semiAxis b parameter controlling the z-spread rate
  */
-/**
- * Minimal single-sheet hyperboloid surface (rotationally symmetric).
- * Parametrized as x^2/a^2 + y^2/a^2 - z^2/b^2 = 1 in local coordinates.
- *
- * @param position placement (axis is symmetry axis)
- * @param radius radius at z=0 (waist)
- * @param semiAxis b parameter controlling the z-spread rate
- */
 public final class HyperboloidSurface implements SurfaceGeometry {
     private final Axis2Placement3D position;
     private final double radius;

@@ -1,13 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal TEXT_STYLE_FOR_DEFINED_FONT.
- *
- * @param id STEP instance id
- * @param textColour referenced text colour
- */
 /**
  * Minimal TEXT_STYLE_FOR_DEFINED_FONT.
  *

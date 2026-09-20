@@ -1,20 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepDirection;
 import java.util.Objects;
-/**
- * Resolved EXTRUDED_AREA_SOLID_TAPERED.
- * An extruded solid with tapered profile.
- *
- * @param id STEP instance id
- * @param name solid name
- * @param sweptArea profile to extrude
- * @param direction extrusion direction
- * @param depth extrusion depth
- * @param taperAngle taper angle
- */
 /**
  * Resolved EXTRUDED_AREA_SOLID_TAPERED.
  * An extruded solid with tapered profile.

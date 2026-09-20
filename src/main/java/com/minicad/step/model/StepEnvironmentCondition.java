@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ENVIRONMENT_CONDITION.
- * An environment condition entity.
- *
- * @param id STEP instance id
- * @param name condition name
- * @param conditionType condition type (temperature, humidity, vibration)
- * @param conditionValue condition value
- * @varianceTolerance condition variance tolerance
- * @param conditionUnit condition unit specification
- * @param conditionRange condition range (min/max)
- * @param conditionStatus condition status
- */
 /**
  * Resolved ENVIRONMENT_CONDITION.
  * An environment condition entity.

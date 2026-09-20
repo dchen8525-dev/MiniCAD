@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved RUNOUT_TOLERANCE_ZONE.
- * A tolerance zone specifically for runout tolerances.
- *
- * @param id STEP instance id
- * @param name zone name
- * @param form zone form reference
- */
 /**
  * Resolved RUNOUT_TOLERANCE_ZONE.
  * A tolerance zone specifically for runout tolerances.

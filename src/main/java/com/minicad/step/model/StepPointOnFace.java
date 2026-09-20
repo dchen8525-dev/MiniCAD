@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved POINT_ON_FACE.
- * A point located on a face.
- */
 /**
  * Resolved POINT_ON_FACE.
  * A point located on a face.

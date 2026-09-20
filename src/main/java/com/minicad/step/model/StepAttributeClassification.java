@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ATTRIBUTE_CLASSIFICATION.
- * An attribute classification assignment.
- */
 /**
  * Resolved ATTRIBUTE_CLASSIFICATION.
  * An attribute classification assignment.

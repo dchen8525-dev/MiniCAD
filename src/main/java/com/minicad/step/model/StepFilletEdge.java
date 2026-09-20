@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FILLET_EDGE.
- * A fillet edge entity.
- *
- * @param id STEP instance id
- * @param name edge name
- * @param originalEdge original edge being filleted
- * @param filletRadius fillet radius
- * @param adjacentFaces adjacent faces for fillet
- * @param filletType fillet type classification (constant, variable)
- */
 /**
  * Resolved FILLET_EDGE.
  * A fillet edge entity.

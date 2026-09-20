@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CIRCLE.
- *
- * @param id step id
- * @param name step label
- * @param position circle placement
- * @param radius radius value
- */
 /**
  * Resolved CIRCLE.
  *

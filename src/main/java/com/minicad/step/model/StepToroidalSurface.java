@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved TOROIDAL_SURFACE.
- *
- * @param id step id
- * @param name step label
- * @param position torus placement
- * @param majorRadius major radius
- * @param minorRadius minor radius
- */
 /**
  * Resolved TOROIDAL_SURFACE.
  *

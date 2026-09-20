@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved EXTERNALLY_DEFINED_HATCH_STYLE.
- * A hatch style defined by an external source.
- */
 /**
  * Resolved EXTERNALLY_DEFINED_HATCH_STYLE.
  * A hatch style defined by an external source.

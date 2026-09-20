@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DIRECTION_SENSE.
- * Direction sense for kinematic joints.
- */
 /**
  * Resolved DIRECTION_SENSE.
  * Direction sense for kinematic joints.

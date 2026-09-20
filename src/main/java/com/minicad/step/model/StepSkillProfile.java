@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SKILL_PROFILE.
- * A skill profile entity.
- *
- * @param id STEP instance id
- * @param name profile name
- * @variancePerson person variance reference
- * @varianceSkills skill variance list
- * @varianceLevels skill variance levels
- * @varianceExperience experience variance years
- * @varianceStatus profile variance status
- */
 /**
  * Resolved SKILL_PROFILE.
  * A skill profile entity.

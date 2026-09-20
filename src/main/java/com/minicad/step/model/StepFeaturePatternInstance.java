@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FEATURE_PATTERN_INSTANCE.
- * A feature pattern instance entity.
- *
- * @param id STEP instance id
- * @param name instance name
- * @param patternDef pattern definition reference
- * @param instancePosition instance position in pattern
- * @param instanceIndex instance index number
- * @param replicatedFeature replicated feature at this position
- */
 /**
  * Resolved FEATURE_PATTERN_INSTANCE.
  * A feature pattern instance entity.

@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved TOLERANCE_ZONE.
- * Defines a tolerance zone with specific form and appearance.
- *
- * @param id STEP instance id
- * @param name zone name
- * @param form tolerance zone form reference
- */
 /**
  * Resolved TOLERANCE_ZONE.
  * Defines a tolerance zone with specific form and appearance.

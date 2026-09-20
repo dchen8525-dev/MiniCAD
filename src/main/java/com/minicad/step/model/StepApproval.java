@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal APPROVAL metadata.
- *
- * @param id STEP instance id
- * @param status approval status
- * @param level approval level
- */
 /**
  * Minimal APPROVAL metadata.
  *

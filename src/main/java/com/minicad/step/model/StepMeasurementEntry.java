@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MEASUREMENT_ENTRY.
- * A measurement entry entity.
- *
- * @param id STEP instance id
- * @param name entry name
- * @param entryType entry variance type
- * @param entryMeasurement entry variance measurement type
- * @param entryValue entry variance measurement value
- * @param entryUnit entry variance unit reference
- * @param entryTimestamp entry variance timestamp
- * @param entryAccuracy entry variance accuracy
- * @param entryStatus entry variance status
- */
 /**
  * Resolved MEASUREMENT_ENTRY.
  * A measurement entry entity.

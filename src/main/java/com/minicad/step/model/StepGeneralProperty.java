@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal GENERAL_PROPERTY metadata.
- *
- * @param id STEP instance id
- * @param propertyId property identifier
- * @param name property name
- * @param description property description
- */
 /**
  * Minimal GENERAL_PROPERTY metadata.
  *

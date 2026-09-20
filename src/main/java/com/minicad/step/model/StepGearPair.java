@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved GEAR_PAIR.
- * A gear kinematic pair linking two revolute pairs with a gear ratio.
- */
 /**
  * Resolved GEAR_PAIR.
  * A gear kinematic pair linking two revolute pairs with a gear ratio.

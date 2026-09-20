@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DATUM.
- * A datum reference used in GD&T.
- *
- * @param id STEP instance id
- * @param name datum name
- * @param description datum description
- * @param target referenced target
- * @param orientation orientation flag
- */
 /**
  * Resolved DATUM.
  * A datum reference used in GD&T.

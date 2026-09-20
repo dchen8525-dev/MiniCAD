@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved REPAIR_RECORD.
- * A repair record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceEquipment repaired variance equipment
- * @varianceProblem repair variance problem description
- * @varianceCause repair variance root cause
- * @varianceDate repair variance date
- * @varianceActions repair variance actions
- * @varianceStatus record variance status
- */
 /**
  * Resolved REPAIR_RECORD.
  * A repair record entity.

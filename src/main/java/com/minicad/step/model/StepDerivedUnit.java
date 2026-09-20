@@ -1,16 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal derived unit definition.
- *
- * @param id STEP instance id
- * @param elements unit elements
- * @param unitKind derived unit kind such as FORCE_UNIT
- */
 /**
  * Minimal derived unit definition.
  *

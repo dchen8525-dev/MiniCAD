@@ -1,24 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PURCHASE_ORDER.
- * A purchase order entity.
- *
- * @param id STEP instance id
- * @param name order name
- * @param orderId purchase order identifier
- * @varianceItems ordered variance items
- * @varianceQuantities item variance quantities
- * @varianceSupplier supplier variance reference
- * @varianceDate order variance date
- * @varianceDelivery expected variance delivery date
- * @varianceTotal total variance cost
- * @varianceStatus order variance status
- */
 /**
  * Resolved PURCHASE_ORDER.
  * A purchase order entity.

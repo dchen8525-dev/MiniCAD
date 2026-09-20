@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved MOTION_CONSTRAINT.
- * A motion constraint for kinematic joints.
- */
 /**
  * Resolved MOTION_CONSTRAINT.
  * A motion constraint for kinematic joints.

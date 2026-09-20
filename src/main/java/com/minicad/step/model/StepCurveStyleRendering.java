@@ -1,11 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
 
-/**
- * Resolved CURVE_STYLE_RENDERING.
- */
 /**
  * Resolved CURVE_STYLE_RENDERING.
  */

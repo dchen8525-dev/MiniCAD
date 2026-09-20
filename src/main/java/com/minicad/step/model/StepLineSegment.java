@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved LINE_SEGMENT.
- * A simple line segment defined by two endpoints.
- *
- * @param id STEP instance id
- * @param name segment name
- * @param startPoint the start point of the segment
- * @param endPoint the end point of the segment
- */
 /**
  * Resolved LINE_SEGMENT.
  * A simple line segment defined by two endpoints.

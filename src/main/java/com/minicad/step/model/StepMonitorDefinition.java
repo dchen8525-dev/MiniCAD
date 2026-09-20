@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MONITOR_DEFINITION.
- * A monitor definition entity.
- *
- * @param id STEP instance id
- * @param name monitor name
- * @param monitorType monitor variance type
- * @param monitorTarget monitor variance target reference
- * @param monitorMetrics monitor variance metrics
- * @param monitorInterval monitor variance check interval
- * @param monitorThresholds monitor variance thresholds
- * @param monitorStatus monitor variance status
- */
 /**
  * Resolved MONITOR_DEFINITION.
  * A monitor definition entity.

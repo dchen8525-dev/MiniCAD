@@ -14,13 +14,6 @@ import java.util.Objects;
  * @param xDirection local x direction
  * @param radius positive radius
  */
-/**
- * Minimal 2D circle representation.
- *
- * @param center circle center
- * @param xDirection local x direction
- * @param radius positive radius
- */
 public final class Circle2 implements Curve2 {
     private final Point2 center;
     private final Direction2 xDirection;

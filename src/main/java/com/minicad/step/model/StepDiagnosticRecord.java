@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DIAGNOSTIC_RECORD.
- * A diagnostic record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceSystem diagnosed variance system
- * @varianceTests diagnostic variance tests
- * @varianceResults diagnostic variance results
- * @varianceConclusion diagnostic variance conclusion
- * @varianceRecommendation recommendation variance for fix
- * @varianceStatus record variance status
- */
 /**
  * Resolved DIAGNOSTIC_RECORD.
  * A diagnostic record entity.

@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal parse-only conic curve for PARABOLA and HYPERBOLA.
- *
- * @param id STEP instance id
- * @param name curve name
- * @param position curve placement
- * @param parameters numeric conic parameters
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal parse-only conic curve for PARABOLA and HYPERBOLA.
  *

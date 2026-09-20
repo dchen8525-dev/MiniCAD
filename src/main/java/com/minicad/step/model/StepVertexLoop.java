@@ -9,13 +9,6 @@ import java.util.Objects;
  * @param name step label
  * @param loopVertex referenced single vertex
  */
-/**
- * Resolved VERTEX_LOOP.
- *
- * @param id step id
- * @param name step label
- * @param loopVertex referenced single vertex
- */
 public final class StepVertexLoop implements StepLoop {
     private final int id;
     private final String name;

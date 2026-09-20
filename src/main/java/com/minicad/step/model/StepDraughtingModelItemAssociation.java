@@ -1,19 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepRepresentation;
 import java.util.Objects;
-/**
- * Minimal draughting model item association.
- *
- * @param id STEP instance id
- * @param name usage name
- * @param description usage description
- * @param definition association definition/select target
- * @param usedRepresentation draughting model representation
- * @param identifiedItem associated item
- */
 /**
  * Minimal draughting model item association.
  *

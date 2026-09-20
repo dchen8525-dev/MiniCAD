@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved HYDRAULIC_FEATURE.
- * A hydraulic feature entity.
- *
- * @param id STEP instance id
- * @param name hydraulic name
- * @param hydraulicType hydraulic feature type (pump, valve, cylinder, line)
- * @param hydraulicGeometry hydraulic geometry representation
- * @variancePressure variance pressure rating
- * @param flowRate flow rate specification
- * @param portSize port size specification
- * @varianceConnections variance connections count
- */
 /**
  * Resolved HYDRAULIC_FEATURE.
  * A hydraulic feature entity.

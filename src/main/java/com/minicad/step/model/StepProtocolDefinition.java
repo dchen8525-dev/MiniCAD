@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PROTOCOL_DEFINITION.
- * A protocol definition entity.
- *
- * @param id STEP instance id
- * @param name definition name
- * @varianceProtocol defined variance protocol
- * @varianceType protocol variance type (communication, data, control)
- * @varianceFormat protocol variance format specification
- * @varianceSequence protocol variance sequence/steps
- * @varianceStandard protocol variance standard reference
- * @varianceStatus definition variance status
- */
 /**
  * Resolved PROTOCOL_DEFINITION.
  * A protocol definition entity.

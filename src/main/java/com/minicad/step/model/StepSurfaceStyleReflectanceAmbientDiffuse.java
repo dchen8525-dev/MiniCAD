@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE.
- *
- * @param id STEP instance id
- * @param ambientReflectance ambient reflectance factor
- * @param diffuseReflectance diffuse reflectance factor
- */
 /**
  * Minimal SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE.
  *

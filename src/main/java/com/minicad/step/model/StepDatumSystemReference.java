@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DATUM_SYSTEM_REFERENCE.
- * A datum system reference entity.
- *
- * @param id STEP instance id
- * @param name datum system name
- * @param datumSystem the datum system being referenced
- * @param precedenceLevel precedence level in the datum system
- */
 /**
  * Resolved DATUM_SYSTEM_REFERENCE.
  * A datum system reference entity.

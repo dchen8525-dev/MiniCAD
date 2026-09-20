@@ -1,17 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SPHERICAL_SURFACE_WITH_ELLIPTICAL_AXIS.
- * A spherical surface with an elliptical axis definition.
- *
- * @param id STEP instance id
- * @param name surface name
- * @param position axis placement
- * @param radius sphere radius
- * @param ellipticalRatio ratio defining the elliptical shape
- */
 /**
  * Resolved SPHERICAL_SURFACE_WITH_ELLIPTICAL_AXIS.
  * A spherical surface with an elliptical axis definition.

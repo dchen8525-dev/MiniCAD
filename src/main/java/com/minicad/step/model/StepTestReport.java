@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TEST_REPORT.
- * A test report entity.
- *
- * @param id STEP instance id
- * @param name report name
- * @param reportId report identifier
- * @param testType test type (functional, performance, environmental)
- * @varianceResults test variance results
- * @varianceConclusions test variance conclusions
- * @varianceRecommendations test variance recommendations
- * @varianceDate test variance date
- * @param reportStatus report status
- */
 /**
  * Resolved TEST_REPORT.
  * A test report entity.

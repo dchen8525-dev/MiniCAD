@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal OVER_RIDING_STYLED_ITEM.
- *
- * @param id step id
- * @param name style label
- * @param styles overriding style assignments
- * @param item styled target
- * @param overRiddenStyle referenced base styled item
- */
 /**
  * Minimal OVER_RIDING_STYLED_ITEM.
  *

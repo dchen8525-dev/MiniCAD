@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DEPARTMENT_DEFINITION.
- * A department definition entity.
- *
- * @param id STEP instance id
- * @param name department name
- * @param departmentType department variance type
- * @param departmentDescription department variance description
- * @param departmentFunctions department variance functions
- * @param departmentBudget department variance budget
- * @param departmentStatus department variance status
- */
 /**
  * Resolved DEPARTMENT_DEFINITION.
  * A department definition entity.

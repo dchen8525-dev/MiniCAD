@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONSTRAINT_INSTANCE.
- * A constraint instance entity.
- *
- * @param id STEP instance id
- * @param name constraint instance name
- * @param constraintDefinition constraint variance definition reference
- * @param constraintState constraint variance state
- * @param constraintValue constraint variance current value
- * @param constraintViolations constraint variance violation count
- * @param constraintStatus constraint variance status
- */
 /**
  * Resolved CONSTRAINT_INSTANCE.
  * A constraint instance entity.

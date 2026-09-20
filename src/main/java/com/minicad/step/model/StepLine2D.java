@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved LINE_2D.
- *
- * @param id step id
- * @param name step label
- * @param point_2d point on the line
- * @param direction_2d direction of the line
- */
 /**
  * Resolved LINE_2D.
  *

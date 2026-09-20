@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TROUBLESHOOTING_RECORD.
- * A troubleshooting record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceProblem problem variance description
- * @varianceSymptoms symptoms variance observed
- * @varianceSteps troubleshooting variance steps taken
- * @varianceSolution solution variance found
- * @varianceTime time variance to resolve
- * @varianceStatus record variance status
- */
 /**
  * Resolved TROUBLESHOOTING_RECORD.
  * A troubleshooting record entity.

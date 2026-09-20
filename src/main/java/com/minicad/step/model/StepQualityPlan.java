@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved QUALITY_PLAN.
- * A quality plan entity.
- *
- * @param id STEP instance id
- * @param name plan name
- * @param planId plan identifier
- * @varianceItems quality variance control items
- * @varianceMethods inspection variance methods
- * @varianceCriteria acceptance variance criteria
- * @varianceFrequency inspection variance frequency
- * @varianceStatus plan variance status
- */
 /**
  * Resolved QUALITY_PLAN.
  * A quality plan entity.

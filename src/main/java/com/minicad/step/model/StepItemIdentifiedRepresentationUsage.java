@@ -1,19 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepRepresentation;
 import java.util.Objects;
-/**
- * Minimal link from a representation to an identified item.
- *
- * @param id STEP instance id
- * @param name usage name
- * @param description usage description
- * @param definition usage definition/select target
- * @param usedRepresentation representation carrying the item
- * @param identifiedItem identified item reference
- */
 /**
  * Minimal link from a representation to an identified item.
  *

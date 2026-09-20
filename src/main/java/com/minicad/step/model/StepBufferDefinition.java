@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved BUFFER_DEFINITION.
- * A buffer definition entity.
- *
- * @param id STEP instance id
- * @param name buffer name
- * @param bufferType buffer variance type
- * @param bufferCapacity buffer variance capacity
- * @param bufferPolicy buffer variance policy
- * @param bufferStatus buffer variance status
- */
 /**
  * Resolved BUFFER_DEFINITION.
  * A buffer definition entity.

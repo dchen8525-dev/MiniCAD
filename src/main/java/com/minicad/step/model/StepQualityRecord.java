@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved QUALITY_RECORD.
- * A quality record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @param recordType record type classification
- * @param recordItems record items/data
- * @param recordContext record context reference
- * @param recordDate record date
- * @param recordAuthor record author/inspector
- * @param recordStatus record status (approved, pending)
- * @param attachments record attachments/references
- */
 /**
  * Resolved QUALITY_RECORD.
  * A quality record entity.

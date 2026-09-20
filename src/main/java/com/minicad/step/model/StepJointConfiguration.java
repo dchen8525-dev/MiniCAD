@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved JOINT_CONFIGURATION.
- * A joint configuration entity.
- *
- * @param id STEP instance id
- * @param name configuration name
- * @param joint reference kinematic joint
- * @param jointType joint type (revolute, prismatic, spherical)
- * @param jointPosition joint position/angle value
- * @param jointVelocity joint velocity
- * @param jointLimits joint limit values
- * @param jointMotion joint motion direction
- */
 /**
  * Resolved JOINT_CONFIGURATION.
  * A joint configuration entity.

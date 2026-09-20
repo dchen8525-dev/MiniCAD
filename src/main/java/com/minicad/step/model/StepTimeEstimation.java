@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TIME_ESTIMATION.
- * A time estimation entity.
- *
- * @param id STEP instance id
- * @param name estimation name
- * @param estimationType estimation type (setup, operation, total)
- * @param estimatedTime estimated time value
- * @param timeUnit time unit specification
- * @param timeBreakdown time breakdown items
- * @param estimationMethod estimation method used
- * @param estimationFactors estimation factors applied
- */
 /**
  * Resolved TIME_ESTIMATION.
  * A time estimation entity.

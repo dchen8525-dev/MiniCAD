@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ARCHIVE_INSTANCE.
- * An archive instance entity.
- *
- * @param id STEP instance id
- * @param name archive instance name
- * @param archiveDefinition archive variance definition reference
- * @param archiveTime archive variance creation time
- * @param archiveSize archive variance size
- * @param archiveEntries archive variance entry count
- * @param archiveStatus archive variance status
- */
 /**
  * Resolved ARCHIVE_INSTANCE.
  * An archive instance entity.

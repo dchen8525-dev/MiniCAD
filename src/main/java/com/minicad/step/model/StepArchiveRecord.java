@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ARCHIVE_RECORD.
- * An archive record entity.
- *
- * @param id STEP instance id
- * @param name record name
- * @varianceData archived variance data
- * @varianceLocation archive variance location
- * @varianceDate archive variance date
- * @varianceRetention retention variance period
- * @varianceAccess access variance restrictions
- * @varianceStatus record variance status
- */
 /**
  * Resolved ARCHIVE_RECORD.
  * An archive record entity.

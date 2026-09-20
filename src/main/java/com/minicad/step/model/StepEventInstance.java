@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved EVENT_INSTANCE.
- * An event instance entity.
- *
- * @param id STEP instance id
- * @param name event instance name
- * @param eventDefinition event variance definition reference
- * @param eventState event variance state
- * @param eventTriggerTime event variance trigger time
- * @param eventExecutedActions event variance executed actions
- * @param eventStatus event variance status
- */
 /**
  * Resolved EVENT_INSTANCE.
  * An event instance entity.

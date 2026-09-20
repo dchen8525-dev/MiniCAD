@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal placed datum target feature link.
- *
- * @param id STEP instance id
- * @param definition property definition
- * @param usedRepresentation referenced representation
- */
 /**
  * Minimal placed datum target feature link.
  *

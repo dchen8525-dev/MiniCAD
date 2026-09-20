@@ -1,19 +1,9 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 
-import com.minicad.step.model.StepPresentationStyleAssignment;
 import java.util.Objects;
 
-/**
- * Minimal projection curve occurrence.
- *
- * @param id STEP instance id
- * @param name occurrence name
- * @param styles style assignments
- * @param item projected curve geometry
- */
 /**
  * Minimal projection curve occurrence.
  *

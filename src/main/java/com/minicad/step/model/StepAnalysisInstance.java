@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ANALYSIS_INSTANCE.
- * An analysis instance entity.
- *
- * @param id STEP instance id
- * @param name analysis instance name
- * @param analysisDefinition analysis variance definition reference
- * @param analysisState analysis variance state
- * @param analysisResults analysis variance results
- * @param analysisConclusions analysis variance conclusions
- * @param analysisStatus analysis variance status
- */
 /**
  * Resolved ANALYSIS_INSTANCE.
  * An analysis instance entity.

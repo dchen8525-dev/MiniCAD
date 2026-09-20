@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved THRESHOLD_INSTANCE.
- * A threshold instance entity.
- *
- * @param id STEP instance id
- * @param name threshold instance name
- * @param thresholdDefinition threshold variance definition reference
- * @param thresholdState threshold variance state (normal/warning/critical)
- * @param thresholdCurrentValue threshold variance current value
- * @param thresholdViolations threshold variance violation count
- * @param thresholdStatus threshold variance status
- */
 /**
  * Resolved THRESHOLD_INSTANCE.
  * A threshold instance entity.

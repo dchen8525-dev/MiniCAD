@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved MANUFACTURING_FEATURE_REPRESENTATION.
- * Represents the representation of a manufacturing feature.
- *
- * @param id STEP instance id
- * @param name representation name
- * @param items representation items
- * @param context representation context
- */
 /**
  * Resolved MANUFACTURING_FEATURE_REPRESENTATION.
  * Represents the representation of a manufacturing feature.

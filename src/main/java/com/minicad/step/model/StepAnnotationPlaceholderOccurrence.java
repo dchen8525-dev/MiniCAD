@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal annotation placeholder occurrence.
- *
- * @param id STEP instance id
- * @param name occurrence name
- * @param styles style assignments
- * @param item referenced point-like carrier
- * @param role placeholder role enum
- * @param lineSpacing positive line spacing
- */
 /**
  * Minimal annotation placeholder occurrence.
  *

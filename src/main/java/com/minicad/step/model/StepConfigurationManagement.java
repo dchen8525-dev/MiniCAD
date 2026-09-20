@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CONFIGURATION_MANAGEMENT.
- * A configuration management entity.
- *
- * @param id STEP instance id
- * @param name configuration name
- * @param configurationId configuration identifier
- * @param configurationItems configuration items
- * @param configurationStatus configuration status
- * @param configurationBaseline configuration baseline reference
- * @param configurationOwner configuration owner
- */
 /**
  * Resolved CONFIGURATION_MANAGEMENT.
  * A configuration management entity.

@@ -1,19 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved SURFACE_CURVE_SWEPT_AREA_SOLID.
- * A swept solid where the trajectory follows a surface curve.
- *
- * @param id STEP instance id
- * @param name solid name
- * @param sweptArea profile to sweep
- * @param referenceSurface surface the trajectory follows
- * @param trajectory path curve
- * @param startPoint start parameter
- * @param endPoint end parameter
- */
 /**
  * Resolved SURFACE_CURVE_SWEPT_AREA_SOLID.
  * A swept solid where the trajectory follows a surface curve.

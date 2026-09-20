@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STANDARD_DEFINITION.
- * A standard definition entity.
- *
- * @param id STEP instance id
- * @param name standard name
- * @param standardType standard variance type
- * @param standardCode standard variance code/identifier
- * @param standardVersion standard variance version
- * @param standardRequirements standard variance requirements
- * @param standardStatus standard variance status
- */
 /**
  * Resolved STANDARD_DEFINITION.
  * A standard definition entity.

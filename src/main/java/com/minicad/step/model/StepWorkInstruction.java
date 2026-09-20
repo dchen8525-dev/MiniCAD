@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved WORK_INSTRUCTION.
- * A work instruction entity.
- *
- * @param id STEP instance id
- * @param name instruction name
- * @param instructionId instruction identifier
- * @param instructionType instruction type (assembly, machining, inspection)
- * @param instructionSteps work instruction steps
- * @param instructionMedia associated media/images
- * @param instructionTools required tools reference
- * @param instructionStatus instruction status (approved, draft)
- */
 /**
  * Resolved WORK_INSTRUCTION.
  * A work instruction entity.

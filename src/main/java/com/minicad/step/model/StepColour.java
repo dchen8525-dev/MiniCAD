@@ -1,12 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal COLOUR marker.
- *
- * @param id step id
- */
 /**
  * Minimal COLOUR marker.
  *

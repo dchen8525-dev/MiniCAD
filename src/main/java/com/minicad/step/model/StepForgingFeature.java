@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FORGING_FEATURE.
- * A forging feature entity.
- *
- * @param id STEP instance id
- * @param name forging name
- * @param forgingType forging type classification (open die, closed die, upset)
- * @param forgingGeometry forging geometry representation
- * @param dieFlash die flash allowance
- * @param forgingGrain grain direction specification
- * @param forgingMaterial forging material specification
- * @param forgingTemperature forging temperature range
- */
 /**
  * Resolved FORGING_FEATURE.
  * A forging feature entity.

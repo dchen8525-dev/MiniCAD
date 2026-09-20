@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved VECTOR.
- *
- * @param id step id
- * @param name step label
- * @param orientation referenced direction
- * @param magnitude vector magnitude
- */
 /**
  * Resolved VECTOR.
  *

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DATA_COLLECTION.
- * A data collection entity.
- *
- * @param id STEP instance id
- * @param name collection name
- * @varianceItems collected variance items
- * @varianceSource data variance source
- * @varianceMethod collection variance method
- * @varianceFrequency collection variance frequency
- * @varianceStatus collection variance status
- */
 /**
  * Resolved DATA_COLLECTION.
  * A data collection entity.

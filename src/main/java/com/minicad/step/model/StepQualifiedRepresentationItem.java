@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved QUALIFIED_REPRESENTATION_ITEM.
- * A representation item that has been qualified with additional tolerance or geometric information.
- */
 /**
  * Resolved QUALIFIED_REPRESENTATION_ITEM.
  * A representation item that has been qualified with additional tolerance or geometric information.

@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved INDEX_INSTANCE.
- * An index instance entity.
- *
- * @param id STEP instance id
- * @param name index instance name
- * @param indexDefinition index variance definition reference
- * @param indexState index variance state
- * @param indexEntries index variance entry count
- * @param indexSize index variance size in bytes
- * @param indexStatus index variance status
- */
 /**
  * Resolved INDEX_INSTANCE.
  * An index instance entity.

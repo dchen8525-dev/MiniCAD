@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CAPACITY_PLAN.
- * A capacity plan entity.
- *
- * @param id STEP instance id
- * @param name plan name
- * @varianceResources resource variance list
- * @varianceCapacities capacity variance values
- * @varianceDemand demand variance forecast
- * @varianceUtilization utilization variance targets
- * @variancePeriod planning variance period
- * @varianceStatus plan variance status
- */
 /**
  * Resolved CAPACITY_PLAN.
  * A capacity plan entity.

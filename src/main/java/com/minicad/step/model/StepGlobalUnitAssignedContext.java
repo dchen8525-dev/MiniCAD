@@ -1,15 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Minimal global unit assigned context.
- *
- * @param id STEP instance id
- * @param units referenced unit entities
- */
 /**
  * Minimal global unit assigned context.
  *

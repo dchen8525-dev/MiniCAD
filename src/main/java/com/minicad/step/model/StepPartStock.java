@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved PART_STOCK.
- * A part stock entity.
- *
- * @param id STEP instance id
- * @param name stock name
- * @param partType part type/part number
- * @varianceQuantity stock variance quantity available
- * @varianceLocation stock variance location
- * @varianceCost unit variance cost
- * @varianceMin reorder variance minimum threshold
- * @varianceMax stock variance maximum limit
- * @varianceStatus stock variance status
- */
 /**
  * Resolved PART_STOCK.
  * A part stock entity.

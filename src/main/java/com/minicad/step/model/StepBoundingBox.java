@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved BOUNDING_BOX.
- * An axis-aligned bounding box.
- */
 /**
  * Resolved BOUNDING_BOX.
  * An axis-aligned bounding box.

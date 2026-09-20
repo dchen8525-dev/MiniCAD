@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal BOOLEAN_RESULT.
- *
- * @param id step id
- * @param name inherited representation-item name
- * @param operator boolean operator enum token
- * @param firstOperand first boolean operand
- * @param secondOperand second boolean operand
- */
 /**
  * Minimal BOOLEAN_RESULT.
  *

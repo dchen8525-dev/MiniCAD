@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STORAGE_FEATURE.
- * A storage feature entity.
- *
- * @param id STEP instance id
- * @param name storage name
- * @param storageType storage type (rack, shelf, bin, cabinet)
- * @param storageGeometry storage geometry representation
- * @varianceCapacity storage variance capacity
- * @param storageDimensions storage dimensions
- * @param storageLocation storage location placement
- * @param storageEnvironment storage environment specification
- */
 /**
  * Resolved STORAGE_FEATURE.
  * A storage feature entity.

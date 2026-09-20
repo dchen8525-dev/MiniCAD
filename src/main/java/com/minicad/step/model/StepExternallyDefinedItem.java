@@ -1,17 +1,7 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 
-import com.minicad.step.model.StepExternalSource;
 import java.util.Objects;
-/**
- * Minimal externally defined item metadata.
- *
- * @param id STEP instance id
- * @param itemId external item identifier
- * @param source external source
- * @param entityName concrete STEP entity name
- */
 /**
  * Minimal externally defined item metadata.
  *

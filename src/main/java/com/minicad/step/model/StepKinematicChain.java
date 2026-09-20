@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved KINEMATIC_CHAIN.
- * A chain of kinematic links and joints.
- */
 /**
  * Resolved KINEMATIC_CHAIN.
  * A chain of kinematic links and joints.

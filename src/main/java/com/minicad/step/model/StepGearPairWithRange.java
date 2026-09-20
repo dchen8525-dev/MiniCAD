@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved GEAR_PAIR_WITH_RANGE.
- * A gear pair with specified range limits.
- */
 /**
  * Resolved GEAR_PAIR_WITH_RANGE.
  * A gear pair with specified range limits.

@@ -1,19 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved DATUM_SYSTEM.
- * A datum system entity with multiple datum references.
- *
- * @param id STEP instance id
- * @param name system name
- * @param datums ordered list of datums in the system
- * @param systemType datum system type classification
- * @param tolerance tolerance that uses this datum system
- */
 /**
  * Resolved DATUM_SYSTEM.
  * A datum system entity with multiple datum references.

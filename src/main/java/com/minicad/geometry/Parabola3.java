@@ -15,13 +15,6 @@ import java.util.Objects;
  * @param position parabola placement (vertex at origin, axis along local Y)
  * @param focalDistance distance from vertex to focus
  */
-/**
- * Minimal 3D parabola representation.
- * A parabola is a conic section defined by a focus and directrix, or parametrically.
- *
- * @param position parabola placement (vertex at origin, axis along local Y)
- * @param focalDistance distance from vertex to focus
- */
 public final class Parabola3 implements Curve3 {
     private final Axis2Placement3D position;
     private final double focalDistance;

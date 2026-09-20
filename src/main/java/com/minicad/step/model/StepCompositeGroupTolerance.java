@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved COMPOSITE_GROUP_TOLERANCE.
- * A composite tolerance that applies multiple tolerance requirements to a feature group.
- */
 /**
  * Resolved COMPOSITE_GROUP_TOLERANCE.
  * A composite tolerance that applies multiple tolerance requirements to a feature group.

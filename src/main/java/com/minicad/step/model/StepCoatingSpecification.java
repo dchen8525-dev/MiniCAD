@@ -1,20 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved COATING_SPECIFICATION.
- * A coating specification entity.
- *
- * @param id STEP instance id
- * @param name specification name
- * @param specificationType specification variance type
- * @param specificationDescription specification variance description
- * @param specificationRequirements specification variance requirements
- * @param specificationStatus specification variance status
- */
 /**
  * Resolved COATING_SPECIFICATION.
  * A coating specification entity.

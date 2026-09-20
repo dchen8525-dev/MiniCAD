@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CAD_MODEL_REFERENCE.
- * A CAD model reference entity.
- *
- * @param id STEP instance id
- * @param name reference name
- * @param modelId model identifier
- * @param modelType model type (3D, 2D, assembly)
- * @param modelGeometry model geometry reference
- * @param modelVersion model version reference
- * @param modelAuthor model author reference
- * @param modelStatus model status
- */
 /**
  * Resolved CAD_MODEL_REFERENCE.
  * A CAD model reference entity.

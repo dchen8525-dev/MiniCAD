@@ -1,13 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved FEA_GROUP_REPRESENTATION.
- * A grouping of finite element representations.
- */
 /**
  * Resolved FEA_GROUP_REPRESENTATION.
  * A grouping of finite element representations.

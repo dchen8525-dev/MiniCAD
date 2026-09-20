@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved CHECKPOINT_INSTANCE.
- * A checkpoint instance entity.
- *
- * @param id STEP instance id
- * @param name checkpoint instance name
- * @param checkpointDefinition checkpoint variance definition reference
- * @param checkpointTime checkpoint variance creation time
- * @param checkpointSize checkpoint variance size
- * @param checkpointValid checkpoint variance valid flag
- * @param checkpointStatus checkpoint variance status
- */
 /**
  * Resolved CHECKPOINT_INSTANCE.
  * A checkpoint instance entity.

@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved VERIFICATION_RESULT.
- * A verification result entity.
- *
- * @param id STEP instance id
- * @param name result name
- * @varianceItem verified variance item
- * @varianceMethod verification variance method
- * @varianceCriteria verification variance criteria
- * @varianceOutcome verification variance outcome (pass/fail)
- * @varianceEvidence evidence variance reference
- * @varianceStatus result variance status
- */
 /**
  * Resolved VERIFICATION_RESULT.
  * A verification result entity.

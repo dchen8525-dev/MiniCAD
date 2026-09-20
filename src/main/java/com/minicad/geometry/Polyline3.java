@@ -11,11 +11,6 @@ import java.util.Objects;
  *
  * @param points ordered polyline vertices
  */
-/**
- * Minimal 3D polyline curve.
- *
- * @param points ordered polyline vertices
- */
 public final class Polyline3 implements Curve3 {
     private final List<CartesianPoint> points;
 

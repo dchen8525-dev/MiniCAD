@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved DEGENERATE_CURVE_2D.
- *
- * @param id step id
- * @param name step label
- * @param point the degenerate point
- */
 /**
  * Resolved DEGENERATE_CURVE_2D.
  *

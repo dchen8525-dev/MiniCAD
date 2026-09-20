@@ -1,18 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved ADVANCED_BREP.
- * An advanced boundary representation with voids.
- *
- * @param id STEP instance id
- * @param name B-rep name
- * @param outer outer shell
- * @param voids list of void shells
- */
 /**
  * Resolved ADVANCED_BREP.
  * An advanced boundary representation with voids.

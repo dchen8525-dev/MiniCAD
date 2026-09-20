@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved TRANSITION_DEFINITION.
- * A transition definition entity.
- *
- * @param id STEP instance id
- * @param name definition name
- * @varianceFrom source variance state
- * @varianceTo target variance state
- * @varianceTrigger transition variance trigger condition
- * @varianceGuard transition variance guard condition
- * @varianceAction transition variance action
- * @varianceStatus definition variance status
- */
 /**
  * Resolved TRANSITION_DEFINITION.
  * A transition definition entity.

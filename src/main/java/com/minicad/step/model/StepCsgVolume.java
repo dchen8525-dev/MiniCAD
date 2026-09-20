@@ -1,15 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CSG_VOLUME.
- * A CSG solid represented as a volume.
- *
- * @param id STEP instance id
- * @param name volume name
- * @param treeRoot root of the CSG tree
- */
 /**
  * Resolved CSG_VOLUME.
  * A CSG solid represented as a volume.

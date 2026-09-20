@@ -1,22 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved STUDY_INSTANCE.
- * A study instance entity.
- *
- * @param id STEP instance id
- * @param name study instance name
- * @param studyDefinition study variance definition reference
- * @param studyState study variance state
- * @param studyStartTime study variance start time
- * @param studyEndTime study variance end time
- * @param studyResults study variance results
- * @param studyStatus study variance status
- */
 /**
  * Resolved STUDY_INSTANCE.
  * A study instance entity.

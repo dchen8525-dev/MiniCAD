@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved CONFIGURATION_EFFECTIVITY.
- * Specifies when a configuration-managed item becomes effective.
- *
- * @param id STEP instance id
- * @param name effectivity name
- * @param configuration configuration item reference
- * @param itemConceived product definition being configured
- */
 /**
  * Resolved CONFIGURATION_EFFECTIVITY.
  * Specifies when a configuration-managed item becomes effective.

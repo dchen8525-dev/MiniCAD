@@ -12,13 +12,6 @@ import java.util.Objects;
  * @param y y component
  * @param z z component
  */
-/**
- * Immutable 3D vector.
- *
- * @param x x component
- * @param y y component
- * @param z z component
- */
 public final class Vector3 {
     private final double x;
     private final double y;

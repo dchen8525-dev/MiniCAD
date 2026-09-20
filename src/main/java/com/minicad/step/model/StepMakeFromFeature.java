@@ -1,16 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved MAKE_FROM_FEATURE.
- * A manufacturing feature definition.
- *
- * @param id STEP instance id
- * @param name feature name
- * @param description feature description
- * @param ofShape shape aspect reference
- */
 /**
  * Resolved MAKE_FROM_FEATURE.
  * A manufacturing feature definition.

@@ -11,12 +11,6 @@ import java.util.Objects;
  * @param position sphere placement
  * @param radius sphere radius
  */
-/**
- * Minimal spherical surface representation.
- *
- * @param position sphere placement
- * @param radius sphere radius
- */
 public final class SphericalSurface implements SurfaceGeometry {
     private final Axis2Placement3D position;
     private final double radius;

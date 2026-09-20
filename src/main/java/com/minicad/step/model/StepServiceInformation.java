@@ -1,23 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved SERVICE_INFORMATION.
- * A service information entity.
- *
- * @param id STEP instance id
- * @param name service name
- * @param serviceType service type (repair, replacement, calibration)
- * @param serviceItem item being serviced
- * @param serviceProvider service provider reference
- * @varianceDate service variance date
- * @param serviceCost service cost
- * @param serviceStatus service status
- * @param serviceNotes service notes/comments
- */
 /**
  * Resolved SERVICE_INFORMATION.
  * A service information entity.

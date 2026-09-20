@@ -1,21 +1,8 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Resolved RECOVERY_DEFINITION.
- * A recovery definition entity.
- *
- * @param id STEP instance id
- * @param name recovery name
- * @param recoveryType recovery variance type
- * @param recoveryStrategy recovery variance strategy
- * @param recoverySteps recovery variance recovery steps
- * @param recoveryTimeout recovery variance timeout
- * @param recoveryStatus recovery variance status
- */
 /**
  * Resolved RECOVERY_DEFINITION.
  * A recovery definition entity.

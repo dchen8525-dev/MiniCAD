@@ -1,14 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Minimal derived unit element.
- *
- * @param id STEP instance id
- * @param unit referenced unit
- * @param exponent exponent value
- */
 /**
  * Minimal derived unit element.
  *

@@ -1,11 +1,6 @@
 package com.minicad.step.model;
 
-import com.minicad.step.model.StepEntity;
 import java.util.Objects;
-/**
- * Resolved ELEMENT_GEOMETRIC_DESCRIPTION.
- * Geometric description of a finite element.
- */
 /**
  * Resolved ELEMENT_GEOMETRIC_DESCRIPTION.
  * Geometric description of a finite element.
