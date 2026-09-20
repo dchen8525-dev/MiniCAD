@@ -55,13 +55,7 @@ public final class PolyLoop implements Loop {
 
     @Override
     public BoundingBox3 boundingBox() {
-        if (points == null || points.isEmpty()) {
-            return BoundingBox3.empty();
-        }
-        BoundingBox3 box = BoundingBox3.empty();
-        for (CartesianPoint p : points) {
-            box = box.union(p);
-        }
-        return box;
+        // Delegates to the shared BoundingBox3.of(Collection) builder; points() may be null here.
+        return points == null ? BoundingBox3.empty() : BoundingBox3.of(points);
     }
 }
