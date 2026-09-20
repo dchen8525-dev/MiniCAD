@@ -317,17 +317,7 @@ public final class StepDumpApp {
         if (simpleName.startsWith("Step")) {
             simpleName = simpleName.substring(4);
         }
-        return camelToUpperSnake(simpleName);
-    }
-
-    private static String camelToUpperSnake(String value) {
-        if (value.isEmpty()) {
-            return value;
-        }
-        String normalized = value
-                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2")
-                .replaceAll("([a-z0-9])([A-Z])", "$1_$2");
-        return normalized.toUpperCase(java.util.Locale.ROOT);
+        return StepEntityNamingUtils.camelToUpperSnake(simpleName);
     }
 
     private static void appendBuildSummary(Map<Integer, StepEntity> resolved, StepCadBuilder builder, List<String> lines) {

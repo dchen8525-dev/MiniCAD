@@ -172,7 +172,7 @@ public final class StepEntityNamingUtils {
      * @param value the camelCase string
      * @return the UPPER_SNAKE_CASE string
      */
-    static String camelToUpperSnake(String value) {
+    public static String camelToUpperSnake(String value) {
         if (value.isEmpty()) {
             return value;
         }
