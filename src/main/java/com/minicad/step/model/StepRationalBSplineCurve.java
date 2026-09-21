@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal rational B-spline curve.
@@ -69,20 +70,19 @@ public final class StepRationalBSplineCurve extends AbstractStepControlPointCurv
     public String knotSpec() { return getKnotSpec(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRationalBSplineCurve that = (StepRationalBSplineCurve) o;
-        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getDegree() == that.getDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(getCurveForm(), that.getCurveForm()) && closedCurve == that.closedCurve && selfIntersect == that.selfIntersect && Objects.equals(weightsData, that.weightsData) && Objects.equals(knotMultiplicities, that.knotMultiplicities) && Objects.equals(knots, that.knots) && Objects.equals(knotSpec, that.knotSpec);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getDegree(), getControlPoints(), getCurveForm(), closedCurve, selfIntersect, weightsData, knotMultiplicities, knots, knotSpec);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRationalBSplineCurve{" + "id=" + getId() + "name=" + getName() + "degree=" + getDegree() + "controlPoints=" + getControlPoints() + "curveForm=" + getCurveForm() + "closedCurve=" + closedCurve + "selfIntersect=" + selfIntersect + "weightsData=" + weightsData + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "knotSpec=" + knotSpec + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("degree", getDegree());
+        state.put("controlPoints", getControlPoints());
+        state.put("curveForm", getCurveForm());
+        state.put("closedCurve", closedCurve);
+        state.put("selfIntersect", selfIntersect);
+        state.put("weightsData", weightsData);
+        state.put("knotMultiplicities", knotMultiplicities);
+        state.put("knots", knots);
+        state.put("knotSpec", knotSpec);
+        return state;
     }
 }

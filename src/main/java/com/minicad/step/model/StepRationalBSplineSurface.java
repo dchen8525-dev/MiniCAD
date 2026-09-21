@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal rational B-spline surface.
@@ -94,20 +95,23 @@ public final class StepRationalBSplineSurface extends AbstractStepControlPointSu
     public String knotSpec() { return getKnotSpec(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRationalBSplineSurface that = (StepRationalBSplineSurface) o;
-        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getUDegree() == that.getUDegree() && getVDegree() == that.getVDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(getSurfaceForm(), that.getSurfaceForm()) && uClosed == that.uClosed && vClosed == that.vClosed && selfIntersect == that.selfIntersect && Objects.equals(weightsData, that.weightsData) && Objects.equals(uMultiplicities, that.uMultiplicities) && Objects.equals(vMultiplicities, that.vMultiplicities) && Objects.equals(uKnots, that.uKnots) && Objects.equals(vKnots, that.vKnots) && Objects.equals(knotSpec, that.knotSpec);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getUDegree(), getVDegree(), getControlPoints(), getSurfaceForm(), uClosed, vClosed, selfIntersect, weightsData, uMultiplicities, vMultiplicities, uKnots, vKnots, knotSpec);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRationalBSplineSurface{" + "id=" + getId() + "name=" + getName() + "uDegree=" + getUDegree() + "vDegree=" + getVDegree() + "controlPoints=" + getControlPoints() + "surfaceForm=" + getSurfaceForm() + "uClosed=" + uClosed + "vClosed=" + vClosed + "selfIntersect=" + selfIntersect + "weightsData=" + weightsData + "uMultiplicities=" + uMultiplicities + "vMultiplicities=" + vMultiplicities + "uKnots=" + uKnots + "vKnots=" + vKnots + "knotSpec=" + knotSpec + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("uDegree", getUDegree());
+        state.put("vDegree", getVDegree());
+        state.put("controlPoints", getControlPoints());
+        state.put("surfaceForm", getSurfaceForm());
+        state.put("uClosed", uClosed);
+        state.put("vClosed", vClosed);
+        state.put("selfIntersect", selfIntersect);
+        state.put("weightsData", weightsData);
+        state.put("uMultiplicities", uMultiplicities);
+        state.put("vMultiplicities", vMultiplicities);
+        state.put("uKnots", uKnots);
+        state.put("vKnots", vKnots);
+        state.put("knotSpec", knotSpec);
+        return state;
     }
 }

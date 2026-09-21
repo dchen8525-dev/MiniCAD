@@ -45,12 +45,17 @@ import org.junit.jupiter.api.Test;
  *
  * <ul>
  *   <li><b>Who extends what.</b> The set of files naming each core after {@code extends} is exactly
- *       the expected twelve / eight, and the total mention count in the whole main tree is that
- *       number plus the core's own declaration - so no {@code instanceof}, no {@code .class} key and
- *       no cast can exist.</li>
+ *       the expected twelve / eight, and outside the core's own file no other file names it except
+ *       to extend it - so no {@code instanceof}, no {@code .class} key and no cast can exist.</li>
  *   <li><b>The shared half is gone from the subclasses.</b> No entity declares a core field or a
  *       core accessor (getter or record-style alias) any more, and every one of them still is a
  *       {@code StepEntity} and still {@code final}.</li>
+ *   <li><b>The value contract is written once, in the cores.</b> {@code equals}, {@code hashCode}
+ *       and {@code toString} were three more algorithms written out per entity. They are now final
+ *       on the cores and derive from one {@code components()} map per entity: this pins that no
+ *       entity restates them, that the component list is the retired order, that it covers every
+ *       field the entity declares, and - via {@link #RETIRED_VALUES} - that the pair
+ *       {@code hashCode|toString} still equals what the deleted bodies produced.</li>
  *   <li><b>Behaviour.</b> Reflective round-trips over all twenty: every core accessor returns what
  *       the constructor was given, the control-point list is copied and immutable, {@code null} stays
  *       {@code null}, {@code toString} still prints every core field in order, and {@code equals} /
@@ -159,13 +164,11 @@ class ControlPointEntityCoreConvergenceTest {
         TreeSet<String> surfaceExtenders = sourceExtenders(SURFACE_CORE);
         assertEquals(new TreeSet<>(SURFACES), surfaceExtenders, "who extends the surface core");
 
-        String main = stripCommentsOfMainTree();
-        // The name may appear only in the core's own file (declaration + constructor) and in the
-        // twenty extends clauses. Anything else is a use, and a use is a widened branch.
-        assertEquals(2 + CURVES.size(), count(main, CURVE_CORE),
-                CURVE_CORE + " may be named only by its own declaration/constructor and its subclasses");
-        assertEquals(2 + SURFACES.size(), count(main, SURFACE_CORE),
-                SURFACE_CORE + " may be named only by its own declaration/constructor and its subclasses");
+        // Outside the core's own file - where it names itself in its declaration, its constructor
+        // and its self-cast - the name may appear exactly once per subclass and only inside an
+        // `extends` clause. Any other mention is a use, and a use is a widened branch.
+        assertNamedOnlyToExtend(CURVE_CORE, curveExtenders);
+        assertNamedOnlyToExtend(SURFACE_CORE, surfaceExtenders);
     }
 
     @Test
@@ -280,6 +283,133 @@ class ControlPointEntityCoreConvergenceTest {
         Object surface = construct("StepUniformSurface", fixture("StepUniformSurface"), false);
         assertNotEquals(curve, surface, "a curve and a surface must not compare equal");
         assertNotEquals(curve.hashCode(), surface.hashCode(), "and must not collide here");
+    }
+
+    private static final Map<String, String> COMPONENT_ORDER = Map.ofEntries(
+            entry("StepBSplineCurve", "id,name,degree,controlPoints,curveForm,closedCurve,selfIntersect"),
+            entry("StepBSplineCurve2D", "id,name,degree,controlPoints,curveForm"),
+            entry("StepBSplineCurveWithKnots", "id,name,degree,controlPoints,curveForm,closedCurve,selfIntersect,knotMultiplicities,knots,knotSpec"),
+            entry("StepBSplineCurveWithKnotsAndBreakpoints", "id,name,degree,controlPoints,knotMultiplicities,knots,breakpoints,curveForm,closedCurve,selfIntersect"),
+            entry("StepBezierCurve", "id,name,degree,controlPoints,curveForm,closedCurve,selfIntersect"),
+            entry("StepPiecewiseBezierCurve", "id,name,degree,controlPoints,curveForm,closedCurve,selfIntersect"),
+            entry("StepQuasiUniformCurve", "id,name,degree,controlPoints,curveForm,closedCurve,selfIntersect"),
+            entry("StepQuasiUniformCurve2D", "id,name,degree,controlPoints,curveForm"),
+            entry("StepRationalBSplineCurve", "id,name,degree,controlPoints,curveForm,closedCurve,selfIntersect,weightsData,knotMultiplicities,knots,knotSpec"),
+            entry("StepRationalBSplineCurve2D", "id,name,degree,controlPoints,weights,curveForm"),
+            entry("StepUniformCurve", "id,name,degree,controlPoints,curveForm,closedCurve,selfIntersect"),
+            entry("StepUniformCurve2D", "id,name,degree,controlPoints,curveForm"),
+            entry("StepBSplineSurface", "id,name,uDegree,vDegree,controlPoints,surfaceForm,uClosed,vClosed,selfIntersect"),
+            entry("StepBSplineSurfaceWithKnots", "id,name,uDegree,vDegree,controlPoints,surfaceForm,uClosed,vClosed,selfIntersect,uMultiplicities,vMultiplicities,uKnots,vKnots,knotSpec"),
+            entry("StepBSplineSurfaceWithKnotsAndBreakpoints", "id,name,uDegree,vDegree,controlPoints,uKnotMultiplicities,vKnotMultiplicities,uKnots,vKnots,uBreakpoints,vBreakpoints,surfaceForm,uClosed,vClosed,selfIntersect"),
+            entry("StepBezierSurface", "id,name,uDegree,vDegree,controlPoints,surfaceForm,uClosed,vClosed,selfIntersect"),
+            entry("StepPiecewiseBezierSurface", "id,name,uDegree,vDegree,controlPoints,surfaceForm,uClosed,vClosed,selfIntersect"),
+            entry("StepQuasiUniformSurface", "id,name,uDegree,vDegree,controlPoints,surfaceForm,uClosed,vClosed,selfIntersect"),
+            entry("StepRationalBSplineSurface", "id,name,uDegree,vDegree,controlPoints,surfaceForm,uClosed,vClosed,selfIntersect,weightsData,uMultiplicities,vMultiplicities,uKnots,vKnots,knotSpec"),
+            entry("StepUniformSurface", "id,name,uDegree,vDegree,controlPoints,surfaceForm,uClosed,vClosed,selfIntersect")
+            );
+
+    private static final Map<String, String> RETIRED_VALUES = Map.ofEntries(
+            entry("StepBSplineCurve", "-959215823|StepBSplineCurve{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7closedCurve=trueselfIntersect=false}"),
+            entry("StepBSplineCurve2D", "615760907|StepBSplineCurve2D{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7}"),
+            entry("StepBSplineCurveWithKnots", "-1822652325|StepBSplineCurveWithKnots{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7closedCurve=trueselfIntersect=falseknotMultiplicities=[1, 2, 3]knots=[0.0, 0.25, 1.0]knotSpec=knot-spec-7}"),
+            entry("StepBSplineCurveWithKnotsAndBreakpoints", "1773734642|StepBSplineCurveWithKnotsAndBreakpoints{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]knotMultiplicities=[1, 2, 3]knots=[0.0, 0.25, 1.0]breakpoints=[0.0625]curveForm=curve-form-7closedCurve=trueselfIntersect=false}"),
+            entry("StepBezierCurve", "-959215823|StepBezierCurve{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7closedCurve=trueselfIntersect=false}"),
+            entry("StepPiecewiseBezierCurve", "-959215823|StepPiecewiseBezierCurve{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7closedCurve=trueselfIntersect=false}"),
+            entry("StepQuasiUniformCurve", "-959215823|StepQuasiUniformCurve{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7closedCurve=trueselfIntersect=false}"),
+            entry("StepQuasiUniformCurve2D", "615760907|StepQuasiUniformCurve2D{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7}"),
+            entry("StepRationalBSplineCurve", "-1972638946|StepRationalBSplineCurve{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7closedCurve=trueselfIntersect=falseweightsData=[1.5, 2.5, 3.5]knotMultiplicities=[1, 2, 3]knots=[0.0, 0.25, 1.0]knotSpec=knot-spec-7}"),
+            entry("StepRationalBSplineCurve2D", "-1721257908|StepRationalBSplineCurve2D{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]weights=[4.5, 5.5]curveForm=curve-form-7}"),
+            entry("StepUniformCurve", "-959215823|StepUniformCurve{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7closedCurve=trueselfIntersect=false}"),
+            entry("StepUniformCurve2D", "615760907|StepUniformCurve2D{id=7name=entity-7degree=3controlPoints=[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}]curveForm=curve-form-7}"),
+            entry("StepBSplineSurface", "853998297|StepBSplineSurface{id=7name=entity-7uDegree=2vDegree=4controlPoints=[[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}], [StepCartesianPoint{id=92name=cpt-bcoordinates=[-4.0, 5.0, 6.0]}]]surfaceForm=surface-form-7uClosed=truevClosed=falseselfIntersect=false}"),
+            entry("StepBSplineSurfaceWithKnots", "-2136757839|StepBSplineSurfaceWithKnots{id=7name=entity-7uDegree=2vDegree=4controlPoints=[[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}], [StepCartesianPoint{id=92name=cpt-bcoordinates=[-4.0, 5.0, 6.0]}]]surfaceForm=surface-form-7uClosed=truevClosed=falseselfIntersect=falseuMultiplicities=[11, 12]vMultiplicities=[13, 14]uKnots=[0.0, 0.5]vKnots=[0.125, 0.875]knotSpec=knot-spec-7}"),
+            entry("StepBSplineSurfaceWithKnotsAndBreakpoints", "-1565146791|StepBSplineSurfaceWithKnotsAndBreakpoints{id=7name=entity-7uDegree=2vDegree=4controlPoints=[[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}], [StepCartesianPoint{id=92name=cpt-bcoordinates=[-4.0, 5.0, 6.0]}]]uKnotMultiplicities=[5, 6]vKnotMultiplicities=[7, 8]uKnots=[0.0, 0.5]vKnots=[0.125, 0.875]uBreakpoints=[0.25]vBreakpoints=[0.75]surfaceForm=surface-form-7uClosed=truevClosed=falseselfIntersect=false}"),
+            entry("StepBezierSurface", "853998297|StepBezierSurface{id=7name=entity-7uDegree=2vDegree=4controlPoints=[[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}], [StepCartesianPoint{id=92name=cpt-bcoordinates=[-4.0, 5.0, 6.0]}]]surfaceForm=surface-form-7uClosed=truevClosed=falseselfIntersect=false}"),
+            entry("StepPiecewiseBezierSurface", "853998297|StepPiecewiseBezierSurface{id=7name=entity-7uDegree=2vDegree=4controlPoints=[[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}], [StepCartesianPoint{id=92name=cpt-bcoordinates=[-4.0, 5.0, 6.0]}]]surfaceForm=surface-form-7uClosed=truevClosed=falseselfIntersect=false}"),
+            entry("StepQuasiUniformSurface", "853998297|StepQuasiUniformSurface{id=7name=entity-7uDegree=2vDegree=4controlPoints=[[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}], [StepCartesianPoint{id=92name=cpt-bcoordinates=[-4.0, 5.0, 6.0]}]]surfaceForm=surface-form-7uClosed=truevClosed=falseselfIntersect=false}"),
+            entry("StepRationalBSplineSurface", "1663232004|StepRationalBSplineSurface{id=7name=entity-7uDegree=2vDegree=4controlPoints=[[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}], [StepCartesianPoint{id=92name=cpt-bcoordinates=[-4.0, 5.0, 6.0]}]]surfaceForm=surface-form-7uClosed=truevClosed=falseselfIntersect=falseweightsData=[1.5, 2.5, 3.5]uMultiplicities=[11, 12]vMultiplicities=[13, 14]uKnots=[0.0, 0.5]vKnots=[0.125, 0.875]knotSpec=knot-spec-7}"),
+            entry("StepUniformSurface", "853998297|StepUniformSurface{id=7name=entity-7uDegree=2vDegree=4controlPoints=[[StepCartesianPoint{id=91name=cpt-acoordinates=[1.0, 2.0, 3.0]}], [StepCartesianPoint{id=92name=cpt-bcoordinates=[-4.0, 5.0, 6.0]}]]surfaceForm=surface-form-7uClosed=truevClosed=falseselfIntersect=false}")
+            );
+
+    // ------------------------------------------------------------------ value contract
+
+    @Test
+    void theValueContractIsWrittenOnceInTheCoresAndSealedThere() throws Exception {
+        for (String core : List.of(CURVE_CORE, SURFACE_CORE)) {
+            Class<?> type = Class.forName(PKG + core);
+            for (String name : List.of("equals", "hashCode", "toString")) {
+                Method method = name.equals("equals")
+                        ? type.getDeclaredMethod("equals", Object.class)
+                        : type.getDeclaredMethod(name);
+                assertTrue(Modifier.isFinal(method.getModifiers()),
+                        core + "." + name + " must be final - the entities may not restate it");
+            }
+            assertTrue(Modifier.isAbstract(type.getDeclaredMethod("components").getModifiers()),
+                    core + ".components must be abstract - every entity declares its own state");
+        }
+        for (String name : everyEntity()) {
+            Class<?> type = Class.forName(PKG + name);
+            for (Method method : type.getDeclaredMethods()) {
+                assertFalse(List.of("equals", "hashCode", "toString").contains(method.getName()),
+                        name + " must not restate " + method.getName() + "; declare components() instead");
+            }
+        }
+    }
+
+    @Test
+    void everyComponentIsCapturedInTheRetiredOrder() throws Exception {
+        for (String name : everyEntity()) {
+            Object entity = construct(name, fixture(name), false);
+            assertEquals(List.of(COMPONENT_ORDER.get(name).split(",")), componentKeys(entity),
+                    name + " component order");
+        }
+    }
+
+    /**
+     * The invariant that the retired bodies could not enforce: a new field added to the constructor
+     * but forgotten in one of the three algorithms. Deriving all three from one map makes the
+     * omission a compile error instead, and this pins it from the outside.
+     */
+    @Test
+    void noOwnFieldIsLeftOutOfTheComponentList() throws Exception {
+        for (String name : everyEntity()) {
+            Class<?> type = Class.forName(PKG + name);
+            List<String> keys = componentKeys(construct(name, fixture(name), false));
+            List<String> ownFields = new ArrayList<>();
+            for (Field field : type.getDeclaredFields()) {
+                if (!Modifier.isStatic(field.getModifiers())) {
+                    ownFields.add(field.getName());
+                }
+            }
+            for (String field : ownFields) {
+                assertTrue(keys.contains(field), name + " field " + field + " is missing from components()");
+            }
+            // The 2D entities have no state of their own, so the component list is exactly the core
+            // fields - the total is what proves nothing was dropped *and* nothing was listed twice.
+            assertEquals(coreFieldsOf(name).size() + ownFields.size(), keys.size(),
+                    name + " must list every core field once plus exactly its own " + ownFields);
+        }
+    }
+
+    /**
+     * The oracle: the exact {@code hashCode} and {@code toString} the retired hand-written bodies
+     * produced, captured before they were deleted. Reordering a component moves both, so this is
+     * what makes the "same order" claim in the cores checkable rather than asserted in prose.
+     */
+    @Test
+    void theValueContractStillProducesWhatTheRetiredBodiesDid() throws Exception {
+        for (String name : everyEntity()) {
+            Object entity = construct(name, fixture(name), false);
+            assertEquals(RETIRED_VALUES.get(name), entity.hashCode() + "|" + entity.toString(),
+                    name + " must hash and print exactly as before");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> componentKeys(Object entity) throws Exception {
+        Method components = entity.getClass().getDeclaredMethod("components");
+        components.setAccessible(true);
+        return new ArrayList<>(((Map<String, Object>) components.invoke(entity)).keySet());
     }
 
     // ------------------------------------------------------------------ helpers
@@ -415,12 +545,18 @@ class ControlPointEntityCoreConvergenceTest {
         return found;
     }
 
-    private static String stripCommentsOfMainTree() throws IOException {
-        StringBuilder all = new StringBuilder();
+    private static void assertNamedOnlyToExtend(String core, TreeSet<String> extenders) throws IOException {
         for (Path source : mainSources()) {
-            all.append(stripComments(Files.readString(source, StandardCharsets.UTF_8))).append('\n');
+            String file = source.getFileName().toString();
+            if (file.equals(core + ".java")) {
+                continue;
+            }
+            String code = stripComments(Files.readString(source, StandardCharsets.UTF_8));
+            assertEquals(0, count(code.replace("extends " + core, "extends @"), core),
+                    file + " names " + core + " outside an extends clause; that is a widened branch");
+            assertEquals(extenders.contains(file.replace(".java", "")) ? 1 : 0, count(code, core),
+                    file + " may name " + core + " only to extend it");
         }
-        return all.toString();
     }
 
     private static List<Path> mainSources() throws IOException {

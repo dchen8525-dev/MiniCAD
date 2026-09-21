@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved B_SPLINE_CURVE_2D.
@@ -18,20 +19,13 @@ public final class StepBSplineCurve2D extends AbstractStepControlPointCurve {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBSplineCurve2D that = (StepBSplineCurve2D) o;
-        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getDegree() == that.getDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(getCurveForm(), that.getCurveForm());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getDegree(), getControlPoints(), getCurveForm());
-    }
-
-    @Override
-    public String toString() {
-        return "StepBSplineCurve2D{" + "id=" + getId() + "name=" + getName() + "degree=" + getDegree() + "controlPoints=" + getControlPoints() + "curveForm=" + getCurveForm() + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("degree", getDegree());
+        state.put("controlPoints", getControlPoints());
+        state.put("curveForm", getCurveForm());
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BEZIER_SURFACE marker with inherited B-spline data when present.
@@ -41,20 +42,17 @@ public final class StepBezierSurface extends AbstractStepControlPointSurface {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBezierSurface that = (StepBezierSurface) o;
-        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getUDegree() == that.getUDegree() && getVDegree() == that.getVDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(getSurfaceForm(), that.getSurfaceForm()) && uClosed == that.uClosed && vClosed == that.vClosed && selfIntersect == that.selfIntersect;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getUDegree(), getVDegree(), getControlPoints(), getSurfaceForm(), uClosed, vClosed, selfIntersect);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBezierSurface{" + "id=" + getId() + "name=" + getName() + "uDegree=" + getUDegree() + "vDegree=" + getVDegree() + "controlPoints=" + getControlPoints() + "surfaceForm=" + getSurfaceForm() + "uClosed=" + uClosed + "vClosed=" + vClosed + "selfIntersect=" + selfIntersect + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("uDegree", getUDegree());
+        state.put("vDegree", getVDegree());
+        state.put("controlPoints", getControlPoints());
+        state.put("surfaceForm", getSurfaceForm());
+        state.put("uClosed", uClosed);
+        state.put("vClosed", vClosed);
+        state.put("selfIntersect", selfIntersect);
+        return state;
     }
 }

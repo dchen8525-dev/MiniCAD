@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved B_SPLINE_CURVE_WITH_KNOTS_AND_BREAKPOINTS.
@@ -62,20 +63,18 @@ public final class StepBSplineCurveWithKnotsAndBreakpoints extends AbstractStepC
     public boolean selfIntersect() { return isSelfIntersect(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBSplineCurveWithKnotsAndBreakpoints that = (StepBSplineCurveWithKnotsAndBreakpoints) o;
-        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getDegree() == that.getDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(knotMultiplicities, that.knotMultiplicities) && Objects.equals(knots, that.knots) && Objects.equals(breakpoints, that.breakpoints) && Objects.equals(getCurveForm(), that.getCurveForm()) && closedCurve == that.closedCurve && selfIntersect == that.selfIntersect;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getDegree(), getControlPoints(), knotMultiplicities, knots, breakpoints, getCurveForm(), closedCurve, selfIntersect);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBSplineCurveWithKnotsAndBreakpoints{" + "id=" + getId() + "name=" + getName() + "degree=" + getDegree() + "controlPoints=" + getControlPoints() + "knotMultiplicities=" + knotMultiplicities + "knots=" + knots + "breakpoints=" + breakpoints + "curveForm=" + getCurveForm() + "closedCurve=" + closedCurve + "selfIntersect=" + selfIntersect + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("degree", getDegree());
+        state.put("controlPoints", getControlPoints());
+        state.put("knotMultiplicities", knotMultiplicities);
+        state.put("knots", knots);
+        state.put("breakpoints", breakpoints);
+        state.put("curveForm", getCurveForm());
+        state.put("closedCurve", closedCurve);
+        state.put("selfIntersect", selfIntersect);
+        return state;
     }
 }

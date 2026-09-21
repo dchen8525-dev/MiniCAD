@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved B_SPLINE_SURFACE_WITH_KNOTS_AND_BREAKPOINTS.
@@ -90,20 +91,23 @@ public final class StepBSplineSurfaceWithKnotsAndBreakpoints extends AbstractSte
     public List<Double> vKnots() { return getVKnots(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBSplineSurfaceWithKnotsAndBreakpoints that = (StepBSplineSurfaceWithKnotsAndBreakpoints) o;
-        return getId() == that.getId() && Objects.equals(getName(), that.getName()) && getUDegree() == that.getUDegree() && getVDegree() == that.getVDegree() && Objects.equals(getControlPoints(), that.getControlPoints()) && Objects.equals(uKnotMultiplicities, that.uKnotMultiplicities) && Objects.equals(vKnotMultiplicities, that.vKnotMultiplicities) && Objects.equals(uKnots, that.uKnots) && Objects.equals(vKnots, that.vKnots) && Objects.equals(uBreakpoints, that.uBreakpoints) && Objects.equals(vBreakpoints, that.vBreakpoints) && Objects.equals(getSurfaceForm(), that.getSurfaceForm()) && uClosed == that.uClosed && vClosed == that.vClosed && selfIntersect == that.selfIntersect;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getUDegree(), getVDegree(), getControlPoints(), uKnotMultiplicities, vKnotMultiplicities, uKnots, vKnots, uBreakpoints, vBreakpoints, getSurfaceForm(), uClosed, vClosed, selfIntersect);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBSplineSurfaceWithKnotsAndBreakpoints{" + "id=" + getId() + "name=" + getName() + "uDegree=" + getUDegree() + "vDegree=" + getVDegree() + "controlPoints=" + getControlPoints() + "uKnotMultiplicities=" + uKnotMultiplicities + "vKnotMultiplicities=" + vKnotMultiplicities + "uKnots=" + uKnots + "vKnots=" + vKnots + "uBreakpoints=" + uBreakpoints + "vBreakpoints=" + vBreakpoints + "surfaceForm=" + getSurfaceForm() + "uClosed=" + uClosed + "vClosed=" + vClosed + "selfIntersect=" + selfIntersect + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("uDegree", getUDegree());
+        state.put("vDegree", getVDegree());
+        state.put("controlPoints", getControlPoints());
+        state.put("uKnotMultiplicities", uKnotMultiplicities);
+        state.put("vKnotMultiplicities", vKnotMultiplicities);
+        state.put("uKnots", uKnots);
+        state.put("vKnots", vKnots);
+        state.put("uBreakpoints", uBreakpoints);
+        state.put("vBreakpoints", vBreakpoints);
+        state.put("surfaceForm", getSurfaceForm());
+        state.put("uClosed", uClosed);
+        state.put("vClosed", vClosed);
+        state.put("selfIntersect", selfIntersect);
+        return state;
     }
 }
