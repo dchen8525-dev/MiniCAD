@@ -37,7 +37,10 @@ import org.junit.jupiter.api.Test;
  *       still declare exactly one {@code components()}, and must not still declare the two moved
  *       fields. The count of such entities is asserted exactly, so a new entity cannot quietly opt
  *       out - and any entity outside the base that still writes {@code equals} has to be on the
- *       documented legacy list, which is itself asserted to be exactly the nineteen expected.</li>
+ *       documented legacy list, which is itself asserted to be exactly the nineteen expected. The
+ *       same claim is then made about the package as a whole rather than about a list of entities:
+ *       the algorithms and their component cache appear in exactly one file, which is what catches a
+ *       copy in a file that is neither a {@code Step*} entity nor on the legacy list.</li>
  *   <li><b>The retired order is preserved.</b> The single most dangerous part of the fold was
  *       reordering a component: the order is what {@code toString} prints and what {@code hashCode}
  *       folds. The digest below was computed from the retired bodies themselves, read out of
@@ -175,6 +178,33 @@ class AbstractStepEntityConvergenceTest {
                         + "or one of the legacy contracts was folded or removed");
     }
 
+    /**
+     * The strongest form of that claim: inside the package the algorithm exists once, full stop.
+     * The two control-point cores used to carry a byte-identical copy each; every file that still
+     * writes a body the base owns - or keeps a second component cache - is a regression, whether or
+     * not it happens to be one of the entities the tests above walk. Reading the whole package is
+     * what lets this catch a copy in a file that is neither a {@code Step*} entity nor on the legacy
+     * list.
+     */
+    @Test
+    void thePackageWritesTheAlgorithmInExactlyOnePlace() throws IOException {
+        List<String> declarations = new ArrayList<>();
+        List<String> caches = new ArrayList<>();
+        for (Path source : sources()) {
+            String code = strip(Files.readString(source, StandardCharsets.UTF_8));
+            if (code.contains("public final boolean equals(Object o)")) {
+                declarations.add(fileName(source));
+            }
+            if (code.contains("componentCache")) {
+                caches.add(fileName(source));
+            }
+        }
+        assertEquals(List.of("AbstractStepEntity"), declarations,
+                "the value algorithms must be written in the base and nowhere else");
+        assertEquals(List.of("AbstractStepEntity"), caches,
+                "the component cache must exist in the base and nowhere else");
+    }
+
     // ------------------------------------------------------------------ the order is preserved
 
     @Test
@@ -182,7 +212,10 @@ class AbstractStepEntityConvergenceTest {
         List<String> lines = new ArrayList<>();
         for (Path source : sources()) {
             String name = fileName(source);
-            if (LEGACY_CONTRACT.contains(name)) {
+            // The subject is the concrete entities the base absorbed. The base itself and the two
+            // control-point cores extend it too, but they are abstract and declare no components of
+            // their own; those two are pinned by ControlPointEntityCoreConvergenceTest.
+            if (LEGACY_CONTRACT.contains(name) || !name.startsWith("Step")) {
                 continue;
             }
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));
@@ -208,7 +241,7 @@ class AbstractStepEntityConvergenceTest {
         int checked = 0;
         for (Path source : sources()) {
             String name = fileName(source);
-            if (LEGACY_CONTRACT.contains(name)) {
+            if (LEGACY_CONTRACT.contains(name) || !name.startsWith("Step")) {
                 continue;
             }
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));

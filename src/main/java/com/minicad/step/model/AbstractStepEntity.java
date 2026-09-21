@@ -26,6 +26,12 @@ import java.util.Objects;
  * <p>The three algorithms are {@code final}: an entity that restates one is reintroducing the
  * duplication this type exists to remove.
  *
+ * <p>The two control-point cores, {@link AbstractStepControlPointCurve} and
+ * {@link AbstractStepControlPointSurface}, extend this type too. They were where the same contract
+ * had been written a second and a third time - byte-identical copies of the three algorithms and of
+ * the component cache, one per core - so they now carry only their geometry and inherit the rest
+ * from here.
+ *
  * <p>Not every entity in the package extends this type yet. The classes that key equality on the
  * instance id alone, and the one whose {@code toString} uses a different separator, still carry
  * their own bodies; they are listed, with the reason, in the convergence test.

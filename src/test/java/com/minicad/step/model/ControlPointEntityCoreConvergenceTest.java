@@ -50,12 +50,14 @@ import org.junit.jupiter.api.Test;
  *   <li><b>The shared half is gone from the subclasses.</b> No entity declares a core field or a
  *       core accessor (getter or record-style alias) any more, and every one of them still is a
  *       {@code StepEntity} and still {@code final}.</li>
- *   <li><b>The value contract is written once, in the cores.</b> {@code equals}, {@code hashCode}
- *       and {@code toString} were three more algorithms written out per entity. They are now final
- *       on the cores and derive from one {@code components()} map per entity: this pins that no
- *       entity restates them, that the component list is the retired order, that it covers every
- *       field the entity declares, and - via {@link #RETIRED_VALUES} - that the pair
- *       {@code hashCode|toString} still equals what the deleted bodies produced.</li>
+ *   <li><b>The value contract is written once, and now one level lower.</b> {@code equals},
+ *       {@code hashCode} and {@code toString} were three more algorithms written out per entity, and
+ *       then a third time over as a byte-identical copy inside each core. They are now final on
+ *       {@link AbstractStepEntity}, which both cores extend and which owns them for the whole
+ *       package; the cores keep only their geometry. This pins that neither core nor any entity
+ *       restates them, that the component list is the retired order, that it covers every field the
+ *       entity declares, and - via {@link #RETIRED_VALUES} - that the pair {@code hashCode|toString}
+ *       still equals what the deleted bodies produced.</li>
  *   <li><b>Behaviour.</b> Reflective round-trips over all twenty: every core accessor returns what
  *       the constructor was given, the control-point list is copied and immutable, {@code null} stays
  *       {@code null}, {@code toString} still prints every core field in order, and {@code equals} /
@@ -93,11 +95,24 @@ class ControlPointEntityCoreConvergenceTest {
     private static final String CURVE_CORE = "AbstractStepControlPointCurve";
     private static final String SURFACE_CORE = "AbstractStepControlPointSurface";
 
+    /** The type that owns the value contract for the whole package; the cores inherit it. */
+    private static final String BASE = "AbstractStepEntity";
+
     /** Core fields, in the order the core constructor takes them. */
     private static final List<String> CURVE_CORE_FIELDS =
             List.of("id", "name", "degree", "controlPoints", "curveForm");
     private static final List<String> SURFACE_CORE_FIELDS =
             List.of("id", "name", "uDegree", "vDegree", "controlPoints", "surfaceForm");
+
+    /**
+     * What a core keeps for itself now that {@code id}, {@code name} and the three algorithms moved
+     * to the base: the geometry, and nothing else. A core that grows another field is starting a
+     * second copy of whatever that field is for.
+     */
+    private static final List<String> CURVE_CORE_GEOMETRY =
+            List.of("degree", "controlPoints", "curveForm");
+    private static final List<String> SURFACE_CORE_GEOMETRY =
+            List.of("uDegree", "vDegree", "controlPoints", "surfaceForm");
 
     /** Core accessors: the getter plus the record-style alias of each core field. */
     private static final List<String> CORE_METHODS = List.of(
@@ -173,17 +188,18 @@ class ControlPointEntityCoreConvergenceTest {
 
     @Test
     void theCoresAreAbstractAndAssignableToStepEntity() throws Exception {
+        Class<?> base = Class.forName(PKG + BASE);
         for (String core : List.of(CURVE_CORE, SURFACE_CORE)) {
             Class<?> type = Class.forName(PKG + core);
             assertTrue(Modifier.isAbstract(type.getModifiers()), core + " must be abstract");
             assertTrue(StepEntity.class.isAssignableFrom(type), core + " must be a StepEntity");
+            assertEquals(base, type.getSuperclass(),
+                    core + " must take the value contract from the base that owns it");
             List<Constructor<?>> ctors = List.of(type.getDeclaredConstructors());
             assertEquals(1, ctors.size(), core + " must have exactly one constructor");
             assertFalse(Modifier.isPublic(ctors.get(0).getModifiers()),
                     core + " must not be constructible from outside the package");
         }
-        assertNull(Class.forName(PKG + CURVE_CORE).getSuperclass().getSuperclass(),
-                "curve core must sit directly under Object");
     }
 
     @Test
@@ -334,19 +350,44 @@ class ControlPointEntityCoreConvergenceTest {
     // ------------------------------------------------------------------ value contract
 
     @Test
-    void theValueContractIsWrittenOnceInTheCoresAndSealedThere() throws Exception {
+    void theValueContractIsInheritedFromTheBaseNotCopied() throws Exception {
+        Class<?> base = Class.forName(PKG + BASE);
         for (String core : List.of(CURVE_CORE, SURFACE_CORE)) {
             Class<?> type = Class.forName(PKG + core);
-            for (String name : List.of("equals", "hashCode", "toString")) {
-                Method method = name.equals("equals")
-                        ? type.getDeclaredMethod("equals", Object.class)
-                        : type.getDeclaredMethod(name);
-                assertTrue(Modifier.isFinal(method.getModifiers()),
-                        core + "." + name + " must be final - the entities may not restate it");
+            assertEquals(base, type.getSuperclass(),
+                    core + " must inherit the value contract from the base");
+
+            List<String> declaredMethods = new ArrayList<>();
+            for (Method method : type.getDeclaredMethods()) {
+                if (!method.isSynthetic()) {
+                    declaredMethods.add(method.getName());
+                }
             }
-            assertTrue(Modifier.isAbstract(type.getDeclaredMethod("components").getModifiers()),
-                    core + ".components must be abstract - every entity declares its own state");
+            List<String> declaredFields = new ArrayList<>();
+            for (Field field : type.getDeclaredFields()) {
+                if (!field.isSynthetic()) {
+                    declaredFields.add(field.getName());
+                }
+            }
+            for (String name : List.of("equals", "hashCode", "toString", "getId", "getName",
+                    "componentMap", "componentValues", "components")) {
+                assertFalse(declaredMethods.contains(name),
+                        core + " must not declare " + name + " - the base owns it");
+            }
+            for (String field : List.of("id", "name", "componentCache")) {
+                assertFalse(declaredFields.contains(field),
+                        core + " must not declare the " + field + " field - the base owns it");
+            }
+            assertEquals(core.equals(CURVE_CORE) ? CURVE_CORE_GEOMETRY : SURFACE_CORE_GEOMETRY,
+                    declaredFields, core + " must hold its geometry and nothing else");
+
+            Method equals = type.getMethod("equals", Object.class);
+            assertEquals(base, equals.getDeclaringClass(), core + ".equals must come from the base");
+            assertTrue(Modifier.isFinal(equals.getModifiers()),
+                    core + ".equals must stay final - the entities may not restate it");
         }
+        assertTrue(Modifier.isAbstract(base.getDeclaredMethod("components").getModifiers()),
+                "components must be abstract on the base - every entity declares its own state");
         for (String name : everyEntity()) {
             Class<?> type = Class.forName(PKG + name);
             for (Method method : type.getDeclaredMethods()) {
