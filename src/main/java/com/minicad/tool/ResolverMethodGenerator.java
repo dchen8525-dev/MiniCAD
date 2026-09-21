@@ -58,8 +58,8 @@ public class ResolverMethodGenerator {
       return null; // Entity not found
     }
 
-    String className = "Step" + toCamelCase(entityName);
-    String methodName = "resolve" + toCamelCase(entityName);
+    String className = "Step" + ToolNaming.toCamelCase(entityName);
+    String methodName = "resolve" + ToolNaming.toCamelCase(entityName);
     JSONArray attributes = entityObj.getJSONArray("attributes");
 
     StringBuilder sb = new StringBuilder();
@@ -108,7 +108,7 @@ public class ResolverMethodGenerator {
 
     if (isEntityRef) {
       String refEntity = attr.getString("referenced_entity");
-      String refClass = "Step" + toCamelCase(refEntity);
+      String refClass = "Step" + ToolNaming.toCamelCase(refEntity);
 
       if (optional) {
         return "optionalEntity(referenceId(instance, definition, " + (index + 1) + "), " + refClass + ".class, resolver)";
@@ -159,7 +159,7 @@ public class ResolverMethodGenerator {
    * Generate registration code for an entity.
    */
   public String generateRegistrationCode(String entityName) {
-    String methodName = "resolve" + toCamelCase(entityName);
+    String methodName = "resolve" + ToolNaming.toCamelCase(entityName);
 
     return "    registry.put(\"" + entityName + "\", StepEntityResolver::" + methodName + ");";
   }
@@ -254,13 +254,13 @@ public class ResolverMethodGenerator {
       List<String> aliases = entry.getValue();
 
       if (aliases.size() > 5) { // Only for significant alias families
-        String methodName = "register" + toCamelCase(baseEntity) + "Aliases";
+        String methodName = "register" + ToolNaming.toCamelCase(baseEntity) + "Aliases";
 
         lines.add("  private static void " + methodName + "(Map<String, EntityFactory> registry) {");
         lines.add("    // Entities sharing same structure:");
         for (String alias : aliases) {
           lines.add("    registry.put(\"" + alias + "\",");
-          lines.add("        (resolver, instance) -> resolver.resolve" + toCamelCase(baseEntity) + "(instance));");
+          lines.add("        (resolver, instance) -> resolver.resolve" + ToolNaming.toCamelCase(baseEntity) + "(instance));");
         }
         lines.add("  }\n");
       }
@@ -268,29 +268,6 @@ public class ResolverMethodGenerator {
 
     Files.write(outputPath, lines);
     System.out.println("Written alias helpers: " + outputPath);
-  }
-
-  /**
-   * Convert UPPER_CASE to CamelCase.
-   */
-  private String toCamelCase(String upper) {
-    if (upper == null) return "";
-    String[] parts = upper.toLowerCase().split("_");
-    StringBuilder sb = new StringBuilder();
-    for (String part : parts) {
-      if (!part.isEmpty()) {
-        sb.append(capitalize(part));
-      }
-    }
-    return sb.toString();
-  }
-
-  /**
-   * Capitalize first letter.
-   */
-  private String capitalize(String str) {
-    if (str == null || str.isEmpty()) return str;
-    return str.substring(0, 1).toUpperCase() + str.substring(1);
   }
 
   /**

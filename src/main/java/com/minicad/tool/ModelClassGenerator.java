@@ -58,7 +58,7 @@ public class ModelClassGenerator {
     }
 
     String domain = classifyDomain(entityName);
-    String className = "Step" + toCamelCase(entityName);
+    String className = "Step" + ToolNaming.toCamelCase(entityName);
     JSONArray attributes = entityObj.getJSONArray("attributes");
 
     StringBuilder sb = new StringBuilder();
@@ -81,7 +81,7 @@ public class ModelClassGenerator {
         String refEntity = attr.getString("referenced_entity");
         if (refEntity != null && !refEntity.isEmpty()) {
           String refDomain = classifyDomain(refEntity);
-          imports.add("com.minicad.step.model." + refDomain + ".Step" + toCamelCase(refEntity));
+          imports.add("com.minicad.step.model." + refDomain + ".Step" + ToolNaming.toCamelCase(refEntity));
         }
       }
     }
@@ -103,7 +103,7 @@ public class ModelClassGenerator {
 
     for (int i = 0; i < attributes.size(); i++) {
       JSONObject attr = attributes.getJSONObject(i);
-      String fieldName = toCamelCase(attr.getString("name"));
+      String fieldName = ToolNaming.toCamelCase(attr.getString("name"));
       String javaType = mapToJavaType(attr);
 
       sb.append("  private final ").append(javaType).append(" ").append(fieldName).append(";\n");
@@ -117,7 +117,7 @@ public class ModelClassGenerator {
 
     for (int i = 0; i < attributes.size(); i++) {
       JSONObject attr = attributes.getJSONObject(i);
-      String fieldName = toCamelCase(attr.getString("name"));
+      String fieldName = ToolNaming.toCamelCase(attr.getString("name"));
       String javaType = mapToJavaType(attr);
 
       sb.append(",\n      ").append(javaType).append(" ").append(fieldName);
@@ -129,7 +129,7 @@ public class ModelClassGenerator {
 
     for (int i = 0; i < attributes.size(); i++) {
       JSONObject attr = attributes.getJSONObject(i);
-      String fieldName = toCamelCase(attr.getString("name"));
+      String fieldName = ToolNaming.toCamelCase(attr.getString("name"));
 
       sb.append("    this.").append(fieldName).append(" = ").append(fieldName).append(";\n");
     }
@@ -148,10 +148,10 @@ public class ModelClassGenerator {
 
     for (int i = 0; i < attributes.size(); i++) {
       JSONObject attr = attributes.getJSONObject(i);
-      String fieldName = toCamelCase(attr.getString("name"));
+      String fieldName = ToolNaming.toCamelCase(attr.getString("name"));
       String javaType = mapToJavaType(attr);
 
-      sb.append("  public ").append(javaType).append(" get").append(capitalize(fieldName))
+      sb.append("  public ").append(javaType).append(" get").append(ToolNaming.capitalize(fieldName))
         .append("() {\n");
       sb.append("    return ").append(fieldName).append(";\n");
       sb.append("  }\n\n");
@@ -180,7 +180,7 @@ public class ModelClassGenerator {
     sb.append("        \", name='\" + name + '\\'' +\n");
     for (int i = 0; i < attributes.size(); i++) {
       JSONObject attr = attributes.getJSONObject(i);
-      String fieldName = toCamelCase(attr.getString("name"));
+      String fieldName = ToolNaming.toCamelCase(attr.getString("name"));
       sb.append("        \", ").append(fieldName).append("=").append(fieldName);
       if (i < attributes.size() - 1) {
         sb.append(" +\n");
@@ -210,7 +210,7 @@ public class ModelClassGenerator {
     String baseType;
     if (isEntityRef) {
       String refEntity = attr.getString("referenced_entity");
-      baseType = "Step" + toCamelCase(refEntity);
+      baseType = "Step" + ToolNaming.toCamelCase(refEntity);
     } else if (isPrimitiveType(type)) {
       baseType = mapPrimitiveType(type);
     } else {
@@ -406,29 +406,6 @@ public class ModelClassGenerator {
   }
 
   /**
-   * Convert UPPER_CASE to CamelCase.
-   */
-  private String toCamelCase(String upper) {
-    if (upper == null) return "";
-    String[] parts = upper.toLowerCase().split("_");
-    StringBuilder sb = new StringBuilder();
-    for (String part : parts) {
-      if (!part.isEmpty()) {
-        sb.append(capitalize(part));
-      }
-    }
-    return sb.toString();
-  }
-
-  /**
-   * Capitalize first letter.
-   */
-  private String capitalize(String str) {
-    if (str == null || str.isEmpty()) return str;
-    return str.substring(0, 1).toUpperCase() + str.substring(1);
-  }
-
-  /**
    * Generate model classes for entities in priority queue.
    * Outputs to src/main/java/com/minicad/step/model/{domain}/ directories.
    */
@@ -438,7 +415,7 @@ public class ModelClassGenerator {
       if (code == null) continue;
 
       String domain = classifyDomain(entityName);
-      String className = "Step" + toCamelCase(entityName);
+      String className = "Step" + ToolNaming.toCamelCase(entityName);
 
       Path packagePath = baseOutputPath.resolve(domain);
       Files.createDirectories(packagePath);
