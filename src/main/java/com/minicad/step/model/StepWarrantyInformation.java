@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved WARRANTY_INFORMATION.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param warrantyProvider warranty provider reference
  * @param warrantyStatus warranty status (active, expired)
  */
-public final class StepWarrantyInformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepWarrantyInformation extends AbstractStepEntity {
     private final String warrantyType;
     private final double warrantyPeriod;
     private final StepEntity warrantyStart;
@@ -29,8 +28,7 @@ public final class StepWarrantyInformation implements StepEntity {
     private final String warrantyStatus;
 
     public StepWarrantyInformation(int id, String name, String warrantyType, double warrantyPeriod, StepEntity warrantyStart, StepEntity warrantyEnd, List<String> varianceConditions, StepEntity warrantyProvider, String warrantyStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.warrantyType = warrantyType;
         this.warrantyPeriod = warrantyPeriod;
         this.warrantyStart = warrantyStart;
@@ -38,14 +36,6 @@ public final class StepWarrantyInformation implements StepEntity {
         this.varianceConditions = varianceConditions == null ? null : java.util.List.copyOf(varianceConditions);
         this.warrantyProvider = warrantyProvider;
         this.warrantyStatus = warrantyStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getWarrantyType() {
@@ -77,20 +67,17 @@ public final class StepWarrantyInformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepWarrantyInformation that = (StepWarrantyInformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(warrantyType, that.warrantyType) && warrantyPeriod == that.warrantyPeriod && Objects.equals(warrantyStart, that.warrantyStart) && Objects.equals(warrantyEnd, that.warrantyEnd) && Objects.equals(varianceConditions, that.varianceConditions) && Objects.equals(warrantyProvider, that.warrantyProvider) && Objects.equals(warrantyStatus, that.warrantyStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, warrantyType, warrantyPeriod, warrantyStart, warrantyEnd, varianceConditions, warrantyProvider, warrantyStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepWarrantyInformation{" + "id=" + id + "name=" + name + "warrantyType=" + warrantyType + "warrantyPeriod=" + warrantyPeriod + "warrantyStart=" + warrantyStart + "warrantyEnd=" + warrantyEnd + "varianceConditions=" + varianceConditions + "warrantyProvider=" + warrantyProvider + "warrantyStatus=" + warrantyStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("warrantyType", warrantyType);
+        state.put("warrantyPeriod", warrantyPeriod);
+        state.put("warrantyStart", warrantyStart);
+        state.put("warrantyEnd", warrantyEnd);
+        state.put("varianceConditions", varianceConditions);
+        state.put("warrantyProvider", warrantyProvider);
+        state.put("warrantyStatus", warrantyStatus);
+        return state;
     }
 }

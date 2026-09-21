@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved FEA_CONSTANT_FUNCTION_3D.
  * A constant scalar or vector function in 3D FEA space.
  */
-public final class StepFeaConstantFunction3d implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaConstantFunction3d extends AbstractStepEntity {
     private final Double value;
     private final StepEntity functionSpace;
 
     public StepFeaConstantFunction3d(int id, String name, Double value, StepEntity functionSpace) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.value = value;
         this.functionSpace = functionSpace;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Double getValue() {
@@ -35,20 +26,12 @@ public final class StepFeaConstantFunction3d implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaConstantFunction3d that = (StepFeaConstantFunction3d) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(value, that.value) && Objects.equals(functionSpace, that.functionSpace);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, value, functionSpace);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaConstantFunction3d{" + "id=" + id + "name=" + name + "value=" + value + "functionSpace=" + functionSpace + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("value", value);
+        state.put("functionSpace", functionSpace);
+        return state;
     }
 }

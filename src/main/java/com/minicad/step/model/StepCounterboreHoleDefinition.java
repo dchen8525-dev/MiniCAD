@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COUNTERBORE_HOLE_DEFINITION.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param counterboreDiameter diameter of the counterbore
  * @param counterboreDepth depth of the counterbore
  */
-public final class StepCounterboreHoleDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCounterboreHoleDefinition extends AbstractStepEntity {
     private final StepEntity throughHoleReference;
     private final Double counterboreDiameter;
     private final Double counterboreDepth;
 
     public StepCounterboreHoleDefinition(int id, String name, StepEntity throughHoleReference, Double counterboreDiameter, Double counterboreDepth) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.throughHoleReference = throughHoleReference;
         this.counterboreDiameter = counterboreDiameter;
         this.counterboreDepth = counterboreDepth;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getThroughHoleReference() {
@@ -49,20 +39,13 @@ public final class StepCounterboreHoleDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCounterboreHoleDefinition that = (StepCounterboreHoleDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(throughHoleReference, that.throughHoleReference) && Objects.equals(counterboreDiameter, that.counterboreDiameter) && Objects.equals(counterboreDepth, that.counterboreDepth);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, throughHoleReference, counterboreDiameter, counterboreDepth);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCounterboreHoleDefinition{" + "id=" + id + "name=" + name + "throughHoleReference=" + throughHoleReference + "counterboreDiameter=" + counterboreDiameter + "counterboreDepth=" + counterboreDepth + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("throughHoleReference", throughHoleReference);
+        state.put("counterboreDiameter", counterboreDiameter);
+        state.put("counterboreDepth", counterboreDepth);
+        return state;
     }
 }

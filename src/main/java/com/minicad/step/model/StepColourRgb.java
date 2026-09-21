@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal RGB colour definition.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param green green channel in [0, 1]
  * @param blue blue channel in [0, 1]
  */
-public final class StepColourRgb implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepColourRgb extends AbstractStepEntity {
     private final double red;
     private final double green;
     private final double blue;
 
     public StepColourRgb(int id, String name, double red, double green, double blue) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.red = red;
         this.green = green;
         this.blue = blue;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getRed() {
@@ -47,7 +38,7 @@ public final class StepColourRgb implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public double red() {
@@ -63,20 +54,13 @@ public final class StepColourRgb implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepColourRgb that = (StepColourRgb) o;
-        return id == that.id && Objects.equals(name, that.name) && red == that.red && green == that.green && blue == that.blue;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, red, green, blue);
-    }
-
-    @Override
-    public String toString() {
-        return "StepColourRgb{" + "id=" + id + "name=" + name + "red=" + red + "green=" + green + "blue=" + blue + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("red", red);
+        state.put("green", green);
+        state.put("blue", blue);
+        return state;
     }
 }

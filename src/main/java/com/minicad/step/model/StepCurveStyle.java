@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CURVE_STYLE.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param curveWidth stroke width
  * @param colour referenced colour
  */
-public final class StepCurveStyle implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCurveStyle extends AbstractStepEntity {
     private final StepEntity curveFont;
     private final double curveWidth;
     private final StepEntity colour;
 
     public StepCurveStyle(int id, String name, StepEntity curveFont, double curveWidth, StepEntity colour) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.curveFont = curveFont;
         this.curveWidth = curveWidth;
         this.colour = colour;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCurveFont() {
@@ -59,20 +50,13 @@ public final class StepCurveStyle implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCurveStyle that = (StepCurveStyle) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(curveFont, that.curveFont) && curveWidth == that.curveWidth && Objects.equals(colour, that.colour);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, curveFont, curveWidth, colour);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCurveStyle{" + "id=" + id + "name=" + name + "curveFont=" + curveFont + "curveWidth=" + curveWidth + "colour=" + colour + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("curveFont", curveFont);
+        state.put("curveWidth", curveWidth);
+        state.put("colour", colour);
+        return state;
     }
 }

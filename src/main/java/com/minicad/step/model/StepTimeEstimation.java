@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TIME_ESTIMATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param estimationMethod estimation method used
  * @param estimationFactors estimation factors applied
  */
-public final class StepTimeEstimation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTimeEstimation extends AbstractStepEntity {
     private final String estimationType;
     private final double estimatedTime;
     private final String timeUnit;
@@ -27,22 +26,13 @@ public final class StepTimeEstimation implements StepEntity {
     private final List<Double> estimationFactors;
 
     public StepTimeEstimation(int id, String name, String estimationType, double estimatedTime, String timeUnit, List<StepEntity> timeBreakdown, String estimationMethod, List<Double> estimationFactors) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.estimationType = estimationType;
         this.estimatedTime = estimatedTime;
         this.timeUnit = timeUnit;
         this.timeBreakdown = timeBreakdown == null ? null : java.util.List.copyOf(timeBreakdown);
         this.estimationMethod = estimationMethod;
         this.estimationFactors = estimationFactors == null ? null : java.util.List.copyOf(estimationFactors);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEstimationType() {
@@ -70,20 +60,16 @@ public final class StepTimeEstimation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTimeEstimation that = (StepTimeEstimation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(estimationType, that.estimationType) && estimatedTime == that.estimatedTime && Objects.equals(timeUnit, that.timeUnit) && Objects.equals(timeBreakdown, that.timeBreakdown) && Objects.equals(estimationMethod, that.estimationMethod) && Objects.equals(estimationFactors, that.estimationFactors);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, estimationType, estimatedTime, timeUnit, timeBreakdown, estimationMethod, estimationFactors);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTimeEstimation{" + "id=" + id + "name=" + name + "estimationType=" + estimationType + "estimatedTime=" + estimatedTime + "timeUnit=" + timeUnit + "timeBreakdown=" + timeBreakdown + "estimationMethod=" + estimationMethod + "estimationFactors=" + estimationFactors + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("estimationType", estimationType);
+        state.put("estimatedTime", estimatedTime);
+        state.put("timeUnit", timeUnit);
+        state.put("timeBreakdown", timeBreakdown);
+        state.put("estimationMethod", estimationMethod);
+        state.put("estimationFactors", estimationFactors);
+        return state;
     }
 }

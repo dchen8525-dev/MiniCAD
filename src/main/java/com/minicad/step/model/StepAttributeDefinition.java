@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ATTRIBUTE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param attributeDefault attribute variance default value
  * @param attributeStatus attribute variance status
  */
-public final class StepAttributeDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAttributeDefinition extends AbstractStepEntity {
     private final String attributeType;
     private final String attributeDataType;
     private final List<String> attributeRange;
@@ -25,21 +24,12 @@ public final class StepAttributeDefinition implements StepEntity {
     private final String attributeStatus;
 
     public StepAttributeDefinition(int id, String name, String attributeType, String attributeDataType, List<String> attributeRange, String attributeDefault, String attributeStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.attributeType = attributeType;
         this.attributeDataType = attributeDataType;
         this.attributeRange = attributeRange == null ? null : java.util.List.copyOf(attributeRange);
         this.attributeDefault = attributeDefault;
         this.attributeStatus = attributeStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAttributeType() {
@@ -63,20 +53,15 @@ public final class StepAttributeDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAttributeDefinition that = (StepAttributeDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(attributeType, that.attributeType) && Objects.equals(attributeDataType, that.attributeDataType) && Objects.equals(attributeRange, that.attributeRange) && Objects.equals(attributeDefault, that.attributeDefault) && Objects.equals(attributeStatus, that.attributeStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, attributeType, attributeDataType, attributeRange, attributeDefault, attributeStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAttributeDefinition{" + "id=" + id + "name=" + name + "attributeType=" + attributeType + "attributeDataType=" + attributeDataType + "attributeRange=" + attributeRange + "attributeDefault=" + attributeDefault + "attributeStatus=" + attributeStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("attributeType", attributeType);
+        state.put("attributeDataType", attributeDataType);
+        state.put("attributeRange", attributeRange);
+        state.put("attributeDefault", attributeDefault);
+        state.put("attributeStatus", attributeStatus);
+        return state;
     }
 }

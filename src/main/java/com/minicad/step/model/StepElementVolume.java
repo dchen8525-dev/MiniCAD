@@ -1,27 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved ELEMENT_VOLUME.
  * Volume of a finite element.
  */
-public final class StepElementVolume implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepElementVolume extends AbstractStepEntity {
     private final double volume;
 
     public StepElementVolume(int id, String name, double volume) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.volume = volume;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getVolume() {
@@ -29,20 +20,11 @@ public final class StepElementVolume implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepElementVolume that = (StepElementVolume) o;
-        return id == that.id && Objects.equals(name, that.name) && volume == that.volume;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, volume);
-    }
-
-    @Override
-    public String toString() {
-        return "StepElementVolume{" + "id=" + id + "name=" + name + "volume=" + volume + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("volume", volume);
+        return state;
     }
 }

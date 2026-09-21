@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ANOMALY_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceAction action variance taken
  * @varianceStatus record variance status
  */
-public final class StepAnomalyRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnomalyRecord extends AbstractStepEntity {
     private final StepEntity varianceSystem;
     private final String varianceType;
     private final String varianceDetection;
@@ -29,8 +28,7 @@ public final class StepAnomalyRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepAnomalyRecord(int id, String name, StepEntity varianceSystem, String varianceType, String varianceDetection, StepEntity varianceDate, String varianceInvestigation, String varianceAction, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceSystem = varianceSystem;
         this.varianceType = varianceType;
         this.varianceDetection = varianceDetection;
@@ -38,14 +36,6 @@ public final class StepAnomalyRecord implements StepEntity {
         this.varianceInvestigation = varianceInvestigation;
         this.varianceAction = varianceAction;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceSystem() {
@@ -77,20 +67,17 @@ public final class StepAnomalyRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnomalyRecord that = (StepAnomalyRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceSystem, that.varianceSystem) && Objects.equals(varianceType, that.varianceType) && Objects.equals(varianceDetection, that.varianceDetection) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceInvestigation, that.varianceInvestigation) && Objects.equals(varianceAction, that.varianceAction) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceSystem, varianceType, varianceDetection, varianceDate, varianceInvestigation, varianceAction, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnomalyRecord{" + "id=" + id + "name=" + name + "varianceSystem=" + varianceSystem + "varianceType=" + varianceType + "varianceDetection=" + varianceDetection + "varianceDate=" + varianceDate + "varianceInvestigation=" + varianceInvestigation + "varianceAction=" + varianceAction + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceSystem", varianceSystem);
+        state.put("varianceType", varianceType);
+        state.put("varianceDetection", varianceDetection);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceInvestigation", varianceInvestigation);
+        state.put("varianceAction", varianceAction);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

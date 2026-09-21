@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FLAT_PATTERN.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param grainDirection grain direction reference
  * @param unfoldingSequence unfolding sequence operations
  */
-public final class StepFlatPattern implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFlatPattern extends AbstractStepEntity {
     private final StepEntity flatGeometry;
     private final List<StepEntity> bendLines;
     private final List<StepEntity> formingFeatures;
@@ -25,21 +24,12 @@ public final class StepFlatPattern implements StepEntity {
     private final List<StepEntity> unfoldingSequence;
 
     public StepFlatPattern(int id, String name, StepEntity flatGeometry, List<StepEntity> bendLines, List<StepEntity> formingFeatures, StepEntity grainDirection, List<StepEntity> unfoldingSequence) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.flatGeometry = flatGeometry;
         this.bendLines = bendLines == null ? null : java.util.List.copyOf(bendLines);
         this.formingFeatures = formingFeatures == null ? null : java.util.List.copyOf(formingFeatures);
         this.grainDirection = grainDirection;
         this.unfoldingSequence = unfoldingSequence == null ? null : java.util.List.copyOf(unfoldingSequence);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getFlatGeometry() {
@@ -72,20 +62,15 @@ public final class StepFlatPattern implements StepEntity {
     public List<StepEntity> unfoldingSequence() { return getUnfoldingSequence(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFlatPattern that = (StepFlatPattern) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(flatGeometry, that.flatGeometry) && Objects.equals(bendLines, that.bendLines) && Objects.equals(formingFeatures, that.formingFeatures) && Objects.equals(grainDirection, that.grainDirection) && Objects.equals(unfoldingSequence, that.unfoldingSequence);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, flatGeometry, bendLines, formingFeatures, grainDirection, unfoldingSequence);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFlatPattern{" + "id=" + id + "name=" + name + "flatGeometry=" + flatGeometry + "bendLines=" + bendLines + "formingFeatures=" + formingFeatures + "grainDirection=" + grainDirection + "unfoldingSequence=" + unfoldingSequence + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("flatGeometry", flatGeometry);
+        state.put("bendLines", bendLines);
+        state.put("formingFeatures", formingFeatures);
+        state.put("grainDirection", grainDirection);
+        state.put("unfoldingSequence", unfoldingSequence);
+        return state;
     }
 }

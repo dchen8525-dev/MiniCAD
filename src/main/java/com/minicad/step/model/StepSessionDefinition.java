@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SESSION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param sessionFeatures session variance features
  * @param sessionStatus session variance status
  */
-public final class StepSessionDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSessionDefinition extends AbstractStepEntity {
     private final String sessionType;
     private final int sessionTimeout;
     private final int sessionMaxInactive;
@@ -25,21 +24,12 @@ public final class StepSessionDefinition implements StepEntity {
     private final String sessionStatus;
 
     public StepSessionDefinition(int id, String name, String sessionType, int sessionTimeout, int sessionMaxInactive, List<String> sessionFeatures, String sessionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sessionType = sessionType;
         this.sessionTimeout = sessionTimeout;
         this.sessionMaxInactive = sessionMaxInactive;
         this.sessionFeatures = sessionFeatures == null ? null : java.util.List.copyOf(sessionFeatures);
         this.sessionStatus = sessionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSessionType() {
@@ -63,20 +53,15 @@ public final class StepSessionDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSessionDefinition that = (StepSessionDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sessionType, that.sessionType) && sessionTimeout == that.sessionTimeout && sessionMaxInactive == that.sessionMaxInactive && Objects.equals(sessionFeatures, that.sessionFeatures) && Objects.equals(sessionStatus, that.sessionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sessionType, sessionTimeout, sessionMaxInactive, sessionFeatures, sessionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSessionDefinition{" + "id=" + id + "name=" + name + "sessionType=" + sessionType + "sessionTimeout=" + sessionTimeout + "sessionMaxInactive=" + sessionMaxInactive + "sessionFeatures=" + sessionFeatures + "sessionStatus=" + sessionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sessionType", sessionType);
+        state.put("sessionTimeout", sessionTimeout);
+        state.put("sessionMaxInactive", sessionMaxInactive);
+        state.put("sessionFeatures", sessionFeatures);
+        state.put("sessionStatus", sessionStatus);
+        return state;
     }
 }

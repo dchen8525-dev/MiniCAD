@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved FEA_SPRING_ELEMENT_PROPERTY.
  */
-public final class StepFeaSpringElementProperty implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaSpringElementProperty extends AbstractStepEntity {
     private final double springConstant;
     private final StepEntity material;
 
     public StepFeaSpringElementProperty(int id, String name, double springConstant, StepEntity material) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.springConstant = springConstant;
         this.material = material;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getSpringConstant() {
@@ -35,20 +25,12 @@ public final class StepFeaSpringElementProperty implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaSpringElementProperty that = (StepFeaSpringElementProperty) o;
-        return id == that.id && Objects.equals(name, that.name) && springConstant == that.springConstant && Objects.equals(material, that.material);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, springConstant, material);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaSpringElementProperty{" + "id=" + id + "name=" + name + "springConstant=" + springConstant + "material=" + material + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("springConstant", springConstant);
+        state.put("material", material);
+        return state;
     }
 }

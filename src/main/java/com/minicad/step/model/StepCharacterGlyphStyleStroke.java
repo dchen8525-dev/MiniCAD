@@ -1,27 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CHARACTER_GLYPH_STYLE_STROKE.
  *
  * @param id STEP instance id
  * @param strokeStyle referenced curve style
  */
-public final class StepCharacterGlyphStyleStroke implements StepEntity {
-    private final int id;
+public final class StepCharacterGlyphStyleStroke extends AbstractStepEntity {
     private final StepCurveStyle strokeStyle;
 
     public StepCharacterGlyphStyleStroke(int id, StepCurveStyle strokeStyle) {
-        this.id = id;
+        super(id, "");
         this.strokeStyle = strokeStyle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepCurveStyle getStrokeStyle() {
@@ -34,20 +27,10 @@ public final class StepCharacterGlyphStyleStroke implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCharacterGlyphStyleStroke that = (StepCharacterGlyphStyleStroke) o;
-        return id == that.id && Objects.equals(strokeStyle, that.strokeStyle);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, strokeStyle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCharacterGlyphStyleStroke{" + "id=" + id + "strokeStyle=" + strokeStyle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("strokeStyle", strokeStyle);
+        return state;
     }
 }

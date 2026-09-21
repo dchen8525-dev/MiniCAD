@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal ANNOTATION_OCCURRENCE_RELATIONSHIP.
  *
@@ -11,33 +13,22 @@ import java.util.Objects;
  * @param relatingAnnotationOccurrence source occurrence
  * @param relatedAnnotationOccurrence target occurrence
  */
-public final class StepAnnotationOccurrenceRelationship implements StepEntity {
-    private final int id;
+public final class StepAnnotationOccurrenceRelationship extends AbstractStepEntity {
     private final String entityName;
-    private final String name;
     private final String description;
     private final StepEntity relatingAnnotationOccurrence;
     private final StepEntity relatedAnnotationOccurrence;
 
     public StepAnnotationOccurrenceRelationship(int id, String entityName, String name, String description, StepEntity relatingAnnotationOccurrence, StepEntity relatedAnnotationOccurrence) {
-        this.id = id;
+        super(id, name);
         this.entityName = entityName;
-        this.name = name;
         this.description = description;
         this.relatingAnnotationOccurrence = relatingAnnotationOccurrence;
         this.relatedAnnotationOccurrence = relatedAnnotationOccurrence;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getEntityName() {
         return entityName;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -58,7 +49,7 @@ public final class StepAnnotationOccurrenceRelationship implements StepEntity {
     }
 
     public String name() {
-        return name;
+        return getName();
     }
 
     public String description() {
@@ -74,20 +65,14 @@ public final class StepAnnotationOccurrenceRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnnotationOccurrenceRelationship that = (StepAnnotationOccurrenceRelationship) o;
-        return id == that.id && Objects.equals(entityName, that.entityName) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingAnnotationOccurrence, that.relatingAnnotationOccurrence) && Objects.equals(relatedAnnotationOccurrence, that.relatedAnnotationOccurrence);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, entityName, name, description, relatingAnnotationOccurrence, relatedAnnotationOccurrence);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnnotationOccurrenceRelationship{" + "id=" + id + "entityName=" + entityName + "name=" + name + "description=" + description + "relatingAnnotationOccurrence=" + relatingAnnotationOccurrence + "relatedAnnotationOccurrence=" + relatedAnnotationOccurrence + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("entityName", entityName);
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingAnnotationOccurrence", relatingAnnotationOccurrence);
+        state.put("relatedAnnotationOccurrence", relatedAnnotationOccurrence);
+        return state;
     }
 }

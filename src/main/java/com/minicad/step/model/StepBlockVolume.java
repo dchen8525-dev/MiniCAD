@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved BLOCK_VOLUME.
  * A block-shaped volume defined by position and dimensions.
@@ -12,29 +14,18 @@ import java.util.Objects;
  * @param yLength y dimension
  * @param zLength z dimension
  */
-public final class StepBlockVolume implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBlockVolume extends AbstractStepEntity {
     private final StepEntity position;
     private final double xLength;
     private final double yLength;
     private final double zLength;
 
     public StepBlockVolume(int id, String name, StepEntity position, double xLength, double yLength, double zLength) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.xLength = xLength;
         this.yLength = yLength;
         this.zLength = zLength;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -62,20 +53,14 @@ public final class StepBlockVolume implements StepEntity {
     public double zLength() { return getZLength(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBlockVolume that = (StepBlockVolume) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && xLength == that.xLength && yLength == that.yLength && zLength == that.zLength;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, xLength, yLength, zLength);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBlockVolume{" + "id=" + id + "name=" + name + "position=" + position + "xLength=" + xLength + "yLength=" + yLength + "zLength=" + zLength + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("xLength", xLength);
+        state.put("yLength", yLength);
+        state.put("zLength", zLength);
+        return state;
     }
 }

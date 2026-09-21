@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Minimal topological representation item marker.
@@ -8,38 +9,16 @@ import java.util.Objects;
  * @param id STEP instance id
  * @param name item name
  */
-public final class StepTopologicalRepresentationItem implements StepEntity {
-    private final int id;
-    private final String name;
-
+public final class StepTopologicalRepresentationItem extends AbstractStepEntity {
     public StepTopologicalRepresentationItem(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+        super(id, name);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTopologicalRepresentationItem that = (StepTopologicalRepresentationItem) o;
-        return id == that.id && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTopologicalRepresentationItem{" + "id=" + id + "name=" + name + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        return state;
     }
 }

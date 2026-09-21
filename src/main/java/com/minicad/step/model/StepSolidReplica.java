@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal SOLID_REPLICA parse-only solid model.
  *
@@ -10,25 +11,14 @@ import java.util.Objects;
  * @param parentSolid source solid
  * @param transformation placement transformation
  */
-public final class StepSolidReplica implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSolidReplica extends AbstractStepEntity {
     private final StepEntity parentSolid;
     private final StepCartesianTransformationOperator transformation;
 
     public StepSolidReplica(int id, String name, StepEntity parentSolid, StepCartesianTransformationOperator transformation) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.parentSolid = parentSolid;
         this.transformation = transformation;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getParentSolid() {
@@ -46,20 +36,12 @@ public final class StepSolidReplica implements StepEntity {
     public StepCartesianTransformationOperator transformation() { return getTransformation(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSolidReplica that = (StepSolidReplica) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(parentSolid, that.parentSolid) && Objects.equals(transformation, that.transformation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, parentSolid, transformation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSolidReplica{" + "id=" + id + "name=" + name + "parentSolid=" + parentSolid + "transformation=" + transformation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("parentSolid", parentSolid);
+        state.put("transformation", transformation);
+        return state;
     }
 }

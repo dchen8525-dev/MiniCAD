@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved EXCEPTION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param exceptionHandler exception variance handler reference
  * @param exceptionStatus exception variance status
  */
-public final class StepExceptionDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepExceptionDefinition extends AbstractStepEntity {
     private final String exceptionType;
     private final String exceptionCode;
     private final String exceptionDescription;
@@ -25,21 +24,12 @@ public final class StepExceptionDefinition implements StepEntity {
     private final String exceptionStatus;
 
     public StepExceptionDefinition(int id, String name, String exceptionType, String exceptionCode, String exceptionDescription, StepEntity exceptionHandler, String exceptionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.exceptionType = exceptionType;
         this.exceptionCode = exceptionCode;
         this.exceptionDescription = exceptionDescription;
         this.exceptionHandler = exceptionHandler;
         this.exceptionStatus = exceptionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getExceptionType() {
@@ -63,20 +53,15 @@ public final class StepExceptionDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepExceptionDefinition that = (StepExceptionDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(exceptionType, that.exceptionType) && Objects.equals(exceptionCode, that.exceptionCode) && Objects.equals(exceptionDescription, that.exceptionDescription) && Objects.equals(exceptionHandler, that.exceptionHandler) && Objects.equals(exceptionStatus, that.exceptionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, exceptionType, exceptionCode, exceptionDescription, exceptionHandler, exceptionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepExceptionDefinition{" + "id=" + id + "name=" + name + "exceptionType=" + exceptionType + "exceptionCode=" + exceptionCode + "exceptionDescription=" + exceptionDescription + "exceptionHandler=" + exceptionHandler + "exceptionStatus=" + exceptionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("exceptionType", exceptionType);
+        state.put("exceptionCode", exceptionCode);
+        state.put("exceptionDescription", exceptionDescription);
+        state.put("exceptionHandler", exceptionHandler);
+        state.put("exceptionStatus", exceptionStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Resolved EXTRUDED_AREA_SOLID_TAPERED.
  * An extruded solid with tapered profile.
@@ -13,29 +14,18 @@ import java.util.Objects;
  * @param depth extrusion depth
  * @param taperAngle taper angle
  */
-public final class StepExtrudedAreaSolidTapered implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepExtrudedAreaSolidTapered extends AbstractStepEntity {
     private final StepEntity sweptArea;
     private final StepDirection direction;
     private final double depth;
     private final double taperAngle;
 
     public StepExtrudedAreaSolidTapered(int id, String name, StepEntity sweptArea, StepDirection direction, double depth, double taperAngle) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sweptArea = sweptArea;
         this.direction = direction;
         this.depth = depth;
         this.taperAngle = taperAngle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSweptArea() {
@@ -61,20 +51,14 @@ public final class StepExtrudedAreaSolidTapered implements StepEntity {
     public double taperAngle() { return taperAngle; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepExtrudedAreaSolidTapered that = (StepExtrudedAreaSolidTapered) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sweptArea, that.sweptArea) && Objects.equals(direction, that.direction) && depth == that.depth && taperAngle == that.taperAngle;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sweptArea, direction, depth, taperAngle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepExtrudedAreaSolidTapered{" + "id=" + id + "name=" + name + "sweptArea=" + sweptArea + "direction=" + direction + "depth=" + depth + "taperAngle=" + taperAngle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sweptArea", sweptArea);
+        state.put("direction", direction);
+        state.put("depth", depth);
+        state.put("taperAngle", taperAngle);
+        return state;
     }
 }

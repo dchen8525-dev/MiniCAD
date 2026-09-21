@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COUNTERSINK_HOLE.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param countersinkDiameter countersink diameter
  * @param countersinkAngle countersink angle
  */
-public final class StepCountersinkHole implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCountersinkHole extends AbstractStepEntity {
     private final StepEntity throughHole;
     private final Double countersinkDiameter;
     private final Double countersinkAngle;
 
     public StepCountersinkHole(int id, String name, StepEntity throughHole, Double countersinkDiameter, Double countersinkAngle) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.throughHole = throughHole;
         this.countersinkDiameter = countersinkDiameter;
         this.countersinkAngle = countersinkAngle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getThroughHole() {
@@ -49,20 +39,13 @@ public final class StepCountersinkHole implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCountersinkHole that = (StepCountersinkHole) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(throughHole, that.throughHole) && Objects.equals(countersinkDiameter, that.countersinkDiameter) && Objects.equals(countersinkAngle, that.countersinkAngle);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, throughHole, countersinkDiameter, countersinkAngle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCountersinkHole{" + "id=" + id + "name=" + name + "throughHole=" + throughHole + "countersinkDiameter=" + countersinkDiameter + "countersinkAngle=" + countersinkAngle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("throughHole", throughHole);
+        state.put("countersinkDiameter", countersinkDiameter);
+        state.put("countersinkAngle", countersinkAngle);
+        return state;
     }
 }

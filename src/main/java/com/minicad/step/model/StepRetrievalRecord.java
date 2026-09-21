@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RETRIEVAL_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @variancePurpose retrieval variance purpose
  * @varianceStatus record variance status
  */
-public final class StepRetrievalRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRetrievalRecord extends AbstractStepEntity {
     private final StepEntity varianceData;
     private final StepEntity varianceArchive;
     private final StepEntity varianceDate;
@@ -27,22 +26,13 @@ public final class StepRetrievalRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepRetrievalRecord(int id, String name, StepEntity varianceData, StepEntity varianceArchive, StepEntity varianceDate, StepEntity varianceRequester, String variancePurpose, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceData = varianceData;
         this.varianceArchive = varianceArchive;
         this.varianceDate = varianceDate;
         this.varianceRequester = varianceRequester;
         this.variancePurpose = variancePurpose;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceData() {
@@ -70,20 +60,16 @@ public final class StepRetrievalRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRetrievalRecord that = (StepRetrievalRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceData, that.varianceData) && Objects.equals(varianceArchive, that.varianceArchive) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceRequester, that.varianceRequester) && Objects.equals(variancePurpose, that.variancePurpose) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceData, varianceArchive, varianceDate, varianceRequester, variancePurpose, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRetrievalRecord{" + "id=" + id + "name=" + name + "varianceData=" + varianceData + "varianceArchive=" + varianceArchive + "varianceDate=" + varianceDate + "varianceRequester=" + varianceRequester + "variancePurpose=" + variancePurpose + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceData", varianceData);
+        state.put("varianceArchive", varianceArchive);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceRequester", varianceRequester);
+        state.put("variancePurpose", variancePurpose);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

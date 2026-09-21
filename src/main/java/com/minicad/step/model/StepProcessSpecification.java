@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PROCESS_SPECIFICATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceTools tool variance requirements
  * @varianceStatus specification variance status
  */
-public final class StepProcessSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProcessSpecification extends AbstractStepEntity {
     private final StepEntity varianceProcess;
     private final List<String> varianceParameters;
     private final List<Double> varianceRanges;
@@ -27,22 +26,13 @@ public final class StepProcessSpecification implements StepEntity {
     private final String varianceStatus;
 
     public StepProcessSpecification(int id, String name, StepEntity varianceProcess, List<String> varianceParameters, List<Double> varianceRanges, List<StepEntity> varianceMaterials, List<StepEntity> varianceTools, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceProcess = varianceProcess;
         this.varianceParameters = varianceParameters == null ? null : java.util.List.copyOf(varianceParameters);
         this.varianceRanges = varianceRanges == null ? null : java.util.List.copyOf(varianceRanges);
         this.varianceMaterials = varianceMaterials == null ? null : java.util.List.copyOf(varianceMaterials);
         this.varianceTools = varianceTools == null ? null : java.util.List.copyOf(varianceTools);
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceProcess() {
@@ -70,20 +60,16 @@ public final class StepProcessSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProcessSpecification that = (StepProcessSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceProcess, that.varianceProcess) && Objects.equals(varianceParameters, that.varianceParameters) && Objects.equals(varianceRanges, that.varianceRanges) && Objects.equals(varianceMaterials, that.varianceMaterials) && Objects.equals(varianceTools, that.varianceTools) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceProcess, varianceParameters, varianceRanges, varianceMaterials, varianceTools, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProcessSpecification{" + "id=" + id + "name=" + name + "varianceProcess=" + varianceProcess + "varianceParameters=" + varianceParameters + "varianceRanges=" + varianceRanges + "varianceMaterials=" + varianceMaterials + "varianceTools=" + varianceTools + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceProcess", varianceProcess);
+        state.put("varianceParameters", varianceParameters);
+        state.put("varianceRanges", varianceRanges);
+        state.put("varianceMaterials", varianceMaterials);
+        state.put("varianceTools", varianceTools);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

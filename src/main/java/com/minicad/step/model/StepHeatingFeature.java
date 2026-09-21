@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved HEATING_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param operatingTemperature operating temperature range
  * @param heatingControl heating control specification
  */
-public final class StepHeatingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepHeatingFeature extends AbstractStepEntity {
     private final String heatingType;
     private final StepEntity heatingGeometry;
     private final double heatingCapacity;
@@ -27,22 +26,13 @@ public final class StepHeatingFeature implements StepEntity {
     private final StepEntity heatingControl;
 
     public StepHeatingFeature(int id, String name, String heatingType, StepEntity heatingGeometry, double heatingCapacity, List<StepEntity> heatingElements, List<Double> operatingTemperature, StepEntity heatingControl) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.heatingType = heatingType;
         this.heatingGeometry = heatingGeometry;
         this.heatingCapacity = heatingCapacity;
         this.heatingElements = heatingElements == null ? null : java.util.List.copyOf(heatingElements);
         this.operatingTemperature = operatingTemperature == null ? null : java.util.List.copyOf(operatingTemperature);
         this.heatingControl = heatingControl;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getHeatingType() {
@@ -70,20 +60,16 @@ public final class StepHeatingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepHeatingFeature that = (StepHeatingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(heatingType, that.heatingType) && Objects.equals(heatingGeometry, that.heatingGeometry) && heatingCapacity == that.heatingCapacity && Objects.equals(heatingElements, that.heatingElements) && Objects.equals(operatingTemperature, that.operatingTemperature) && Objects.equals(heatingControl, that.heatingControl);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, heatingType, heatingGeometry, heatingCapacity, heatingElements, operatingTemperature, heatingControl);
-    }
-
-    @Override
-    public String toString() {
-        return "StepHeatingFeature{" + "id=" + id + "name=" + name + "heatingType=" + heatingType + "heatingGeometry=" + heatingGeometry + "heatingCapacity=" + heatingCapacity + "heatingElements=" + heatingElements + "operatingTemperature=" + operatingTemperature + "heatingControl=" + heatingControl + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("heatingType", heatingType);
+        state.put("heatingGeometry", heatingGeometry);
+        state.put("heatingCapacity", heatingCapacity);
+        state.put("heatingElements", heatingElements);
+        state.put("operatingTemperature", operatingTemperature);
+        state.put("heatingControl", heatingControl);
+        return state;
     }
 }

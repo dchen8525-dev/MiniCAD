@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal PRODUCT_RELATIONSHIP metadata.
  *
@@ -12,35 +14,24 @@ import java.util.Objects;
  * @param relatedProduct target product
  * @param entityName concrete STEP entity name
  */
-public final class StepProductRelationship implements StepEntity {
-    private final int id;
+public final class StepProductRelationship extends AbstractStepEntity {
     private final String identifier;
-    private final String name;
     private final String description;
     private final StepProduct relatingProduct;
     private final StepProduct relatedProduct;
     private final String entityName;
 
     public StepProductRelationship(int id, String identifier, String name, String description, StepProduct relatingProduct, StepProduct relatedProduct, String entityName) {
-        this.id = id;
+        super(id, name);
         this.identifier = identifier;
-        this.name = name;
         this.description = description;
         this.relatingProduct = relatingProduct;
         this.relatedProduct = relatedProduct;
         this.entityName = entityName;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getIdentifier() {
         return identifier;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -65,7 +56,7 @@ public final class StepProductRelationship implements StepEntity {
     }
 
     public String name() {
-        return name;
+        return getName();
     }
 
     public String description() {
@@ -85,20 +76,15 @@ public final class StepProductRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductRelationship that = (StepProductRelationship) o;
-        return id == that.id && Objects.equals(identifier, that.identifier) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingProduct, that.relatingProduct) && Objects.equals(relatedProduct, that.relatedProduct) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, identifier, name, description, relatingProduct, relatedProduct, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductRelationship{" + "id=" + id + "identifier=" + identifier + "name=" + name + "description=" + description + "relatingProduct=" + relatingProduct + "relatedProduct=" + relatedProduct + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("identifier", identifier);
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingProduct", relatingProduct);
+        state.put("relatedProduct", relatedProduct);
+        state.put("entityName", entityName);
+        return state;
     }
 }

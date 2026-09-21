@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOCATOR_FEATURE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @varianceTolerance locator variance tolerance
  * @param locatorMaterial locator material reference
  */
-public final class StepLocatorFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLocatorFeature extends AbstractStepEntity {
     private final String locatorType;
     private final StepEntity locatorGeometry;
     private final StepEntity locatorPosition;
@@ -25,21 +24,12 @@ public final class StepLocatorFeature implements StepEntity {
     private final StepEntity locatorMaterial;
 
     public StepLocatorFeature(int id, String name, String locatorType, StepEntity locatorGeometry, StepEntity locatorPosition, double varianceTolerance, StepEntity locatorMaterial) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.locatorType = locatorType;
         this.locatorGeometry = locatorGeometry;
         this.locatorPosition = locatorPosition;
         this.varianceTolerance = varianceTolerance;
         this.locatorMaterial = locatorMaterial;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLocatorType() {
@@ -63,20 +53,15 @@ public final class StepLocatorFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLocatorFeature that = (StepLocatorFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(locatorType, that.locatorType) && Objects.equals(locatorGeometry, that.locatorGeometry) && Objects.equals(locatorPosition, that.locatorPosition) && varianceTolerance == that.varianceTolerance && Objects.equals(locatorMaterial, that.locatorMaterial);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, locatorType, locatorGeometry, locatorPosition, varianceTolerance, locatorMaterial);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLocatorFeature{" + "id=" + id + "name=" + name + "locatorType=" + locatorType + "locatorGeometry=" + locatorGeometry + "locatorPosition=" + locatorPosition + "varianceTolerance=" + varianceTolerance + "locatorMaterial=" + locatorMaterial + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("locatorType", locatorType);
+        state.put("locatorGeometry", locatorGeometry);
+        state.put("locatorPosition", locatorPosition);
+        state.put("varianceTolerance", varianceTolerance);
+        state.put("locatorMaterial", locatorMaterial);
+        return state;
     }
 }

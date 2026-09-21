@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SCENARIO_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceOutcome scenario variance expected outcome
  * @varianceStatus definition variance status
  */
-public final class StepScenarioDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepScenarioDefinition extends AbstractStepEntity {
     private final String varianceScenario;
     private final List<StepEntity> varianceSequence;
     private final List<StepEntity> varianceStates;
@@ -27,22 +26,13 @@ public final class StepScenarioDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepScenarioDefinition(int id, String name, String varianceScenario, List<StepEntity> varianceSequence, List<StepEntity> varianceStates, List<StepEntity> varianceEvents, String varianceOutcome, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceScenario = varianceScenario;
         this.varianceSequence = varianceSequence == null ? null : java.util.List.copyOf(varianceSequence);
         this.varianceStates = varianceStates == null ? null : java.util.List.copyOf(varianceStates);
         this.varianceEvents = varianceEvents == null ? null : java.util.List.copyOf(varianceEvents);
         this.varianceOutcome = varianceOutcome;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceScenario() {
@@ -70,20 +60,16 @@ public final class StepScenarioDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepScenarioDefinition that = (StepScenarioDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceScenario, that.varianceScenario) && Objects.equals(varianceSequence, that.varianceSequence) && Objects.equals(varianceStates, that.varianceStates) && Objects.equals(varianceEvents, that.varianceEvents) && Objects.equals(varianceOutcome, that.varianceOutcome) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceScenario, varianceSequence, varianceStates, varianceEvents, varianceOutcome, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepScenarioDefinition{" + "id=" + id + "name=" + name + "varianceScenario=" + varianceScenario + "varianceSequence=" + varianceSequence + "varianceStates=" + varianceStates + "varianceEvents=" + varianceEvents + "varianceOutcome=" + varianceOutcome + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceScenario", varianceScenario);
+        state.put("varianceSequence", varianceSequence);
+        state.put("varianceStates", varianceStates);
+        state.put("varianceEvents", varianceEvents);
+        state.put("varianceOutcome", varianceOutcome);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

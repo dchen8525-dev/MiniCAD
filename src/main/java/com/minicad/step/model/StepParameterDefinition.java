@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PARAMETER_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceUnit parameter variance unit
  * @varianceStatus definition variance status
  */
-public final class StepParameterDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepParameterDefinition extends AbstractStepEntity {
     private final String varianceParameter;
     private final String varianceType;
     private final double varianceDefaultValue;
@@ -27,22 +26,13 @@ public final class StepParameterDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepParameterDefinition(int id, String name, String varianceParameter, String varianceType, double varianceDefaultValue, List<Double> varianceRange, StepEntity varianceUnit, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceParameter = varianceParameter;
         this.varianceType = varianceType;
         this.varianceDefaultValue = varianceDefaultValue;
         this.varianceRange = varianceRange == null ? null : java.util.List.copyOf(varianceRange);
         this.varianceUnit = varianceUnit;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceParameter() {
@@ -70,20 +60,16 @@ public final class StepParameterDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepParameterDefinition that = (StepParameterDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceParameter, that.varianceParameter) && Objects.equals(varianceType, that.varianceType) && varianceDefaultValue == that.varianceDefaultValue && Objects.equals(varianceRange, that.varianceRange) && Objects.equals(varianceUnit, that.varianceUnit) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceParameter, varianceType, varianceDefaultValue, varianceRange, varianceUnit, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepParameterDefinition{" + "id=" + id + "name=" + name + "varianceParameter=" + varianceParameter + "varianceType=" + varianceType + "varianceDefaultValue=" + varianceDefaultValue + "varianceRange=" + varianceRange + "varianceUnit=" + varianceUnit + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceParameter", varianceParameter);
+        state.put("varianceType", varianceType);
+        state.put("varianceDefaultValue", varianceDefaultValue);
+        state.put("varianceRange", varianceRange);
+        state.put("varianceUnit", varianceUnit);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

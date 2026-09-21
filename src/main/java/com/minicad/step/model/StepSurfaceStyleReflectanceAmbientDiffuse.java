@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE.
  *
@@ -8,19 +10,14 @@ import java.util.Objects;
  * @param ambientReflectance ambient reflectance factor
  * @param diffuseReflectance diffuse reflectance factor
  */
-public final class StepSurfaceStyleReflectanceAmbientDiffuse implements StepEntity {
-    private final int id;
+public final class StepSurfaceStyleReflectanceAmbientDiffuse extends AbstractStepEntity {
     private final double ambientReflectance;
     private final double diffuseReflectance;
 
     public StepSurfaceStyleReflectanceAmbientDiffuse(int id, double ambientReflectance, double diffuseReflectance) {
-        this.id = id;
+        super(id, "");
         this.ambientReflectance = ambientReflectance;
         this.diffuseReflectance = diffuseReflectance;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public double getAmbientReflectance() {
@@ -29,10 +26,6 @@ public final class StepSurfaceStyleReflectanceAmbientDiffuse implements StepEnti
 
     public double getDiffuseReflectance() {
         return diffuseReflectance;
-    }
-
-    public String getName() {
-        return "";
     }
 
     // Record-style accessors
@@ -45,20 +38,11 @@ public final class StepSurfaceStyleReflectanceAmbientDiffuse implements StepEnti
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceStyleReflectanceAmbientDiffuse that = (StepSurfaceStyleReflectanceAmbientDiffuse) o;
-        return id == that.id && ambientReflectance == that.ambientReflectance && diffuseReflectance == that.diffuseReflectance;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, ambientReflectance, diffuseReflectance);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceStyleReflectanceAmbientDiffuse{" + "id=" + id + "ambientReflectance=" + ambientReflectance + "diffuseReflectance=" + diffuseReflectance + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("ambientReflectance", ambientReflectance);
+        state.put("diffuseReflectance", diffuseReflectance);
+        return state;
     }
 }

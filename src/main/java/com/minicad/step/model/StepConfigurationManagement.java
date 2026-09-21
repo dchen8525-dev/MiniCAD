@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CONFIGURATION_MANAGEMENT.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param configurationBaseline configuration baseline reference
  * @param configurationOwner configuration owner
  */
-public final class StepConfigurationManagement implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConfigurationManagement extends AbstractStepEntity {
     private final String configurationId;
     private final List<StepEntity> configurationItems;
     private final String configurationStatus;
@@ -25,21 +24,12 @@ public final class StepConfigurationManagement implements StepEntity {
     private final StepEntity configurationOwner;
 
     public StepConfigurationManagement(int id, String name, String configurationId, List<StepEntity> configurationItems, String configurationStatus, StepEntity configurationBaseline, StepEntity configurationOwner) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.configurationId = configurationId;
         this.configurationItems = configurationItems == null ? null : java.util.List.copyOf(configurationItems);
         this.configurationStatus = configurationStatus;
         this.configurationBaseline = configurationBaseline;
         this.configurationOwner = configurationOwner;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getConfigurationId() {
@@ -63,20 +53,15 @@ public final class StepConfigurationManagement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConfigurationManagement that = (StepConfigurationManagement) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(configurationId, that.configurationId) && Objects.equals(configurationItems, that.configurationItems) && Objects.equals(configurationStatus, that.configurationStatus) && Objects.equals(configurationBaseline, that.configurationBaseline) && Objects.equals(configurationOwner, that.configurationOwner);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, configurationId, configurationItems, configurationStatus, configurationBaseline, configurationOwner);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConfigurationManagement{" + "id=" + id + "name=" + name + "configurationId=" + configurationId + "configurationItems=" + configurationItems + "configurationStatus=" + configurationStatus + "configurationBaseline=" + configurationBaseline + "configurationOwner=" + configurationOwner + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("configurationId", configurationId);
+        state.put("configurationItems", configurationItems);
+        state.put("configurationStatus", configurationStatus);
+        state.put("configurationBaseline", configurationBaseline);
+        state.put("configurationOwner", configurationOwner);
+        return state;
     }
 }

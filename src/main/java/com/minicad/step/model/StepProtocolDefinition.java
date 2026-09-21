@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PROTOCOL_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceStandard protocol variance standard reference
  * @varianceStatus definition variance status
  */
-public final class StepProtocolDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProtocolDefinition extends AbstractStepEntity {
     private final String varianceProtocol;
     private final String varianceType;
     private final String varianceFormat;
@@ -27,22 +26,13 @@ public final class StepProtocolDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepProtocolDefinition(int id, String name, String varianceProtocol, String varianceType, String varianceFormat, List<String> varianceSequence, String varianceStandard, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceProtocol = varianceProtocol;
         this.varianceType = varianceType;
         this.varianceFormat = varianceFormat;
         this.varianceSequence = varianceSequence == null ? null : java.util.List.copyOf(varianceSequence);
         this.varianceStandard = varianceStandard;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceProtocol() {
@@ -70,20 +60,16 @@ public final class StepProtocolDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProtocolDefinition that = (StepProtocolDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceProtocol, that.varianceProtocol) && Objects.equals(varianceType, that.varianceType) && Objects.equals(varianceFormat, that.varianceFormat) && Objects.equals(varianceSequence, that.varianceSequence) && Objects.equals(varianceStandard, that.varianceStandard) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceProtocol, varianceType, varianceFormat, varianceSequence, varianceStandard, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProtocolDefinition{" + "id=" + id + "name=" + name + "varianceProtocol=" + varianceProtocol + "varianceType=" + varianceType + "varianceFormat=" + varianceFormat + "varianceSequence=" + varianceSequence + "varianceStandard=" + varianceStandard + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceProtocol", varianceProtocol);
+        state.put("varianceType", varianceType);
+        state.put("varianceFormat", varianceFormat);
+        state.put("varianceSequence", varianceSequence);
+        state.put("varianceStandard", varianceStandard);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal draughting callout containing PMI text and optional leader geometry.
@@ -11,25 +12,14 @@ import java.util.Objects;
  * @param contents callout contents
  * @param entityName concrete STEP entity name
  */
-public final class StepDraughtingCallout implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDraughtingCallout extends AbstractStepEntity {
     private final List<StepEntity> contents;
     private final String entityName;
 
     public StepDraughtingCallout(int id, String name, List<StepEntity> contents, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.contents = contents == null ? null : java.util.List.copyOf(contents);
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getContents() {
@@ -50,20 +40,12 @@ public final class StepDraughtingCallout implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDraughtingCallout that = (StepDraughtingCallout) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(contents, that.contents) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, contents, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDraughtingCallout{" + "id=" + id + "name=" + name + "contents=" + contents + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("contents", contents);
+        state.put("entityName", entityName);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FEATURE_CONTROL_FRAME.
@@ -12,25 +13,14 @@ import java.util.Objects;
  * @param datumSystem datum references
  * @param tolerance the geometric tolerance value
  */
-public final class StepFeatureControlFrame implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeatureControlFrame extends AbstractStepEntity {
     private final List<StepEntity> datumSystem;
     private final StepEntity tolerance;
 
     public StepFeatureControlFrame(int id, String name, List<StepEntity> datumSystem, StepEntity tolerance) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.datumSystem = datumSystem == null ? null : java.util.List.copyOf(datumSystem);
         this.tolerance = tolerance;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getDatumSystem() {
@@ -42,20 +32,12 @@ public final class StepFeatureControlFrame implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeatureControlFrame that = (StepFeatureControlFrame) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(datumSystem, that.datumSystem) && Objects.equals(tolerance, that.tolerance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, datumSystem, tolerance);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeatureControlFrame{" + "id=" + id + "name=" + name + "datumSystem=" + datumSystem + "tolerance=" + tolerance + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("datumSystem", datumSystem);
+        state.put("tolerance", tolerance);
+        return state;
     }
 }

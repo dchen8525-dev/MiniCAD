@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ALERT_CONFIGURATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceSeverity alert variance severity level
  * @varianceStatus configuration variance status
  */
-public final class StepAlertConfiguration implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAlertConfiguration extends AbstractStepEntity {
     private final String varianceCondition;
     private final double varianceThreshold;
     private final List<StepEntity> varianceActions;
@@ -27,22 +26,13 @@ public final class StepAlertConfiguration implements StepEntity {
     private final String varianceStatus;
 
     public StepAlertConfiguration(int id, String name, String varianceCondition, double varianceThreshold, List<StepEntity> varianceActions, List<StepEntity> varianceRecipients, int varianceSeverity, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceCondition = varianceCondition;
         this.varianceThreshold = varianceThreshold;
         this.varianceActions = varianceActions == null ? null : java.util.List.copyOf(varianceActions);
         this.varianceRecipients = varianceRecipients == null ? null : java.util.List.copyOf(varianceRecipients);
         this.varianceSeverity = varianceSeverity;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceCondition() {
@@ -70,20 +60,16 @@ public final class StepAlertConfiguration implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAlertConfiguration that = (StepAlertConfiguration) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceCondition, that.varianceCondition) && varianceThreshold == that.varianceThreshold && Objects.equals(varianceActions, that.varianceActions) && Objects.equals(varianceRecipients, that.varianceRecipients) && varianceSeverity == that.varianceSeverity && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceCondition, varianceThreshold, varianceActions, varianceRecipients, varianceSeverity, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAlertConfiguration{" + "id=" + id + "name=" + name + "varianceCondition=" + varianceCondition + "varianceThreshold=" + varianceThreshold + "varianceActions=" + varianceActions + "varianceRecipients=" + varianceRecipients + "varianceSeverity=" + varianceSeverity + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceCondition", varianceCondition);
+        state.put("varianceThreshold", varianceThreshold);
+        state.put("varianceActions", varianceActions);
+        state.put("varianceRecipients", varianceRecipients);
+        state.put("varianceSeverity", varianceSeverity);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

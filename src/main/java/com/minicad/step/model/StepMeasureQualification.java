@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MEASURE_QUALIFICATION.
@@ -12,25 +13,14 @@ import java.util.Objects;
  * @param qualifiedMeasure qualified measure reference
  * @param qualifiers list of qualifiers
  */
-public final class StepMeasureQualification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMeasureQualification extends AbstractStepEntity {
     private final StepEntity qualifiedMeasure;
     private final List<StepEntity> qualifiers;
 
     public StepMeasureQualification(int id, String name, StepEntity qualifiedMeasure, List<StepEntity> qualifiers) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.qualifiedMeasure = qualifiedMeasure;
         this.qualifiers = qualifiers == null ? null : java.util.List.copyOf(qualifiers);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getQualifiedMeasure() {
@@ -42,20 +32,12 @@ public final class StepMeasureQualification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMeasureQualification that = (StepMeasureQualification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(qualifiedMeasure, that.qualifiedMeasure) && Objects.equals(qualifiers, that.qualifiers);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, qualifiedMeasure, qualifiers);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMeasureQualification{" + "id=" + id + "name=" + name + "qualifiedMeasure=" + qualifiedMeasure + "qualifiers=" + qualifiers + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("qualifiedMeasure", qualifiedMeasure);
+        state.put("qualifiers", qualifiers);
+        return state;
     }
 }

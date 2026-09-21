@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SHAFT_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param shaftMaterial shaft material specification
  * @param surfaceTreatment surface treatment specification
  */
-public final class StepShaftFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepShaftFeature extends AbstractStepEntity {
     private final double shaftDiameter;
     private final double shaftLength;
     private final String shaftType;
@@ -27,22 +26,13 @@ public final class StepShaftFeature implements StepEntity {
     private final StepEntity surfaceTreatment;
 
     public StepShaftFeature(int id, String name, double shaftDiameter, double shaftLength, String shaftType, List<StepEntity> features, StepEntity shaftMaterial, StepEntity surfaceTreatment) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.shaftDiameter = shaftDiameter;
         this.shaftLength = shaftLength;
         this.shaftType = shaftType;
         this.features = features == null ? null : java.util.List.copyOf(features);
         this.shaftMaterial = shaftMaterial;
         this.surfaceTreatment = surfaceTreatment;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getShaftDiameter() {
@@ -70,20 +60,16 @@ public final class StepShaftFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepShaftFeature that = (StepShaftFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && shaftDiameter == that.shaftDiameter && shaftLength == that.shaftLength && Objects.equals(shaftType, that.shaftType) && Objects.equals(features, that.features) && Objects.equals(shaftMaterial, that.shaftMaterial) && Objects.equals(surfaceTreatment, that.surfaceTreatment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, shaftDiameter, shaftLength, shaftType, features, shaftMaterial, surfaceTreatment);
-    }
-
-    @Override
-    public String toString() {
-        return "StepShaftFeature{" + "id=" + id + "name=" + name + "shaftDiameter=" + shaftDiameter + "shaftLength=" + shaftLength + "shaftType=" + shaftType + "features=" + features + "shaftMaterial=" + shaftMaterial + "surfaceTreatment=" + surfaceTreatment + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("shaftDiameter", shaftDiameter);
+        state.put("shaftLength", shaftLength);
+        state.put("shaftType", shaftType);
+        state.put("features", features);
+        state.put("shaftMaterial", shaftMaterial);
+        state.put("surfaceTreatment", surfaceTreatment);
+        return state;
     }
 }

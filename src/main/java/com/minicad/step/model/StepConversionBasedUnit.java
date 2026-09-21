@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal conversion-based unit definition.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param conversionFactor referenced conversion factor
  * @param entityName actual entity type name (for subtype handling)
  */
-public final class StepConversionBasedUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConversionBasedUnit extends AbstractStepEntity {
     private final String unitKind;
     private final StepMeasureWithUnit conversionFactor;
     private final String entityName;
 
     public StepConversionBasedUnit(int id, String name, String unitKind, StepMeasureWithUnit conversionFactor, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.unitKind = unitKind;
         this.conversionFactor = conversionFactor;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getUnitKind() {
@@ -46,27 +37,20 @@ public final class StepConversionBasedUnit implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String name() { return name; }
+    public int id() { return getId(); }
+    public String name() { return getName(); }
     public String unitKind() { return unitKind; }
     public StepMeasureWithUnit conversionFactor() { return conversionFactor; }
     public String entityName() { return entityName; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConversionBasedUnit that = (StepConversionBasedUnit) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(unitKind, that.unitKind) && Objects.equals(conversionFactor, that.conversionFactor) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, unitKind, conversionFactor, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConversionBasedUnit{" + "id=" + id + "name=" + name + "unitKind=" + unitKind + "conversionFactor=" + conversionFactor + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("unitKind", unitKind);
+        state.put("conversionFactor", conversionFactor);
+        state.put("entityName", entityName);
+        return state;
     }
 }

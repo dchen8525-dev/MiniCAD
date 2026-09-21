@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal next assembly usage occurrence.
  *
@@ -12,35 +14,24 @@ import java.util.Objects;
  * @param relatedProductDefinition component product definition
  * @param referenceDesignator optional occurrence reference designator
  */
-public final class StepNextAssemblyUsageOccurrence implements StepEntity {
-    private final int id;
+public final class StepNextAssemblyUsageOccurrence extends AbstractStepEntity {
     private final String identifier;
-    private final String name;
     private final String description;
     private final StepProductDefinition relatingProductDefinition;
     private final StepProductDefinition relatedProductDefinition;
     private final String referenceDesignator;
 
     public StepNextAssemblyUsageOccurrence(int id, String identifier, String name, String description, StepProductDefinition relatingProductDefinition, StepProductDefinition relatedProductDefinition, String referenceDesignator) {
-        this.id = id;
+        super(id, name);
         this.identifier = identifier;
-        this.name = name;
         this.description = description;
         this.relatingProductDefinition = relatingProductDefinition;
         this.relatedProductDefinition = relatedProductDefinition;
         this.referenceDesignator = referenceDesignator;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getIdentifier() {
         return identifier;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -60,29 +51,24 @@ public final class StepNextAssemblyUsageOccurrence implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
+    public int id() { return getId(); }
     public String identifier() { return identifier; }
-    public String name() { return name; }
+    public String name() { return getName(); }
     public String description() { return description; }
     public StepProductDefinition relatingProductDefinition() { return relatingProductDefinition; }
     public StepProductDefinition relatedProductDefinition() { return relatedProductDefinition; }
     public String referenceDesignator() { return referenceDesignator; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNextAssemblyUsageOccurrence that = (StepNextAssemblyUsageOccurrence) o;
-        return id == that.id && Objects.equals(identifier, that.identifier) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingProductDefinition, that.relatingProductDefinition) && Objects.equals(relatedProductDefinition, that.relatedProductDefinition) && Objects.equals(referenceDesignator, that.referenceDesignator);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, identifier, name, description, relatingProductDefinition, relatedProductDefinition, referenceDesignator);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNextAssemblyUsageOccurrence{" + "id=" + id + "identifier=" + identifier + "name=" + name + "description=" + description + "relatingProductDefinition=" + relatingProductDefinition + "relatedProductDefinition=" + relatedProductDefinition + "referenceDesignator=" + referenceDesignator + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("identifier", identifier);
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingProductDefinition", relatingProductDefinition);
+        state.put("relatedProductDefinition", relatedProductDefinition);
+        state.put("referenceDesignator", referenceDesignator);
+        return state;
     }
 }

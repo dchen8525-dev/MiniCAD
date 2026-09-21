@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CURVE_2D.
  * A 2D curve defined by a placement and parametric equation.
@@ -10,25 +12,14 @@ import java.util.Objects;
  * @param position the 2D placement
  * @param equation the parametric equation coefficients
  */
-public final class StepCurve2D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCurve2D extends AbstractStepEntity {
     private final StepAxis2Placement2D position;
     private final double[] equation;
 
     public StepCurve2D(int id, String name, StepAxis2Placement2D position, double[] equation) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.equation = equation;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepAxis2Placement2D getPosition() {
@@ -46,20 +37,12 @@ public final class StepCurve2D implements StepEntity {
     public double[] equation() { return getEquation(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCurve2D that = (StepCurve2D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && Objects.equals(equation, that.equation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, equation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCurve2D{" + "id=" + id + "name=" + name + "position=" + position + "equation=" + equation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("equation", equation);
+        return state;
     }
 }

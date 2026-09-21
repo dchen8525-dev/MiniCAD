@@ -1,33 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved VELOCITY_BOUNDARY_CONDITION.
  * Velocity boundary condition for FEA.
  */
-public final class StepVelocityBoundaryCondition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepVelocityBoundaryCondition extends AbstractStepEntity {
     private final StepEntity appliedTo;
     private final double vx;
     private final double vy;
     private final double vz;
 
     public StepVelocityBoundaryCondition(int id, String name, StepEntity appliedTo, double vx, double vy, double vz) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.appliedTo = appliedTo;
         this.vx = vx;
         this.vy = vy;
         this.vz = vz;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getAppliedTo() {
@@ -47,20 +38,14 @@ public final class StepVelocityBoundaryCondition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVelocityBoundaryCondition that = (StepVelocityBoundaryCondition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(appliedTo, that.appliedTo) && vx == that.vx && vy == that.vy && vz == that.vz;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, appliedTo, vx, vy, vz);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVelocityBoundaryCondition{" + "id=" + id + "name=" + name + "appliedTo=" + appliedTo + "vx=" + vx + "vy=" + vy + "vz=" + vz + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("appliedTo", appliedTo);
+        state.put("vx", vx);
+        state.put("vy", vy);
+        state.put("vz", vz);
+        return state;
     }
 }

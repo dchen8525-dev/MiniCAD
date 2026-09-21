@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOAD_CASE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param caseDescription case variance description
  * @param caseStatus case variance status
  */
-public final class StepLoadCase implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLoadCase extends AbstractStepEntity {
     private final String caseType;
     private final List<StepEntity> caseLoads;
     private final String caseDescription;
     private final String caseStatus;
 
     public StepLoadCase(int id, String name, String caseType, List<StepEntity> caseLoads, String caseDescription, String caseStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.caseType = caseType;
         this.caseLoads = caseLoads == null ? null : java.util.List.copyOf(caseLoads);
         this.caseDescription = caseDescription;
         this.caseStatus = caseStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCaseType() {
@@ -56,20 +46,14 @@ public final class StepLoadCase implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLoadCase that = (StepLoadCase) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(caseType, that.caseType) && Objects.equals(caseLoads, that.caseLoads) && Objects.equals(caseDescription, that.caseDescription) && Objects.equals(caseStatus, that.caseStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, caseType, caseLoads, caseDescription, caseStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLoadCase{" + "id=" + id + "name=" + name + "caseType=" + caseType + "caseLoads=" + caseLoads + "caseDescription=" + caseDescription + "caseStatus=" + caseStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("caseType", caseType);
+        state.put("caseLoads", caseLoads);
+        state.put("caseDescription", caseDescription);
+        state.put("caseStatus", caseStatus);
+        return state;
     }
 }

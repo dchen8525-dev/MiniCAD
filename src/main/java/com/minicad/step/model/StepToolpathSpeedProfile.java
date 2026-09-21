@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TOOLPATH_SPEED_PROFILE.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param feedValues feed values along the toolpath
  * @param positionPoints position points for profile values
  */
-public final class StepToolpathSpeedProfile implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepToolpathSpeedProfile extends AbstractStepEntity {
     private final List<Double> speedValues;
     private final List<Double> feedValues;
     private final List<StepEntity> positionPoints;
 
     public StepToolpathSpeedProfile(int id, String name, List<Double> speedValues, List<Double> feedValues, List<StepEntity> positionPoints) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.speedValues = speedValues == null ? null : java.util.List.copyOf(speedValues);
         this.feedValues = feedValues == null ? null : java.util.List.copyOf(feedValues);
         this.positionPoints = positionPoints == null ? null : java.util.List.copyOf(positionPoints);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<Double> getSpeedValues() {
@@ -49,20 +39,13 @@ public final class StepToolpathSpeedProfile implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepToolpathSpeedProfile that = (StepToolpathSpeedProfile) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(speedValues, that.speedValues) && Objects.equals(feedValues, that.feedValues) && Objects.equals(positionPoints, that.positionPoints);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, speedValues, feedValues, positionPoints);
-    }
-
-    @Override
-    public String toString() {
-        return "StepToolpathSpeedProfile{" + "id=" + id + "name=" + name + "speedValues=" + speedValues + "feedValues=" + feedValues + "positionPoints=" + positionPoints + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("speedValues", speedValues);
+        state.put("feedValues", feedValues);
+        state.put("positionPoints", positionPoints);
+        return state;
     }
 }

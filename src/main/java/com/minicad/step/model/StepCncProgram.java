@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CNC_PROGRAM.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param postProcessor post-processor specification
  * @param machineTarget target CNC machine
  */
-public final class StepCncProgram implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCncProgram extends AbstractStepEntity {
     private final String programType;
     private final List<StepEntity> toolpaths;
     private final List<StepEntity> machiningOperations;
@@ -27,22 +26,13 @@ public final class StepCncProgram implements StepEntity {
     private final StepEntity machineTarget;
 
     public StepCncProgram(int id, String name, String programType, List<StepEntity> toolpaths, List<StepEntity> machiningOperations, StepEntity programCode, String postProcessor, StepEntity machineTarget) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.programType = programType;
         this.toolpaths = toolpaths == null ? null : java.util.List.copyOf(toolpaths);
         this.machiningOperations = machiningOperations == null ? null : java.util.List.copyOf(machiningOperations);
         this.programCode = programCode;
         this.postProcessor = postProcessor;
         this.machineTarget = machineTarget;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getProgramType() {
@@ -70,20 +60,16 @@ public final class StepCncProgram implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCncProgram that = (StepCncProgram) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(programType, that.programType) && Objects.equals(toolpaths, that.toolpaths) && Objects.equals(machiningOperations, that.machiningOperations) && Objects.equals(programCode, that.programCode) && Objects.equals(postProcessor, that.postProcessor) && Objects.equals(machineTarget, that.machineTarget);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, programType, toolpaths, machiningOperations, programCode, postProcessor, machineTarget);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCncProgram{" + "id=" + id + "name=" + name + "programType=" + programType + "toolpaths=" + toolpaths + "machiningOperations=" + machiningOperations + "programCode=" + programCode + "postProcessor=" + postProcessor + "machineTarget=" + machineTarget + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("programType", programType);
+        state.put("toolpaths", toolpaths);
+        state.put("machiningOperations", machiningOperations);
+        state.put("programCode", programCode);
+        state.put("postProcessor", postProcessor);
+        state.put("machineTarget", machineTarget);
+        return state;
     }
 }

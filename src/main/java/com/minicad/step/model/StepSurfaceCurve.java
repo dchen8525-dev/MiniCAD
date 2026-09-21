@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SURFACE_CURVE with supported 3D curve geometry.
@@ -13,33 +14,22 @@ import java.util.Objects;
  * @param associatedGeometry associated PCURVE or surface-geometry items
  * @param masterRepresentation preferred representation enum
  */
-public final class StepSurfaceCurve implements StepEntity {
-    private final int id;
+public final class StepSurfaceCurve extends AbstractStepEntity {
     private final String entityName;
-    private final String name;
     private final StepEntity curve3d;
     private final List<StepEntity> associatedGeometry;
     private final String masterRepresentation;
 
     public StepSurfaceCurve(int id, String entityName, String name, StepEntity curve3d, List<StepEntity> associatedGeometry, String masterRepresentation) {
-        this.id = id;
+        super(id, name);
         this.entityName = entityName;
-        this.name = name;
         this.curve3d = curve3d;
         this.associatedGeometry = associatedGeometry == null ? null : java.util.List.copyOf(associatedGeometry);
         this.masterRepresentation = masterRepresentation;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getEntityName() {
         return entityName;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCurve3d() {
@@ -63,20 +53,14 @@ public final class StepSurfaceCurve implements StepEntity {
     public String masterRepresentation() { return getMasterRepresentation(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceCurve that = (StepSurfaceCurve) o;
-        return id == that.id && Objects.equals(entityName, that.entityName) && Objects.equals(name, that.name) && Objects.equals(curve3d, that.curve3d) && Objects.equals(associatedGeometry, that.associatedGeometry) && Objects.equals(masterRepresentation, that.masterRepresentation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, entityName, name, curve3d, associatedGeometry, masterRepresentation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceCurve{" + "id=" + id + "entityName=" + entityName + "name=" + name + "curve3d=" + curve3d + "associatedGeometry=" + associatedGeometry + "masterRepresentation=" + masterRepresentation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("entityName", entityName);
+        state.put("name", getName());
+        state.put("curve3d", curve3d);
+        state.put("associatedGeometry", associatedGeometry);
+        state.put("masterRepresentation", masterRepresentation);
+        return state;
     }
 }

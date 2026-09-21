@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DEMAND_FORECAST.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceAccuracy forecast variance accuracy
  * @varianceStatus forecast variance status
  */
-public final class StepDemandForecast implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDemandForecast extends AbstractStepEntity {
     private final List<StepEntity> varianceProducts;
     private final List<Double> varianceForecast;
     private final List<Double> varianceHistory;
@@ -27,22 +26,13 @@ public final class StepDemandForecast implements StepEntity {
     private final String varianceStatus;
 
     public StepDemandForecast(int id, String name, List<StepEntity> varianceProducts, List<Double> varianceForecast, List<Double> varianceHistory, String varianceMethod, double varianceAccuracy, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceProducts = varianceProducts == null ? null : java.util.List.copyOf(varianceProducts);
         this.varianceForecast = varianceForecast == null ? null : java.util.List.copyOf(varianceForecast);
         this.varianceHistory = varianceHistory == null ? null : java.util.List.copyOf(varianceHistory);
         this.varianceMethod = varianceMethod;
         this.varianceAccuracy = varianceAccuracy;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getVarianceProducts() {
@@ -70,20 +60,16 @@ public final class StepDemandForecast implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDemandForecast that = (StepDemandForecast) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceProducts, that.varianceProducts) && Objects.equals(varianceForecast, that.varianceForecast) && Objects.equals(varianceHistory, that.varianceHistory) && Objects.equals(varianceMethod, that.varianceMethod) && varianceAccuracy == that.varianceAccuracy && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceProducts, varianceForecast, varianceHistory, varianceMethod, varianceAccuracy, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDemandForecast{" + "id=" + id + "name=" + name + "varianceProducts=" + varianceProducts + "varianceForecast=" + varianceForecast + "varianceHistory=" + varianceHistory + "varianceMethod=" + varianceMethod + "varianceAccuracy=" + varianceAccuracy + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceProducts", varianceProducts);
+        state.put("varianceForecast", varianceForecast);
+        state.put("varianceHistory", varianceHistory);
+        state.put("varianceMethod", varianceMethod);
+        state.put("varianceAccuracy", varianceAccuracy);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

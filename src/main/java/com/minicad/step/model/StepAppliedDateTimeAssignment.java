@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_DATE_AND_TIME_ASSIGNMENT metadata.
@@ -12,23 +13,18 @@ import java.util.Objects;
  * @param role assignment role
  * @param items assigned target items
  */
-public final class StepAppliedDateTimeAssignment implements StepEntity {
-    private final int id;
+public final class StepAppliedDateTimeAssignment extends AbstractStepEntity {
     private final String entityName;
     private final StepDateAndTime assignedDateAndTime;
     private final StepDateTimeRole role;
     private final List<StepEntity> items;
 
     public StepAppliedDateTimeAssignment(int id, String entityName, StepDateAndTime assignedDateAndTime, StepDateTimeRole role, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.entityName = entityName;
         this.assignedDateAndTime = assignedDateAndTime;
         this.role = role;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getEntityName() {
@@ -48,28 +44,20 @@ public final class StepAppliedDateTimeAssignment implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String getName() { return ""; }
+    public int id() { return getId(); }
     public String entityName() { return entityName; }
     public StepDateAndTime assignedDateAndTime() { return assignedDateAndTime; }
     public StepDateTimeRole role() { return role; }
     public List<StepEntity> items() { return items; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedDateTimeAssignment that = (StepAppliedDateTimeAssignment) o;
-        return id == that.id && Objects.equals(entityName, that.entityName) && Objects.equals(assignedDateAndTime, that.assignedDateAndTime) && Objects.equals(role, that.role) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, entityName, assignedDateAndTime, role, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedDateTimeAssignment{" + "id=" + id + "entityName=" + entityName + "assignedDateAndTime=" + assignedDateAndTime + "role=" + role + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("entityName", entityName);
+        state.put("assignedDateAndTime", assignedDateAndTime);
+        state.put("role", role);
+        state.put("items", items);
+        return state;
     }
 }

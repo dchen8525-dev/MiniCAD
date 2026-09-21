@@ -1,26 +1,16 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public final class StepRenderingProperties implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRenderingProperties extends AbstractStepEntity {
     private final double specularExponent;
     private final double specularRoughness;
 
     public StepRenderingProperties(int id, String name, double specularExponent, double specularRoughness) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.specularExponent = specularExponent;
         this.specularRoughness = specularRoughness;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getSpecularExponent() {
@@ -32,20 +22,12 @@ public final class StepRenderingProperties implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRenderingProperties that = (StepRenderingProperties) o;
-        return id == that.id && Objects.equals(name, that.name) && specularExponent == that.specularExponent && specularRoughness == that.specularRoughness;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, specularExponent, specularRoughness);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRenderingProperties{" + "id=" + id + "name=" + name + "specularExponent=" + specularExponent + "specularRoughness=" + specularRoughness + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("specularExponent", specularExponent);
+        state.put("specularRoughness", specularRoughness);
+        return state;
     }
 }

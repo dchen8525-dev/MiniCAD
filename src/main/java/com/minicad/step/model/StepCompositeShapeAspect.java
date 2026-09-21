@@ -1,31 +1,21 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved COMPOSITE_SHAPE_ASPECT.
  */
-public final class StepCompositeShapeAspect implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCompositeShapeAspect extends AbstractStepEntity {
     private final String description;
     private final StepEntity ofShape;
     private final boolean productDefinitional;
 
     public StepCompositeShapeAspect(int id, String name, String description, StepEntity ofShape, boolean productDefinitional) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.ofShape = ofShape;
         this.productDefinitional = productDefinitional;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -42,7 +32,7 @@ public final class StepCompositeShapeAspect implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public String description() {
@@ -58,20 +48,13 @@ public final class StepCompositeShapeAspect implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCompositeShapeAspect that = (StepCompositeShapeAspect) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(ofShape, that.ofShape) && productDefinitional == that.productDefinitional;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, ofShape, productDefinitional);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCompositeShapeAspect{" + "id=" + id + "name=" + name + "description=" + description + "ofShape=" + ofShape + "productDefinitional=" + productDefinitional + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("ofShape", ofShape);
+        state.put("productDefinitional", productDefinitional);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOCK_ENTRY.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param entryTimestamp entry variance timestamp
  * @param entryStatus entry variance status
  */
-public final class StepLockEntry implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLockEntry extends AbstractStepEntity {
     private final String entryType;
     private final StepEntity entryTarget;
     private final StepEntity entryHolder;
@@ -27,22 +26,13 @@ public final class StepLockEntry implements StepEntity {
     private final String entryStatus;
 
     public StepLockEntry(int id, String name, String entryType, StepEntity entryTarget, StepEntity entryHolder, String entryState, StepEntity entryTimestamp, String entryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.entryType = entryType;
         this.entryTarget = entryTarget;
         this.entryHolder = entryHolder;
         this.entryState = entryState;
         this.entryTimestamp = entryTimestamp;
         this.entryStatus = entryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEntryType() {
@@ -70,20 +60,16 @@ public final class StepLockEntry implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLockEntry that = (StepLockEntry) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(entryType, that.entryType) && Objects.equals(entryTarget, that.entryTarget) && Objects.equals(entryHolder, that.entryHolder) && Objects.equals(entryState, that.entryState) && Objects.equals(entryTimestamp, that.entryTimestamp) && Objects.equals(entryStatus, that.entryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, entryType, entryTarget, entryHolder, entryState, entryTimestamp, entryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLockEntry{" + "id=" + id + "name=" + name + "entryType=" + entryType + "entryTarget=" + entryTarget + "entryHolder=" + entryHolder + "entryState=" + entryState + "entryTimestamp=" + entryTimestamp + "entryStatus=" + entryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("entryType", entryType);
+        state.put("entryTarget", entryTarget);
+        state.put("entryHolder", entryHolder);
+        state.put("entryState", entryState);
+        state.put("entryTimestamp", entryTimestamp);
+        state.put("entryStatus", entryStatus);
+        return state;
     }
 }

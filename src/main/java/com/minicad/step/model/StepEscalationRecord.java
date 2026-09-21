@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ESCALATION_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceHandler handler variance reference
  * @varianceStatus record variance status
  */
-public final class StepEscalationRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEscalationRecord extends AbstractStepEntity {
     private final StepEntity varianceIssue;
     private final int varianceFrom;
     private final int varianceTo;
@@ -29,8 +28,7 @@ public final class StepEscalationRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepEscalationRecord(int id, String name, StepEntity varianceIssue, int varianceFrom, int varianceTo, String varianceReason, StepEntity varianceDate, StepEntity varianceHandler, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceIssue = varianceIssue;
         this.varianceFrom = varianceFrom;
         this.varianceTo = varianceTo;
@@ -38,14 +36,6 @@ public final class StepEscalationRecord implements StepEntity {
         this.varianceDate = varianceDate;
         this.varianceHandler = varianceHandler;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceIssue() {
@@ -77,20 +67,17 @@ public final class StepEscalationRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEscalationRecord that = (StepEscalationRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceIssue, that.varianceIssue) && varianceFrom == that.varianceFrom && varianceTo == that.varianceTo && Objects.equals(varianceReason, that.varianceReason) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceHandler, that.varianceHandler) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceIssue, varianceFrom, varianceTo, varianceReason, varianceDate, varianceHandler, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEscalationRecord{" + "id=" + id + "name=" + name + "varianceIssue=" + varianceIssue + "varianceFrom=" + varianceFrom + "varianceTo=" + varianceTo + "varianceReason=" + varianceReason + "varianceDate=" + varianceDate + "varianceHandler=" + varianceHandler + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceIssue", varianceIssue);
+        state.put("varianceFrom", varianceFrom);
+        state.put("varianceTo", varianceTo);
+        state.put("varianceReason", varianceReason);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceHandler", varianceHandler);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

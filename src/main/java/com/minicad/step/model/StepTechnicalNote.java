@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TECHNICAL_NOTE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceSubject note variance subject/topic
  * @param noteStatus note status
  */
-public final class StepTechnicalNote implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTechnicalNote extends AbstractStepEntity {
     private final String noteType;
     private final String noteContent;
     private final StepEntity noteAuthor;
@@ -27,22 +26,13 @@ public final class StepTechnicalNote implements StepEntity {
     private final String noteStatus;
 
     public StepTechnicalNote(int id, String name, String noteType, String noteContent, StepEntity noteAuthor, StepEntity noteDate, String varianceSubject, String noteStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.noteType = noteType;
         this.noteContent = noteContent;
         this.noteAuthor = noteAuthor;
         this.noteDate = noteDate;
         this.varianceSubject = varianceSubject;
         this.noteStatus = noteStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getNoteType() {
@@ -70,20 +60,16 @@ public final class StepTechnicalNote implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTechnicalNote that = (StepTechnicalNote) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(noteType, that.noteType) && Objects.equals(noteContent, that.noteContent) && Objects.equals(noteAuthor, that.noteAuthor) && Objects.equals(noteDate, that.noteDate) && Objects.equals(varianceSubject, that.varianceSubject) && Objects.equals(noteStatus, that.noteStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, noteType, noteContent, noteAuthor, noteDate, varianceSubject, noteStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTechnicalNote{" + "id=" + id + "name=" + name + "noteType=" + noteType + "noteContent=" + noteContent + "noteAuthor=" + noteAuthor + "noteDate=" + noteDate + "varianceSubject=" + varianceSubject + "noteStatus=" + noteStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("noteType", noteType);
+        state.put("noteContent", noteContent);
+        state.put("noteAuthor", noteAuthor);
+        state.put("noteDate", noteDate);
+        state.put("varianceSubject", varianceSubject);
+        state.put("noteStatus", noteStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REGULATION_INSTANCE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param regulationViolations regulation variance violations
  * @param regulationStatus regulation variance status
  */
-public final class StepRegulationInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRegulationInstance extends AbstractStepEntity {
     private final StepEntity regulationDefinition;
     private final String regulationCompliance;
     private final int regulationViolations;
     private final String regulationStatus;
 
     public StepRegulationInstance(int id, String name, StepEntity regulationDefinition, String regulationCompliance, int regulationViolations, String regulationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.regulationDefinition = regulationDefinition;
         this.regulationCompliance = regulationCompliance;
         this.regulationViolations = regulationViolations;
         this.regulationStatus = regulationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRegulationDefinition() {
@@ -56,20 +46,14 @@ public final class StepRegulationInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRegulationInstance that = (StepRegulationInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(regulationDefinition, that.regulationDefinition) && Objects.equals(regulationCompliance, that.regulationCompliance) && regulationViolations == that.regulationViolations && Objects.equals(regulationStatus, that.regulationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, regulationDefinition, regulationCompliance, regulationViolations, regulationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRegulationInstance{" + "id=" + id + "name=" + name + "regulationDefinition=" + regulationDefinition + "regulationCompliance=" + regulationCompliance + "regulationViolations=" + regulationViolations + "regulationStatus=" + regulationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("regulationDefinition", regulationDefinition);
+        state.put("regulationCompliance", regulationCompliance);
+        state.put("regulationViolations", regulationViolations);
+        state.put("regulationStatus", regulationStatus);
+        return state;
     }
 }

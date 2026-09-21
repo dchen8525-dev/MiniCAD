@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved RUNOUT_TOLERANCE_ZONE.
  * A tolerance zone specifically for runout tolerances.
@@ -9,23 +11,12 @@ import java.util.Objects;
  * @param name zone name
  * @param form zone form reference
  */
-public final class StepRunoutToleranceZone implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRunoutToleranceZone extends AbstractStepEntity {
     private final StepEntity form;
 
     public StepRunoutToleranceZone(int id, String name, StepEntity form) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.form = form;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getForm() {
@@ -33,20 +24,11 @@ public final class StepRunoutToleranceZone implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRunoutToleranceZone that = (StepRunoutToleranceZone) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(form, that.form);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, form);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRunoutToleranceZone{" + "id=" + id + "name=" + name + "form=" + form + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("form", form);
+        return state;
     }
 }

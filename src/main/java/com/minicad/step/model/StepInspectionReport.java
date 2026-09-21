@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INSPECTION_REPORT.
@@ -18,9 +19,7 @@ import java.util.Objects;
  * @param inspector inspector reference
  * @param reportStatus report status
  */
-public final class StepInspectionReport implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInspectionReport extends AbstractStepEntity {
     private final String reportId;
     private final String inspectionType;
     private final List<StepEntity> varianceItems;
@@ -31,8 +30,7 @@ public final class StepInspectionReport implements StepEntity {
     private final String reportStatus;
 
     public StepInspectionReport(int id, String name, String reportId, String inspectionType, List<StepEntity> varianceItems, List<StepEntity> varianceResults, List<StepEntity> varianceDefects, StepEntity inspectionDate, StepEntity inspector, String reportStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.reportId = reportId;
         this.inspectionType = inspectionType;
         this.varianceItems = varianceItems == null ? null : java.util.List.copyOf(varianceItems);
@@ -41,14 +39,6 @@ public final class StepInspectionReport implements StepEntity {
         this.inspectionDate = inspectionDate;
         this.inspector = inspector;
         this.reportStatus = reportStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getReportId() {
@@ -84,20 +74,18 @@ public final class StepInspectionReport implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInspectionReport that = (StepInspectionReport) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(reportId, that.reportId) && Objects.equals(inspectionType, that.inspectionType) && Objects.equals(varianceItems, that.varianceItems) && Objects.equals(varianceResults, that.varianceResults) && Objects.equals(varianceDefects, that.varianceDefects) && Objects.equals(inspectionDate, that.inspectionDate) && Objects.equals(inspector, that.inspector) && Objects.equals(reportStatus, that.reportStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, reportId, inspectionType, varianceItems, varianceResults, varianceDefects, inspectionDate, inspector, reportStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInspectionReport{" + "id=" + id + "name=" + name + "reportId=" + reportId + "inspectionType=" + inspectionType + "varianceItems=" + varianceItems + "varianceResults=" + varianceResults + "varianceDefects=" + varianceDefects + "inspectionDate=" + inspectionDate + "inspector=" + inspector + "reportStatus=" + reportStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("reportId", reportId);
+        state.put("inspectionType", inspectionType);
+        state.put("varianceItems", varianceItems);
+        state.put("varianceResults", varianceResults);
+        state.put("varianceDefects", varianceDefects);
+        state.put("inspectionDate", inspectionDate);
+        state.put("inspector", inspector);
+        state.put("reportStatus", reportStatus);
+        return state;
     }
 }

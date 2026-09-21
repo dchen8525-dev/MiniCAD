@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved LINEAR_TOLERANCE_ZONE.
  * A linear tolerance zone definition.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param zoneForm the form of the tolerance zone
  * @param zoneLength length of the tolerance zone
  */
-public final class StepLinearToleranceZone implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLinearToleranceZone extends AbstractStepEntity {
     private final StepEntity definingTolerance;
     private final StepEntity zoneForm;
     private final Double zoneLength;
 
     public StepLinearToleranceZone(int id, String name, StepEntity definingTolerance, StepEntity zoneForm, Double zoneLength) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.definingTolerance = definingTolerance;
         this.zoneForm = zoneForm;
         this.zoneLength = zoneLength;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getDefiningTolerance() {
@@ -47,20 +38,13 @@ public final class StepLinearToleranceZone implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLinearToleranceZone that = (StepLinearToleranceZone) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(definingTolerance, that.definingTolerance) && Objects.equals(zoneForm, that.zoneForm) && Objects.equals(zoneLength, that.zoneLength);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, definingTolerance, zoneForm, zoneLength);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLinearToleranceZone{" + "id=" + id + "name=" + name + "definingTolerance=" + definingTolerance + "zoneForm=" + zoneForm + "zoneLength=" + zoneLength + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("definingTolerance", definingTolerance);
+        state.put("zoneForm", zoneForm);
+        state.put("zoneLength", zoneLength);
+        return state;
     }
 }

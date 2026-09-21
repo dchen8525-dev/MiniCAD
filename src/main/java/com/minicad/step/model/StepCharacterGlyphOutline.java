@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved CHARACTER_GLYPH_OUTLINE.
  */
-public final class StepCharacterGlyphOutline implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCharacterGlyphOutline extends AbstractStepEntity {
     private final StepEntity glyph;
     private final StepEntity outline;
 
     public StepCharacterGlyphOutline(int id, String name, StepEntity glyph, StepEntity outline) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.glyph = glyph;
         this.outline = outline;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getGlyph() {
@@ -35,20 +25,12 @@ public final class StepCharacterGlyphOutline implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCharacterGlyphOutline that = (StepCharacterGlyphOutline) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(glyph, that.glyph) && Objects.equals(outline, that.outline);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, glyph, outline);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCharacterGlyphOutline{" + "id=" + id + "name=" + name + "glyph=" + glyph + "outline=" + outline + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("glyph", glyph);
+        state.put("outline", outline);
+        return state;
     }
 }

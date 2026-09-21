@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CHAMFER_EDGE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param adjacentFaces adjacent faces for chamfer
  * @param chamferType chamfer type classification (symmetric, asymmetric)
  */
-public final class StepChamferEdge implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepChamferEdge extends AbstractStepEntity {
     private final StepEntity originalEdge;
     private final double chamferAngle;
     private final double chamferWidth;
@@ -25,21 +24,12 @@ public final class StepChamferEdge implements StepEntity {
     private final String chamferType;
 
     public StepChamferEdge(int id, String name, StepEntity originalEdge, double chamferAngle, double chamferWidth, List<StepEntity> adjacentFaces, String chamferType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.originalEdge = originalEdge;
         this.chamferAngle = chamferAngle;
         this.chamferWidth = chamferWidth;
         this.adjacentFaces = adjacentFaces == null ? null : java.util.List.copyOf(adjacentFaces);
         this.chamferType = chamferType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getOriginalEdge() {
@@ -72,20 +62,15 @@ public final class StepChamferEdge implements StepEntity {
     public String chamferType() { return getChamferType(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepChamferEdge that = (StepChamferEdge) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(originalEdge, that.originalEdge) && chamferAngle == that.chamferAngle && chamferWidth == that.chamferWidth && Objects.equals(adjacentFaces, that.adjacentFaces) && Objects.equals(chamferType, that.chamferType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, originalEdge, chamferAngle, chamferWidth, adjacentFaces, chamferType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepChamferEdge{" + "id=" + id + "name=" + name + "originalEdge=" + originalEdge + "chamferAngle=" + chamferAngle + "chamferWidth=" + chamferWidth + "adjacentFaces=" + adjacentFaces + "chamferType=" + chamferType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("originalEdge", originalEdge);
+        state.put("chamferAngle", chamferAngle);
+        state.put("chamferWidth", chamferWidth);
+        state.put("adjacentFaces", adjacentFaces);
+        state.put("chamferType", chamferType);
+        return state;
     }
 }

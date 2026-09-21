@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PLUS_MINUS_TOLERANCE_WITH_MODIFIERS.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * * @param deviationUnit deviation unit
  * @param modifiers tolerance modifiers
  */
-public final class StepPlusMinusToleranceWithModifiers implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPlusMinusToleranceWithModifiers extends AbstractStepEntity {
     private final Double upperDeviation;
     private final Double lowerDeviation;
     private final StepEntity deviationUnit;
     private final List<String> modifiers;
 
     public StepPlusMinusToleranceWithModifiers(int id, String name, Double upperDeviation, Double lowerDeviation, StepEntity deviationUnit, List<String> modifiers) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.upperDeviation = upperDeviation;
         this.lowerDeviation = lowerDeviation;
         this.deviationUnit = deviationUnit;
         this.modifiers = modifiers == null ? null : java.util.List.copyOf(modifiers);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Double getUpperDeviation() {
@@ -56,20 +46,14 @@ public final class StepPlusMinusToleranceWithModifiers implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPlusMinusToleranceWithModifiers that = (StepPlusMinusToleranceWithModifiers) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(upperDeviation, that.upperDeviation) && Objects.equals(lowerDeviation, that.lowerDeviation) && Objects.equals(deviationUnit, that.deviationUnit) && Objects.equals(modifiers, that.modifiers);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, upperDeviation, lowerDeviation, deviationUnit, modifiers);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPlusMinusToleranceWithModifiers{" + "id=" + id + "name=" + name + "upperDeviation=" + upperDeviation + "lowerDeviation=" + lowerDeviation + "deviationUnit=" + deviationUnit + "modifiers=" + modifiers + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("upperDeviation", upperDeviation);
+        state.put("lowerDeviation", lowerDeviation);
+        state.put("deviationUnit", deviationUnit);
+        state.put("modifiers", modifiers);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ARCHIVE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param archiveEntries archive variance entry count
  * @param archiveStatus archive variance status
  */
-public final class StepArchiveInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepArchiveInstance extends AbstractStepEntity {
     private final StepEntity archiveDefinition;
     private final StepEntity archiveTime;
     private final long archiveSize;
@@ -25,21 +24,12 @@ public final class StepArchiveInstance implements StepEntity {
     private final String archiveStatus;
 
     public StepArchiveInstance(int id, String name, StepEntity archiveDefinition, StepEntity archiveTime, long archiveSize, int archiveEntries, String archiveStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.archiveDefinition = archiveDefinition;
         this.archiveTime = archiveTime;
         this.archiveSize = archiveSize;
         this.archiveEntries = archiveEntries;
         this.archiveStatus = archiveStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getArchiveDefinition() {
@@ -63,20 +53,15 @@ public final class StepArchiveInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepArchiveInstance that = (StepArchiveInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(archiveDefinition, that.archiveDefinition) && Objects.equals(archiveTime, that.archiveTime) && archiveSize == that.archiveSize && archiveEntries == that.archiveEntries && Objects.equals(archiveStatus, that.archiveStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, archiveDefinition, archiveTime, archiveSize, archiveEntries, archiveStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepArchiveInstance{" + "id=" + id + "name=" + name + "archiveDefinition=" + archiveDefinition + "archiveTime=" + archiveTime + "archiveSize=" + archiveSize + "archiveEntries=" + archiveEntries + "archiveStatus=" + archiveStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("archiveDefinition", archiveDefinition);
+        state.put("archiveTime", archiveTime);
+        state.put("archiveSize", archiveSize);
+        state.put("archiveEntries", archiveEntries);
+        state.put("archiveStatus", archiveStatus);
+        return state;
     }
 }

@@ -1,27 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal SURFACE_STYLE_PARAMETER_LINE.
  *
  * @param id STEP instance id
  * @param style referenced curve style
  */
-public final class StepSurfaceStyleParameterLine implements StepEntity {
-    private final int id;
+public final class StepSurfaceStyleParameterLine extends AbstractStepEntity {
     private final StepCurveStyle style;
 
     public StepSurfaceStyleParameterLine(int id, StepCurveStyle style) {
-        this.id = id;
+        super(id, "");
         this.style = style;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepCurveStyle getStyle() {
@@ -34,20 +27,10 @@ public final class StepSurfaceStyleParameterLine implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceStyleParameterLine that = (StepSurfaceStyleParameterLine) o;
-        return id == that.id && Objects.equals(style, that.style);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, style);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceStyleParameterLine{" + "id=" + id + "style=" + style + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("style", style);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BASELINE_INSTANCE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param baselineVariance baseline variance deviation from baseline
  * @param baselineStatus baseline variance status
  */
-public final class StepBaselineInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBaselineInstance extends AbstractStepEntity {
     private final StepEntity baselineDefinition;
     private final List<Double> baselineActualValues;
     private final double baselineVariance;
     private final String baselineStatus;
 
     public StepBaselineInstance(int id, String name, StepEntity baselineDefinition, List<Double> baselineActualValues, double baselineVariance, String baselineStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.baselineDefinition = baselineDefinition;
         this.baselineActualValues = baselineActualValues == null ? null : java.util.List.copyOf(baselineActualValues);
         this.baselineVariance = baselineVariance;
         this.baselineStatus = baselineStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBaselineDefinition() {
@@ -56,20 +46,14 @@ public final class StepBaselineInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBaselineInstance that = (StepBaselineInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(baselineDefinition, that.baselineDefinition) && Objects.equals(baselineActualValues, that.baselineActualValues) && baselineVariance == that.baselineVariance && Objects.equals(baselineStatus, that.baselineStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, baselineDefinition, baselineActualValues, baselineVariance, baselineStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBaselineInstance{" + "id=" + id + "name=" + name + "baselineDefinition=" + baselineDefinition + "baselineActualValues=" + baselineActualValues + "baselineVariance=" + baselineVariance + "baselineStatus=" + baselineStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("baselineDefinition", baselineDefinition);
+        state.put("baselineActualValues", baselineActualValues);
+        state.put("baselineVariance", baselineVariance);
+        state.put("baselineStatus", baselineStatus);
+        return state;
     }
 }

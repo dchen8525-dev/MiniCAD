@@ -1,31 +1,22 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved TORUS_VOLUME.
  * A CSG torus primitive volume.
  */
-public final class StepTorusVolume implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTorusVolume extends AbstractStepEntity {
     private final StepEntity position;
     private final Double majorRadius;
     private final Double minorRadius;
 
     public StepTorusVolume(int id, String name, StepEntity position, Double majorRadius, Double minorRadius) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.majorRadius = majorRadius;
         this.minorRadius = minorRadius;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -48,20 +39,13 @@ public final class StepTorusVolume implements StepEntity {
     public Double minorRadius() { return getMinorRadius(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTorusVolume that = (StepTorusVolume) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && Objects.equals(majorRadius, that.majorRadius) && Objects.equals(minorRadius, that.minorRadius);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, majorRadius, minorRadius);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTorusVolume{" + "id=" + id + "name=" + name + "position=" + position + "majorRadius=" + majorRadius + "minorRadius=" + minorRadius + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("majorRadius", majorRadius);
+        state.put("minorRadius", minorRadius);
+        return state;
     }
 }

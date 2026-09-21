@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DATE_ASSIGNMENT metadata.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param assignedDate assigned calendar date
  * @param role assignment role
  */
-public final class StepDateAssignment implements StepEntity {
-    private final int id;
+public final class StepDateAssignment extends AbstractStepEntity {
     private final StepCalendarDate assignedDate;
     private final StepDateRole role;
 
     public StepDateAssignment(int id, StepCalendarDate assignedDate, StepDateRole role) {
-        this.id = id;
+        super(id, "");
         this.assignedDate = assignedDate;
         this.role = role;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepCalendarDate getAssignedDate() {
@@ -45,20 +38,11 @@ public final class StepDateAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDateAssignment that = (StepDateAssignment) o;
-        return id == that.id && Objects.equals(assignedDate, that.assignedDate) && Objects.equals(role, that.role);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedDate, role);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDateAssignment{" + "id=" + id + "assignedDate=" + assignedDate + "role=" + role + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedDate", assignedDate);
+        state.put("role", role);
+        return state;
     }
 }

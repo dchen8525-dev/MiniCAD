@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal annotation fill area occurrence.
@@ -12,27 +13,16 @@ import java.util.Objects;
  * @param item referenced fill area
  * @param fillStyleTarget target point for fill styling
  */
-public final class StepAnnotationFillAreaOccurrence implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnnotationFillAreaOccurrence extends AbstractStepEntity {
     private final List<StepPresentationStyleAssignment> styles;
     private final StepAnnotationFillArea item;
     private final StepEntity fillStyleTarget;
 
     public StepAnnotationFillAreaOccurrence(int id, String name, List<StepPresentationStyleAssignment> styles, StepAnnotationFillArea item, StepEntity fillStyleTarget) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.styles = styles == null ? null : java.util.List.copyOf(styles);
         this.item = item;
         this.fillStyleTarget = fillStyleTarget;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepPresentationStyleAssignment> getStyles() {
@@ -45,7 +35,7 @@ public final class StepAnnotationFillAreaOccurrence implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public List<StepPresentationStyleAssignment> styles() {
@@ -61,20 +51,13 @@ public final class StepAnnotationFillAreaOccurrence implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnnotationFillAreaOccurrence that = (StepAnnotationFillAreaOccurrence) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(styles, that.styles) && Objects.equals(item, that.item) && Objects.equals(fillStyleTarget, that.fillStyleTarget);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, styles, item, fillStyleTarget);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnnotationFillAreaOccurrence{" + "id=" + id + "name=" + name + "styles=" + styles + "item=" + item + "fillStyleTarget=" + fillStyleTarget + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("styles", styles);
+        state.put("item", item);
+        state.put("fillStyleTarget", fillStyleTarget);
+        return state;
     }
 }

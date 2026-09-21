@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RESOURCE_UTILIZATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceAverage average variance utilization
  * @varianceStatus utilization variance status
  */
-public final class StepResourceUtilization implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepResourceUtilization extends AbstractStepEntity {
     private final StepEntity varianceResource;
     private final double varianceUtilization;
     private final String variancePeriod;
@@ -27,22 +26,13 @@ public final class StepResourceUtilization implements StepEntity {
     private final String varianceStatus;
 
     public StepResourceUtilization(int id, String name, StepEntity varianceResource, double varianceUtilization, String variancePeriod, double variancePeak, double varianceAverage, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceResource = varianceResource;
         this.varianceUtilization = varianceUtilization;
         this.variancePeriod = variancePeriod;
         this.variancePeak = variancePeak;
         this.varianceAverage = varianceAverage;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceResource() {
@@ -70,20 +60,16 @@ public final class StepResourceUtilization implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepResourceUtilization that = (StepResourceUtilization) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceResource, that.varianceResource) && varianceUtilization == that.varianceUtilization && Objects.equals(variancePeriod, that.variancePeriod) && variancePeak == that.variancePeak && varianceAverage == that.varianceAverage && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceResource, varianceUtilization, variancePeriod, variancePeak, varianceAverage, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepResourceUtilization{" + "id=" + id + "name=" + name + "varianceResource=" + varianceResource + "varianceUtilization=" + varianceUtilization + "variancePeriod=" + variancePeriod + "variancePeak=" + variancePeak + "varianceAverage=" + varianceAverage + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceResource", varianceResource);
+        state.put("varianceUtilization", varianceUtilization);
+        state.put("variancePeriod", variancePeriod);
+        state.put("variancePeak", variancePeak);
+        state.put("varianceAverage", varianceAverage);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

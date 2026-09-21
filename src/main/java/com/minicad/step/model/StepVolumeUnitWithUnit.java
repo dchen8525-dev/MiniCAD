@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved VOLUME_UNIT_WITH_UNIT.
  */
-public final class StepVolumeUnitWithUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepVolumeUnitWithUnit extends AbstractStepEntity {
     private final StepEntity volumeUnit;
     private final StepEntity unitComponent;
 
     public StepVolumeUnitWithUnit(int id, String name, StepEntity volumeUnit, StepEntity unitComponent) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.volumeUnit = volumeUnit;
         this.unitComponent = unitComponent;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVolumeUnit() {
@@ -35,20 +25,12 @@ public final class StepVolumeUnitWithUnit implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVolumeUnitWithUnit that = (StepVolumeUnitWithUnit) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(volumeUnit, that.volumeUnit) && Objects.equals(unitComponent, that.unitComponent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, volumeUnit, unitComponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVolumeUnitWithUnit{" + "id=" + id + "name=" + name + "volumeUnit=" + volumeUnit + "unitComponent=" + unitComponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("volumeUnit", volumeUnit);
+        state.put("unitComponent", unitComponent);
+        return state;
     }
 }

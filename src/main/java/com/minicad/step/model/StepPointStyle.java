@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal POINT_STYLE.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param markerSize marker size
  * @param colour referenced colour
  */
-public final class StepPointStyle implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPointStyle extends AbstractStepEntity {
     private final StepEntity marker;
     private final double markerSize;
     private final StepEntity colour;
 
     public StepPointStyle(int id, String name, StepEntity marker, double markerSize, StepEntity colour) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.marker = marker;
         this.markerSize = markerSize;
         this.colour = colour;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMarker() {
@@ -59,20 +50,13 @@ public final class StepPointStyle implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPointStyle that = (StepPointStyle) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(marker, that.marker) && markerSize == that.markerSize && Objects.equals(colour, that.colour);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, marker, markerSize, colour);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPointStyle{" + "id=" + id + "name=" + name + "marker=" + marker + "markerSize=" + markerSize + "colour=" + colour + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("marker", marker);
+        state.put("markerSize", markerSize);
+        state.put("colour", colour);
+        return state;
     }
 }

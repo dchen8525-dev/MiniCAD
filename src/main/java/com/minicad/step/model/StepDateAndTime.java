@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DATE_AND_TIME metadata.
  *
@@ -8,19 +10,14 @@ import java.util.Objects;
  * @param dateComponent calendar date
  * @param timeComponent local time
  */
-public final class StepDateAndTime implements StepEntity {
-    private final int id;
+public final class StepDateAndTime extends AbstractStepEntity {
     private final StepCalendarDate dateComponent;
     private final StepLocalTime timeComponent;
 
     public StepDateAndTime(int id, StepCalendarDate dateComponent, StepLocalTime timeComponent) {
-        this.id = id;
+        super(id, "");
         this.dateComponent = dateComponent;
         this.timeComponent = timeComponent;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public StepCalendarDate getDateComponent() {
@@ -32,7 +29,7 @@ public final class StepDateAndTime implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
+    public int id() { return getId(); }
     public String getName() {
         if (dateComponent == null && timeComponent == null) {
             return "";
@@ -64,24 +61,16 @@ public final class StepDateAndTime implements StepEntity {
         String s = Double.toString(value);
         return s;
     }
+
     public StepCalendarDate dateComponent() { return dateComponent; }
     public StepLocalTime timeComponent() { return timeComponent; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDateAndTime that = (StepDateAndTime) o;
-        return id == that.id && Objects.equals(dateComponent, that.dateComponent) && Objects.equals(timeComponent, that.timeComponent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, dateComponent, timeComponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDateAndTime{" + "id=" + id + "dateComponent=" + dateComponent + "timeComponent=" + timeComponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("dateComponent", dateComponent);
+        state.put("timeComponent", timeComponent);
+        return state;
     }
 }

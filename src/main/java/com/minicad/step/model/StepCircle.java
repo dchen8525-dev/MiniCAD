@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CIRCLE.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param position circle placement
  * @param radius radius value
  */
-public final class StepCircle implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCircle extends AbstractStepEntity {
     private final StepEntity position;
     private final double radius;
 
     public StepCircle(int id, String name, StepEntity position, double radius) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.radius = radius;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -45,20 +36,12 @@ public final class StepCircle implements StepEntity {
     public double radius() { return getRadius(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCircle that = (StepCircle) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && radius == that.radius;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, radius);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCircle{" + "id=" + id + "name=" + name + "position=" + position + "radius=" + radius + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("radius", radius);
+        return state;
     }
 }

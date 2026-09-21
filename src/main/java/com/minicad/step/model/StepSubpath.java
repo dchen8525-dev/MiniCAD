@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SUBPATH.
@@ -12,25 +12,14 @@ import java.util.Objects;
  * @param edges oriented edges in path order
  * @param parentPath parent path entity
  */
-public final class StepSubpath implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSubpath extends AbstractStepEntity {
     private final List<StepOrientedEdge> edges;
     private final StepEntity parentPath;
 
     public StepSubpath(int id, String name, List<StepOrientedEdge> edges, StepEntity parentPath) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.edges = edges == null ? null : java.util.List.copyOf(edges);
         this.parentPath = parentPath;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepOrientedEdge> getEdges() {
@@ -52,20 +41,12 @@ public final class StepSubpath implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSubpath that = (StepSubpath) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(edges, that.edges) && Objects.equals(parentPath, that.parentPath);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, edges, parentPath);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSubpath{" + "id=" + id + "name=" + name + "edges=" + edges + "parentPath=" + parentPath + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("edges", edges);
+        state.put("parentPath", parentPath);
+        return state;
     }
 }

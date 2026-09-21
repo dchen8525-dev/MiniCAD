@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CONSTRAINT_SPECIFICATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceUnit constraint variance unit
  * @varianceStatus specification variance status
  */
-public final class StepConstraintSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConstraintSpecification extends AbstractStepEntity {
     private final String constraintType;
     private final StepEntity varianceSubject;
     private final double varianceValue;
@@ -27,22 +26,13 @@ public final class StepConstraintSpecification implements StepEntity {
     private final String varianceStatus;
 
     public StepConstraintSpecification(int id, String name, String constraintType, StepEntity varianceSubject, double varianceValue, double varianceTolerance, StepEntity varianceUnit, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.constraintType = constraintType;
         this.varianceSubject = varianceSubject;
         this.varianceValue = varianceValue;
         this.varianceTolerance = varianceTolerance;
         this.varianceUnit = varianceUnit;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getConstraintType() {
@@ -70,20 +60,16 @@ public final class StepConstraintSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConstraintSpecification that = (StepConstraintSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(constraintType, that.constraintType) && Objects.equals(varianceSubject, that.varianceSubject) && varianceValue == that.varianceValue && varianceTolerance == that.varianceTolerance && Objects.equals(varianceUnit, that.varianceUnit) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, constraintType, varianceSubject, varianceValue, varianceTolerance, varianceUnit, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConstraintSpecification{" + "id=" + id + "name=" + name + "constraintType=" + constraintType + "varianceSubject=" + varianceSubject + "varianceValue=" + varianceValue + "varianceTolerance=" + varianceTolerance + "varianceUnit=" + varianceUnit + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("constraintType", constraintType);
+        state.put("varianceSubject", varianceSubject);
+        state.put("varianceValue", varianceValue);
+        state.put("varianceTolerance", varianceTolerance);
+        state.put("varianceUnit", varianceUnit);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

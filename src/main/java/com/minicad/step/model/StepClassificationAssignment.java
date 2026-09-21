@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CLASSIFICATION_ASSIGNMENT metadata.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param assignedClass assigned classification group
  * @param role assignment role
  */
-public final class StepClassificationAssignment implements StepEntity {
-    private final int id;
+public final class StepClassificationAssignment extends AbstractStepEntity {
     private final StepGroup assignedClass;
     private final StepClassificationRole role;
 
     public StepClassificationAssignment(int id, StepGroup assignedClass, StepClassificationRole role) {
-        this.id = id;
+        super(id, "");
         this.assignedClass = assignedClass;
         this.role = role;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepGroup getAssignedClass() {
@@ -45,20 +38,11 @@ public final class StepClassificationAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepClassificationAssignment that = (StepClassificationAssignment) o;
-        return id == that.id && Objects.equals(assignedClass, that.assignedClass) && Objects.equals(role, that.role);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedClass, role);
-    }
-
-    @Override
-    public String toString() {
-        return "StepClassificationAssignment{" + "id=" + id + "assignedClass=" + assignedClass + "role=" + role + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedClass", assignedClass);
+        state.put("role", role);
+        return state;
     }
 }

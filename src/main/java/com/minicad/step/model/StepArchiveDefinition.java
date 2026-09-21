@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ARCHIVE_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param archiveRetention archive variance retention period
  * @param archiveStatus archive variance status
  */
-public final class StepArchiveDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepArchiveDefinition extends AbstractStepEntity {
     private final String archiveType;
     private final StepEntity archiveSource;
     private final StepEntity archiveTarget;
@@ -27,22 +26,13 @@ public final class StepArchiveDefinition implements StepEntity {
     private final String archiveStatus;
 
     public StepArchiveDefinition(int id, String name, String archiveType, StepEntity archiveSource, StepEntity archiveTarget, String archiveFormat, int archiveRetention, String archiveStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.archiveType = archiveType;
         this.archiveSource = archiveSource;
         this.archiveTarget = archiveTarget;
         this.archiveFormat = archiveFormat;
         this.archiveRetention = archiveRetention;
         this.archiveStatus = archiveStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getArchiveType() {
@@ -70,20 +60,16 @@ public final class StepArchiveDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepArchiveDefinition that = (StepArchiveDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(archiveType, that.archiveType) && Objects.equals(archiveSource, that.archiveSource) && Objects.equals(archiveTarget, that.archiveTarget) && Objects.equals(archiveFormat, that.archiveFormat) && archiveRetention == that.archiveRetention && Objects.equals(archiveStatus, that.archiveStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, archiveType, archiveSource, archiveTarget, archiveFormat, archiveRetention, archiveStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepArchiveDefinition{" + "id=" + id + "name=" + name + "archiveType=" + archiveType + "archiveSource=" + archiveSource + "archiveTarget=" + archiveTarget + "archiveFormat=" + archiveFormat + "archiveRetention=" + archiveRetention + "archiveStatus=" + archiveStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("archiveType", archiveType);
+        state.put("archiveSource", archiveSource);
+        state.put("archiveTarget", archiveTarget);
+        state.put("archiveFormat", archiveFormat);
+        state.put("archiveRetention", archiveRetention);
+        state.put("archiveStatus", archiveStatus);
+        return state;
     }
 }

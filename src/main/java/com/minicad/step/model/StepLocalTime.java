@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal LOCAL_TIME metadata.
  *
@@ -10,23 +12,18 @@ import java.util.Objects;
  * @param secondComponent optional second value
  * @param zone UTC offset
  */
-public final class StepLocalTime implements StepEntity {
-    private final int id;
+public final class StepLocalTime extends AbstractStepEntity {
     private final int hourComponent;
     private final int minuteComponent;
     private final Double secondComponent;
     private final StepCoordinatedUniversalTimeOffset zone;
 
     public StepLocalTime(int id, int hourComponent, int minuteComponent, Double secondComponent, StepCoordinatedUniversalTimeOffset zone) {
-        this.id = id;
+        super(id, "");
         this.hourComponent = hourComponent;
         this.minuteComponent = minuteComponent;
         this.secondComponent = secondComponent;
         this.zone = zone;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public int getHourComponent() {
@@ -46,28 +43,20 @@ public final class StepLocalTime implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String getName() { return ""; }
+    public int id() { return getId(); }
     public int hourComponent() { return hourComponent; }
     public int minuteComponent() { return minuteComponent; }
     public Double secondComponent() { return secondComponent; }
     public StepCoordinatedUniversalTimeOffset zone() { return zone; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLocalTime that = (StepLocalTime) o;
-        return id == that.id && hourComponent == that.hourComponent && minuteComponent == that.minuteComponent && Objects.equals(secondComponent, that.secondComponent) && Objects.equals(zone, that.zone);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, hourComponent, minuteComponent, secondComponent, zone);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLocalTime{" + "id=" + id + "hourComponent=" + hourComponent + "minuteComponent=" + minuteComponent + "secondComponent=" + secondComponent + "zone=" + zone + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("hourComponent", hourComponent);
+        state.put("minuteComponent", minuteComponent);
+        state.put("secondComponent", secondComponent);
+        state.put("zone", zone);
+        return state;
     }
 }

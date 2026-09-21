@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MODEL_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param modelProperties model variance properties
  * @param modelStatus model variance status
  */
-public final class StepModelInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepModelInstance extends AbstractStepEntity {
     private final StepEntity modelDefinition;
     private final String modelState;
     private final String modelVersion;
@@ -25,21 +24,12 @@ public final class StepModelInstance implements StepEntity {
     private final String modelStatus;
 
     public StepModelInstance(int id, String name, StepEntity modelDefinition, String modelState, String modelVersion, List<String> modelProperties, String modelStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.modelDefinition = modelDefinition;
         this.modelState = modelState;
         this.modelVersion = modelVersion;
         this.modelProperties = modelProperties == null ? null : java.util.List.copyOf(modelProperties);
         this.modelStatus = modelStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getModelDefinition() {
@@ -63,20 +53,15 @@ public final class StepModelInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepModelInstance that = (StepModelInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(modelDefinition, that.modelDefinition) && Objects.equals(modelState, that.modelState) && Objects.equals(modelVersion, that.modelVersion) && Objects.equals(modelProperties, that.modelProperties) && Objects.equals(modelStatus, that.modelStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, modelDefinition, modelState, modelVersion, modelProperties, modelStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepModelInstance{" + "id=" + id + "name=" + name + "modelDefinition=" + modelDefinition + "modelState=" + modelState + "modelVersion=" + modelVersion + "modelProperties=" + modelProperties + "modelStatus=" + modelStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("modelDefinition", modelDefinition);
+        state.put("modelState", modelState);
+        state.put("modelVersion", modelVersion);
+        state.put("modelProperties", modelProperties);
+        state.put("modelStatus", modelStatus);
+        return state;
     }
 }

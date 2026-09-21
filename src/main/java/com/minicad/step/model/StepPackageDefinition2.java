@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PACKAGE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param packageDependencies package variance dependencies
  * @param packageStatus package variance status
  */
-public final class StepPackageDefinition2 implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPackageDefinition2 extends AbstractStepEntity {
     private final String packageType;
     private final String packageDescription;
     private final List<StepEntity> packageContents;
@@ -25,21 +24,12 @@ public final class StepPackageDefinition2 implements StepEntity {
     private final String packageStatus;
 
     public StepPackageDefinition2(int id, String name, String packageType, String packageDescription, List<StepEntity> packageContents, List<StepEntity> packageDependencies, String packageStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.packageType = packageType;
         this.packageDescription = packageDescription;
         this.packageContents = packageContents == null ? null : java.util.List.copyOf(packageContents);
         this.packageDependencies = packageDependencies == null ? null : java.util.List.copyOf(packageDependencies);
         this.packageStatus = packageStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPackageType() {
@@ -63,20 +53,15 @@ public final class StepPackageDefinition2 implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPackageDefinition2 that = (StepPackageDefinition2) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(packageType, that.packageType) && Objects.equals(packageDescription, that.packageDescription) && Objects.equals(packageContents, that.packageContents) && Objects.equals(packageDependencies, that.packageDependencies) && Objects.equals(packageStatus, that.packageStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, packageType, packageDescription, packageContents, packageDependencies, packageStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPackageDefinition2{" + "id=" + id + "name=" + name + "packageType=" + packageType + "packageDescription=" + packageDescription + "packageContents=" + packageContents + "packageDependencies=" + packageDependencies + "packageStatus=" + packageStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("packageType", packageType);
+        state.put("packageDescription", packageDescription);
+        state.put("packageContents", packageContents);
+        state.put("packageDependencies", packageDependencies);
+        state.put("packageStatus", packageStatus);
+        return state;
     }
 }

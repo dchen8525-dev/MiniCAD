@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SEQUENCE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param sequenceCompleted sequence variance completed items
  * @param sequenceStatus sequence variance status
  */
-public final class StepSequenceInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSequenceInstance extends AbstractStepEntity {
     private final StepEntity sequenceDefinition;
     private final String sequenceState;
     private final int sequencePosition;
@@ -25,21 +24,12 @@ public final class StepSequenceInstance implements StepEntity {
     private final String sequenceStatus;
 
     public StepSequenceInstance(int id, String name, StepEntity sequenceDefinition, String sequenceState, int sequencePosition, int sequenceCompleted, String sequenceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sequenceDefinition = sequenceDefinition;
         this.sequenceState = sequenceState;
         this.sequencePosition = sequencePosition;
         this.sequenceCompleted = sequenceCompleted;
         this.sequenceStatus = sequenceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSequenceDefinition() {
@@ -63,20 +53,15 @@ public final class StepSequenceInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSequenceInstance that = (StepSequenceInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sequenceDefinition, that.sequenceDefinition) && Objects.equals(sequenceState, that.sequenceState) && sequencePosition == that.sequencePosition && sequenceCompleted == that.sequenceCompleted && Objects.equals(sequenceStatus, that.sequenceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sequenceDefinition, sequenceState, sequencePosition, sequenceCompleted, sequenceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSequenceInstance{" + "id=" + id + "name=" + name + "sequenceDefinition=" + sequenceDefinition + "sequenceState=" + sequenceState + "sequencePosition=" + sequencePosition + "sequenceCompleted=" + sequenceCompleted + "sequenceStatus=" + sequenceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sequenceDefinition", sequenceDefinition);
+        state.put("sequenceState", sequenceState);
+        state.put("sequencePosition", sequencePosition);
+        state.put("sequenceCompleted", sequenceCompleted);
+        state.put("sequenceStatus", sequenceStatus);
+        return state;
     }
 }

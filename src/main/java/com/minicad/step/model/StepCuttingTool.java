@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CUTTING_TOOL.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param toolMaterial tool material specification
  * @param toolGeometry tool geometry representation
  */
-public final class StepCuttingTool implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCuttingTool extends AbstractStepEntity {
     private final String toolType;
     private final double toolDiameter;
     private final double toolLength;
@@ -29,8 +28,7 @@ public final class StepCuttingTool implements StepEntity {
     private final StepEntity toolGeometry;
 
     public StepCuttingTool(int id, String name, String toolType, double toolDiameter, double toolLength, double cuttingLength, int numberOfFlutes, StepEntity toolMaterial, StepEntity toolGeometry) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.toolType = toolType;
         this.toolDiameter = toolDiameter;
         this.toolLength = toolLength;
@@ -38,14 +36,6 @@ public final class StepCuttingTool implements StepEntity {
         this.numberOfFlutes = numberOfFlutes;
         this.toolMaterial = toolMaterial;
         this.toolGeometry = toolGeometry;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getToolType() {
@@ -77,20 +67,17 @@ public final class StepCuttingTool implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCuttingTool that = (StepCuttingTool) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(toolType, that.toolType) && toolDiameter == that.toolDiameter && toolLength == that.toolLength && cuttingLength == that.cuttingLength && numberOfFlutes == that.numberOfFlutes && Objects.equals(toolMaterial, that.toolMaterial) && Objects.equals(toolGeometry, that.toolGeometry);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, toolType, toolDiameter, toolLength, cuttingLength, numberOfFlutes, toolMaterial, toolGeometry);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCuttingTool{" + "id=" + id + "name=" + name + "toolType=" + toolType + "toolDiameter=" + toolDiameter + "toolLength=" + toolLength + "cuttingLength=" + cuttingLength + "numberOfFlutes=" + numberOfFlutes + "toolMaterial=" + toolMaterial + "toolGeometry=" + toolGeometry + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("toolType", toolType);
+        state.put("toolDiameter", toolDiameter);
+        state.put("toolLength", toolLength);
+        state.put("cuttingLength", cuttingLength);
+        state.put("numberOfFlutes", numberOfFlutes);
+        state.put("toolMaterial", toolMaterial);
+        state.put("toolGeometry", toolGeometry);
+        return state;
     }
 }

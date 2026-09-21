@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ASSEMBLY_SEQUENCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param estimatedTime estimated assembly time
  * @param sequenceDependencies dependencies between operations
  */
-public final class StepAssemblySequence implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAssemblySequence extends AbstractStepEntity {
     private final List<StepEntity> assemblyOperations;
     private final List<Integer> sequenceOrder;
     private final StepEntity assemblyFixture;
@@ -27,22 +26,13 @@ public final class StepAssemblySequence implements StepEntity {
     private final List<StepEntity> sequenceDependencies;
 
     public StepAssemblySequence(int id, String name, List<StepEntity> assemblyOperations, List<Integer> sequenceOrder, StepEntity assemblyFixture, List<StepEntity> assemblyTools, double estimatedTime, List<StepEntity> sequenceDependencies) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.assemblyOperations = assemblyOperations == null ? null : java.util.List.copyOf(assemblyOperations);
         this.sequenceOrder = sequenceOrder == null ? null : java.util.List.copyOf(sequenceOrder);
         this.assemblyFixture = assemblyFixture;
         this.assemblyTools = assemblyTools == null ? null : java.util.List.copyOf(assemblyTools);
         this.estimatedTime = estimatedTime;
         this.sequenceDependencies = sequenceDependencies == null ? null : java.util.List.copyOf(sequenceDependencies);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getAssemblyOperations() {
@@ -70,20 +60,16 @@ public final class StepAssemblySequence implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAssemblySequence that = (StepAssemblySequence) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(assemblyOperations, that.assemblyOperations) && Objects.equals(sequenceOrder, that.sequenceOrder) && Objects.equals(assemblyFixture, that.assemblyFixture) && Objects.equals(assemblyTools, that.assemblyTools) && estimatedTime == that.estimatedTime && Objects.equals(sequenceDependencies, that.sequenceDependencies);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, assemblyOperations, sequenceOrder, assemblyFixture, assemblyTools, estimatedTime, sequenceDependencies);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAssemblySequence{" + "id=" + id + "name=" + name + "assemblyOperations=" + assemblyOperations + "sequenceOrder=" + sequenceOrder + "assemblyFixture=" + assemblyFixture + "assemblyTools=" + assemblyTools + "estimatedTime=" + estimatedTime + "sequenceDependencies=" + sequenceDependencies + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("assemblyOperations", assemblyOperations);
+        state.put("sequenceOrder", sequenceOrder);
+        state.put("assemblyFixture", assemblyFixture);
+        state.put("assemblyTools", assemblyTools);
+        state.put("estimatedTime", estimatedTime);
+        state.put("sequenceDependencies", sequenceDependencies);
+        return state;
     }
 }

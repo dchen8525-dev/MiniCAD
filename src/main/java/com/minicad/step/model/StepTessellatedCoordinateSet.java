@@ -1,28 +1,19 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+
 /**
  * Resolved TESSELLATED_COORDINATE_SET.
  * A set of coordinates for tessellated geometry.
  */
-public final class StepTessellatedCoordinateSet implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTessellatedCoordinateSet extends AbstractStepEntity {
     private final List<StepEntity> coordinates;
 
     public StepTessellatedCoordinateSet(int id, String name, List<StepEntity> coordinates) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.coordinates = coordinates == null ? null : java.util.List.copyOf(coordinates);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getCoordinates() {
@@ -30,20 +21,11 @@ public final class StepTessellatedCoordinateSet implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTessellatedCoordinateSet that = (StepTessellatedCoordinateSet) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(coordinates, that.coordinates);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, coordinates);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTessellatedCoordinateSet{" + "id=" + id + "name=" + name + "coordinates=" + coordinates + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("coordinates", coordinates);
+        return state;
     }
 }

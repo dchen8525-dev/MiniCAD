@@ -1,28 +1,18 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FILL_AREA_WITH_OUTLINE.
  */
-public final class StepFillAreaWithOutline implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFillAreaWithOutline extends AbstractStepEntity {
     private final List<StepEntity> outlines;
 
     public StepFillAreaWithOutline(int id, String name, List<StepEntity> outlines) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.outlines = outlines == null ? null : java.util.List.copyOf(outlines);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getOutlines() {
@@ -35,20 +25,11 @@ public final class StepFillAreaWithOutline implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFillAreaWithOutline that = (StepFillAreaWithOutline) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(outlines, that.outlines);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, outlines);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFillAreaWithOutline{" + "id=" + id + "name=" + name + "outlines=" + outlines + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("outlines", outlines);
+        return state;
     }
 }

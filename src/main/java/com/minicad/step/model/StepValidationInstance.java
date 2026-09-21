@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved VALIDATION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param validationIssues validation variance issues found
  * @param validationStatus validation variance status
  */
-public final class StepValidationInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepValidationInstance extends AbstractStepEntity {
     private final StepEntity validationDefinition;
     private final StepEntity validationTarget;
     private final boolean validationResult;
@@ -25,21 +24,12 @@ public final class StepValidationInstance implements StepEntity {
     private final String validationStatus;
 
     public StepValidationInstance(int id, String name, StepEntity validationDefinition, StepEntity validationTarget, boolean validationResult, List<String> validationIssues, String validationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.validationDefinition = validationDefinition;
         this.validationTarget = validationTarget;
         this.validationResult = validationResult;
         this.validationIssues = validationIssues == null ? null : java.util.List.copyOf(validationIssues);
         this.validationStatus = validationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getValidationDefinition() {
@@ -63,20 +53,15 @@ public final class StepValidationInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepValidationInstance that = (StepValidationInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(validationDefinition, that.validationDefinition) && Objects.equals(validationTarget, that.validationTarget) && validationResult == that.validationResult && Objects.equals(validationIssues, that.validationIssues) && Objects.equals(validationStatus, that.validationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, validationDefinition, validationTarget, validationResult, validationIssues, validationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepValidationInstance{" + "id=" + id + "name=" + name + "validationDefinition=" + validationDefinition + "validationTarget=" + validationTarget + "validationResult=" + validationResult + "validationIssues=" + validationIssues + "validationStatus=" + validationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("validationDefinition", validationDefinition);
+        state.put("validationTarget", validationTarget);
+        state.put("validationResult", validationResult);
+        state.put("validationIssues", validationIssues);
+        state.put("validationStatus", validationStatus);
+        return state;
     }
 }

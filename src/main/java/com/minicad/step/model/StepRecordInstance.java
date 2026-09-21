@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RECORD_INSTANCE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param recordTimestamp record variance timestamp
  * @param recordStatus record variance status
  */
-public final class StepRecordInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRecordInstance extends AbstractStepEntity {
     private final StepEntity recordDefinition;
     private final List<String> recordValues;
     private final StepEntity recordTimestamp;
     private final String recordStatus;
 
     public StepRecordInstance(int id, String name, StepEntity recordDefinition, List<String> recordValues, StepEntity recordTimestamp, String recordStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.recordDefinition = recordDefinition;
         this.recordValues = recordValues == null ? null : java.util.List.copyOf(recordValues);
         this.recordTimestamp = recordTimestamp;
         this.recordStatus = recordStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRecordDefinition() {
@@ -56,20 +46,14 @@ public final class StepRecordInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRecordInstance that = (StepRecordInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(recordDefinition, that.recordDefinition) && Objects.equals(recordValues, that.recordValues) && Objects.equals(recordTimestamp, that.recordTimestamp) && Objects.equals(recordStatus, that.recordStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, recordDefinition, recordValues, recordTimestamp, recordStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRecordInstance{" + "id=" + id + "name=" + name + "recordDefinition=" + recordDefinition + "recordValues=" + recordValues + "recordTimestamp=" + recordTimestamp + "recordStatus=" + recordStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("recordDefinition", recordDefinition);
+        state.put("recordValues", recordValues);
+        state.put("recordTimestamp", recordTimestamp);
+        state.put("recordStatus", recordStatus);
+        return state;
     }
 }

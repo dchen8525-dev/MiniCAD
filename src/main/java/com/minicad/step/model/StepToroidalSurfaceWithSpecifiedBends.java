@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved TOROIDAL_SURFACE_WITH_SPECIFIED_BENDS.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param majorAxisCurve optional curve defining the major axis path
  * @param minorAxisCurve optional curve defining the minor axis profile
  */
-public final class StepToroidalSurfaceWithSpecifiedBends implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepToroidalSurfaceWithSpecifiedBends extends AbstractStepEntity {
     private final StepAxis2Placement3D position;
     private final double majorRadius;
     private final double minorRadius;
@@ -25,21 +24,12 @@ public final class StepToroidalSurfaceWithSpecifiedBends implements StepEntity {
     private final StepEntity minorAxisCurve;
 
     public StepToroidalSurfaceWithSpecifiedBends(int id, String name, StepAxis2Placement3D position, double majorRadius, double minorRadius, StepEntity majorAxisCurve, StepEntity minorAxisCurve) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.majorRadius = majorRadius;
         this.minorRadius = minorRadius;
         this.majorAxisCurve = majorAxisCurve;
         this.minorAxisCurve = minorAxisCurve;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepAxis2Placement3D getPosition() {
@@ -72,20 +62,15 @@ public final class StepToroidalSurfaceWithSpecifiedBends implements StepEntity {
     public StepEntity minorAxisCurve() { return getMinorAxisCurve(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepToroidalSurfaceWithSpecifiedBends that = (StepToroidalSurfaceWithSpecifiedBends) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && majorRadius == that.majorRadius && minorRadius == that.minorRadius && Objects.equals(majorAxisCurve, that.majorAxisCurve) && Objects.equals(minorAxisCurve, that.minorAxisCurve);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, majorRadius, minorRadius, majorAxisCurve, minorAxisCurve);
-    }
-
-    @Override
-    public String toString() {
-        return "StepToroidalSurfaceWithSpecifiedBends{" + "id=" + id + "name=" + name + "position=" + position + "majorRadius=" + majorRadius + "minorRadius=" + minorRadius + "majorAxisCurve=" + majorAxisCurve + "minorAxisCurve=" + minorAxisCurve + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("majorRadius", majorRadius);
+        state.put("minorRadius", minorRadius);
+        state.put("majorAxisCurve", majorAxisCurve);
+        state.put("minorAxisCurve", minorAxisCurve);
+        return state;
     }
 }

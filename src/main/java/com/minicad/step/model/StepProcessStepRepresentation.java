@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PROCESS_STEP_REPRESENTATION.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param stepParameters step parameters
  * @param operations operations in this step
  */
-public final class StepProcessStepRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProcessStepRepresentation extends AbstractStepEntity {
     private final String stepType;
     private final List<StepEntity> stepParameters;
     private final List<StepEntity> operations;
 
     public StepProcessStepRepresentation(int id, String name, String stepType, List<StepEntity> stepParameters, List<StepEntity> operations) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.stepType = stepType;
         this.stepParameters = stepParameters == null ? null : java.util.List.copyOf(stepParameters);
         this.operations = operations == null ? null : java.util.List.copyOf(operations);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getStepType() {
@@ -49,20 +39,13 @@ public final class StepProcessStepRepresentation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProcessStepRepresentation that = (StepProcessStepRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(stepType, that.stepType) && Objects.equals(stepParameters, that.stepParameters) && Objects.equals(operations, that.operations);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, stepType, stepParameters, operations);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProcessStepRepresentation{" + "id=" + id + "name=" + name + "stepType=" + stepType + "stepParameters=" + stepParameters + "operations=" + operations + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("stepType", stepType);
+        state.put("stepParameters", stepParameters);
+        state.put("operations", operations);
+        return state;
     }
 }

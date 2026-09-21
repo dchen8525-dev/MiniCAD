@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved OPERATOR_QUALIFICATION.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceOperations qualified variance operations
  * @param qualificationStatus qualification status
  */
-public final class StepOperatorQualification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOperatorQualification extends AbstractStepEntity {
     private final String operatorId;
     private final String qualificationType;
     private final int varianceLevel;
@@ -29,8 +28,7 @@ public final class StepOperatorQualification implements StepEntity {
     private final String qualificationStatus;
 
     public StepOperatorQualification(int id, String name, String operatorId, String qualificationType, int varianceLevel, StepEntity qualificationDate, StepEntity expirationDate, List<StepEntity> varianceOperations, String qualificationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.operatorId = operatorId;
         this.qualificationType = qualificationType;
         this.varianceLevel = varianceLevel;
@@ -38,14 +36,6 @@ public final class StepOperatorQualification implements StepEntity {
         this.expirationDate = expirationDate;
         this.varianceOperations = varianceOperations == null ? null : java.util.List.copyOf(varianceOperations);
         this.qualificationStatus = qualificationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getOperatorId() {
@@ -77,20 +67,17 @@ public final class StepOperatorQualification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOperatorQualification that = (StepOperatorQualification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(operatorId, that.operatorId) && Objects.equals(qualificationType, that.qualificationType) && varianceLevel == that.varianceLevel && Objects.equals(qualificationDate, that.qualificationDate) && Objects.equals(expirationDate, that.expirationDate) && Objects.equals(varianceOperations, that.varianceOperations) && Objects.equals(qualificationStatus, that.qualificationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, operatorId, qualificationType, varianceLevel, qualificationDate, expirationDate, varianceOperations, qualificationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOperatorQualification{" + "id=" + id + "name=" + name + "operatorId=" + operatorId + "qualificationType=" + qualificationType + "varianceLevel=" + varianceLevel + "qualificationDate=" + qualificationDate + "expirationDate=" + expirationDate + "varianceOperations=" + varianceOperations + "qualificationStatus=" + qualificationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("operatorId", operatorId);
+        state.put("qualificationType", qualificationType);
+        state.put("varianceLevel", varianceLevel);
+        state.put("qualificationDate", qualificationDate);
+        state.put("expirationDate", expirationDate);
+        state.put("varianceOperations", varianceOperations);
+        state.put("qualificationStatus", qualificationStatus);
+        return state;
     }
 }

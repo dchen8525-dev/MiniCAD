@@ -1,31 +1,21 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FEA_LINEAR_ALGEBRAIC_VECTOR.
  * A vector used in finite element linear algebra computations.
  */
-public final class StepFeaLinearAlgebraicVector implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaLinearAlgebraicVector extends AbstractStepEntity {
     private final int size;
     private final List<Double> values;
 
     public StepFeaLinearAlgebraicVector(int id, String name, int size, List<Double> values) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.size = size;
         this.values = values == null ? null : java.util.List.copyOf(values);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public int getSize() {
@@ -37,20 +27,12 @@ public final class StepFeaLinearAlgebraicVector implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaLinearAlgebraicVector that = (StepFeaLinearAlgebraicVector) o;
-        return id == that.id && Objects.equals(name, that.name) && size == that.size && Objects.equals(values, that.values);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, size, values);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaLinearAlgebraicVector{" + "id=" + id + "name=" + name + "size=" + size + "values=" + values + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("size", size);
+        state.put("values", values);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved BRANCH_INSTANCE.
  * A branch instance entity.
@@ -13,9 +15,7 @@ import java.util.Objects;
  * @param branchTakenPath branch variance taken path reference
  * @param branchStatus branch variance status
  */
-public final class StepBranchInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBranchInstance extends AbstractStepEntity {
     private final StepEntity branchDefinition;
     private final String branchState;
     private final boolean branchResult;
@@ -23,21 +23,12 @@ public final class StepBranchInstance implements StepEntity {
     private final String branchStatus;
 
     public StepBranchInstance(int id, String name, StepEntity branchDefinition, String branchState, boolean branchResult, StepEntity branchTakenPath, String branchStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.branchDefinition = branchDefinition;
         this.branchState = branchState;
         this.branchResult = branchResult;
         this.branchTakenPath = branchTakenPath;
         this.branchStatus = branchStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBranchDefinition() {
@@ -61,20 +52,15 @@ public final class StepBranchInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBranchInstance that = (StepBranchInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(branchDefinition, that.branchDefinition) && Objects.equals(branchState, that.branchState) && branchResult == that.branchResult && Objects.equals(branchTakenPath, that.branchTakenPath) && Objects.equals(branchStatus, that.branchStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, branchDefinition, branchState, branchResult, branchTakenPath, branchStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBranchInstance{" + "id=" + id + "name=" + name + "branchDefinition=" + branchDefinition + "branchState=" + branchState + "branchResult=" + branchResult + "branchTakenPath=" + branchTakenPath + "branchStatus=" + branchStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("branchDefinition", branchDefinition);
+        state.put("branchState", branchState);
+        state.put("branchResult", branchResult);
+        state.put("branchTakenPath", branchTakenPath);
+        state.put("branchStatus", branchStatus);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal COORDINATED_UNIVERSAL_TIME_OFFSET metadata.
  *
@@ -9,21 +11,16 @@ import java.util.Objects;
  * @param minuteOffset optional minute offset from UTC
  * @param sense offset direction enumeration
  */
-public final class StepCoordinatedUniversalTimeOffset implements StepEntity {
-    private final int id;
+public final class StepCoordinatedUniversalTimeOffset extends AbstractStepEntity {
     private final int hourOffset;
     private final Integer minuteOffset;
     private final String sense;
 
     public StepCoordinatedUniversalTimeOffset(int id, int hourOffset, Integer minuteOffset, String sense) {
-        this.id = id;
+        super(id, "");
         this.hourOffset = hourOffset;
         this.minuteOffset = minuteOffset;
         this.sense = sense;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public int getHourOffset() {
@@ -39,27 +36,18 @@ public final class StepCoordinatedUniversalTimeOffset implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String getName() { return ""; }
+    public int id() { return getId(); }
     public int hourOffset() { return hourOffset; }
     public Integer minuteOffset() { return minuteOffset; }
     public String sense() { return sense; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCoordinatedUniversalTimeOffset that = (StepCoordinatedUniversalTimeOffset) o;
-        return id == that.id && hourOffset == that.hourOffset && Objects.equals(minuteOffset, that.minuteOffset) && Objects.equals(sense, that.sense);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, hourOffset, minuteOffset, sense);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCoordinatedUniversalTimeOffset{" + "id=" + id + "hourOffset=" + hourOffset + "minuteOffset=" + minuteOffset + "sense=" + sense + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("hourOffset", hourOffset);
+        state.put("minuteOffset", minuteOffset);
+        state.put("sense", sense);
+        return state;
     }
 }

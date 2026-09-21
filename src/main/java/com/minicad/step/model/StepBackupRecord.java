@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BACKUP_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceType backup variance type (full, incremental)
  * @varianceStatus record variance status
  */
-public final class StepBackupRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBackupRecord extends AbstractStepEntity {
     private final StepEntity varianceData;
     private final String varianceLocation;
     private final StepEntity varianceDate;
@@ -27,22 +26,13 @@ public final class StepBackupRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepBackupRecord(int id, String name, StepEntity varianceData, String varianceLocation, StepEntity varianceDate, double varianceSize, String varianceType, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceData = varianceData;
         this.varianceLocation = varianceLocation;
         this.varianceDate = varianceDate;
         this.varianceSize = varianceSize;
         this.varianceType = varianceType;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceData() {
@@ -70,20 +60,16 @@ public final class StepBackupRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBackupRecord that = (StepBackupRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceData, that.varianceData) && Objects.equals(varianceLocation, that.varianceLocation) && Objects.equals(varianceDate, that.varianceDate) && varianceSize == that.varianceSize && Objects.equals(varianceType, that.varianceType) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceData, varianceLocation, varianceDate, varianceSize, varianceType, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBackupRecord{" + "id=" + id + "name=" + name + "varianceData=" + varianceData + "varianceLocation=" + varianceLocation + "varianceDate=" + varianceDate + "varianceSize=" + varianceSize + "varianceType=" + varianceType + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceData", varianceData);
+        state.put("varianceLocation", varianceLocation);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceSize", varianceSize);
+        state.put("varianceType", varianceType);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

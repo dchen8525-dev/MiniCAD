@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ORDER_INFORMATION.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param orderStatus order status (pending, confirmed, shipped)
  * @param orderCustomer customer reference
  */
-public final class StepOrderInformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOrderInformation extends AbstractStepEntity {
     private final String orderId;
     private final List<StepEntity> orderItems;
     private final List<Integer> orderQuantity;
@@ -29,8 +28,7 @@ public final class StepOrderInformation implements StepEntity {
     private final StepEntity orderCustomer;
 
     public StepOrderInformation(int id, String name, String orderId, List<StepEntity> orderItems, List<Integer> orderQuantity, StepEntity orderDate, StepEntity deliveryDate, String orderStatus, StepEntity orderCustomer) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.orderId = orderId;
         this.orderItems = orderItems == null ? null : java.util.List.copyOf(orderItems);
         this.orderQuantity = orderQuantity == null ? null : java.util.List.copyOf(orderQuantity);
@@ -38,14 +36,6 @@ public final class StepOrderInformation implements StepEntity {
         this.deliveryDate = deliveryDate;
         this.orderStatus = orderStatus;
         this.orderCustomer = orderCustomer;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getOrderId() {
@@ -77,20 +67,17 @@ public final class StepOrderInformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOrderInformation that = (StepOrderInformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(orderId, that.orderId) && Objects.equals(orderItems, that.orderItems) && Objects.equals(orderQuantity, that.orderQuantity) && Objects.equals(orderDate, that.orderDate) && Objects.equals(deliveryDate, that.deliveryDate) && Objects.equals(orderStatus, that.orderStatus) && Objects.equals(orderCustomer, that.orderCustomer);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, orderId, orderItems, orderQuantity, orderDate, deliveryDate, orderStatus, orderCustomer);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOrderInformation{" + "id=" + id + "name=" + name + "orderId=" + orderId + "orderItems=" + orderItems + "orderQuantity=" + orderQuantity + "orderDate=" + orderDate + "deliveryDate=" + deliveryDate + "orderStatus=" + orderStatus + "orderCustomer=" + orderCustomer + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("orderId", orderId);
+        state.put("orderItems", orderItems);
+        state.put("orderQuantity", orderQuantity);
+        state.put("orderDate", orderDate);
+        state.put("deliveryDate", deliveryDate);
+        state.put("orderStatus", orderStatus);
+        state.put("orderCustomer", orderCustomer);
+        return state;
     }
 }

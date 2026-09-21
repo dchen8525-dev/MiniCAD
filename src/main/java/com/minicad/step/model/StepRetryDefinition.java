@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RETRY_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param retryBackoff retry variance backoff strategy
  * @param retryStatus retry variance status
  */
-public final class StepRetryDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRetryDefinition extends AbstractStepEntity {
     private final String retryType;
     private final int retryMaxAttempts;
     private final int retryDelay;
@@ -25,21 +24,12 @@ public final class StepRetryDefinition implements StepEntity {
     private final String retryStatus;
 
     public StepRetryDefinition(int id, String name, String retryType, int retryMaxAttempts, int retryDelay, String retryBackoff, String retryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.retryType = retryType;
         this.retryMaxAttempts = retryMaxAttempts;
         this.retryDelay = retryDelay;
         this.retryBackoff = retryBackoff;
         this.retryStatus = retryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getRetryType() {
@@ -63,20 +53,15 @@ public final class StepRetryDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRetryDefinition that = (StepRetryDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(retryType, that.retryType) && retryMaxAttempts == that.retryMaxAttempts && retryDelay == that.retryDelay && Objects.equals(retryBackoff, that.retryBackoff) && Objects.equals(retryStatus, that.retryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, retryType, retryMaxAttempts, retryDelay, retryBackoff, retryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRetryDefinition{" + "id=" + id + "name=" + name + "retryType=" + retryType + "retryMaxAttempts=" + retryMaxAttempts + "retryDelay=" + retryDelay + "retryBackoff=" + retryBackoff + "retryStatus=" + retryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("retryType", retryType);
+        state.put("retryMaxAttempts", retryMaxAttempts);
+        state.put("retryDelay", retryDelay);
+        state.put("retryBackoff", retryBackoff);
+        state.put("retryStatus", retryStatus);
+        return state;
     }
 }

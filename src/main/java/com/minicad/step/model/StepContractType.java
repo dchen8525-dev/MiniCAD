@@ -1,23 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CONTRACT_TYPE metadata.
  *
  * @param id STEP instance id
  * @param description type description
  */
-public final class StepContractType implements StepEntity {
-    private final int id;
+public final class StepContractType extends AbstractStepEntity {
     private final String description;
 
     public StepContractType(int id, String description) {
-        this.id = id;
+        super(id, "");
         this.description = description;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getDescription() {
@@ -42,20 +39,10 @@ public final class StepContractType implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepContractType that = (StepContractType) o;
-        return id == that.id && Objects.equals(description, that.description);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, description);
-    }
-
-    @Override
-    public String toString() {
-        return "StepContractType{" + "id=" + id + "description=" + description + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("description", description);
+        return state;
     }
 }

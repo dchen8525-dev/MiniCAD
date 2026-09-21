@@ -1,27 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved FILL_AREA_STYLE_TILING.
  */
-public final class StepFillAreaStyleTiling implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFillAreaStyleTiling extends AbstractStepEntity {
     private final StepEntity tilingPattern;
 
     public StepFillAreaStyleTiling(int id, String name, StepEntity tilingPattern) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.tilingPattern = tilingPattern;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getTilingPattern() {
@@ -29,20 +19,11 @@ public final class StepFillAreaStyleTiling implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFillAreaStyleTiling that = (StepFillAreaStyleTiling) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(tilingPattern, that.tilingPattern);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, tilingPattern);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFillAreaStyleTiling{" + "id=" + id + "name=" + name + "tilingPattern=" + tilingPattern + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("tilingPattern", tilingPattern);
+        return state;
     }
 }

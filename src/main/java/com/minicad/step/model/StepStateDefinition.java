@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STATE_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceInitial initial variance state flag
  * @varianceStatus definition variance status
  */
-public final class StepStateDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStateDefinition extends AbstractStepEntity {
     private final String varianceState;
     private final List<String> varianceConditions;
     private final List<StepEntity> varianceActions;
@@ -27,22 +26,13 @@ public final class StepStateDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepStateDefinition(int id, String name, String varianceState, List<String> varianceConditions, List<StepEntity> varianceActions, List<StepEntity> varianceTransitions, boolean varianceInitial, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceState = varianceState;
         this.varianceConditions = varianceConditions == null ? null : java.util.List.copyOf(varianceConditions);
         this.varianceActions = varianceActions == null ? null : java.util.List.copyOf(varianceActions);
         this.varianceTransitions = varianceTransitions == null ? null : java.util.List.copyOf(varianceTransitions);
         this.varianceInitial = varianceInitial;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceState() {
@@ -70,20 +60,16 @@ public final class StepStateDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStateDefinition that = (StepStateDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceState, that.varianceState) && Objects.equals(varianceConditions, that.varianceConditions) && Objects.equals(varianceActions, that.varianceActions) && Objects.equals(varianceTransitions, that.varianceTransitions) && varianceInitial == that.varianceInitial && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceState, varianceConditions, varianceActions, varianceTransitions, varianceInitial, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStateDefinition{" + "id=" + id + "name=" + name + "varianceState=" + varianceState + "varianceConditions=" + varianceConditions + "varianceActions=" + varianceActions + "varianceTransitions=" + varianceTransitions + "varianceInitial=" + varianceInitial + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceState", varianceState);
+        state.put("varianceConditions", varianceConditions);
+        state.put("varianceActions", varianceActions);
+        state.put("varianceTransitions", varianceTransitions);
+        state.put("varianceInitial", varianceInitial);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INVENTORY_INFORMATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param inventoryStatus inventory status
  * @param lastUpdated last update date
  */
-public final class StepInventoryInformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInventoryInformation extends AbstractStepEntity {
     private final List<StepEntity> inventoryItems;
     private final List<Integer> varianceQuantities;
     private final String varianceLocation;
@@ -27,22 +26,13 @@ public final class StepInventoryInformation implements StepEntity {
     private final StepEntity lastUpdated;
 
     public StepInventoryInformation(int id, String name, List<StepEntity> inventoryItems, List<Integer> varianceQuantities, String varianceLocation, int varianceThreshold, String inventoryStatus, StepEntity lastUpdated) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.inventoryItems = inventoryItems == null ? null : java.util.List.copyOf(inventoryItems);
         this.varianceQuantities = varianceQuantities == null ? null : java.util.List.copyOf(varianceQuantities);
         this.varianceLocation = varianceLocation;
         this.varianceThreshold = varianceThreshold;
         this.inventoryStatus = inventoryStatus;
         this.lastUpdated = lastUpdated;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getInventoryItems() {
@@ -70,20 +60,16 @@ public final class StepInventoryInformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInventoryInformation that = (StepInventoryInformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(inventoryItems, that.inventoryItems) && Objects.equals(varianceQuantities, that.varianceQuantities) && Objects.equals(varianceLocation, that.varianceLocation) && varianceThreshold == that.varianceThreshold && Objects.equals(inventoryStatus, that.inventoryStatus) && Objects.equals(lastUpdated, that.lastUpdated);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, inventoryItems, varianceQuantities, varianceLocation, varianceThreshold, inventoryStatus, lastUpdated);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInventoryInformation{" + "id=" + id + "name=" + name + "inventoryItems=" + inventoryItems + "varianceQuantities=" + varianceQuantities + "varianceLocation=" + varianceLocation + "varianceThreshold=" + varianceThreshold + "inventoryStatus=" + inventoryStatus + "lastUpdated=" + lastUpdated + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("inventoryItems", inventoryItems);
+        state.put("varianceQuantities", varianceQuantities);
+        state.put("varianceLocation", varianceLocation);
+        state.put("varianceThreshold", varianceThreshold);
+        state.put("inventoryStatus", inventoryStatus);
+        state.put("lastUpdated", lastUpdated);
+        return state;
     }
 }

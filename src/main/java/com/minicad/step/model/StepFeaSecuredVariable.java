@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved FEA_SECURED_VARIABLE.
  * A secured (constrained) variable in finite element analysis.
  */
-public final class StepFeaSecuredVariable implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaSecuredVariable extends AbstractStepEntity {
     private final StepEntity variable;
     private final StepEntity constraint;
 
     public StepFeaSecuredVariable(int id, String name, StepEntity variable, StepEntity constraint) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.variable = variable;
         this.constraint = constraint;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVariable() {
@@ -35,20 +26,12 @@ public final class StepFeaSecuredVariable implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaSecuredVariable that = (StepFeaSecuredVariable) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(variable, that.variable) && Objects.equals(constraint, that.constraint);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, variable, constraint);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaSecuredVariable{" + "id=" + id + "name=" + name + "variable=" + variable + "constraint=" + constraint + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("variable", variable);
+        state.put("constraint", constraint);
+        return state;
     }
 }

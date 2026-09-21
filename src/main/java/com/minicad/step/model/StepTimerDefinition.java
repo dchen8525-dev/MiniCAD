@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TIMER_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param timerRecurring timer variance recurring flag
  * @param timerStatus timer variance status
  */
-public final class StepTimerDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTimerDefinition extends AbstractStepEntity {
     private final String timerType;
     private final int timerDuration;
     private final StepEntity timerAction;
@@ -25,21 +24,12 @@ public final class StepTimerDefinition implements StepEntity {
     private final String timerStatus;
 
     public StepTimerDefinition(int id, String name, String timerType, int timerDuration, StepEntity timerAction, boolean timerRecurring, String timerStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.timerType = timerType;
         this.timerDuration = timerDuration;
         this.timerAction = timerAction;
         this.timerRecurring = timerRecurring;
         this.timerStatus = timerStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTimerType() {
@@ -63,20 +53,15 @@ public final class StepTimerDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTimerDefinition that = (StepTimerDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(timerType, that.timerType) && timerDuration == that.timerDuration && Objects.equals(timerAction, that.timerAction) && timerRecurring == that.timerRecurring && Objects.equals(timerStatus, that.timerStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, timerType, timerDuration, timerAction, timerRecurring, timerStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTimerDefinition{" + "id=" + id + "name=" + name + "timerType=" + timerType + "timerDuration=" + timerDuration + "timerAction=" + timerAction + "timerRecurring=" + timerRecurring + "timerStatus=" + timerStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("timerType", timerType);
+        state.put("timerDuration", timerDuration);
+        state.put("timerAction", timerAction);
+        state.put("timerRecurring", timerRecurring);
+        state.put("timerStatus", timerStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PROBE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param probeInterval probe variance probe interval
  * @param probeStatus probe variance status
  */
-public final class StepProbeDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProbeDefinition extends AbstractStepEntity {
     private final String probeType;
     private final StepEntity probeTarget;
     private final List<String> probeParameters;
@@ -25,21 +24,12 @@ public final class StepProbeDefinition implements StepEntity {
     private final String probeStatus;
 
     public StepProbeDefinition(int id, String name, String probeType, StepEntity probeTarget, List<String> probeParameters, int probeInterval, String probeStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.probeType = probeType;
         this.probeTarget = probeTarget;
         this.probeParameters = probeParameters == null ? null : java.util.List.copyOf(probeParameters);
         this.probeInterval = probeInterval;
         this.probeStatus = probeStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getProbeType() {
@@ -63,20 +53,15 @@ public final class StepProbeDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProbeDefinition that = (StepProbeDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(probeType, that.probeType) && Objects.equals(probeTarget, that.probeTarget) && Objects.equals(probeParameters, that.probeParameters) && probeInterval == that.probeInterval && Objects.equals(probeStatus, that.probeStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, probeType, probeTarget, probeParameters, probeInterval, probeStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProbeDefinition{" + "id=" + id + "name=" + name + "probeType=" + probeType + "probeTarget=" + probeTarget + "probeParameters=" + probeParameters + "probeInterval=" + probeInterval + "probeStatus=" + probeStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("probeType", probeType);
+        state.put("probeTarget", probeTarget);
+        state.put("probeParameters", probeParameters);
+        state.put("probeInterval", probeInterval);
+        state.put("probeStatus", probeStatus);
+        return state;
     }
 }

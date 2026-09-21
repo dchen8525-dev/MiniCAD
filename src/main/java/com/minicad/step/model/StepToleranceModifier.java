@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TOLERANCE_MODIFIER.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param modifierValue modifier value if applicable
  * @param appliedTolerance tolerance the modifier applies to
  */
-public final class StepToleranceModifier implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepToleranceModifier extends AbstractStepEntity {
     private final String modifierType;
     private final double modifierValue;
     private final StepEntity appliedTolerance;
 
     public StepToleranceModifier(int id, String name, String modifierType, double modifierValue, StepEntity appliedTolerance) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.modifierType = modifierType;
         this.modifierValue = modifierValue;
         this.appliedTolerance = appliedTolerance;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getModifierType() {
@@ -49,20 +39,13 @@ public final class StepToleranceModifier implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepToleranceModifier that = (StepToleranceModifier) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(modifierType, that.modifierType) && modifierValue == that.modifierValue && Objects.equals(appliedTolerance, that.appliedTolerance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, modifierType, modifierValue, appliedTolerance);
-    }
-
-    @Override
-    public String toString() {
-        return "StepToleranceModifier{" + "id=" + id + "name=" + name + "modifierType=" + modifierType + "modifierValue=" + modifierValue + "appliedTolerance=" + appliedTolerance + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("modifierType", modifierType);
+        state.put("modifierValue", modifierValue);
+        state.put("appliedTolerance", appliedTolerance);
+        return state;
     }
 }

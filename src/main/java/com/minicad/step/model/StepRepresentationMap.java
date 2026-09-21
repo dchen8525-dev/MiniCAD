@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal REPRESENTATION_MAP.
  *
@@ -9,23 +10,14 @@ import java.util.Objects;
  * @param mappedOrigin mapped origin placement
  * @param mappedRepresentation mapped representation
  */
-public final class StepRepresentationMap implements StepEntity {
-    private final int id;
+public final class StepRepresentationMap extends AbstractStepEntity {
     private final StepEntity mappedOrigin;
     private final StepRepresentation mappedRepresentation;
 
     public StepRepresentationMap(int id, StepEntity mappedOrigin, StepRepresentation mappedRepresentation) {
-        this.id = id;
+        super(id, "");
         this.mappedOrigin = mappedOrigin;
         this.mappedRepresentation = mappedRepresentation;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepEntity getMappedOrigin() {
@@ -43,20 +35,11 @@ public final class StepRepresentationMap implements StepEntity {
     public StepRepresentation mappedRepresentation() { return getMappedRepresentation(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRepresentationMap that = (StepRepresentationMap) o;
-        return id == that.id && Objects.equals(mappedOrigin, that.mappedOrigin) && Objects.equals(mappedRepresentation, that.mappedRepresentation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, mappedOrigin, mappedRepresentation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRepresentationMap{" + "id=" + id + "mappedOrigin=" + mappedOrigin + "mappedRepresentation=" + mappedRepresentation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("mappedOrigin", mappedOrigin);
+        state.put("mappedRepresentation", mappedRepresentation);
+        return state;
     }
 }

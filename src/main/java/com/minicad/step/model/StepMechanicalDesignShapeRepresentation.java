@@ -1,24 +1,14 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public final class StepMechanicalDesignShapeRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMechanicalDesignShapeRepresentation extends AbstractStepEntity {
     private final StepEntity context;
 
     public StepMechanicalDesignShapeRepresentation(int id, String name, StepEntity context) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.context = context;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getContext() {
@@ -26,20 +16,11 @@ public final class StepMechanicalDesignShapeRepresentation implements StepEntity
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMechanicalDesignShapeRepresentation that = (StepMechanicalDesignShapeRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(context, that.context);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, context);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMechanicalDesignShapeRepresentation{" + "id=" + id + "name=" + name + "context=" + context + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("context", context);
+        return state;
     }
 }

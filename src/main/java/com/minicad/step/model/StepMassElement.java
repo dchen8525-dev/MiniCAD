@@ -1,30 +1,21 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+
 /**
  * Resolved MASS_ELEMENT.
  * A mass finite element.
  */
-public final class StepMassElement implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMassElement extends AbstractStepEntity {
     private final List<StepEntity> nodes;
     private final double mass;
 
     public StepMassElement(int id, String name, List<StepEntity> nodes, double mass) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.nodes = nodes == null ? null : java.util.List.copyOf(nodes);
         this.mass = mass;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getNodes() {
@@ -36,20 +27,12 @@ public final class StepMassElement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMassElement that = (StepMassElement) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(nodes, that.nodes) && mass == that.mass;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, nodes, mass);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMassElement{" + "id=" + id + "name=" + name + "nodes=" + nodes + "mass=" + mass + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("nodes", nodes);
+        state.put("mass", mass);
+        return state;
     }
 }

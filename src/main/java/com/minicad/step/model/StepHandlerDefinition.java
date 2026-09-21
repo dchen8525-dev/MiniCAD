@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved HANDLER_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param handlerPriority handler variance priority
  * @param handlerStatus handler variance status
  */
-public final class StepHandlerDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepHandlerDefinition extends AbstractStepEntity {
     private final String handlerType;
     private final String handlerCondition;
     private final StepEntity handlerAction;
@@ -25,21 +24,12 @@ public final class StepHandlerDefinition implements StepEntity {
     private final String handlerStatus;
 
     public StepHandlerDefinition(int id, String name, String handlerType, String handlerCondition, StepEntity handlerAction, int handlerPriority, String handlerStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.handlerType = handlerType;
         this.handlerCondition = handlerCondition;
         this.handlerAction = handlerAction;
         this.handlerPriority = handlerPriority;
         this.handlerStatus = handlerStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getHandlerType() {
@@ -63,20 +53,15 @@ public final class StepHandlerDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepHandlerDefinition that = (StepHandlerDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(handlerType, that.handlerType) && Objects.equals(handlerCondition, that.handlerCondition) && Objects.equals(handlerAction, that.handlerAction) && handlerPriority == that.handlerPriority && Objects.equals(handlerStatus, that.handlerStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, handlerType, handlerCondition, handlerAction, handlerPriority, handlerStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepHandlerDefinition{" + "id=" + id + "name=" + name + "handlerType=" + handlerType + "handlerCondition=" + handlerCondition + "handlerAction=" + handlerAction + "handlerPriority=" + handlerPriority + "handlerStatus=" + handlerStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("handlerType", handlerType);
+        state.put("handlerCondition", handlerCondition);
+        state.put("handlerAction", handlerAction);
+        state.put("handlerPriority", handlerPriority);
+        state.put("handlerStatus", handlerStatus);
+        return state;
     }
 }

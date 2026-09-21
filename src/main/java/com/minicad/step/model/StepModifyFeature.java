@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MODIFY_FEATURE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param modificationParameters modification parameters
  * @param modifiedGeometry modified geometry result
  */
-public final class StepModifyFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepModifyFeature extends AbstractStepEntity {
     private final StepEntity originalFeature;
     private final String modificationType;
     private final List<StepEntity> modificationParameters;
     private final StepEntity modifiedGeometry;
 
     public StepModifyFeature(int id, String name, StepEntity originalFeature, String modificationType, List<StepEntity> modificationParameters, StepEntity modifiedGeometry) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.originalFeature = originalFeature;
         this.modificationType = modificationType;
         this.modificationParameters = modificationParameters == null ? null : java.util.List.copyOf(modificationParameters);
         this.modifiedGeometry = modifiedGeometry;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getOriginalFeature() {
@@ -56,20 +46,14 @@ public final class StepModifyFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepModifyFeature that = (StepModifyFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(originalFeature, that.originalFeature) && Objects.equals(modificationType, that.modificationType) && Objects.equals(modificationParameters, that.modificationParameters) && Objects.equals(modifiedGeometry, that.modifiedGeometry);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, originalFeature, modificationType, modificationParameters, modifiedGeometry);
-    }
-
-    @Override
-    public String toString() {
-        return "StepModifyFeature{" + "id=" + id + "name=" + name + "originalFeature=" + originalFeature + "modificationType=" + modificationType + "modificationParameters=" + modificationParameters + "modifiedGeometry=" + modifiedGeometry + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("originalFeature", originalFeature);
+        state.put("modificationType", modificationType);
+        state.put("modificationParameters", modificationParameters);
+        state.put("modifiedGeometry", modifiedGeometry);
+        return state;
     }
 }

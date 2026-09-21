@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INVENTORY_TRANSACTION.
@@ -18,9 +19,7 @@ import java.util.Objects;
  * @varianceReason transaction variance reason
  * @varianceStatus transaction variance status
  */
-public final class StepInventoryTransaction implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInventoryTransaction extends AbstractStepEntity {
     private final String transactionType;
     private final StepEntity varianceItem;
     private final int varianceQuantity;
@@ -31,8 +30,7 @@ public final class StepInventoryTransaction implements StepEntity {
     private final String varianceStatus;
 
     public StepInventoryTransaction(int id, String name, String transactionType, StepEntity varianceItem, int varianceQuantity, String varianceFrom, String varianceTo, StepEntity varianceDate, String varianceReason, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.transactionType = transactionType;
         this.varianceItem = varianceItem;
         this.varianceQuantity = varianceQuantity;
@@ -41,14 +39,6 @@ public final class StepInventoryTransaction implements StepEntity {
         this.varianceDate = varianceDate;
         this.varianceReason = varianceReason;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTransactionType() {
@@ -84,20 +74,18 @@ public final class StepInventoryTransaction implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInventoryTransaction that = (StepInventoryTransaction) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(transactionType, that.transactionType) && Objects.equals(varianceItem, that.varianceItem) && varianceQuantity == that.varianceQuantity && Objects.equals(varianceFrom, that.varianceFrom) && Objects.equals(varianceTo, that.varianceTo) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceReason, that.varianceReason) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, transactionType, varianceItem, varianceQuantity, varianceFrom, varianceTo, varianceDate, varianceReason, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInventoryTransaction{" + "id=" + id + "name=" + name + "transactionType=" + transactionType + "varianceItem=" + varianceItem + "varianceQuantity=" + varianceQuantity + "varianceFrom=" + varianceFrom + "varianceTo=" + varianceTo + "varianceDate=" + varianceDate + "varianceReason=" + varianceReason + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("transactionType", transactionType);
+        state.put("varianceItem", varianceItem);
+        state.put("varianceQuantity", varianceQuantity);
+        state.put("varianceFrom", varianceFrom);
+        state.put("varianceTo", varianceTo);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceReason", varianceReason);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved STACK_INSTANCE.
  * A stack instance entity.
@@ -12,29 +14,18 @@ import java.util.Objects;
  * @param stackDepth stack variance current depth
  * @param stackStatus stack variance status
  */
-public final class StepStackInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStackInstance extends AbstractStepEntity {
     private final StepEntity stackDefinition;
     private final String stackState;
     private final int stackDepth;
     private final String stackStatus;
 
     public StepStackInstance(int id, String name, StepEntity stackDefinition, String stackState, int stackDepth, String stackStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.stackDefinition = stackDefinition;
         this.stackState = stackState;
         this.stackDepth = stackDepth;
         this.stackStatus = stackStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getStackDefinition() {
@@ -54,20 +45,14 @@ public final class StepStackInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStackInstance that = (StepStackInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(stackDefinition, that.stackDefinition) && Objects.equals(stackState, that.stackState) && stackDepth == that.stackDepth && Objects.equals(stackStatus, that.stackStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, stackDefinition, stackState, stackDepth, stackStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStackInstance{" + "id=" + id + "name=" + name + "stackDefinition=" + stackDefinition + "stackState=" + stackState + "stackDepth=" + stackDepth + "stackStatus=" + stackStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("stackDefinition", stackDefinition);
+        state.put("stackState", stackState);
+        state.put("stackDepth", stackDepth);
+        state.put("stackStatus", stackStatus);
+        return state;
     }
 }

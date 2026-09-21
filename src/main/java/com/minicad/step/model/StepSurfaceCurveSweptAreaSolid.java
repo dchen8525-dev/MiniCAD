@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved SURFACE_CURVE_SWEPT_AREA_SOLID.
  * A swept solid where the trajectory follows a surface curve.
@@ -13,9 +15,7 @@ import java.util.Objects;
  * @param startPoint start parameter
  * @param endPoint end parameter
  */
-public final class StepSurfaceCurveSweptAreaSolid implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSurfaceCurveSweptAreaSolid extends AbstractStepEntity {
     private final StepEntity sweptArea;
     private final StepEntity referenceSurface;
     private final StepEntity trajectory;
@@ -23,21 +23,12 @@ public final class StepSurfaceCurveSweptAreaSolid implements StepEntity {
     private final double endPoint;
 
     public StepSurfaceCurveSweptAreaSolid(int id, String name, StepEntity sweptArea, StepEntity referenceSurface, StepEntity trajectory, double startPoint, double endPoint) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sweptArea = sweptArea;
         this.referenceSurface = referenceSurface;
         this.trajectory = trajectory;
         this.startPoint = startPoint;
         this.endPoint = endPoint;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSweptArea() {
@@ -67,20 +58,15 @@ public final class StepSurfaceCurveSweptAreaSolid implements StepEntity {
     public double endPoint() { return endPoint; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceCurveSweptAreaSolid that = (StepSurfaceCurveSweptAreaSolid) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sweptArea, that.sweptArea) && Objects.equals(referenceSurface, that.referenceSurface) && Objects.equals(trajectory, that.trajectory) && startPoint == that.startPoint && endPoint == that.endPoint;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sweptArea, referenceSurface, trajectory, startPoint, endPoint);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceCurveSweptAreaSolid{" + "id=" + id + "name=" + name + "sweptArea=" + sweptArea + "referenceSurface=" + referenceSurface + "trajectory=" + trajectory + "startPoint=" + startPoint + "endPoint=" + endPoint + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sweptArea", sweptArea);
+        state.put("referenceSurface", referenceSurface);
+        state.put("trajectory", trajectory);
+        state.put("startPoint", startPoint);
+        state.put("endPoint", endPoint);
+        return state;
     }
 }

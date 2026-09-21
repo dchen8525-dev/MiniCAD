@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved GROOVE_DEFINITION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param direction groove direction
  * @param grooveType groove type
  */
-public final class StepGrooveDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGrooveDefinition extends AbstractStepEntity {
     private final StepEntity profile;
     private final Double depth;
     private final StepEntity direction;
     private final String grooveType;
 
     public StepGrooveDefinition(int id, String name, StepEntity profile, Double depth, StepEntity direction, String grooveType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.profile = profile;
         this.depth = depth;
         this.direction = direction;
         this.grooveType = grooveType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getProfile() {
@@ -56,20 +46,14 @@ public final class StepGrooveDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGrooveDefinition that = (StepGrooveDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(profile, that.profile) && Objects.equals(depth, that.depth) && Objects.equals(direction, that.direction) && Objects.equals(grooveType, that.grooveType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, profile, depth, direction, grooveType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGrooveDefinition{" + "id=" + id + "name=" + name + "profile=" + profile + "depth=" + depth + "direction=" + direction + "grooveType=" + grooveType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("profile", profile);
+        state.put("depth", depth);
+        state.put("direction", direction);
+        state.put("grooveType", grooveType);
+        return state;
     }
 }

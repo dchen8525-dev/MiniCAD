@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved THREAD.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param threadType thread type (internal/external)
  * @param length thread length
  */
-public final class StepThread implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepThread extends AbstractStepEntity {
     private final Double nominalDiameter;
     private final Double pitch;
     private final String threadType;
     private final Double length;
 
     public StepThread(int id, String name, Double nominalDiameter, Double pitch, String threadType, Double length) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.nominalDiameter = nominalDiameter;
         this.pitch = pitch;
         this.threadType = threadType;
         this.length = length;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Double getNominalDiameter() {
@@ -56,20 +46,14 @@ public final class StepThread implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepThread that = (StepThread) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(nominalDiameter, that.nominalDiameter) && Objects.equals(pitch, that.pitch) && Objects.equals(threadType, that.threadType) && Objects.equals(length, that.length);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, nominalDiameter, pitch, threadType, length);
-    }
-
-    @Override
-    public String toString() {
-        return "StepThread{" + "id=" + id + "name=" + name + "nominalDiameter=" + nominalDiameter + "pitch=" + pitch + "threadType=" + threadType + "length=" + length + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("nominalDiameter", nominalDiameter);
+        state.put("pitch", pitch);
+        state.put("threadType", threadType);
+        state.put("length", length);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CONVERSION_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param conversionOffset conversion variance offset
  * @param conversionStatus conversion variance status
  */
-public final class StepConversionDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConversionDefinition extends AbstractStepEntity {
     private final String conversionType;
     private final StepEntity conversionSource;
     private final StepEntity conversionTarget;
@@ -27,22 +26,13 @@ public final class StepConversionDefinition implements StepEntity {
     private final String conversionStatus;
 
     public StepConversionDefinition(int id, String name, String conversionType, StepEntity conversionSource, StepEntity conversionTarget, double conversionFactor, double conversionOffset, String conversionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.conversionType = conversionType;
         this.conversionSource = conversionSource;
         this.conversionTarget = conversionTarget;
         this.conversionFactor = conversionFactor;
         this.conversionOffset = conversionOffset;
         this.conversionStatus = conversionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getConversionType() {
@@ -70,20 +60,16 @@ public final class StepConversionDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConversionDefinition that = (StepConversionDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(conversionType, that.conversionType) && Objects.equals(conversionSource, that.conversionSource) && Objects.equals(conversionTarget, that.conversionTarget) && conversionFactor == that.conversionFactor && conversionOffset == that.conversionOffset && Objects.equals(conversionStatus, that.conversionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, conversionType, conversionSource, conversionTarget, conversionFactor, conversionOffset, conversionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConversionDefinition{" + "id=" + id + "name=" + name + "conversionType=" + conversionType + "conversionSource=" + conversionSource + "conversionTarget=" + conversionTarget + "conversionFactor=" + conversionFactor + "conversionOffset=" + conversionOffset + "conversionStatus=" + conversionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("conversionType", conversionType);
+        state.put("conversionSource", conversionSource);
+        state.put("conversionTarget", conversionTarget);
+        state.put("conversionFactor", conversionFactor);
+        state.put("conversionOffset", conversionOffset);
+        state.put("conversionStatus", conversionStatus);
+        return state;
     }
 }

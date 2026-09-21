@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved WELD_JOINT.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param jointParts joint variance parts to join
  * @param jointStatus joint variance status
  */
-public final class StepWeldJoint implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepWeldJoint extends AbstractStepEntity {
     private final String jointType;
     private final StepEntity jointGeometry;
     private final List<StepEntity> jointParts;
     private final String jointStatus;
 
     public StepWeldJoint(int id, String name, String jointType, StepEntity jointGeometry, List<StepEntity> jointParts, String jointStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.jointType = jointType;
         this.jointGeometry = jointGeometry;
         this.jointParts = jointParts == null ? null : java.util.List.copyOf(jointParts);
         this.jointStatus = jointStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getJointType() {
@@ -56,20 +46,14 @@ public final class StepWeldJoint implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepWeldJoint that = (StepWeldJoint) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(jointType, that.jointType) && Objects.equals(jointGeometry, that.jointGeometry) && Objects.equals(jointParts, that.jointParts) && Objects.equals(jointStatus, that.jointStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, jointType, jointGeometry, jointParts, jointStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepWeldJoint{" + "id=" + id + "name=" + name + "jointType=" + jointType + "jointGeometry=" + jointGeometry + "jointParts=" + jointParts + "jointStatus=" + jointStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("jointType", jointType);
+        state.put("jointGeometry", jointGeometry);
+        state.put("jointParts", jointParts);
+        state.put("jointStatus", jointStatus);
+        return state;
     }
 }

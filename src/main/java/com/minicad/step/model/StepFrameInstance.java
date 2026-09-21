@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FRAME_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param frameTimestamp frame variance timestamp
  * @param frameStatus frame variance status
  */
-public final class StepFrameInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFrameInstance extends AbstractStepEntity {
     private final StepEntity frameDefinition;
     private final long frameNumber;
     private final String frameData;
@@ -25,21 +24,12 @@ public final class StepFrameInstance implements StepEntity {
     private final String frameStatus;
 
     public StepFrameInstance(int id, String name, StepEntity frameDefinition, long frameNumber, String frameData, StepEntity frameTimestamp, String frameStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.frameDefinition = frameDefinition;
         this.frameNumber = frameNumber;
         this.frameData = frameData;
         this.frameTimestamp = frameTimestamp;
         this.frameStatus = frameStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getFrameDefinition() {
@@ -63,20 +53,15 @@ public final class StepFrameInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFrameInstance that = (StepFrameInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(frameDefinition, that.frameDefinition) && frameNumber == that.frameNumber && Objects.equals(frameData, that.frameData) && Objects.equals(frameTimestamp, that.frameTimestamp) && Objects.equals(frameStatus, that.frameStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, frameDefinition, frameNumber, frameData, frameTimestamp, frameStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFrameInstance{" + "id=" + id + "name=" + name + "frameDefinition=" + frameDefinition + "frameNumber=" + frameNumber + "frameData=" + frameData + "frameTimestamp=" + frameTimestamp + "frameStatus=" + frameStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("frameDefinition", frameDefinition);
+        state.put("frameNumber", frameNumber);
+        state.put("frameData", frameData);
+        state.put("frameTimestamp", frameTimestamp);
+        state.put("frameStatus", frameStatus);
+        return state;
     }
 }

@@ -1,35 +1,25 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved KINEMATIC_PATH.
  * A path through a kinematic mechanism defining the chain of pairs.
  */
-public final class StepKinematicPath implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepKinematicPath extends AbstractStepEntity {
     private final String description;
     private final StepEntity startLink;
     private final StepEntity endLink;
     private final List<StepEntity> pairs;
 
     public StepKinematicPath(int id, String name, String description, StepEntity startLink, StepEntity endLink, List<StepEntity> pairs) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.startLink = startLink;
         this.endLink = endLink;
         this.pairs = pairs == null ? null : java.util.List.copyOf(pairs);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -49,20 +39,14 @@ public final class StepKinematicPath implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepKinematicPath that = (StepKinematicPath) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(startLink, that.startLink) && Objects.equals(endLink, that.endLink) && Objects.equals(pairs, that.pairs);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, startLink, endLink, pairs);
-    }
-
-    @Override
-    public String toString() {
-        return "StepKinematicPath{" + "id=" + id + "name=" + name + "description=" + description + "startLink=" + startLink + "endLink=" + endLink + "pairs=" + pairs + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("startLink", startLink);
+        state.put("endLink", endLink);
+        state.put("pairs", pairs);
+        return state;
     }
 }

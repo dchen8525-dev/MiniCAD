@@ -1,27 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved SURFACE_STYLE_PARAMETER_LINES.
  */
-public final class StepSurfaceStyleParameterLines implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSurfaceStyleParameterLines extends AbstractStepEntity {
     private final StepEntity surfaceStyle;
 
     public StepSurfaceStyleParameterLines(int id, String name, StepEntity surfaceStyle) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.surfaceStyle = surfaceStyle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSurfaceStyle() {
@@ -29,20 +19,11 @@ public final class StepSurfaceStyleParameterLines implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceStyleParameterLines that = (StepSurfaceStyleParameterLines) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(surfaceStyle, that.surfaceStyle);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, surfaceStyle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceStyleParameterLines{" + "id=" + id + "name=" + name + "surfaceStyle=" + surfaceStyle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("surfaceStyle", surfaceStyle);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRAINING_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceProvider training variance provider
  * @varianceStatus training variance status
  */
-public final class StepTrainingRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTrainingRecord extends AbstractStepEntity {
     private final StepEntity trainee;
     private final String trainingType;
     private final String trainingTopic;
@@ -29,8 +28,7 @@ public final class StepTrainingRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepTrainingRecord(int id, String name, StepEntity trainee, String trainingType, String trainingTopic, StepEntity varianceDate, double varianceDuration, StepEntity varianceProvider, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.trainee = trainee;
         this.trainingType = trainingType;
         this.trainingTopic = trainingTopic;
@@ -38,14 +36,6 @@ public final class StepTrainingRecord implements StepEntity {
         this.varianceDuration = varianceDuration;
         this.varianceProvider = varianceProvider;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getTrainee() {
@@ -77,20 +67,17 @@ public final class StepTrainingRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTrainingRecord that = (StepTrainingRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(trainee, that.trainee) && Objects.equals(trainingType, that.trainingType) && Objects.equals(trainingTopic, that.trainingTopic) && Objects.equals(varianceDate, that.varianceDate) && varianceDuration == that.varianceDuration && Objects.equals(varianceProvider, that.varianceProvider) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, trainee, trainingType, trainingTopic, varianceDate, varianceDuration, varianceProvider, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTrainingRecord{" + "id=" + id + "name=" + name + "trainee=" + trainee + "trainingType=" + trainingType + "trainingTopic=" + trainingTopic + "varianceDate=" + varianceDate + "varianceDuration=" + varianceDuration + "varianceProvider=" + varianceProvider + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("trainee", trainee);
+        state.put("trainingType", trainingType);
+        state.put("trainingTopic", trainingTopic);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceDuration", varianceDuration);
+        state.put("varianceProvider", varianceProvider);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,23 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal NAME_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
  * @param assignedName assigned name
  */
-public final class StepNameAssignment implements StepEntity {
-    private final int id;
+public final class StepNameAssignment extends AbstractStepEntity {
     private final String assignedName;
 
     public StepNameAssignment(int id, String assignedName) {
-        this.id = id;
+        super(id, "");
         this.assignedName = assignedName;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getAssignedName() {
@@ -38,20 +35,10 @@ public final class StepNameAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNameAssignment that = (StepNameAssignment) o;
-        return id == that.id && Objects.equals(assignedName, that.assignedName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNameAssignment{" + "id=" + id + "assignedName=" + assignedName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedName", assignedName);
+        return state;
     }
 }

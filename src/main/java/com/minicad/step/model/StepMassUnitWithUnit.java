@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved MASS_UNIT_WITH_UNIT.
  */
-public final class StepMassUnitWithUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMassUnitWithUnit extends AbstractStepEntity {
     private final StepEntity massUnit;
     private final StepEntity unitComponent;
 
     public StepMassUnitWithUnit(int id, String name, StepEntity massUnit, StepEntity unitComponent) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.massUnit = massUnit;
         this.unitComponent = unitComponent;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMassUnit() {
@@ -35,20 +25,12 @@ public final class StepMassUnitWithUnit implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMassUnitWithUnit that = (StepMassUnitWithUnit) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(massUnit, that.massUnit) && Objects.equals(unitComponent, that.unitComponent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, massUnit, unitComponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMassUnitWithUnit{" + "id=" + id + "name=" + name + "massUnit=" + massUnit + "unitComponent=" + unitComponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("massUnit", massUnit);
+        state.put("unitComponent", unitComponent);
+        return state;
     }
 }

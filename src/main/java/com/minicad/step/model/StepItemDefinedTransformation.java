@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal item-defined transformation between two placement items.
  *
@@ -11,27 +12,16 @@ import java.util.Objects;
  * @param transformItem1 source placement item
  * @param transformItem2 target placement item
  */
-public final class StepItemDefinedTransformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepItemDefinedTransformation extends AbstractStepEntity {
     private final String description;
     private final StepAxis2Placement3D transformItem1;
     private final StepAxis2Placement3D transformItem2;
 
     public StepItemDefinedTransformation(int id, String name, String description, StepAxis2Placement3D transformItem1, StepAxis2Placement3D transformItem2) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.transformItem1 = transformItem1;
         this.transformItem2 = transformItem2;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -54,20 +44,13 @@ public final class StepItemDefinedTransformation implements StepEntity {
     public StepAxis2Placement3D transformItem2() { return getTransformItem2(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepItemDefinedTransformation that = (StepItemDefinedTransformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(transformItem1, that.transformItem1) && Objects.equals(transformItem2, that.transformItem2);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, transformItem1, transformItem2);
-    }
-
-    @Override
-    public String toString() {
-        return "StepItemDefinedTransformation{" + "id=" + id + "name=" + name + "description=" + description + "transformItem1=" + transformItem1 + "transformItem2=" + transformItem2 + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("transformItem1", transformItem1);
+        state.put("transformItem2", transformItem2);
+        return state;
     }
 }

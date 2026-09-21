@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal application protocol definition metadata.
  *
@@ -10,27 +12,18 @@ import java.util.Objects;
  * @param year protocol year
  * @param application application context
  */
-public final class StepApplicationProtocolDefinition implements StepEntity {
-    private final int id;
+public final class StepApplicationProtocolDefinition extends AbstractStepEntity {
     private final String status;
     private final String schemaName;
     private final int year;
     private final StepApplicationContext application;
 
     public StepApplicationProtocolDefinition(int id, String status, String schemaName, int year, StepApplicationContext application) {
-        this.id = id;
+        super(id, "");
         this.status = status;
         this.schemaName = schemaName;
         this.year = year;
         this.application = application;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public String getStatus() {
@@ -67,20 +60,13 @@ public final class StepApplicationProtocolDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepApplicationProtocolDefinition that = (StepApplicationProtocolDefinition) o;
-        return id == that.id && Objects.equals(status, that.status) && Objects.equals(schemaName, that.schemaName) && year == that.year && Objects.equals(application, that.application);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, status, schemaName, year, application);
-    }
-
-    @Override
-    public String toString() {
-        return "StepApplicationProtocolDefinition{" + "id=" + id + "status=" + status + "schemaName=" + schemaName + "year=" + year + "application=" + application + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("status", status);
+        state.put("schemaName", schemaName);
+        state.put("year", year);
+        state.put("application", application);
+        return state;
     }
 }

@@ -1,23 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DOCUMENT_TYPE metadata.
  *
  * @param id STEP instance id
  * @param productDataType document kind label
  */
-public final class StepDocumentType implements StepEntity {
-    private final int id;
+public final class StepDocumentType extends AbstractStepEntity {
     private final String productDataType;
 
     public StepDocumentType(int id, String productDataType) {
-        this.id = id;
+        super(id, "");
         this.productDataType = productDataType;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getProductDataType() {
@@ -38,20 +35,10 @@ public final class StepDocumentType implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDocumentType that = (StepDocumentType) o;
-        return id == that.id && Objects.equals(productDataType, that.productDataType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, productDataType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDocumentType{" + "id=" + id + "productDataType=" + productDataType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("productDataType", productDataType);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved HARDNESS_REPRESENTATION_ITEM.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param hardnessMethod hardness variance measurement method
  * @param hardnessStatus hardness variance status
  */
-public final class StepHardnessRepresentationItem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepHardnessRepresentationItem extends AbstractStepEntity {
     private final double hardnessValue;
     private final StepEntity hardnessUnit;
     private final String hardnessMethod;
     private final String hardnessStatus;
 
     public StepHardnessRepresentationItem(int id, String name, double hardnessValue, StepEntity hardnessUnit, String hardnessMethod, String hardnessStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.hardnessValue = hardnessValue;
         this.hardnessUnit = hardnessUnit;
         this.hardnessMethod = hardnessMethod;
         this.hardnessStatus = hardnessStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getHardnessValue() {
@@ -56,20 +46,14 @@ public final class StepHardnessRepresentationItem implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepHardnessRepresentationItem that = (StepHardnessRepresentationItem) o;
-        return id == that.id && Objects.equals(name, that.name) && hardnessValue == that.hardnessValue && Objects.equals(hardnessUnit, that.hardnessUnit) && Objects.equals(hardnessMethod, that.hardnessMethod) && Objects.equals(hardnessStatus, that.hardnessStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, hardnessValue, hardnessUnit, hardnessMethod, hardnessStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepHardnessRepresentationItem{" + "id=" + id + "name=" + name + "hardnessValue=" + hardnessValue + "hardnessUnit=" + hardnessUnit + "hardnessMethod=" + hardnessMethod + "hardnessStatus=" + hardnessStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("hardnessValue", hardnessValue);
+        state.put("hardnessUnit", hardnessUnit);
+        state.put("hardnessMethod", hardnessMethod);
+        state.put("hardnessStatus", hardnessStatus);
+        return state;
     }
 }

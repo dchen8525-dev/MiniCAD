@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PIECEWISE_BEZIER_CURVE_2D.
@@ -11,25 +12,14 @@ import java.util.Objects;
  * @param degree degree of the curve
  * @param controlPoints control points in 2D
  */
-public final class StepPiecewiseBezierCurve2D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPiecewiseBezierCurve2D extends AbstractStepEntity {
     private final int degree;
     private final List<StepCartesianPoint> controlPoints;
 
     public StepPiecewiseBezierCurve2D(int id, String name, int degree, List<StepCartesianPoint> controlPoints) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.degree = degree;
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public int getDegree() {
@@ -45,20 +35,12 @@ public final class StepPiecewiseBezierCurve2D implements StepEntity {
     public List<StepCartesianPoint> controlPoints() { return getControlPoints(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPiecewiseBezierCurve2D that = (StepPiecewiseBezierCurve2D) o;
-        return id == that.id && Objects.equals(name, that.name) && degree == that.degree && Objects.equals(controlPoints, that.controlPoints);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, degree, controlPoints);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPiecewiseBezierCurve2D{" + "id=" + id + "name=" + name + "degree=" + degree + "controlPoints=" + controlPoints + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("degree", degree);
+        state.put("controlPoints", controlPoints);
+        return state;
     }
 }

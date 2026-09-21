@@ -1,31 +1,22 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved KINEMATIC_FRAME_BASED_TRANSFORMATION.
  * A transformation defined by the relative positioning of kinematic frames.
  */
-public final class StepKinematicFrameBasedTransformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepKinematicFrameBasedTransformation extends AbstractStepEntity {
     private final String description;
     private final StepEntity sourceFrame;
     private final StepEntity targetFrame;
 
     public StepKinematicFrameBasedTransformation(int id, String name, String description, StepEntity sourceFrame, StepEntity targetFrame) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.sourceFrame = sourceFrame;
         this.targetFrame = targetFrame;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -41,20 +32,13 @@ public final class StepKinematicFrameBasedTransformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepKinematicFrameBasedTransformation that = (StepKinematicFrameBasedTransformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(sourceFrame, that.sourceFrame) && Objects.equals(targetFrame, that.targetFrame);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, sourceFrame, targetFrame);
-    }
-
-    @Override
-    public String toString() {
-        return "StepKinematicFrameBasedTransformation{" + "id=" + id + "name=" + name + "description=" + description + "sourceFrame=" + sourceFrame + "targetFrame=" + targetFrame + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("sourceFrame", sourceFrame);
+        state.put("targetFrame", targetFrame);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FREE_FORM_SURFACE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param knotVectors knot vectors for U and V
  * @param weights weight values for rational surfaces
  */
-public final class StepFreeFormSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFreeFormSurface extends AbstractStepEntity {
     private final String surfaceType;
     private final List<List<StepEntity>> controlPoints;
     private final int degreeU;
@@ -27,22 +26,13 @@ public final class StepFreeFormSurface implements StepEntity {
     private final List<Double> weights;
 
     public StepFreeFormSurface(int id, String name, String surfaceType, List<List<StepEntity>> controlPoints, int degreeU, int degreeV, List<Double> knotVectors, List<Double> weights) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.surfaceType = surfaceType;
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
         this.degreeU = degreeU;
         this.degreeV = degreeV;
         this.knotVectors = knotVectors == null ? null : java.util.List.copyOf(knotVectors);
         this.weights = weights == null ? null : java.util.List.copyOf(weights);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSurfaceType() {
@@ -76,20 +66,16 @@ public final class StepFreeFormSurface implements StepEntity {
     public List<Double> knotVectors() { return getKnotVectors(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFreeFormSurface that = (StepFreeFormSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(surfaceType, that.surfaceType) && Objects.equals(controlPoints, that.controlPoints) && degreeU == that.degreeU && degreeV == that.degreeV && Objects.equals(knotVectors, that.knotVectors) && Objects.equals(weights, that.weights);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, surfaceType, controlPoints, degreeU, degreeV, knotVectors, weights);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFreeFormSurface{" + "id=" + id + "name=" + name + "surfaceType=" + surfaceType + "controlPoints=" + controlPoints + "degreeU=" + degreeU + "degreeV=" + degreeV + "knotVectors=" + knotVectors + "weights=" + weights + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("surfaceType", surfaceType);
+        state.put("controlPoints", controlPoints);
+        state.put("degreeU", degreeU);
+        state.put("degreeV", degreeV);
+        state.put("knotVectors", knotVectors);
+        state.put("weights", weights);
+        return state;
     }
 }

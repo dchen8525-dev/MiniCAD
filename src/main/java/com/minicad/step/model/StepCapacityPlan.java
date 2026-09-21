@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CAPACITY_PLAN.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @variancePeriod planning variance period
  * @varianceStatus plan variance status
  */
-public final class StepCapacityPlan implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCapacityPlan extends AbstractStepEntity {
     private final List<StepEntity> varianceResources;
     private final List<Double> varianceCapacities;
     private final List<Double> varianceDemand;
@@ -27,22 +26,13 @@ public final class StepCapacityPlan implements StepEntity {
     private final String varianceStatus;
 
     public StepCapacityPlan(int id, String name, List<StepEntity> varianceResources, List<Double> varianceCapacities, List<Double> varianceDemand, List<Double> varianceUtilization, String variancePeriod, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceResources = varianceResources == null ? null : java.util.List.copyOf(varianceResources);
         this.varianceCapacities = varianceCapacities == null ? null : java.util.List.copyOf(varianceCapacities);
         this.varianceDemand = varianceDemand == null ? null : java.util.List.copyOf(varianceDemand);
         this.varianceUtilization = varianceUtilization == null ? null : java.util.List.copyOf(varianceUtilization);
         this.variancePeriod = variancePeriod;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getVarianceResources() {
@@ -70,20 +60,16 @@ public final class StepCapacityPlan implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCapacityPlan that = (StepCapacityPlan) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceResources, that.varianceResources) && Objects.equals(varianceCapacities, that.varianceCapacities) && Objects.equals(varianceDemand, that.varianceDemand) && Objects.equals(varianceUtilization, that.varianceUtilization) && Objects.equals(variancePeriod, that.variancePeriod) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceResources, varianceCapacities, varianceDemand, varianceUtilization, variancePeriod, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCapacityPlan{" + "id=" + id + "name=" + name + "varianceResources=" + varianceResources + "varianceCapacities=" + varianceCapacities + "varianceDemand=" + varianceDemand + "varianceUtilization=" + varianceUtilization + "variancePeriod=" + variancePeriod + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceResources", varianceResources);
+        state.put("varianceCapacities", varianceCapacities);
+        state.put("varianceDemand", varianceDemand);
+        state.put("varianceUtilization", varianceUtilization);
+        state.put("variancePeriod", variancePeriod);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

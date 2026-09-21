@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRANSFORMATION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param transformationParameters transformation variance parameters
  * @param transformationStatus transformation variance status
  */
-public final class StepTransformationDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTransformationDefinition extends AbstractStepEntity {
     private final String transformationType;
     private final String transformationInput;
     private final String transformationOutput;
@@ -25,21 +24,12 @@ public final class StepTransformationDefinition implements StepEntity {
     private final String transformationStatus;
 
     public StepTransformationDefinition(int id, String name, String transformationType, String transformationInput, String transformationOutput, List<String> transformationParameters, String transformationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.transformationType = transformationType;
         this.transformationInput = transformationInput;
         this.transformationOutput = transformationOutput;
         this.transformationParameters = transformationParameters == null ? null : java.util.List.copyOf(transformationParameters);
         this.transformationStatus = transformationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTransformationType() {
@@ -63,20 +53,15 @@ public final class StepTransformationDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTransformationDefinition that = (StepTransformationDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(transformationType, that.transformationType) && Objects.equals(transformationInput, that.transformationInput) && Objects.equals(transformationOutput, that.transformationOutput) && Objects.equals(transformationParameters, that.transformationParameters) && Objects.equals(transformationStatus, that.transformationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, transformationType, transformationInput, transformationOutput, transformationParameters, transformationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTransformationDefinition{" + "id=" + id + "name=" + name + "transformationType=" + transformationType + "transformationInput=" + transformationInput + "transformationOutput=" + transformationOutput + "transformationParameters=" + transformationParameters + "transformationStatus=" + transformationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("transformationType", transformationType);
+        state.put("transformationInput", transformationInput);
+        state.put("transformationOutput", transformationOutput);
+        state.put("transformationParameters", transformationParameters);
+        state.put("transformationStatus", transformationStatus);
+        return state;
     }
 }

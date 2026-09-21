@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LIBRARY_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param libraryLoaded library variance loaded flag
  * @param libraryStatus library variance status
  */
-public final class StepLibraryInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLibraryInstance extends AbstractStepEntity {
     private final StepEntity libraryDefinition;
     private final String libraryState;
     private final String libraryVersion;
@@ -25,21 +24,12 @@ public final class StepLibraryInstance implements StepEntity {
     private final String libraryStatus;
 
     public StepLibraryInstance(int id, String name, StepEntity libraryDefinition, String libraryState, String libraryVersion, boolean libraryLoaded, String libraryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.libraryDefinition = libraryDefinition;
         this.libraryState = libraryState;
         this.libraryVersion = libraryVersion;
         this.libraryLoaded = libraryLoaded;
         this.libraryStatus = libraryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getLibraryDefinition() {
@@ -63,20 +53,15 @@ public final class StepLibraryInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLibraryInstance that = (StepLibraryInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(libraryDefinition, that.libraryDefinition) && Objects.equals(libraryState, that.libraryState) && Objects.equals(libraryVersion, that.libraryVersion) && libraryLoaded == that.libraryLoaded && Objects.equals(libraryStatus, that.libraryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, libraryDefinition, libraryState, libraryVersion, libraryLoaded, libraryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLibraryInstance{" + "id=" + id + "name=" + name + "libraryDefinition=" + libraryDefinition + "libraryState=" + libraryState + "libraryVersion=" + libraryVersion + "libraryLoaded=" + libraryLoaded + "libraryStatus=" + libraryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("libraryDefinition", libraryDefinition);
+        state.put("libraryState", libraryState);
+        state.put("libraryVersion", libraryVersion);
+        state.put("libraryLoaded", libraryLoaded);
+        state.put("libraryStatus", libraryStatus);
+        return state;
     }
 }

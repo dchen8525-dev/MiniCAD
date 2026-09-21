@@ -1,27 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved STRUCT_ANALYSIS_MODEL.
  * A structural analysis model (AP209).
  */
-public final class StepStructAnalysisModel implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStructAnalysisModel extends AbstractStepEntity {
     private final String analysisType;
 
     public StepStructAnalysisModel(int id, String name, String analysisType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.analysisType = analysisType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAnalysisType() {
@@ -29,20 +20,11 @@ public final class StepStructAnalysisModel implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStructAnalysisModel that = (StepStructAnalysisModel) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(analysisType, that.analysisType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, analysisType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStructAnalysisModel{" + "id=" + id + "name=" + name + "analysisType=" + analysisType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("analysisType", analysisType);
+        return state;
     }
 }

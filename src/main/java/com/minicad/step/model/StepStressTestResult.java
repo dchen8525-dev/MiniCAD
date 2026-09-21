@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STRESS_TEST_RESULT.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param testPass test variance pass/fail status
  * @param testStatus test variance status
  */
-public final class StepStressTestResult implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStressTestResult extends AbstractStepEntity {
     private final String testType;
     private final double testValue;
     private final StepEntity testUnit;
@@ -27,22 +26,13 @@ public final class StepStressTestResult implements StepEntity {
     private final String testStatus;
 
     public StepStressTestResult(int id, String name, String testType, double testValue, StepEntity testUnit, double testLimit, boolean testPass, String testStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.testType = testType;
         this.testValue = testValue;
         this.testUnit = testUnit;
         this.testLimit = testLimit;
         this.testPass = testPass;
         this.testStatus = testStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTestType() {
@@ -70,20 +60,16 @@ public final class StepStressTestResult implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStressTestResult that = (StepStressTestResult) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(testType, that.testType) && testValue == that.testValue && Objects.equals(testUnit, that.testUnit) && testLimit == that.testLimit && testPass == that.testPass && Objects.equals(testStatus, that.testStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, testType, testValue, testUnit, testLimit, testPass, testStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStressTestResult{" + "id=" + id + "name=" + name + "testType=" + testType + "testValue=" + testValue + "testUnit=" + testUnit + "testLimit=" + testLimit + "testPass=" + testPass + "testStatus=" + testStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("testType", testType);
+        state.put("testValue", testValue);
+        state.put("testUnit", testUnit);
+        state.put("testLimit", testLimit);
+        state.put("testPass", testPass);
+        state.put("testStatus", testStatus);
+        return state;
     }
 }

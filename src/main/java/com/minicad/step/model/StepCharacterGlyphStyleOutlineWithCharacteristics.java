@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CHARACTER_GLYPH_STYLE_OUTLINE_WITH_CHARACTERISTICS.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param outlineStyle referenced curve style
  * @param characteristics referenced fill area style
  */
-public final class StepCharacterGlyphStyleOutlineWithCharacteristics implements StepEntity {
-    private final int id;
+public final class StepCharacterGlyphStyleOutlineWithCharacteristics extends AbstractStepEntity {
     private final StepCurveStyle outlineStyle;
     private final StepFillAreaStyle characteristics;
 
     public StepCharacterGlyphStyleOutlineWithCharacteristics(int id, StepCurveStyle outlineStyle, StepFillAreaStyle characteristics) {
-        this.id = id;
+        super(id, "");
         this.outlineStyle = outlineStyle;
         this.characteristics = characteristics;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepCurveStyle getOutlineStyle() {
@@ -45,20 +38,11 @@ public final class StepCharacterGlyphStyleOutlineWithCharacteristics implements 
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCharacterGlyphStyleOutlineWithCharacteristics that = (StepCharacterGlyphStyleOutlineWithCharacteristics) o;
-        return id == that.id && Objects.equals(outlineStyle, that.outlineStyle) && Objects.equals(characteristics, that.characteristics);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, outlineStyle, characteristics);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCharacterGlyphStyleOutlineWithCharacteristics{" + "id=" + id + "outlineStyle=" + outlineStyle + "characteristics=" + characteristics + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("outlineStyle", outlineStyle);
+        state.put("characteristics", characteristics);
+        return state;
     }
 }

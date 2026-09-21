@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COATING_SPECIFICATION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param specificationRequirements specification variance requirements
  * @param specificationStatus specification variance status
  */
-public final class StepCoatingSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCoatingSpecification extends AbstractStepEntity {
     private final String specificationType;
     private final String specificationDescription;
     private final List<String> specificationRequirements;
     private final String specificationStatus;
 
     public StepCoatingSpecification(int id, String name, String specificationType, String specificationDescription, List<String> specificationRequirements, String specificationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.specificationType = specificationType;
         this.specificationDescription = specificationDescription;
         this.specificationRequirements = specificationRequirements == null ? null : java.util.List.copyOf(specificationRequirements);
         this.specificationStatus = specificationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSpecificationType() {
@@ -56,20 +46,14 @@ public final class StepCoatingSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCoatingSpecification that = (StepCoatingSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(specificationType, that.specificationType) && Objects.equals(specificationDescription, that.specificationDescription) && Objects.equals(specificationRequirements, that.specificationRequirements) && Objects.equals(specificationStatus, that.specificationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, specificationType, specificationDescription, specificationRequirements, specificationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCoatingSpecification{" + "id=" + id + "name=" + name + "specificationType=" + specificationType + "specificationDescription=" + specificationDescription + "specificationRequirements=" + specificationRequirements + "specificationStatus=" + specificationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("specificationType", specificationType);
+        state.put("specificationDescription", specificationDescription);
+        state.put("specificationRequirements", specificationRequirements);
+        state.put("specificationStatus", specificationStatus);
+        return state;
     }
 }

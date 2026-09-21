@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DELAY_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param delayAction delay variance action after delay
  * @param delayStatus delay variance status
  */
-public final class StepDelayDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDelayDefinition extends AbstractStepEntity {
     private final String delayType;
     private final int delayDuration;
     private final String delayCondition;
@@ -25,21 +24,12 @@ public final class StepDelayDefinition implements StepEntity {
     private final String delayStatus;
 
     public StepDelayDefinition(int id, String name, String delayType, int delayDuration, String delayCondition, StepEntity delayAction, String delayStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.delayType = delayType;
         this.delayDuration = delayDuration;
         this.delayCondition = delayCondition;
         this.delayAction = delayAction;
         this.delayStatus = delayStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDelayType() {
@@ -63,20 +53,15 @@ public final class StepDelayDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDelayDefinition that = (StepDelayDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(delayType, that.delayType) && delayDuration == that.delayDuration && Objects.equals(delayCondition, that.delayCondition) && Objects.equals(delayAction, that.delayAction) && Objects.equals(delayStatus, that.delayStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, delayType, delayDuration, delayCondition, delayAction, delayStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDelayDefinition{" + "id=" + id + "name=" + name + "delayType=" + delayType + "delayDuration=" + delayDuration + "delayCondition=" + delayCondition + "delayAction=" + delayAction + "delayStatus=" + delayStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("delayType", delayType);
+        state.put("delayDuration", delayDuration);
+        state.put("delayCondition", delayCondition);
+        state.put("delayAction", delayAction);
+        state.put("delayStatus", delayStatus);
+        return state;
     }
 }

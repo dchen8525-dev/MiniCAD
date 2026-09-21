@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FUNCTION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param functionOutputs function variance outputs
  * @param functionStatus function variance status
  */
-public final class StepFunctionDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFunctionDefinition extends AbstractStepEntity {
     private final String functionType;
     private final String functionDescription;
     private final List<String> functionInputs;
@@ -25,21 +24,12 @@ public final class StepFunctionDefinition implements StepEntity {
     private final String functionStatus;
 
     public StepFunctionDefinition(int id, String name, String functionType, String functionDescription, List<String> functionInputs, List<String> functionOutputs, String functionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.functionType = functionType;
         this.functionDescription = functionDescription;
         this.functionInputs = functionInputs == null ? null : java.util.List.copyOf(functionInputs);
         this.functionOutputs = functionOutputs == null ? null : java.util.List.copyOf(functionOutputs);
         this.functionStatus = functionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFunctionType() {
@@ -63,20 +53,15 @@ public final class StepFunctionDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFunctionDefinition that = (StepFunctionDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(functionType, that.functionType) && Objects.equals(functionDescription, that.functionDescription) && Objects.equals(functionInputs, that.functionInputs) && Objects.equals(functionOutputs, that.functionOutputs) && Objects.equals(functionStatus, that.functionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, functionType, functionDescription, functionInputs, functionOutputs, functionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFunctionDefinition{" + "id=" + id + "name=" + name + "functionType=" + functionType + "functionDescription=" + functionDescription + "functionInputs=" + functionInputs + "functionOutputs=" + functionOutputs + "functionStatus=" + functionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("functionType", functionType);
+        state.put("functionDescription", functionDescription);
+        state.put("functionInputs", functionInputs);
+        state.put("functionOutputs", functionOutputs);
+        state.put("functionStatus", functionStatus);
+        return state;
     }
 }

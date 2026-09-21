@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved HEAT_AFFECTED_ZONE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param hardnessChange hardness change in HAZ
  * @param microstructureChange microstructure change description
  */
-public final class StepHeatAffectedZone implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepHeatAffectedZone extends AbstractStepEntity {
     private final StepEntity zoneGeometry;
     private final StepEntity affectedMaterial;
     private final double zoneWidth;
@@ -25,21 +24,12 @@ public final class StepHeatAffectedZone implements StepEntity {
     private final String microstructureChange;
 
     public StepHeatAffectedZone(int id, String name, StepEntity zoneGeometry, StepEntity affectedMaterial, double zoneWidth, double hardnessChange, String microstructureChange) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.zoneGeometry = zoneGeometry;
         this.affectedMaterial = affectedMaterial;
         this.zoneWidth = zoneWidth;
         this.hardnessChange = hardnessChange;
         this.microstructureChange = microstructureChange;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getZoneGeometry() {
@@ -63,20 +53,15 @@ public final class StepHeatAffectedZone implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepHeatAffectedZone that = (StepHeatAffectedZone) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(zoneGeometry, that.zoneGeometry) && Objects.equals(affectedMaterial, that.affectedMaterial) && zoneWidth == that.zoneWidth && hardnessChange == that.hardnessChange && Objects.equals(microstructureChange, that.microstructureChange);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, zoneGeometry, affectedMaterial, zoneWidth, hardnessChange, microstructureChange);
-    }
-
-    @Override
-    public String toString() {
-        return "StepHeatAffectedZone{" + "id=" + id + "name=" + name + "zoneGeometry=" + zoneGeometry + "affectedMaterial=" + affectedMaterial + "zoneWidth=" + zoneWidth + "hardnessChange=" + hardnessChange + "microstructureChange=" + microstructureChange + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("zoneGeometry", zoneGeometry);
+        state.put("affectedMaterial", affectedMaterial);
+        state.put("zoneWidth", zoneWidth);
+        state.put("hardnessChange", hardnessChange);
+        state.put("microstructureChange", microstructureChange);
+        return state;
     }
 }

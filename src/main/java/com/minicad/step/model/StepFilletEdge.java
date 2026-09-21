@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FILLET_EDGE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param adjacentFaces adjacent faces for fillet
  * @param filletType fillet type classification (constant, variable)
  */
-public final class StepFilletEdge implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFilletEdge extends AbstractStepEntity {
     private final StepEntity originalEdge;
     private final double filletRadius;
     private final List<StepEntity> adjacentFaces;
     private final String filletType;
 
     public StepFilletEdge(int id, String name, StepEntity originalEdge, double filletRadius, List<StepEntity> adjacentFaces, String filletType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.originalEdge = originalEdge;
         this.filletRadius = filletRadius;
         this.adjacentFaces = adjacentFaces == null ? null : java.util.List.copyOf(adjacentFaces);
         this.filletType = filletType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getOriginalEdge() {
@@ -64,20 +54,14 @@ public final class StepFilletEdge implements StepEntity {
     public String filletType() { return getFilletType(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFilletEdge that = (StepFilletEdge) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(originalEdge, that.originalEdge) && filletRadius == that.filletRadius && Objects.equals(adjacentFaces, that.adjacentFaces) && Objects.equals(filletType, that.filletType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, originalEdge, filletRadius, adjacentFaces, filletType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFilletEdge{" + "id=" + id + "name=" + name + "originalEdge=" + originalEdge + "filletRadius=" + filletRadius + "adjacentFaces=" + adjacentFaces + "filletType=" + filletType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("originalEdge", originalEdge);
+        state.put("filletRadius", filletRadius);
+        state.put("adjacentFaces", adjacentFaces);
+        state.put("filletType", filletType);
+        return state;
     }
 }

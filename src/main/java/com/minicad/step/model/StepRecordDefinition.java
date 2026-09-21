@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RECORD_DEFINITION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param recordKey record variance key fields
  * @param recordStatus record variance status
  */
-public final class StepRecordDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRecordDefinition extends AbstractStepEntity {
     private final String recordType;
     private final List<String> recordFields;
     private final List<String> recordKey;
     private final String recordStatus;
 
     public StepRecordDefinition(int id, String name, String recordType, List<String> recordFields, List<String> recordKey, String recordStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.recordType = recordType;
         this.recordFields = recordFields == null ? null : java.util.List.copyOf(recordFields);
         this.recordKey = recordKey == null ? null : java.util.List.copyOf(recordKey);
         this.recordStatus = recordStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getRecordType() {
@@ -56,20 +46,14 @@ public final class StepRecordDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRecordDefinition that = (StepRecordDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(recordType, that.recordType) && Objects.equals(recordFields, that.recordFields) && Objects.equals(recordKey, that.recordKey) && Objects.equals(recordStatus, that.recordStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, recordType, recordFields, recordKey, recordStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRecordDefinition{" + "id=" + id + "name=" + name + "recordType=" + recordType + "recordFields=" + recordFields + "recordKey=" + recordKey + "recordStatus=" + recordStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("recordType", recordType);
+        state.put("recordFields", recordFields);
+        state.put("recordKey", recordKey);
+        state.put("recordStatus", recordStatus);
+        return state;
     }
 }

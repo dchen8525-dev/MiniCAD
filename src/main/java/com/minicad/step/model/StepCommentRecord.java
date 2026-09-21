@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMMENT_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param commentTimestamp comment variance timestamp
  * @param commentStatus comment variance status
  */
-public final class StepCommentRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCommentRecord extends AbstractStepEntity {
     private final String commentType;
     private final String commentText;
     private final StepEntity commentTarget;
@@ -27,22 +26,13 @@ public final class StepCommentRecord implements StepEntity {
     private final String commentStatus;
 
     public StepCommentRecord(int id, String name, String commentType, String commentText, StepEntity commentTarget, StepEntity commentAuthor, StepEntity commentTimestamp, String commentStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.commentType = commentType;
         this.commentText = commentText;
         this.commentTarget = commentTarget;
         this.commentAuthor = commentAuthor;
         this.commentTimestamp = commentTimestamp;
         this.commentStatus = commentStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCommentType() {
@@ -70,20 +60,16 @@ public final class StepCommentRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCommentRecord that = (StepCommentRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(commentType, that.commentType) && Objects.equals(commentText, that.commentText) && Objects.equals(commentTarget, that.commentTarget) && Objects.equals(commentAuthor, that.commentAuthor) && Objects.equals(commentTimestamp, that.commentTimestamp) && Objects.equals(commentStatus, that.commentStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, commentType, commentText, commentTarget, commentAuthor, commentTimestamp, commentStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCommentRecord{" + "id=" + id + "name=" + name + "commentType=" + commentType + "commentText=" + commentText + "commentTarget=" + commentTarget + "commentAuthor=" + commentAuthor + "commentTimestamp=" + commentTimestamp + "commentStatus=" + commentStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("commentType", commentType);
+        state.put("commentText", commentText);
+        state.put("commentTarget", commentTarget);
+        state.put("commentAuthor", commentAuthor);
+        state.put("commentTimestamp", commentTimestamp);
+        state.put("commentStatus", commentStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BLENDED_SURFACE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param blendRadius blend radius
  * @param blendCurve blend curve defining the blend path
  */
-public final class StepBlendedSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBlendedSurface extends AbstractStepEntity {
     private final String blendingType;
     private final StepEntity primarySurface;
     private final StepEntity secondarySurface;
@@ -25,21 +24,12 @@ public final class StepBlendedSurface implements StepEntity {
     private final StepEntity blendCurve;
 
     public StepBlendedSurface(int id, String name, String blendingType, StepEntity primarySurface, StepEntity secondarySurface, double blendRadius, StepEntity blendCurve) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.blendingType = blendingType;
         this.primarySurface = primarySurface;
         this.secondarySurface = secondarySurface;
         this.blendRadius = blendRadius;
         this.blendCurve = blendCurve;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getBlendingType() {
@@ -67,20 +57,15 @@ public final class StepBlendedSurface implements StepEntity {
     public StepEntity secondarySurface() { return getSecondarySurface(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBlendedSurface that = (StepBlendedSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(blendingType, that.blendingType) && Objects.equals(primarySurface, that.primarySurface) && Objects.equals(secondarySurface, that.secondarySurface) && blendRadius == that.blendRadius && Objects.equals(blendCurve, that.blendCurve);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, blendingType, primarySurface, secondarySurface, blendRadius, blendCurve);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBlendedSurface{" + "id=" + id + "name=" + name + "blendingType=" + blendingType + "primarySurface=" + primarySurface + "secondarySurface=" + secondarySurface + "blendRadius=" + blendRadius + "blendCurve=" + blendCurve + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("blendingType", blendingType);
+        state.put("primarySurface", primarySurface);
+        state.put("secondarySurface", secondarySurface);
+        state.put("blendRadius", blendRadius);
+        state.put("blendCurve", blendCurve);
+        return state;
     }
 }

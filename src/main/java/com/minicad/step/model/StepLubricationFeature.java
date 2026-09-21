@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LUBRICATION_FEATURE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param lubricationInterval lubrication interval/frequency
  * @param lubricantType lubricant type specification
  */
-public final class StepLubricationFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLubricationFeature extends AbstractStepEntity {
     private final String lubricationType;
     private final List<StepEntity> lubricationPoints;
     private final String lubricationMethod;
@@ -25,21 +24,12 @@ public final class StepLubricationFeature implements StepEntity {
     private final String lubricantType;
 
     public StepLubricationFeature(int id, String name, String lubricationType, List<StepEntity> lubricationPoints, String lubricationMethod, String lubricationInterval, String lubricantType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.lubricationType = lubricationType;
         this.lubricationPoints = lubricationPoints == null ? null : java.util.List.copyOf(lubricationPoints);
         this.lubricationMethod = lubricationMethod;
         this.lubricationInterval = lubricationInterval;
         this.lubricantType = lubricantType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLubricationType() {
@@ -63,20 +53,15 @@ public final class StepLubricationFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLubricationFeature that = (StepLubricationFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(lubricationType, that.lubricationType) && Objects.equals(lubricationPoints, that.lubricationPoints) && Objects.equals(lubricationMethod, that.lubricationMethod) && Objects.equals(lubricationInterval, that.lubricationInterval) && Objects.equals(lubricantType, that.lubricantType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, lubricationType, lubricationPoints, lubricationMethod, lubricationInterval, lubricantType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLubricationFeature{" + "id=" + id + "name=" + name + "lubricationType=" + lubricationType + "lubricationPoints=" + lubricationPoints + "lubricationMethod=" + lubricationMethod + "lubricationInterval=" + lubricationInterval + "lubricantType=" + lubricantType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("lubricationType", lubricationType);
+        state.put("lubricationPoints", lubricationPoints);
+        state.put("lubricationMethod", lubricationMethod);
+        state.put("lubricationInterval", lubricationInterval);
+        state.put("lubricantType", lubricantType);
+        return state;
     }
 }

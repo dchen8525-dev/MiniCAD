@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved NOTIFICATION_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param notificationDelivered notification variance delivered flag
  * @param notificationStatus notification variance status
  */
-public final class StepNotificationRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepNotificationRecord extends AbstractStepEntity {
     private final String notificationType;
     private final StepEntity notificationSender;
     private final StepEntity notificationReceiver;
@@ -29,8 +28,7 @@ public final class StepNotificationRecord implements StepEntity {
     private final String notificationStatus;
 
     public StepNotificationRecord(int id, String name, String notificationType, StepEntity notificationSender, StepEntity notificationReceiver, StepEntity notificationTime, String notificationContent, boolean notificationDelivered, String notificationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.notificationType = notificationType;
         this.notificationSender = notificationSender;
         this.notificationReceiver = notificationReceiver;
@@ -38,14 +36,6 @@ public final class StepNotificationRecord implements StepEntity {
         this.notificationContent = notificationContent;
         this.notificationDelivered = notificationDelivered;
         this.notificationStatus = notificationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getNotificationType() {
@@ -77,20 +67,17 @@ public final class StepNotificationRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNotificationRecord that = (StepNotificationRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(notificationType, that.notificationType) && Objects.equals(notificationSender, that.notificationSender) && Objects.equals(notificationReceiver, that.notificationReceiver) && Objects.equals(notificationTime, that.notificationTime) && Objects.equals(notificationContent, that.notificationContent) && notificationDelivered == that.notificationDelivered && Objects.equals(notificationStatus, that.notificationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, notificationType, notificationSender, notificationReceiver, notificationTime, notificationContent, notificationDelivered, notificationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNotificationRecord{" + "id=" + id + "name=" + name + "notificationType=" + notificationType + "notificationSender=" + notificationSender + "notificationReceiver=" + notificationReceiver + "notificationTime=" + notificationTime + "notificationContent=" + notificationContent + "notificationDelivered=" + notificationDelivered + "notificationStatus=" + notificationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("notificationType", notificationType);
+        state.put("notificationSender", notificationSender);
+        state.put("notificationReceiver", notificationReceiver);
+        state.put("notificationTime", notificationTime);
+        state.put("notificationContent", notificationContent);
+        state.put("notificationDelivered", notificationDelivered);
+        state.put("notificationStatus", notificationStatus);
+        return state;
     }
 }

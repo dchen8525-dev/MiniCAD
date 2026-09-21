@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved NOTIFICATION_SPECIFICATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceFormat notification variance format
  * @varianceStatus specification variance status
  */
-public final class StepNotificationSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepNotificationSpecification extends AbstractStepEntity {
     private final List<String> varianceEvents;
     private final List<StepEntity> varianceRecipients;
     private final String varianceMethod;
@@ -27,22 +26,13 @@ public final class StepNotificationSpecification implements StepEntity {
     private final String varianceStatus;
 
     public StepNotificationSpecification(int id, String name, List<String> varianceEvents, List<StepEntity> varianceRecipients, String varianceMethod, int variancePriority, String varianceFormat, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceEvents = varianceEvents == null ? null : java.util.List.copyOf(varianceEvents);
         this.varianceRecipients = varianceRecipients == null ? null : java.util.List.copyOf(varianceRecipients);
         this.varianceMethod = varianceMethod;
         this.variancePriority = variancePriority;
         this.varianceFormat = varianceFormat;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<String> getVarianceEvents() {
@@ -70,20 +60,16 @@ public final class StepNotificationSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNotificationSpecification that = (StepNotificationSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceEvents, that.varianceEvents) && Objects.equals(varianceRecipients, that.varianceRecipients) && Objects.equals(varianceMethod, that.varianceMethod) && variancePriority == that.variancePriority && Objects.equals(varianceFormat, that.varianceFormat) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceEvents, varianceRecipients, varianceMethod, variancePriority, varianceFormat, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNotificationSpecification{" + "id=" + id + "name=" + name + "varianceEvents=" + varianceEvents + "varianceRecipients=" + varianceRecipients + "varianceMethod=" + varianceMethod + "variancePriority=" + variancePriority + "varianceFormat=" + varianceFormat + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceEvents", varianceEvents);
+        state.put("varianceRecipients", varianceRecipients);
+        state.put("varianceMethod", varianceMethod);
+        state.put("variancePriority", variancePriority);
+        state.put("varianceFormat", varianceFormat);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

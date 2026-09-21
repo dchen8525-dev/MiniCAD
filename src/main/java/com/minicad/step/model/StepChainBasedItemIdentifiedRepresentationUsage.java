@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal chain-based item identified representation usage.
@@ -15,9 +15,7 @@ import java.util.Objects;
  * @param undirectedLinks chain links
  * @param identifiedItem identified item reference
  */
-public final class StepChainBasedItemIdentifiedRepresentationUsage implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepChainBasedItemIdentifiedRepresentationUsage extends AbstractStepEntity {
     private final String description;
     private final StepEntity definition;
     private final List<StepRepresentation> nodes;
@@ -25,21 +23,12 @@ public final class StepChainBasedItemIdentifiedRepresentationUsage implements St
     private final StepEntity identifiedItem;
 
     public StepChainBasedItemIdentifiedRepresentationUsage(int id, String name, String description, StepEntity definition, List<StepRepresentation> nodes, List<StepRepresentationRelationship> undirectedLinks, StepEntity identifiedItem) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.definition = definition;
         this.nodes = nodes == null ? null : java.util.List.copyOf(nodes);
         this.undirectedLinks = undirectedLinks == null ? null : java.util.List.copyOf(undirectedLinks);
         this.identifiedItem = identifiedItem;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -64,7 +53,7 @@ public final class StepChainBasedItemIdentifiedRepresentationUsage implements St
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public String description() {
@@ -108,20 +97,15 @@ public final class StepChainBasedItemIdentifiedRepresentationUsage implements St
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepChainBasedItemIdentifiedRepresentationUsage that = (StepChainBasedItemIdentifiedRepresentationUsage) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(definition, that.definition) && Objects.equals(nodes, that.nodes) && Objects.equals(undirectedLinks, that.undirectedLinks) && Objects.equals(identifiedItem, that.identifiedItem);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, definition, nodes, undirectedLinks, identifiedItem);
-    }
-
-    @Override
-    public String toString() {
-        return "StepChainBasedItemIdentifiedRepresentationUsage{" + "id=" + id + "name=" + name + "description=" + description + "definition=" + definition + "nodes=" + nodes + "undirectedLinks=" + undirectedLinks + "identifiedItem=" + identifiedItem + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("definition", definition);
+        state.put("nodes", nodes);
+        state.put("undirectedLinks", undirectedLinks);
+        state.put("identifiedItem", identifiedItem);
+        return state;
     }
 }

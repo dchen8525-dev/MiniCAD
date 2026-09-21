@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal externally defined item metadata.
  *
@@ -10,21 +11,16 @@ import java.util.Objects;
  * @param source external source
  * @param entityName concrete STEP entity name
  */
-public final class StepExternallyDefinedItem implements StepEntity {
-    private final int id;
+public final class StepExternallyDefinedItem extends AbstractStepEntity {
     private final String itemId;
     private final StepExternalSource source;
     private final String entityName;
 
     public StepExternallyDefinedItem(int id, String itemId, StepExternalSource source, String entityName) {
-        this.id = id;
+        super(id, "");
         this.itemId = itemId;
         this.source = source;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {
@@ -53,20 +49,12 @@ public final class StepExternallyDefinedItem implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepExternallyDefinedItem that = (StepExternallyDefinedItem) o;
-        return id == that.id && Objects.equals(itemId, that.itemId) && Objects.equals(source, that.source) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, itemId, source, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepExternallyDefinedItem{" + "id=" + id + "itemId=" + itemId + "source=" + source + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("itemId", itemId);
+        state.put("source", source);
+        state.put("entityName", entityName);
+        return state;
     }
 }

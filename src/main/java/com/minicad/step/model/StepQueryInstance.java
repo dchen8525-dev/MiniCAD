@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved QUERY_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param queryExecutionTime query variance execution time
  * @param queryStatus query variance status
  */
-public final class StepQueryInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepQueryInstance extends AbstractStepEntity {
     private final StepEntity queryDefinition;
     private final String queryState;
     private final List<String> queryParameters;
@@ -27,22 +26,13 @@ public final class StepQueryInstance implements StepEntity {
     private final String queryStatus;
 
     public StepQueryInstance(int id, String name, StepEntity queryDefinition, String queryState, List<String> queryParameters, int queryResult, double queryExecutionTime, String queryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.queryDefinition = queryDefinition;
         this.queryState = queryState;
         this.queryParameters = queryParameters == null ? null : java.util.List.copyOf(queryParameters);
         this.queryResult = queryResult;
         this.queryExecutionTime = queryExecutionTime;
         this.queryStatus = queryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getQueryDefinition() {
@@ -70,20 +60,16 @@ public final class StepQueryInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepQueryInstance that = (StepQueryInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(queryDefinition, that.queryDefinition) && Objects.equals(queryState, that.queryState) && Objects.equals(queryParameters, that.queryParameters) && queryResult == that.queryResult && queryExecutionTime == that.queryExecutionTime && Objects.equals(queryStatus, that.queryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, queryDefinition, queryState, queryParameters, queryResult, queryExecutionTime, queryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepQueryInstance{" + "id=" + id + "name=" + name + "queryDefinition=" + queryDefinition + "queryState=" + queryState + "queryParameters=" + queryParameters + "queryResult=" + queryResult + "queryExecutionTime=" + queryExecutionTime + "queryStatus=" + queryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("queryDefinition", queryDefinition);
+        state.put("queryState", queryState);
+        state.put("queryParameters", queryParameters);
+        state.put("queryResult", queryResult);
+        state.put("queryExecutionTime", queryExecutionTime);
+        state.put("queryStatus", queryStatus);
+        return state;
     }
 }

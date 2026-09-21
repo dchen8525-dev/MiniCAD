@@ -1,27 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved PRE_DEFINED_SURFACE_STYLE.
  */
-public final class StepPreDefinedSurfaceStyle implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPreDefinedSurfaceStyle extends AbstractStepEntity {
     private final String identifier;
 
     public StepPreDefinedSurfaceStyle(int id, String name, String identifier) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.identifier = identifier;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getIdentifier() {
@@ -30,7 +20,7 @@ public final class StepPreDefinedSurfaceStyle implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public String identifier() {
@@ -38,20 +28,11 @@ public final class StepPreDefinedSurfaceStyle implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPreDefinedSurfaceStyle that = (StepPreDefinedSurfaceStyle) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(identifier, that.identifier);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, identifier);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPreDefinedSurfaceStyle{" + "id=" + id + "name=" + name + "identifier=" + identifier + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("identifier", identifier);
+        return state;
     }
 }

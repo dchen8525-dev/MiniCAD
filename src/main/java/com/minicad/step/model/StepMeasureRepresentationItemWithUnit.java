@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved MEASURE_REPRESENTATION_ITEM_WITH_UNIT.
  * A measure with unit as a representation item.
@@ -10,25 +12,14 @@ import java.util.Objects;
  * @param measureValue measure value
  * @param unit unit reference
  */
-public final class StepMeasureRepresentationItemWithUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMeasureRepresentationItemWithUnit extends AbstractStepEntity {
     private final double measureValue;
     private final StepEntity unit;
 
     public StepMeasureRepresentationItemWithUnit(int id, String name, double measureValue, StepEntity unit) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.measureValue = measureValue;
         this.unit = unit;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getMeasureValue() {
@@ -40,20 +31,12 @@ public final class StepMeasureRepresentationItemWithUnit implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMeasureRepresentationItemWithUnit that = (StepMeasureRepresentationItemWithUnit) o;
-        return id == that.id && Objects.equals(name, that.name) && measureValue == that.measureValue && Objects.equals(unit, that.unit);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, measureValue, unit);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMeasureRepresentationItemWithUnit{" + "id=" + id + "name=" + name + "measureValue=" + measureValue + "unit=" + unit + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("measureValue", measureValue);
+        state.put("unit", unit);
+        return state;
     }
 }

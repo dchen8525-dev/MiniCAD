@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved GUIDELINE_DEFINITION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param guidelineRecommendations guideline variance recommendations
  * @param guidelineStatus guideline variance status
  */
-public final class StepGuidelineDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGuidelineDefinition extends AbstractStepEntity {
     private final String guidelineType;
     private final String guidelineContent;
     private final List<String> guidelineRecommendations;
     private final String guidelineStatus;
 
     public StepGuidelineDefinition(int id, String name, String guidelineType, String guidelineContent, List<String> guidelineRecommendations, String guidelineStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.guidelineType = guidelineType;
         this.guidelineContent = guidelineContent;
         this.guidelineRecommendations = guidelineRecommendations == null ? null : java.util.List.copyOf(guidelineRecommendations);
         this.guidelineStatus = guidelineStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getGuidelineType() {
@@ -56,20 +46,14 @@ public final class StepGuidelineDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGuidelineDefinition that = (StepGuidelineDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(guidelineType, that.guidelineType) && Objects.equals(guidelineContent, that.guidelineContent) && Objects.equals(guidelineRecommendations, that.guidelineRecommendations) && Objects.equals(guidelineStatus, that.guidelineStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, guidelineType, guidelineContent, guidelineRecommendations, guidelineStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGuidelineDefinition{" + "id=" + id + "name=" + name + "guidelineType=" + guidelineType + "guidelineContent=" + guidelineContent + "guidelineRecommendations=" + guidelineRecommendations + "guidelineStatus=" + guidelineStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("guidelineType", guidelineType);
+        state.put("guidelineContent", guidelineContent);
+        state.put("guidelineRecommendations", guidelineRecommendations);
+        state.put("guidelineStatus", guidelineStatus);
+        return state;
     }
 }

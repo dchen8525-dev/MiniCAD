@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ANALYSIS_RESULT.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param maxValue maximum result value
  * @param minValue minimum result value
  */
-public final class StepAnalysisResult implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnalysisResult extends AbstractStepEntity {
     private final String resultType;
     private final StepEntity analysisModel;
     private final StepEntity resultGeometry;
@@ -29,8 +28,7 @@ public final class StepAnalysisResult implements StepEntity {
     private final double minValue;
 
     public StepAnalysisResult(int id, String name, String resultType, StepEntity analysisModel, StepEntity resultGeometry, List<Double> resultValues, List<StepEntity> resultLocations, double maxValue, double minValue) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.resultType = resultType;
         this.analysisModel = analysisModel;
         this.resultGeometry = resultGeometry;
@@ -38,14 +36,6 @@ public final class StepAnalysisResult implements StepEntity {
         this.resultLocations = resultLocations == null ? null : java.util.List.copyOf(resultLocations);
         this.maxValue = maxValue;
         this.minValue = minValue;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getResultType() {
@@ -77,20 +67,17 @@ public final class StepAnalysisResult implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnalysisResult that = (StepAnalysisResult) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(resultType, that.resultType) && Objects.equals(analysisModel, that.analysisModel) && Objects.equals(resultGeometry, that.resultGeometry) && Objects.equals(resultValues, that.resultValues) && Objects.equals(resultLocations, that.resultLocations) && maxValue == that.maxValue && minValue == that.minValue;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, resultType, analysisModel, resultGeometry, resultValues, resultLocations, maxValue, minValue);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnalysisResult{" + "id=" + id + "name=" + name + "resultType=" + resultType + "analysisModel=" + analysisModel + "resultGeometry=" + resultGeometry + "resultValues=" + resultValues + "resultLocations=" + resultLocations + "maxValue=" + maxValue + "minValue=" + minValue + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("resultType", resultType);
+        state.put("analysisModel", analysisModel);
+        state.put("resultGeometry", resultGeometry);
+        state.put("resultValues", resultValues);
+        state.put("resultLocations", resultLocations);
+        state.put("maxValue", maxValue);
+        state.put("minValue", minValue);
+        return state;
     }
 }

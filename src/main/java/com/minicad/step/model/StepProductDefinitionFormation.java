@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal product definition formation.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param description optional description
  * @param ofProduct referenced product
  */
-public final class StepProductDefinitionFormation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProductDefinitionFormation extends AbstractStepEntity {
     private final String description;
     private final StepProduct ofProduct;
 
     public StepProductDefinitionFormation(int id, String name, String description, StepProduct ofProduct) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.ofProduct = ofProduct;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -39,26 +30,18 @@ public final class StepProductDefinitionFormation implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String name() { return name; }
+    public int id() { return getId(); }
+    public String name() { return getName(); }
     public String description() { return description; }
     public StepProduct ofProduct() { return ofProduct; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductDefinitionFormation that = (StepProductDefinitionFormation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(ofProduct, that.ofProduct);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, ofProduct);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductDefinitionFormation{" + "id=" + id + "name=" + name + "description=" + description + "ofProduct=" + ofProduct + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("ofProduct", ofProduct);
+        return state;
     }
 }

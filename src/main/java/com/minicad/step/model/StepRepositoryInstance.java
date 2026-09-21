@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REPOSITORY_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param repositoryLastSync repository variance last sync time
  * @param repositoryStatus repository variance status
  */
-public final class StepRepositoryInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRepositoryInstance extends AbstractStepEntity {
     private final StepEntity repositoryDefinition;
     private final String repositoryState;
     private final int repositoryItemCount;
@@ -25,21 +24,12 @@ public final class StepRepositoryInstance implements StepEntity {
     private final String repositoryStatus;
 
     public StepRepositoryInstance(int id, String name, StepEntity repositoryDefinition, String repositoryState, int repositoryItemCount, StepEntity repositoryLastSync, String repositoryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.repositoryDefinition = repositoryDefinition;
         this.repositoryState = repositoryState;
         this.repositoryItemCount = repositoryItemCount;
         this.repositoryLastSync = repositoryLastSync;
         this.repositoryStatus = repositoryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRepositoryDefinition() {
@@ -63,20 +53,15 @@ public final class StepRepositoryInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRepositoryInstance that = (StepRepositoryInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(repositoryDefinition, that.repositoryDefinition) && Objects.equals(repositoryState, that.repositoryState) && repositoryItemCount == that.repositoryItemCount && Objects.equals(repositoryLastSync, that.repositoryLastSync) && Objects.equals(repositoryStatus, that.repositoryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, repositoryDefinition, repositoryState, repositoryItemCount, repositoryLastSync, repositoryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRepositoryInstance{" + "id=" + id + "name=" + name + "repositoryDefinition=" + repositoryDefinition + "repositoryState=" + repositoryState + "repositoryItemCount=" + repositoryItemCount + "repositoryLastSync=" + repositoryLastSync + "repositoryStatus=" + repositoryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("repositoryDefinition", repositoryDefinition);
+        state.put("repositoryState", repositoryState);
+        state.put("repositoryItemCount", repositoryItemCount);
+        state.put("repositoryLastSync", repositoryLastSync);
+        state.put("repositoryStatus", repositoryStatus);
+        return state;
     }
 }

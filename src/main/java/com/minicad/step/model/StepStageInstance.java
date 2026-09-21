@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STAGE_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param stageProgress stage variance progress percentage
  * @param stageStatus stage variance status
  */
-public final class StepStageInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStageInstance extends AbstractStepEntity {
     private final StepEntity stageDefinition;
     private final String stageState;
     private final StepEntity stageStartTime;
@@ -27,22 +26,13 @@ public final class StepStageInstance implements StepEntity {
     private final String stageStatus;
 
     public StepStageInstance(int id, String name, StepEntity stageDefinition, String stageState, StepEntity stageStartTime, StepEntity stageEndTime, double stageProgress, String stageStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.stageDefinition = stageDefinition;
         this.stageState = stageState;
         this.stageStartTime = stageStartTime;
         this.stageEndTime = stageEndTime;
         this.stageProgress = stageProgress;
         this.stageStatus = stageStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getStageDefinition() {
@@ -70,20 +60,16 @@ public final class StepStageInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStageInstance that = (StepStageInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(stageDefinition, that.stageDefinition) && Objects.equals(stageState, that.stageState) && Objects.equals(stageStartTime, that.stageStartTime) && Objects.equals(stageEndTime, that.stageEndTime) && stageProgress == that.stageProgress && Objects.equals(stageStatus, that.stageStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, stageDefinition, stageState, stageStartTime, stageEndTime, stageProgress, stageStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStageInstance{" + "id=" + id + "name=" + name + "stageDefinition=" + stageDefinition + "stageState=" + stageState + "stageStartTime=" + stageStartTime + "stageEndTime=" + stageEndTime + "stageProgress=" + stageProgress + "stageStatus=" + stageStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("stageDefinition", stageDefinition);
+        state.put("stageState", stageState);
+        state.put("stageStartTime", stageStartTime);
+        state.put("stageEndTime", stageEndTime);
+        state.put("stageProgress", stageProgress);
+        state.put("stageStatus", stageStatus);
+        return state;
     }
 }

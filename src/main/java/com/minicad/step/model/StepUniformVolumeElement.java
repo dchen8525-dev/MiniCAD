@@ -1,30 +1,21 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+
 /**
  * Resolved UNIFORM_VOLUME_ELEMENT.
  * A uniform volume finite element.
  */
-public final class StepUniformVolumeElement implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepUniformVolumeElement extends AbstractStepEntity {
     private final List<StepEntity> nodes;
     private final StepEntity elementProperty;
 
     public StepUniformVolumeElement(int id, String name, List<StepEntity> nodes, StepEntity elementProperty) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.nodes = nodes == null ? null : java.util.List.copyOf(nodes);
         this.elementProperty = elementProperty;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getNodes() {
@@ -36,20 +27,12 @@ public final class StepUniformVolumeElement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepUniformVolumeElement that = (StepUniformVolumeElement) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(nodes, that.nodes) && Objects.equals(elementProperty, that.elementProperty);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, nodes, elementProperty);
-    }
-
-    @Override
-    public String toString() {
-        return "StepUniformVolumeElement{" + "id=" + id + "name=" + name + "nodes=" + nodes + "elementProperty=" + elementProperty + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("nodes", nodes);
+        state.put("elementProperty", elementProperty);
+        return state;
     }
 }

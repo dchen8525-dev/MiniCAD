@@ -1,26 +1,16 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public final class StepPersonAndOrganizationAddress implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPersonAndOrganizationAddress extends AbstractStepEntity {
     private final StepEntity personAndOrganization;
     private final StepEntity address;
 
     public StepPersonAndOrganizationAddress(int id, String name, StepEntity personAndOrganization, StepEntity address) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.personAndOrganization = personAndOrganization;
         this.address = address;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPersonAndOrganization() {
@@ -32,20 +22,12 @@ public final class StepPersonAndOrganizationAddress implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPersonAndOrganizationAddress that = (StepPersonAndOrganizationAddress) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(personAndOrganization, that.personAndOrganization) && Objects.equals(address, that.address);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, personAndOrganization, address);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPersonAndOrganizationAddress{" + "id=" + id + "name=" + name + "personAndOrganization=" + personAndOrganization + "address=" + address + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("personAndOrganization", personAndOrganization);
+        state.put("address", address);
+        return state;
     }
 }

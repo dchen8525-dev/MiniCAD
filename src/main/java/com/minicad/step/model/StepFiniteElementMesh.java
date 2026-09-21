@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FINITE_ELEMENT_MESH.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param elementTypes element type specifications
  * @param meshDensity mesh density parameter
  */
-public final class StepFiniteElementMesh implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFiniteElementMesh extends AbstractStepEntity {
     private final String meshType;
     private final List<StepEntity> nodes;
     private final List<StepEntity> elements;
@@ -25,21 +24,12 @@ public final class StepFiniteElementMesh implements StepEntity {
     private final double meshDensity;
 
     public StepFiniteElementMesh(int id, String name, String meshType, List<StepEntity> nodes, List<StepEntity> elements, List<String> elementTypes, double meshDensity) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.meshType = meshType;
         this.nodes = nodes == null ? null : java.util.List.copyOf(nodes);
         this.elements = elements == null ? null : java.util.List.copyOf(elements);
         this.elementTypes = elementTypes == null ? null : java.util.List.copyOf(elementTypes);
         this.meshDensity = meshDensity;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMeshType() {
@@ -72,20 +62,15 @@ public final class StepFiniteElementMesh implements StepEntity {
     public double meshDensity() { return getMeshDensity(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFiniteElementMesh that = (StepFiniteElementMesh) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(meshType, that.meshType) && Objects.equals(nodes, that.nodes) && Objects.equals(elements, that.elements) && Objects.equals(elementTypes, that.elementTypes) && meshDensity == that.meshDensity;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, meshType, nodes, elements, elementTypes, meshDensity);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFiniteElementMesh{" + "id=" + id + "name=" + name + "meshType=" + meshType + "nodes=" + nodes + "elements=" + elements + "elementTypes=" + elementTypes + "meshDensity=" + meshDensity + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("meshType", meshType);
+        state.put("nodes", nodes);
+        state.put("elements", elements);
+        state.put("elementTypes", elementTypes);
+        state.put("meshDensity", meshDensity);
+        return state;
     }
 }

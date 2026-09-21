@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOG_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param logRetention log variance retention period
  * @param logStatus log variance status
  */
-public final class StepLogDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLogDefinition extends AbstractStepEntity {
     private final String logType;
     private final String logLevel;
     private final String logFormat;
@@ -25,21 +24,12 @@ public final class StepLogDefinition implements StepEntity {
     private final String logStatus;
 
     public StepLogDefinition(int id, String name, String logType, String logLevel, String logFormat, int logRetention, String logStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.logType = logType;
         this.logLevel = logLevel;
         this.logFormat = logFormat;
         this.logRetention = logRetention;
         this.logStatus = logStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLogType() {
@@ -63,20 +53,15 @@ public final class StepLogDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLogDefinition that = (StepLogDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(logType, that.logType) && Objects.equals(logLevel, that.logLevel) && Objects.equals(logFormat, that.logFormat) && logRetention == that.logRetention && Objects.equals(logStatus, that.logStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, logType, logLevel, logFormat, logRetention, logStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLogDefinition{" + "id=" + id + "name=" + name + "logType=" + logType + "logLevel=" + logLevel + "logFormat=" + logFormat + "logRetention=" + logRetention + "logStatus=" + logStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("logType", logType);
+        state.put("logLevel", logLevel);
+        state.put("logFormat", logFormat);
+        state.put("logRetention", logRetention);
+        state.put("logStatus", logStatus);
+        return state;
     }
 }

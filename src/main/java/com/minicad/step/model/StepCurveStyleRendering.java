@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved CURVE_STYLE_RENDERING.
  */
-public final class StepCurveStyleRendering implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCurveStyleRendering extends AbstractStepEntity {
     private final double transparency;
     private final StepEntity colour;
 
     public StepCurveStyleRendering(int id, String name, double transparency, StepEntity colour) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.transparency = transparency;
         this.colour = colour;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getTransparency() {
@@ -36,7 +26,7 @@ public final class StepCurveStyleRendering implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public double transparency() {
@@ -48,20 +38,12 @@ public final class StepCurveStyleRendering implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCurveStyleRendering that = (StepCurveStyleRendering) o;
-        return id == that.id && Objects.equals(name, that.name) && transparency == that.transparency && Objects.equals(colour, that.colour);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, transparency, colour);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCurveStyleRendering{" + "id=" + id + "name=" + name + "transparency=" + transparency + "colour=" + colour + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("transparency", transparency);
+        state.put("colour", colour);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved WIRE_SHELL.
@@ -10,23 +11,12 @@ import java.util.Objects;
  * @param name STEP label
  * @param loops defining loops
  */
-public final class StepWireShell implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepWireShell extends AbstractStepEntity {
     private final List<StepLoop> loops;
 
     public StepWireShell(int id, String name, List<StepLoop> loops) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.loops = loops == null ? null : java.util.List.copyOf(loops);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepLoop> getLoops() {
@@ -39,20 +29,11 @@ public final class StepWireShell implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepWireShell that = (StepWireShell) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(loops, that.loops);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, loops);
-    }
-
-    @Override
-    public String toString() {
-        return "StepWireShell{" + "id=" + id + "name=" + name + "loops=" + loops + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("loops", loops);
+        return state;
     }
 }

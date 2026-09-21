@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRACE_ENTRY.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param entryDuration entry variance duration
  * @param entryStatus entry variance status
  */
-public final class StepTraceEntry implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTraceEntry extends AbstractStepEntity {
     private final String entryType;
     private final String entryOperation;
     private final List<String> entryDetails;
@@ -27,22 +26,13 @@ public final class StepTraceEntry implements StepEntity {
     private final String entryStatus;
 
     public StepTraceEntry(int id, String name, String entryType, String entryOperation, List<String> entryDetails, StepEntity entryTimestamp, long entryDuration, String entryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.entryType = entryType;
         this.entryOperation = entryOperation;
         this.entryDetails = entryDetails == null ? null : java.util.List.copyOf(entryDetails);
         this.entryTimestamp = entryTimestamp;
         this.entryDuration = entryDuration;
         this.entryStatus = entryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEntryType() {
@@ -70,20 +60,16 @@ public final class StepTraceEntry implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTraceEntry that = (StepTraceEntry) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(entryType, that.entryType) && Objects.equals(entryOperation, that.entryOperation) && Objects.equals(entryDetails, that.entryDetails) && Objects.equals(entryTimestamp, that.entryTimestamp) && entryDuration == that.entryDuration && Objects.equals(entryStatus, that.entryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, entryType, entryOperation, entryDetails, entryTimestamp, entryDuration, entryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTraceEntry{" + "id=" + id + "name=" + name + "entryType=" + entryType + "entryOperation=" + entryOperation + "entryDetails=" + entryDetails + "entryTimestamp=" + entryTimestamp + "entryDuration=" + entryDuration + "entryStatus=" + entryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("entryType", entryType);
+        state.put("entryOperation", entryOperation);
+        state.put("entryDetails", entryDetails);
+        state.put("entryTimestamp", entryTimestamp);
+        state.put("entryDuration", entryDuration);
+        state.put("entryStatus", entryStatus);
+        return state;
     }
 }

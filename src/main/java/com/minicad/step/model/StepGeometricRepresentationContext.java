@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal geometric representation context.
  *
@@ -12,8 +13,7 @@ import java.util.Objects;
  * @param globalUnitAssignedContext optional global unit assignments from the same complex entity
  * @param globalUncertaintyAssignedContext optional global uncertainty assignments from the same complex entity
  */
-public final class StepGeometricRepresentationContext implements StepEntity {
-    private final int id;
+public final class StepGeometricRepresentationContext extends AbstractStepEntity {
     private final int coordinateSpaceDimension;
     private final String contextIdentifier;
     private final String contextType;
@@ -21,16 +21,12 @@ public final class StepGeometricRepresentationContext implements StepEntity {
     private final StepGlobalUncertaintyAssignedContext globalUncertaintyAssignedContext;
 
     public StepGeometricRepresentationContext(int id, int coordinateSpaceDimension, String contextIdentifier, String contextType, StepGlobalUnitAssignedContext globalUnitAssignedContext, StepGlobalUncertaintyAssignedContext globalUncertaintyAssignedContext) {
-        this.id = id;
+        super(id, "");
         this.coordinateSpaceDimension = coordinateSpaceDimension;
         this.contextIdentifier = contextIdentifier;
         this.contextType = contextType;
         this.globalUnitAssignedContext = globalUnitAssignedContext;
         this.globalUncertaintyAssignedContext = globalUncertaintyAssignedContext;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {
@@ -65,20 +61,14 @@ public final class StepGeometricRepresentationContext implements StepEntity {
     public StepGlobalUncertaintyAssignedContext globalUncertaintyAssignedContext() { return getGlobalUncertaintyAssignedContext(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGeometricRepresentationContext that = (StepGeometricRepresentationContext) o;
-        return id == that.id && coordinateSpaceDimension == that.coordinateSpaceDimension && Objects.equals(contextIdentifier, that.contextIdentifier) && Objects.equals(contextType, that.contextType) && Objects.equals(globalUnitAssignedContext, that.globalUnitAssignedContext) && Objects.equals(globalUncertaintyAssignedContext, that.globalUncertaintyAssignedContext);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, coordinateSpaceDimension, contextIdentifier, contextType, globalUnitAssignedContext, globalUncertaintyAssignedContext);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGeometricRepresentationContext{" + "id=" + id + "coordinateSpaceDimension=" + coordinateSpaceDimension + "contextIdentifier=" + contextIdentifier + "contextType=" + contextType + "globalUnitAssignedContext=" + globalUnitAssignedContext + "globalUncertaintyAssignedContext=" + globalUncertaintyAssignedContext + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("coordinateSpaceDimension", coordinateSpaceDimension);
+        state.put("contextIdentifier", contextIdentifier);
+        state.put("contextType", contextType);
+        state.put("globalUnitAssignedContext", globalUnitAssignedContext);
+        state.put("globalUncertaintyAssignedContext", globalUncertaintyAssignedContext);
+        return state;
     }
 }

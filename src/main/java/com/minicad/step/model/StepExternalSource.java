@@ -1,23 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal EXTERNAL_SOURCE metadata.
  *
  * @param id STEP instance id
  * @param sourceId external source identifier
  */
-public final class StepExternalSource implements StepEntity {
-    private final int id;
+public final class StepExternalSource extends AbstractStepEntity {
     private final String sourceId;
 
     public StepExternalSource(int id, String sourceId) {
-        this.id = id;
+        super(id, "");
         this.sourceId = sourceId;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getSourceId() {
@@ -34,20 +31,10 @@ public final class StepExternalSource implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepExternalSource that = (StepExternalSource) o;
-        return id == that.id && Objects.equals(sourceId, that.sourceId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, sourceId);
-    }
-
-    @Override
-    public String toString() {
-        return "StepExternalSource{" + "id=" + id + "sourceId=" + sourceId + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("sourceId", sourceId);
+        return state;
     }
 }

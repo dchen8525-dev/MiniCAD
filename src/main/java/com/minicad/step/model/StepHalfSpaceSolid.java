@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal parse-only half-space solid.
  *
@@ -11,29 +13,18 @@ import java.util.Objects;
  * @param enclosure optional enclosure entity for boxed half spaces
  * @param entityName concrete STEP entity name
  */
-public final class StepHalfSpaceSolid implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepHalfSpaceSolid extends AbstractStepEntity {
     private final StepEntity baseSurface;
     private final boolean agreementFlag;
     private final StepEntity enclosure;
     private final String entityName;
 
     public StepHalfSpaceSolid(int id, String name, StepEntity baseSurface, boolean agreementFlag, StepEntity enclosure, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.baseSurface = baseSurface;
         this.agreementFlag = agreementFlag;
         this.enclosure = enclosure;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBaseSurface() {
@@ -61,20 +52,14 @@ public final class StepHalfSpaceSolid implements StepEntity {
     public String entityName() { return getEntityName(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepHalfSpaceSolid that = (StepHalfSpaceSolid) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(baseSurface, that.baseSurface) && agreementFlag == that.agreementFlag && Objects.equals(enclosure, that.enclosure) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, baseSurface, agreementFlag, enclosure, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepHalfSpaceSolid{" + "id=" + id + "name=" + name + "baseSurface=" + baseSurface + "agreementFlag=" + agreementFlag + "enclosure=" + enclosure + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("baseSurface", baseSurface);
+        state.put("agreementFlag", agreementFlag);
+        state.put("enclosure", enclosure);
+        state.put("entityName", entityName);
+        return state;
     }
 }

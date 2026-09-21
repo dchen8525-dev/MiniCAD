@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved THRESHOLD_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param thresholdActions threshold variance actions when exceeded
  * @param thresholdStatus threshold variance status
  */
-public final class StepThresholdDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepThresholdDefinition extends AbstractStepEntity {
     private final String thresholdType;
     private final double thresholdValue;
     private final double thresholdTolerance;
@@ -25,21 +24,12 @@ public final class StepThresholdDefinition implements StepEntity {
     private final String thresholdStatus;
 
     public StepThresholdDefinition(int id, String name, String thresholdType, double thresholdValue, double thresholdTolerance, List<String> thresholdActions, String thresholdStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.thresholdType = thresholdType;
         this.thresholdValue = thresholdValue;
         this.thresholdTolerance = thresholdTolerance;
         this.thresholdActions = thresholdActions == null ? null : java.util.List.copyOf(thresholdActions);
         this.thresholdStatus = thresholdStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getThresholdType() {
@@ -63,20 +53,15 @@ public final class StepThresholdDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepThresholdDefinition that = (StepThresholdDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(thresholdType, that.thresholdType) && thresholdValue == that.thresholdValue && thresholdTolerance == that.thresholdTolerance && Objects.equals(thresholdActions, that.thresholdActions) && Objects.equals(thresholdStatus, that.thresholdStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, thresholdType, thresholdValue, thresholdTolerance, thresholdActions, thresholdStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepThresholdDefinition{" + "id=" + id + "name=" + name + "thresholdType=" + thresholdType + "thresholdValue=" + thresholdValue + "thresholdTolerance=" + thresholdTolerance + "thresholdActions=" + thresholdActions + "thresholdStatus=" + thresholdStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("thresholdType", thresholdType);
+        state.put("thresholdValue", thresholdValue);
+        state.put("thresholdTolerance", thresholdTolerance);
+        state.put("thresholdActions", thresholdActions);
+        state.put("thresholdStatus", thresholdStatus);
+        return state;
     }
 }

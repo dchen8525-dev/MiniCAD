@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TAG_RECORD.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param tagCategory tag variance category
  * @param tagStatus tag variance status
  */
-public final class StepTagRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTagRecord extends AbstractStepEntity {
     private final String tagType;
     private final String tagValue;
     private final StepEntity tagTarget;
@@ -25,21 +24,12 @@ public final class StepTagRecord implements StepEntity {
     private final String tagStatus;
 
     public StepTagRecord(int id, String name, String tagType, String tagValue, StepEntity tagTarget, String tagCategory, String tagStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.tagType = tagType;
         this.tagValue = tagValue;
         this.tagTarget = tagTarget;
         this.tagCategory = tagCategory;
         this.tagStatus = tagStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTagType() {
@@ -63,20 +53,15 @@ public final class StepTagRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTagRecord that = (StepTagRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(tagType, that.tagType) && Objects.equals(tagValue, that.tagValue) && Objects.equals(tagTarget, that.tagTarget) && Objects.equals(tagCategory, that.tagCategory) && Objects.equals(tagStatus, that.tagStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, tagType, tagValue, tagTarget, tagCategory, tagStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTagRecord{" + "id=" + id + "name=" + name + "tagType=" + tagType + "tagValue=" + tagValue + "tagTarget=" + tagTarget + "tagCategory=" + tagCategory + "tagStatus=" + tagStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("tagType", tagType);
+        state.put("tagValue", tagValue);
+        state.put("tagTarget", tagTarget);
+        state.put("tagCategory", tagCategory);
+        state.put("tagStatus", tagStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DRAWING_REFERENCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param drawingStatus drawing status
  * @param drawingAuthor drawing author reference
  */
-public final class StepDrawingReference implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDrawingReference extends AbstractStepEntity {
     private final String drawingId;
     private final String drawingType;
     private final String drawingRevision;
@@ -27,22 +26,13 @@ public final class StepDrawingReference implements StepEntity {
     private final StepEntity drawingAuthor;
 
     public StepDrawingReference(int id, String name, String drawingId, String drawingType, String drawingRevision, double drawingScale, String drawingStatus, StepEntity drawingAuthor) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.drawingId = drawingId;
         this.drawingType = drawingType;
         this.drawingRevision = drawingRevision;
         this.drawingScale = drawingScale;
         this.drawingStatus = drawingStatus;
         this.drawingAuthor = drawingAuthor;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDrawingId() {
@@ -70,20 +60,16 @@ public final class StepDrawingReference implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDrawingReference that = (StepDrawingReference) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(drawingId, that.drawingId) && Objects.equals(drawingType, that.drawingType) && Objects.equals(drawingRevision, that.drawingRevision) && drawingScale == that.drawingScale && Objects.equals(drawingStatus, that.drawingStatus) && Objects.equals(drawingAuthor, that.drawingAuthor);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, drawingId, drawingType, drawingRevision, drawingScale, drawingStatus, drawingAuthor);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDrawingReference{" + "id=" + id + "name=" + name + "drawingId=" + drawingId + "drawingType=" + drawingType + "drawingRevision=" + drawingRevision + "drawingScale=" + drawingScale + "drawingStatus=" + drawingStatus + "drawingAuthor=" + drawingAuthor + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("drawingId", drawingId);
+        state.put("drawingType", drawingType);
+        state.put("drawingRevision", drawingRevision);
+        state.put("drawingScale", drawingScale);
+        state.put("drawingStatus", drawingStatus);
+        state.put("drawingAuthor", drawingAuthor);
+        return state;
     }
 }

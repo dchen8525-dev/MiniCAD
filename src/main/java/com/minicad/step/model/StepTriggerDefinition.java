@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRIGGER_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param triggerSchedule trigger variance schedule
  * @param triggerStatus trigger variance status
  */
-public final class StepTriggerDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTriggerDefinition extends AbstractStepEntity {
     private final String triggerType;
     private final String triggerCondition;
     private final StepEntity triggerAction;
@@ -25,21 +24,12 @@ public final class StepTriggerDefinition implements StepEntity {
     private final String triggerStatus;
 
     public StepTriggerDefinition(int id, String name, String triggerType, String triggerCondition, StepEntity triggerAction, String triggerSchedule, String triggerStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.triggerType = triggerType;
         this.triggerCondition = triggerCondition;
         this.triggerAction = triggerAction;
         this.triggerSchedule = triggerSchedule;
         this.triggerStatus = triggerStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTriggerType() {
@@ -63,20 +53,15 @@ public final class StepTriggerDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTriggerDefinition that = (StepTriggerDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(triggerType, that.triggerType) && Objects.equals(triggerCondition, that.triggerCondition) && Objects.equals(triggerAction, that.triggerAction) && Objects.equals(triggerSchedule, that.triggerSchedule) && Objects.equals(triggerStatus, that.triggerStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, triggerType, triggerCondition, triggerAction, triggerSchedule, triggerStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTriggerDefinition{" + "id=" + id + "name=" + name + "triggerType=" + triggerType + "triggerCondition=" + triggerCondition + "triggerAction=" + triggerAction + "triggerSchedule=" + triggerSchedule + "triggerStatus=" + triggerStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("triggerType", triggerType);
+        state.put("triggerCondition", triggerCondition);
+        state.put("triggerAction", triggerAction);
+        state.put("triggerSchedule", triggerSchedule);
+        state.put("triggerStatus", triggerStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DATUM_SYSTEM.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param systemType datum system type classification
  * @param tolerance tolerance that uses this datum system
  */
-public final class StepDatumSystem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDatumSystem extends AbstractStepEntity {
     private final List<StepEntity> datums;
     private final String systemType;
     private final StepEntity tolerance;
 
     public StepDatumSystem(int id, String name, List<StepEntity> datums, String systemType, StepEntity tolerance) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.datums = datums == null ? null : java.util.List.copyOf(datums);
         this.systemType = systemType;
         this.tolerance = tolerance;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getDatums() {
@@ -49,20 +39,13 @@ public final class StepDatumSystem implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDatumSystem that = (StepDatumSystem) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(datums, that.datums) && Objects.equals(systemType, that.systemType) && Objects.equals(tolerance, that.tolerance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, datums, systemType, tolerance);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDatumSystem{" + "id=" + id + "name=" + name + "datums=" + datums + "systemType=" + systemType + "tolerance=" + tolerance + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("datums", datums);
+        state.put("systemType", systemType);
+        state.put("tolerance", tolerance);
+        return state;
     }
 }

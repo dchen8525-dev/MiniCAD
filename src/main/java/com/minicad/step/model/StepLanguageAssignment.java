@@ -1,27 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal LANGUAGE_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
  * @param assignedLanguage assigned language
  */
-public final class StepLanguageAssignment implements StepEntity {
-    private final int id;
+public final class StepLanguageAssignment extends AbstractStepEntity {
     private final StepLanguage assignedLanguage;
 
     public StepLanguageAssignment(int id, StepLanguage assignedLanguage) {
-        this.id = id;
+        super(id, "");
         this.assignedLanguage = assignedLanguage;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepLanguage getAssignedLanguage() {
@@ -34,20 +27,10 @@ public final class StepLanguageAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLanguageAssignment that = (StepLanguageAssignment) o;
-        return id == that.id && Objects.equals(assignedLanguage, that.assignedLanguage);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedLanguage);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLanguageAssignment{" + "id=" + id + "assignedLanguage=" + assignedLanguage + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedLanguage", assignedLanguage);
+        return state;
     }
 }

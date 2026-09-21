@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal ORIENTED_CURVE parse-only curve wrapper.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param curveElement referenced curve
  * @param orientation orientation sense
  */
-public final class StepOrientedCurve implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOrientedCurve extends AbstractStepEntity {
     private final StepEntity curveElement;
     private final boolean orientation;
 
     public StepOrientedCurve(int id, String name, StepEntity curveElement, boolean orientation) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.curveElement = curveElement;
         this.orientation = orientation;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCurveElement() {
@@ -45,20 +36,12 @@ public final class StepOrientedCurve implements StepEntity {
     public boolean orientation() { return isOrientation(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOrientedCurve that = (StepOrientedCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(curveElement, that.curveElement) && orientation == that.orientation;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, curveElement, orientation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOrientedCurve{" + "id=" + id + "name=" + name + "curveElement=" + curveElement + "orientation=" + orientation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("curveElement", curveElement);
+        state.put("orientation", orientation);
+        return state;
     }
 }

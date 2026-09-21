@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved PARABOLA 2D.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param position placement of the parabola
  * @param focalDist focal distance of the parabola
  */
-public final class StepParabola2D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepParabola2D extends AbstractStepEntity {
     private final StepAxis2Placement2D position;
     private final double focalDist;
 
     public StepParabola2D(int id, String name, StepAxis2Placement2D position, double focalDist) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.focalDist = focalDist;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepAxis2Placement2D getPosition() {
@@ -45,20 +36,12 @@ public final class StepParabola2D implements StepEntity {
     public double focalDist() { return getFocalDist(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepParabola2D that = (StepParabola2D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && focalDist == that.focalDist;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, focalDist);
-    }
-
-    @Override
-    public String toString() {
-        return "StepParabola2D{" + "id=" + id + "name=" + name + "position=" + position + "focalDist=" + focalDist + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("focalDist", focalDist);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MACHINING_FEATURE_RELATIONSHIP.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param relationshipType relationship type classification
  * @param description relationship description
  */
-public final class StepMachiningFeatureRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMachiningFeatureRelationship extends AbstractStepEntity {
     private final StepEntity relatingFeature;
     private final StepEntity relatedFeature;
     private final String relationshipType;
     private final String description;
 
     public StepMachiningFeatureRelationship(int id, String name, StepEntity relatingFeature, StepEntity relatedFeature, String relationshipType, String description) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.relatingFeature = relatingFeature;
         this.relatedFeature = relatedFeature;
         this.relationshipType = relationshipType;
         this.description = description;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRelatingFeature() {
@@ -56,20 +46,14 @@ public final class StepMachiningFeatureRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMachiningFeatureRelationship that = (StepMachiningFeatureRelationship) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(relatingFeature, that.relatingFeature) && Objects.equals(relatedFeature, that.relatedFeature) && Objects.equals(relationshipType, that.relationshipType) && Objects.equals(description, that.description);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, relatingFeature, relatedFeature, relationshipType, description);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMachiningFeatureRelationship{" + "id=" + id + "name=" + name + "relatingFeature=" + relatingFeature + "relatedFeature=" + relatedFeature + "relationshipType=" + relationshipType + "description=" + description + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("relatingFeature", relatingFeature);
+        state.put("relatedFeature", relatedFeature);
+        state.put("relationshipType", relationshipType);
+        state.put("description", description);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CLUSTER_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param clusterLoad cluster variance load level
  * @param clusterStatus cluster variance status
  */
-public final class StepClusterInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepClusterInstance extends AbstractStepEntity {
     private final StepEntity clusterDefinition;
     private final String clusterState;
     private final int clusterNodeCount;
@@ -25,21 +24,12 @@ public final class StepClusterInstance implements StepEntity {
     private final String clusterStatus;
 
     public StepClusterInstance(int id, String name, StepEntity clusterDefinition, String clusterState, int clusterNodeCount, double clusterLoad, String clusterStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.clusterDefinition = clusterDefinition;
         this.clusterState = clusterState;
         this.clusterNodeCount = clusterNodeCount;
         this.clusterLoad = clusterLoad;
         this.clusterStatus = clusterStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getClusterDefinition() {
@@ -63,20 +53,15 @@ public final class StepClusterInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepClusterInstance that = (StepClusterInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(clusterDefinition, that.clusterDefinition) && Objects.equals(clusterState, that.clusterState) && clusterNodeCount == that.clusterNodeCount && clusterLoad == that.clusterLoad && Objects.equals(clusterStatus, that.clusterStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, clusterDefinition, clusterState, clusterNodeCount, clusterLoad, clusterStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepClusterInstance{" + "id=" + id + "name=" + name + "clusterDefinition=" + clusterDefinition + "clusterState=" + clusterState + "clusterNodeCount=" + clusterNodeCount + "clusterLoad=" + clusterLoad + "clusterStatus=" + clusterStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("clusterDefinition", clusterDefinition);
+        state.put("clusterState", clusterState);
+        state.put("clusterNodeCount", clusterNodeCount);
+        state.put("clusterLoad", clusterLoad);
+        state.put("clusterStatus", clusterStatus);
+        return state;
     }
 }

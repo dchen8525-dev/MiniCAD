@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TASK_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param taskPostconditions task variance postconditions
  * @param taskStatus task variance status
  */
-public final class StepTaskDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTaskDefinition extends AbstractStepEntity {
     private final String taskType;
     private final int taskPriority;
     private final String taskDescription;
@@ -27,22 +26,13 @@ public final class StepTaskDefinition implements StepEntity {
     private final String taskStatus;
 
     public StepTaskDefinition(int id, String name, String taskType, int taskPriority, String taskDescription, List<String> taskPreconditions, List<String> taskPostconditions, String taskStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.taskType = taskType;
         this.taskPriority = taskPriority;
         this.taskDescription = taskDescription;
         this.taskPreconditions = taskPreconditions == null ? null : java.util.List.copyOf(taskPreconditions);
         this.taskPostconditions = taskPostconditions == null ? null : java.util.List.copyOf(taskPostconditions);
         this.taskStatus = taskStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTaskType() {
@@ -70,20 +60,16 @@ public final class StepTaskDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTaskDefinition that = (StepTaskDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(taskType, that.taskType) && taskPriority == that.taskPriority && Objects.equals(taskDescription, that.taskDescription) && Objects.equals(taskPreconditions, that.taskPreconditions) && Objects.equals(taskPostconditions, that.taskPostconditions) && Objects.equals(taskStatus, that.taskStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, taskType, taskPriority, taskDescription, taskPreconditions, taskPostconditions, taskStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTaskDefinition{" + "id=" + id + "name=" + name + "taskType=" + taskType + "taskPriority=" + taskPriority + "taskDescription=" + taskDescription + "taskPreconditions=" + taskPreconditions + "taskPostconditions=" + taskPostconditions + "taskStatus=" + taskStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("taskType", taskType);
+        state.put("taskPriority", taskPriority);
+        state.put("taskDescription", taskDescription);
+        state.put("taskPreconditions", taskPreconditions);
+        state.put("taskPostconditions", taskPostconditions);
+        state.put("taskStatus", taskStatus);
+        return state;
     }
 }

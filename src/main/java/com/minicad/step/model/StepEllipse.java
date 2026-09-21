@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved ELLIPSE.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param semiAxis1 local X semi-axis
  * @param semiAxis2 local Y semi-axis
  */
-public final class StepEllipse implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEllipse extends AbstractStepEntity {
     private final StepEntity position;
     private final double semiAxis1;
     private final double semiAxis2;
 
     public StepEllipse(int id, String name, StepEntity position, double semiAxis1, double semiAxis2) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.semiAxis1 = semiAxis1;
         this.semiAxis2 = semiAxis2;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -53,20 +44,13 @@ public final class StepEllipse implements StepEntity {
     public double semiAxis2() { return getSemiAxis2(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEllipse that = (StepEllipse) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && semiAxis1 == that.semiAxis1 && semiAxis2 == that.semiAxis2;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, semiAxis1, semiAxis2);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEllipse{" + "id=" + id + "name=" + name + "position=" + position + "semiAxis1=" + semiAxis1 + "semiAxis2=" + semiAxis2 + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("semiAxis1", semiAxis1);
+        state.put("semiAxis2", semiAxis2);
+        return state;
     }
 }

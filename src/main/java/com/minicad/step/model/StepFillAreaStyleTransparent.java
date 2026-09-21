@@ -1,27 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved FILL_AREA_STYLE_TRANSPARENT.
  */
-public final class StepFillAreaStyleTransparent implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFillAreaStyleTransparent extends AbstractStepEntity {
     private final double transparency;
 
     public StepFillAreaStyleTransparent(int id, String name, double transparency) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.transparency = transparency;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getTransparency() {
@@ -29,20 +19,11 @@ public final class StepFillAreaStyleTransparent implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFillAreaStyleTransparent that = (StepFillAreaStyleTransparent) o;
-        return id == that.id && Objects.equals(name, that.name) && transparency == that.transparency;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, transparency);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFillAreaStyleTransparent{" + "id=" + id + "name=" + name + "transparency=" + transparency + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("transparency", transparency);
+        return state;
     }
 }

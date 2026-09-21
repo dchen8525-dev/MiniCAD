@@ -1,27 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved BUY_FROM_USAGE_OPTION.
  */
-public final class StepBuyFromUsageOption implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBuyFromUsageOption extends AbstractStepEntity {
     private final StepEntity supplier;
 
     public StepBuyFromUsageOption(int id, String name, StepEntity supplier) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.supplier = supplier;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSupplier() {
@@ -29,20 +19,11 @@ public final class StepBuyFromUsageOption implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBuyFromUsageOption that = (StepBuyFromUsageOption) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(supplier, that.supplier);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, supplier);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBuyFromUsageOption{" + "id=" + id + "name=" + name + "supplier=" + supplier + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("supplier", supplier);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMPOSED_TEXT.
@@ -12,25 +13,14 @@ import java.util.Objects;
  * @param collection collection of text elements
  * @param extent bounding extent
  */
-public final class StepComposedText implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepComposedText extends AbstractStepEntity {
     private final List<StepEntity> collection;
     private final StepEntity extent;
 
     public StepComposedText(int id, String name, List<StepEntity> collection, StepEntity extent) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.collection = collection == null ? null : java.util.List.copyOf(collection);
         this.extent = extent;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getCollection() {
@@ -42,20 +32,12 @@ public final class StepComposedText implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepComposedText that = (StepComposedText) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(collection, that.collection) && Objects.equals(extent, that.extent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, collection, extent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepComposedText{" + "id=" + id + "name=" + name + "collection=" + collection + "extent=" + extent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("collection", collection);
+        state.put("extent", extent);
+        return state;
     }
 }

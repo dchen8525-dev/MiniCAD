@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STORAGE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param storageAvailable storage variance available space
  * @param storageStatus storage variance status
  */
-public final class StepStorageInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStorageInstance extends AbstractStepEntity {
     private final StepEntity storageDefinition;
     private final String storageState;
     private final long storageUsed;
@@ -25,21 +24,12 @@ public final class StepStorageInstance implements StepEntity {
     private final String storageStatus;
 
     public StepStorageInstance(int id, String name, StepEntity storageDefinition, String storageState, long storageUsed, long storageAvailable, String storageStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.storageDefinition = storageDefinition;
         this.storageState = storageState;
         this.storageUsed = storageUsed;
         this.storageAvailable = storageAvailable;
         this.storageStatus = storageStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getStorageDefinition() {
@@ -63,20 +53,15 @@ public final class StepStorageInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStorageInstance that = (StepStorageInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(storageDefinition, that.storageDefinition) && Objects.equals(storageState, that.storageState) && storageUsed == that.storageUsed && storageAvailable == that.storageAvailable && Objects.equals(storageStatus, that.storageStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, storageDefinition, storageState, storageUsed, storageAvailable, storageStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStorageInstance{" + "id=" + id + "name=" + name + "storageDefinition=" + storageDefinition + "storageState=" + storageState + "storageUsed=" + storageUsed + "storageAvailable=" + storageAvailable + "storageStatus=" + storageStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("storageDefinition", storageDefinition);
+        state.put("storageState", storageState);
+        state.put("storageUsed", storageUsed);
+        state.put("storageAvailable", storageAvailable);
+        state.put("storageStatus", storageStatus);
+        return state;
     }
 }

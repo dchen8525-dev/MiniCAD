@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DESIGNED_PART_DESIGN_VERSION.
@@ -12,25 +13,14 @@ import java.util.Objects;
  * @param description part description
  * @param frameOfReference product context
  */
-public final class StepDesignedPartDesignVersion implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDesignedPartDesignVersion extends AbstractStepEntity {
     private final String description;
     private final StepEntity frameOfReference;
 
     public StepDesignedPartDesignVersion(int id, String name, String description, StepEntity frameOfReference) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.frameOfReference = frameOfReference;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -42,20 +32,12 @@ public final class StepDesignedPartDesignVersion implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDesignedPartDesignVersion that = (StepDesignedPartDesignVersion) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(frameOfReference, that.frameOfReference);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, frameOfReference);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDesignedPartDesignVersion{" + "id=" + id + "name=" + name + "description=" + description + "frameOfReference=" + frameOfReference + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("frameOfReference", frameOfReference);
+        return state;
     }
 }

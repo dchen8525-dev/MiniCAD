@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CALCULATION_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceUnits calculation variance units
  * @varianceAssumptions calculation variance assumptions
  */
-public final class StepCalculationRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCalculationRecord extends AbstractStepEntity {
     private final String calculationType;
     private final List<Double> inputParameters;
     private final List<Double> varianceResults;
@@ -27,22 +26,13 @@ public final class StepCalculationRecord implements StepEntity {
     private final List<String> varianceAssumptions;
 
     public StepCalculationRecord(int id, String name, String calculationType, List<Double> inputParameters, List<Double> varianceResults, String calculationMethod, StepEntity varianceUnits, List<String> varianceAssumptions) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.calculationType = calculationType;
         this.inputParameters = inputParameters == null ? null : java.util.List.copyOf(inputParameters);
         this.varianceResults = varianceResults == null ? null : java.util.List.copyOf(varianceResults);
         this.calculationMethod = calculationMethod;
         this.varianceUnits = varianceUnits;
         this.varianceAssumptions = varianceAssumptions == null ? null : java.util.List.copyOf(varianceAssumptions);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCalculationType() {
@@ -70,20 +60,16 @@ public final class StepCalculationRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCalculationRecord that = (StepCalculationRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(calculationType, that.calculationType) && Objects.equals(inputParameters, that.inputParameters) && Objects.equals(varianceResults, that.varianceResults) && Objects.equals(calculationMethod, that.calculationMethod) && Objects.equals(varianceUnits, that.varianceUnits) && Objects.equals(varianceAssumptions, that.varianceAssumptions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, calculationType, inputParameters, varianceResults, calculationMethod, varianceUnits, varianceAssumptions);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCalculationRecord{" + "id=" + id + "name=" + name + "calculationType=" + calculationType + "inputParameters=" + inputParameters + "varianceResults=" + varianceResults + "calculationMethod=" + calculationMethod + "varianceUnits=" + varianceUnits + "varianceAssumptions=" + varianceAssumptions + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("calculationType", calculationType);
+        state.put("inputParameters", inputParameters);
+        state.put("varianceResults", varianceResults);
+        state.put("calculationMethod", calculationMethod);
+        state.put("varianceUnits", varianceUnits);
+        state.put("varianceAssumptions", varianceAssumptions);
+        return state;
     }
 }

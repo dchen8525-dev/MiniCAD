@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved OPEN_SHELL.
@@ -11,23 +11,12 @@ import java.util.Objects;
  * @param name step label
  * @param faces shell faces
  */
-public final class StepOpenShell implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOpenShell extends AbstractStepEntity {
     private final List<StepFaceEntity> faces;
 
     public StepOpenShell(int id, String name, List<StepFaceEntity> faces) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.faces = faces == null ? null : java.util.List.copyOf(faces);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepFaceEntity> getFaces() {
@@ -40,20 +29,11 @@ public final class StepOpenShell implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOpenShell that = (StepOpenShell) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(faces, that.faces);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, faces);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOpenShell{" + "id=" + id + "name=" + name + "faces=" + faces + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("faces", faces);
+        return state;
     }
 }

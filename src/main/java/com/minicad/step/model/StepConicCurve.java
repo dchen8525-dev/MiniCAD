@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal parse-only conic curve for PARABOLA and HYPERBOLA.
@@ -12,27 +13,16 @@ import java.util.Objects;
  * @param parameters numeric conic parameters
  * @param entityName concrete STEP entity name
  */
-public final class StepConicCurve implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConicCurve extends AbstractStepEntity {
     private final StepEntity position;
     private final List<Double> parameters;
     private final String entityName;
 
     public StepConicCurve(int id, String name, StepEntity position, List<Double> parameters, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.parameters = parameters == null ? null : java.util.List.copyOf(parameters);
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -55,20 +45,13 @@ public final class StepConicCurve implements StepEntity {
     public String entityName() { return getEntityName(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConicCurve that = (StepConicCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && Objects.equals(parameters, that.parameters) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, parameters, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConicCurve{" + "id=" + id + "name=" + name + "position=" + position + "parameters=" + parameters + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("parameters", parameters);
+        state.put("entityName", entityName);
+        return state;
     }
 }

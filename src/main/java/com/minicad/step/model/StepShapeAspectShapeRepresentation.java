@@ -1,27 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved SHAPE_ASPECT_SHAPE_REPRESENTATION.
  * Shape representation for shape aspects.
  */
-public final class StepShapeAspectShapeRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepShapeAspectShapeRepresentation extends AbstractStepEntity {
     private final StepEntity ofShape;
 
     public StepShapeAspectShapeRepresentation(int id, String name, StepEntity ofShape) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.ofShape = ofShape;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getOfShape() {
@@ -29,20 +20,11 @@ public final class StepShapeAspectShapeRepresentation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepShapeAspectShapeRepresentation that = (StepShapeAspectShapeRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(ofShape, that.ofShape);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, ofShape);
-    }
-
-    @Override
-    public String toString() {
-        return "StepShapeAspectShapeRepresentation{" + "id=" + id + "name=" + name + "ofShape=" + ofShape + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("ofShape", ofShape);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMPOUND_REPRESENTATION_ITEM.
@@ -11,25 +12,14 @@ import java.util.Objects;
  * @param items list of representation items
  * @param entityName actual entity type name (for subtype handling)
  */
-public final class StepCompoundRepresentationItem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCompoundRepresentationItem extends AbstractStepEntity {
     private final List<StepEntity> items;
     private final String entityName;
 
     public StepCompoundRepresentationItem(int id, String name, List<StepEntity> items, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.items = items == null ? null : java.util.List.copyOf(items);
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getItems() {
@@ -41,26 +31,18 @@ public final class StepCompoundRepresentationItem implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String name() { return name; }
+    public int id() { return getId(); }
+    public String name() { return getName(); }
     public List<StepEntity> items() { return items; }
     public String entityName() { return entityName; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCompoundRepresentationItem that = (StepCompoundRepresentationItem) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(items, that.items) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, items, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCompoundRepresentationItem{" + "id=" + id + "name=" + name + "items=" + items + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("items", items);
+        state.put("entityName", entityName);
+        return state;
     }
 }

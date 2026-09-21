@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LAYERED_ITEM.
@@ -11,23 +12,12 @@ import java.util.Objects;
  * @param name item name
  * @param assignment layers assignment reference
  */
-public final class StepLayeredItem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLayeredItem extends AbstractStepEntity {
     private final StepEntity assignment;
 
     public StepLayeredItem(int id, String name, StepEntity assignment) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.assignment = assignment;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getAssignment() {
@@ -35,20 +25,11 @@ public final class StepLayeredItem implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLayeredItem that = (StepLayeredItem) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(assignment, that.assignment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, assignment);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLayeredItem{" + "id=" + id + "name=" + name + "assignment=" + assignment + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("assignment", assignment);
+        return state;
     }
 }

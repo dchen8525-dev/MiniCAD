@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved VALVE_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param valveMaterial valve material specification
  * @param flowDirection flow direction specification
  */
-public final class StepValveFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepValveFeature extends AbstractStepEntity {
     private final String valveType;
     private final double portDiameter;
     private final StepEntity valveBody;
@@ -27,22 +26,13 @@ public final class StepValveFeature implements StepEntity {
     private final String flowDirection;
 
     public StepValveFeature(int id, String name, String valveType, double portDiameter, StepEntity valveBody, StepEntity valveActuator, StepEntity valveMaterial, String flowDirection) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.valveType = valveType;
         this.portDiameter = portDiameter;
         this.valveBody = valveBody;
         this.valveActuator = valveActuator;
         this.valveMaterial = valveMaterial;
         this.flowDirection = flowDirection;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getValveType() {
@@ -70,20 +60,16 @@ public final class StepValveFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepValveFeature that = (StepValveFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(valveType, that.valveType) && portDiameter == that.portDiameter && Objects.equals(valveBody, that.valveBody) && Objects.equals(valveActuator, that.valveActuator) && Objects.equals(valveMaterial, that.valveMaterial) && Objects.equals(flowDirection, that.flowDirection);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, valveType, portDiameter, valveBody, valveActuator, valveMaterial, flowDirection);
-    }
-
-    @Override
-    public String toString() {
-        return "StepValveFeature{" + "id=" + id + "name=" + name + "valveType=" + valveType + "portDiameter=" + portDiameter + "valveBody=" + valveBody + "valveActuator=" + valveActuator + "valveMaterial=" + valveMaterial + "flowDirection=" + flowDirection + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("valveType", valveType);
+        state.put("portDiameter", portDiameter);
+        state.put("valveBody", valveBody);
+        state.put("valveActuator", valveActuator);
+        state.put("valveMaterial", valveMaterial);
+        state.put("flowDirection", flowDirection);
+        return state;
     }
 }

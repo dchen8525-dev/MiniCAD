@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FRAME_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param frameDuration frame variance duration
  * @param frameStatus frame variance status
  */
-public final class StepFrameDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFrameDefinition extends AbstractStepEntity {
     private final String frameType;
     private final String frameFormat;
     private final int frameSize;
@@ -25,21 +24,12 @@ public final class StepFrameDefinition implements StepEntity {
     private final String frameStatus;
 
     public StepFrameDefinition(int id, String name, String frameType, String frameFormat, int frameSize, double frameDuration, String frameStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.frameType = frameType;
         this.frameFormat = frameFormat;
         this.frameSize = frameSize;
         this.frameDuration = frameDuration;
         this.frameStatus = frameStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFrameType() {
@@ -63,20 +53,15 @@ public final class StepFrameDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFrameDefinition that = (StepFrameDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(frameType, that.frameType) && Objects.equals(frameFormat, that.frameFormat) && frameSize == that.frameSize && frameDuration == that.frameDuration && Objects.equals(frameStatus, that.frameStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, frameType, frameFormat, frameSize, frameDuration, frameStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFrameDefinition{" + "id=" + id + "name=" + name + "frameType=" + frameType + "frameFormat=" + frameFormat + "frameSize=" + frameSize + "frameDuration=" + frameDuration + "frameStatus=" + frameStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("frameType", frameType);
+        state.put("frameFormat", frameFormat);
+        state.put("frameSize", frameSize);
+        state.put("frameDuration", frameDuration);
+        state.put("frameStatus", frameStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved OPTIMIZATION_CRITERIA.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param constraintValues constraint limit values
  * @param targetValue target objective value
  */
-public final class StepOptimizationCriteria implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOptimizationCriteria extends AbstractStepEntity {
     private final String objectiveType;
     private final String objectiveVariable;
     private final List<String> constraints;
@@ -25,21 +24,12 @@ public final class StepOptimizationCriteria implements StepEntity {
     private final double targetValue;
 
     public StepOptimizationCriteria(int id, String name, String objectiveType, String objectiveVariable, List<String> constraints, List<Double> constraintValues, double targetValue) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.objectiveType = objectiveType;
         this.objectiveVariable = objectiveVariable;
         this.constraints = constraints == null ? null : java.util.List.copyOf(constraints);
         this.constraintValues = constraintValues == null ? null : java.util.List.copyOf(constraintValues);
         this.targetValue = targetValue;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getObjectiveType() {
@@ -63,20 +53,15 @@ public final class StepOptimizationCriteria implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOptimizationCriteria that = (StepOptimizationCriteria) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(objectiveType, that.objectiveType) && Objects.equals(objectiveVariable, that.objectiveVariable) && Objects.equals(constraints, that.constraints) && Objects.equals(constraintValues, that.constraintValues) && targetValue == that.targetValue;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, objectiveType, objectiveVariable, constraints, constraintValues, targetValue);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOptimizationCriteria{" + "id=" + id + "name=" + name + "objectiveType=" + objectiveType + "objectiveVariable=" + objectiveVariable + "constraints=" + constraints + "constraintValues=" + constraintValues + "targetValue=" + targetValue + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("objectiveType", objectiveType);
+        state.put("objectiveVariable", objectiveVariable);
+        state.put("constraints", constraints);
+        state.put("constraintValues", constraintValues);
+        state.put("targetValue", targetValue);
+        return state;
     }
 }

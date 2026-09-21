@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INTERFACE_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param interfaceStandard interface standard reference
  * @param matingInterface mating interface reference
  */
-public final class StepInterfaceFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInterfaceFeature extends AbstractStepEntity {
     private final String interfaceType;
     private final StepEntity interfaceGeometry;
     private final StepEntity interfacePosition;
@@ -27,22 +26,13 @@ public final class StepInterfaceFeature implements StepEntity {
     private final StepEntity matingInterface;
 
     public StepInterfaceFeature(int id, String name, String interfaceType, StepEntity interfaceGeometry, StepEntity interfacePosition, int varianceConnections, String interfaceStandard, StepEntity matingInterface) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.interfaceType = interfaceType;
         this.interfaceGeometry = interfaceGeometry;
         this.interfacePosition = interfacePosition;
         this.varianceConnections = varianceConnections;
         this.interfaceStandard = interfaceStandard;
         this.matingInterface = matingInterface;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getInterfaceType() {
@@ -70,20 +60,16 @@ public final class StepInterfaceFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInterfaceFeature that = (StepInterfaceFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(interfaceType, that.interfaceType) && Objects.equals(interfaceGeometry, that.interfaceGeometry) && Objects.equals(interfacePosition, that.interfacePosition) && varianceConnections == that.varianceConnections && Objects.equals(interfaceStandard, that.interfaceStandard) && Objects.equals(matingInterface, that.matingInterface);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, interfaceType, interfaceGeometry, interfacePosition, varianceConnections, interfaceStandard, matingInterface);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInterfaceFeature{" + "id=" + id + "name=" + name + "interfaceType=" + interfaceType + "interfaceGeometry=" + interfaceGeometry + "interfacePosition=" + interfacePosition + "varianceConnections=" + varianceConnections + "interfaceStandard=" + interfaceStandard + "matingInterface=" + matingInterface + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("interfaceType", interfaceType);
+        state.put("interfaceGeometry", interfaceGeometry);
+        state.put("interfacePosition", interfacePosition);
+        state.put("varianceConnections", varianceConnections);
+        state.put("interfaceStandard", interfaceStandard);
+        state.put("matingInterface", matingInterface);
+        return state;
     }
 }

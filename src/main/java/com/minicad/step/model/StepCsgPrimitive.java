@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal parse-only CSG primitive solid.
@@ -12,27 +13,16 @@ import java.util.Objects;
  * @param dimensions primitive numeric parameters in STEP order
  * @param entityName concrete STEP entity name
  */
-public final class StepCsgPrimitive implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCsgPrimitive extends AbstractStepEntity {
     private final StepEntity position;
     private final List<Double> dimensions;
     private final String entityName;
 
     public StepCsgPrimitive(int id, String name, StepEntity position, List<Double> dimensions, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.dimensions = dimensions == null ? null : java.util.List.copyOf(dimensions);
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -55,20 +45,13 @@ public final class StepCsgPrimitive implements StepEntity {
     public String entityName() { return getEntityName(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCsgPrimitive that = (StepCsgPrimitive) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && Objects.equals(dimensions, that.dimensions) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, dimensions, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCsgPrimitive{" + "id=" + id + "name=" + name + "position=" + position + "dimensions=" + dimensions + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("dimensions", dimensions);
+        state.put("entityName", entityName);
+        return state;
     }
 }

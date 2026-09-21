@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved LOCATION_INSTANCE.
  * A location instance entity.
@@ -12,29 +14,18 @@ import java.util.Objects;
  * @param locationCapacity location variance capacity
  * @param locationStatus location variance status
  */
-public final class StepLocationInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLocationInstance extends AbstractStepEntity {
     private final StepEntity locationDefinition;
     private final String locationState;
     private final double locationCapacity;
     private final String locationStatus;
 
     public StepLocationInstance(int id, String name, StepEntity locationDefinition, String locationState, double locationCapacity, String locationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.locationDefinition = locationDefinition;
         this.locationState = locationState;
         this.locationCapacity = locationCapacity;
         this.locationStatus = locationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getLocationDefinition() {
@@ -54,20 +45,14 @@ public final class StepLocationInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLocationInstance that = (StepLocationInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(locationDefinition, that.locationDefinition) && Objects.equals(locationState, that.locationState) && locationCapacity == that.locationCapacity && Objects.equals(locationStatus, that.locationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, locationDefinition, locationState, locationCapacity, locationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLocationInstance{" + "id=" + id + "name=" + name + "locationDefinition=" + locationDefinition + "locationState=" + locationState + "locationCapacity=" + locationCapacity + "locationStatus=" + locationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("locationDefinition", locationDefinition);
+        state.put("locationState", locationState);
+        state.put("locationCapacity", locationCapacity);
+        state.put("locationStatus", locationStatus);
+        return state;
     }
 }

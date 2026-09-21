@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SHAPE_DIMENSION_REPRESENTATION_WITH_TOLERANCE.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * * @param context representation context
  * @param tolerance tolerance associated with the dimension
  */
-public final class StepShapeDimensionRepresentationWithTolerance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepShapeDimensionRepresentationWithTolerance extends AbstractStepEntity {
     private final List<StepEntity> items;
     private final StepEntity context;
     private final StepEntity tolerance;
 
     public StepShapeDimensionRepresentationWithTolerance(int id, String name, List<StepEntity> items, StepEntity context, StepEntity tolerance) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.items = items == null ? null : java.util.List.copyOf(items);
         this.context = context;
         this.tolerance = tolerance;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getItems() {
@@ -49,20 +39,13 @@ public final class StepShapeDimensionRepresentationWithTolerance implements Step
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepShapeDimensionRepresentationWithTolerance that = (StepShapeDimensionRepresentationWithTolerance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(items, that.items) && Objects.equals(context, that.context) && Objects.equals(tolerance, that.tolerance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, items, context, tolerance);
-    }
-
-    @Override
-    public String toString() {
-        return "StepShapeDimensionRepresentationWithTolerance{" + "id=" + id + "name=" + name + "items=" + items + "context=" + context + "tolerance=" + tolerance + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("items", items);
+        state.put("context", context);
+        state.put("tolerance", tolerance);
+        return state;
     }
 }

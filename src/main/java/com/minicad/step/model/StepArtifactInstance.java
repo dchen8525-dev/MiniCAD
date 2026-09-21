@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ARTIFACT_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param artifactSize artifact variance size
  * @param artifactStatus artifact variance status
  */
-public final class StepArtifactInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepArtifactInstance extends AbstractStepEntity {
     private final StepEntity artifactDefinition;
     private final String artifactState;
     private final StepEntity artifactLocation;
@@ -25,21 +24,12 @@ public final class StepArtifactInstance implements StepEntity {
     private final String artifactStatus;
 
     public StepArtifactInstance(int id, String name, StepEntity artifactDefinition, String artifactState, StepEntity artifactLocation, long artifactSize, String artifactStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.artifactDefinition = artifactDefinition;
         this.artifactState = artifactState;
         this.artifactLocation = artifactLocation;
         this.artifactSize = artifactSize;
         this.artifactStatus = artifactStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getArtifactDefinition() {
@@ -63,20 +53,15 @@ public final class StepArtifactInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepArtifactInstance that = (StepArtifactInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(artifactDefinition, that.artifactDefinition) && Objects.equals(artifactState, that.artifactState) && Objects.equals(artifactLocation, that.artifactLocation) && artifactSize == that.artifactSize && Objects.equals(artifactStatus, that.artifactStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, artifactDefinition, artifactState, artifactLocation, artifactSize, artifactStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepArtifactInstance{" + "id=" + id + "name=" + name + "artifactDefinition=" + artifactDefinition + "artifactState=" + artifactState + "artifactLocation=" + artifactLocation + "artifactSize=" + artifactSize + "artifactStatus=" + artifactStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("artifactDefinition", artifactDefinition);
+        state.put("artifactState", artifactState);
+        state.put("artifactLocation", artifactLocation);
+        state.put("artifactSize", artifactSize);
+        state.put("artifactStatus", artifactStatus);
+        return state;
     }
 }

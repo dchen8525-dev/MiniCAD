@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_DOCUMENT_REFERENCE metadata.
@@ -12,23 +13,18 @@ import java.util.Objects;
  * @param source document source label
  * @param items referenced target items
  */
-public final class StepAppliedDocumentReference implements StepEntity {
-    private final int id;
+public final class StepAppliedDocumentReference extends AbstractStepEntity {
     private final String entityName;
     private final StepDocument assignedDocument;
     private final String source;
     private final List<StepEntity> items;
 
     public StepAppliedDocumentReference(int id, String entityName, StepDocument assignedDocument, String source, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.entityName = entityName;
         this.assignedDocument = assignedDocument;
         this.source = source;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getEntityName() {
@@ -69,20 +65,13 @@ public final class StepAppliedDocumentReference implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedDocumentReference that = (StepAppliedDocumentReference) o;
-        return id == that.id && Objects.equals(entityName, that.entityName) && Objects.equals(assignedDocument, that.assignedDocument) && Objects.equals(source, that.source) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, entityName, assignedDocument, source, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedDocumentReference{" + "id=" + id + "entityName=" + entityName + "assignedDocument=" + assignedDocument + "source=" + source + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("entityName", entityName);
+        state.put("assignedDocument", assignedDocument);
+        state.put("source", source);
+        state.put("items", items);
+        return state;
     }
 }

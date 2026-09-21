@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SEAL_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param sealMaterial seal material specification
  * @param sealPlacement seal position placement
  */
-public final class StepSealFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSealFeature extends AbstractStepEntity {
     private final String sealType;
     private final double innerDiameter;
     private final double outerDiameter;
@@ -27,22 +26,13 @@ public final class StepSealFeature implements StepEntity {
     private final StepEntity sealPlacement;
 
     public StepSealFeature(int id, String name, String sealType, double innerDiameter, double outerDiameter, double sealWidth, StepEntity sealMaterial, StepEntity sealPlacement) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sealType = sealType;
         this.innerDiameter = innerDiameter;
         this.outerDiameter = outerDiameter;
         this.sealWidth = sealWidth;
         this.sealMaterial = sealMaterial;
         this.sealPlacement = sealPlacement;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSealType() {
@@ -70,20 +60,16 @@ public final class StepSealFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSealFeature that = (StepSealFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sealType, that.sealType) && innerDiameter == that.innerDiameter && outerDiameter == that.outerDiameter && sealWidth == that.sealWidth && Objects.equals(sealMaterial, that.sealMaterial) && Objects.equals(sealPlacement, that.sealPlacement);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sealType, innerDiameter, outerDiameter, sealWidth, sealMaterial, sealPlacement);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSealFeature{" + "id=" + id + "name=" + name + "sealType=" + sealType + "innerDiameter=" + innerDiameter + "outerDiameter=" + outerDiameter + "sealWidth=" + sealWidth + "sealMaterial=" + sealMaterial + "sealPlacement=" + sealPlacement + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sealType", sealType);
+        state.put("innerDiameter", innerDiameter);
+        state.put("outerDiameter", outerDiameter);
+        state.put("sealWidth", sealWidth);
+        state.put("sealMaterial", sealMaterial);
+        state.put("sealPlacement", sealPlacement);
+        return state;
     }
 }

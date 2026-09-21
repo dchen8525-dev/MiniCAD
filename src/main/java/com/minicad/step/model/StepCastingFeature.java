@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CASTING_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param partingSurface parting surface geometry
  * @param castingMaterial casting material specification
  */
-public final class StepCastingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCastingFeature extends AbstractStepEntity {
     private final String castingType;
     private final StepEntity moldGeometry;
     private final List<StepEntity> gatingSystem;
@@ -27,22 +26,13 @@ public final class StepCastingFeature implements StepEntity {
     private final StepEntity castingMaterial;
 
     public StepCastingFeature(int id, String name, String castingType, StepEntity moldGeometry, List<StepEntity> gatingSystem, List<StepEntity> riserFeatures, StepEntity partingSurface, StepEntity castingMaterial) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.castingType = castingType;
         this.moldGeometry = moldGeometry;
         this.gatingSystem = gatingSystem == null ? null : java.util.List.copyOf(gatingSystem);
         this.riserFeatures = riserFeatures == null ? null : java.util.List.copyOf(riserFeatures);
         this.partingSurface = partingSurface;
         this.castingMaterial = castingMaterial;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCastingType() {
@@ -70,20 +60,16 @@ public final class StepCastingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCastingFeature that = (StepCastingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(castingType, that.castingType) && Objects.equals(moldGeometry, that.moldGeometry) && Objects.equals(gatingSystem, that.gatingSystem) && Objects.equals(riserFeatures, that.riserFeatures) && Objects.equals(partingSurface, that.partingSurface) && Objects.equals(castingMaterial, that.castingMaterial);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, castingType, moldGeometry, gatingSystem, riserFeatures, partingSurface, castingMaterial);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCastingFeature{" + "id=" + id + "name=" + name + "castingType=" + castingType + "moldGeometry=" + moldGeometry + "gatingSystem=" + gatingSystem + "riserFeatures=" + riserFeatures + "partingSurface=" + partingSurface + "castingMaterial=" + castingMaterial + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("castingType", castingType);
+        state.put("moldGeometry", moldGeometry);
+        state.put("gatingSystem", gatingSystem);
+        state.put("riserFeatures", riserFeatures);
+        state.put("partingSurface", partingSurface);
+        state.put("castingMaterial", castingMaterial);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved SURFACED_EDGE_CURVE.
  * An edge curve with associated surface geometry.
@@ -12,29 +14,18 @@ import java.util.Objects;
  * @param surface2 second associated surface
  * @param sameSurface flag indicating surfaces are identical
  */
-public final class StepSurfacedEdgeCurve implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSurfacedEdgeCurve extends AbstractStepEntity {
     private final StepEntity edgeGeometry;
     private final StepEntity surface1;
     private final StepEntity surface2;
     private final boolean sameSurface;
 
     public StepSurfacedEdgeCurve(int id, String name, StepEntity edgeGeometry, StepEntity surface1, StepEntity surface2, boolean sameSurface) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.edgeGeometry = edgeGeometry;
         this.surface1 = surface1;
         this.surface2 = surface2;
         this.sameSurface = sameSurface;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getEdgeGeometry() {
@@ -61,20 +52,14 @@ public final class StepSurfacedEdgeCurve implements StepEntity {
     public boolean reversed() { return false; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfacedEdgeCurve that = (StepSurfacedEdgeCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(edgeGeometry, that.edgeGeometry) && Objects.equals(surface1, that.surface1) && Objects.equals(surface2, that.surface2) && sameSurface == that.sameSurface;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, edgeGeometry, surface1, surface2, sameSurface);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfacedEdgeCurve{" + "id=" + id + "name=" + name + "edgeGeometry=" + edgeGeometry + "surface1=" + surface1 + "surface2=" + surface2 + "sameSurface=" + sameSurface + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("edgeGeometry", edgeGeometry);
+        state.put("surface1", surface1);
+        state.put("surface2", surface2);
+        state.put("sameSurface", sameSurface);
+        return state;
     }
 }

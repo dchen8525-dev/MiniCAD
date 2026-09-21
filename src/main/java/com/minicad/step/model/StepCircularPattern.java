@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CIRCULAR_PATTERN.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param angularSpacing angular spacing between features
  * @param count number of features
  */
-public final class StepCircularPattern implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCircularPattern extends AbstractStepEntity {
     private final StepEntity baseFeature;
     private final StepEntity axis;
     private final Double angularSpacing;
     private final Integer count;
 
     public StepCircularPattern(int id, String name, StepEntity baseFeature, StepEntity axis, Double angularSpacing, Integer count) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.baseFeature = baseFeature;
         this.axis = axis;
         this.angularSpacing = angularSpacing;
         this.count = count;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBaseFeature() {
@@ -56,20 +46,14 @@ public final class StepCircularPattern implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCircularPattern that = (StepCircularPattern) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(baseFeature, that.baseFeature) && Objects.equals(axis, that.axis) && Objects.equals(angularSpacing, that.angularSpacing) && Objects.equals(count, that.count);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, baseFeature, axis, angularSpacing, count);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCircularPattern{" + "id=" + id + "name=" + name + "baseFeature=" + baseFeature + "axis=" + axis + "angularSpacing=" + angularSpacing + "count=" + count + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("baseFeature", baseFeature);
+        state.put("axis", axis);
+        state.put("angularSpacing", angularSpacing);
+        state.put("count", count);
+        return state;
     }
 }

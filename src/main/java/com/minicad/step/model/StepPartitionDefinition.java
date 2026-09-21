@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PARTITION_DEFINITION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param partitionRange partition variance range
  * @param partitionStatus partition variance status
  */
-public final class StepPartitionDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPartitionDefinition extends AbstractStepEntity {
     private final String partitionType;
     private final String partitionCriteria;
     private final List<String> partitionRange;
     private final String partitionStatus;
 
     public StepPartitionDefinition(int id, String name, String partitionType, String partitionCriteria, List<String> partitionRange, String partitionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.partitionType = partitionType;
         this.partitionCriteria = partitionCriteria;
         this.partitionRange = partitionRange == null ? null : java.util.List.copyOf(partitionRange);
         this.partitionStatus = partitionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPartitionType() {
@@ -56,20 +46,14 @@ public final class StepPartitionDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPartitionDefinition that = (StepPartitionDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(partitionType, that.partitionType) && Objects.equals(partitionCriteria, that.partitionCriteria) && Objects.equals(partitionRange, that.partitionRange) && Objects.equals(partitionStatus, that.partitionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, partitionType, partitionCriteria, partitionRange, partitionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPartitionDefinition{" + "id=" + id + "name=" + name + "partitionType=" + partitionType + "partitionCriteria=" + partitionCriteria + "partitionRange=" + partitionRange + "partitionStatus=" + partitionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("partitionType", partitionType);
+        state.put("partitionCriteria", partitionCriteria);
+        state.put("partitionRange", partitionRange);
+        state.put("partitionStatus", partitionStatus);
+        return state;
     }
 }

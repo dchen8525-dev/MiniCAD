@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal shape aspect relationship.
  *
@@ -11,29 +13,18 @@ import java.util.Objects;
  * @param relatedShapeAspect target shape aspect (or subtype)
  * @param entityName concrete STEP entity name
  */
-public final class StepShapeAspectRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepShapeAspectRelationship extends AbstractStepEntity {
     private final String description;
     private final StepEntity relatingShapeAspect;
     private final StepEntity relatedShapeAspect;
     private final String entityName;
 
     public StepShapeAspectRelationship(int id, String name, String description, StepEntity relatingShapeAspect, StepEntity relatedShapeAspect, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.relatingShapeAspect = relatingShapeAspect;
         this.relatedShapeAspect = relatedShapeAspect;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -66,20 +57,14 @@ public final class StepShapeAspectRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepShapeAspectRelationship that = (StepShapeAspectRelationship) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingShapeAspect, that.relatingShapeAspect) && Objects.equals(relatedShapeAspect, that.relatedShapeAspect) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, relatingShapeAspect, relatedShapeAspect, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepShapeAspectRelationship{" + "id=" + id + "name=" + name + "description=" + description + "relatingShapeAspect=" + relatingShapeAspect + "relatedShapeAspect=" + relatedShapeAspect + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingShapeAspect", relatingShapeAspect);
+        state.put("relatedShapeAspect", relatedShapeAspect);
+        state.put("entityName", entityName);
+        return state;
     }
 }

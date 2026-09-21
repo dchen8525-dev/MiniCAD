@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ALGORITHM_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceComplexity algorithm variance complexity level
  * @varianceStatus definition variance status
  */
-public final class StepAlgorithmDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAlgorithmDefinition extends AbstractStepEntity {
     private final String varianceAlgorithm;
     private final List<StepEntity> varianceInputs;
     private final List<StepEntity> varianceOutputs;
@@ -27,22 +26,13 @@ public final class StepAlgorithmDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepAlgorithmDefinition(int id, String name, String varianceAlgorithm, List<StepEntity> varianceInputs, List<StepEntity> varianceOutputs, List<String> varianceSteps, int varianceComplexity, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceAlgorithm = varianceAlgorithm;
         this.varianceInputs = varianceInputs == null ? null : java.util.List.copyOf(varianceInputs);
         this.varianceOutputs = varianceOutputs == null ? null : java.util.List.copyOf(varianceOutputs);
         this.varianceSteps = varianceSteps == null ? null : java.util.List.copyOf(varianceSteps);
         this.varianceComplexity = varianceComplexity;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceAlgorithm() {
@@ -70,20 +60,16 @@ public final class StepAlgorithmDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAlgorithmDefinition that = (StepAlgorithmDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceAlgorithm, that.varianceAlgorithm) && Objects.equals(varianceInputs, that.varianceInputs) && Objects.equals(varianceOutputs, that.varianceOutputs) && Objects.equals(varianceSteps, that.varianceSteps) && varianceComplexity == that.varianceComplexity && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceAlgorithm, varianceInputs, varianceOutputs, varianceSteps, varianceComplexity, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAlgorithmDefinition{" + "id=" + id + "name=" + name + "varianceAlgorithm=" + varianceAlgorithm + "varianceInputs=" + varianceInputs + "varianceOutputs=" + varianceOutputs + "varianceSteps=" + varianceSteps + "varianceComplexity=" + varianceComplexity + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceAlgorithm", varianceAlgorithm);
+        state.put("varianceInputs", varianceInputs);
+        state.put("varianceOutputs", varianceOutputs);
+        state.put("varianceSteps", varianceSteps);
+        state.put("varianceComplexity", varianceComplexity);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

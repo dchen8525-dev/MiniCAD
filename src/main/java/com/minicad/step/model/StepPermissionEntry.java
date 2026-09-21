@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PERMISSION_ENTRY.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param entryTimestamp entry variance timestamp
  * @param entryStatus entry variance status
  */
-public final class StepPermissionEntry implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPermissionEntry extends AbstractStepEntity {
     private final String entryType;
     private final String entryPermission;
     private final StepEntity entryTarget;
@@ -29,8 +28,7 @@ public final class StepPermissionEntry implements StepEntity {
     private final String entryStatus;
 
     public StepPermissionEntry(int id, String name, String entryType, String entryPermission, StepEntity entryTarget, StepEntity entryHolder, boolean entryGranted, StepEntity entryTimestamp, String entryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.entryType = entryType;
         this.entryPermission = entryPermission;
         this.entryTarget = entryTarget;
@@ -38,14 +36,6 @@ public final class StepPermissionEntry implements StepEntity {
         this.entryGranted = entryGranted;
         this.entryTimestamp = entryTimestamp;
         this.entryStatus = entryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEntryType() {
@@ -77,20 +67,17 @@ public final class StepPermissionEntry implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPermissionEntry that = (StepPermissionEntry) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(entryType, that.entryType) && Objects.equals(entryPermission, that.entryPermission) && Objects.equals(entryTarget, that.entryTarget) && Objects.equals(entryHolder, that.entryHolder) && entryGranted == that.entryGranted && Objects.equals(entryTimestamp, that.entryTimestamp) && Objects.equals(entryStatus, that.entryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, entryType, entryPermission, entryTarget, entryHolder, entryGranted, entryTimestamp, entryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPermissionEntry{" + "id=" + id + "name=" + name + "entryType=" + entryType + "entryPermission=" + entryPermission + "entryTarget=" + entryTarget + "entryHolder=" + entryHolder + "entryGranted=" + entryGranted + "entryTimestamp=" + entryTimestamp + "entryStatus=" + entryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("entryType", entryType);
+        state.put("entryPermission", entryPermission);
+        state.put("entryTarget", entryTarget);
+        state.put("entryHolder", entryHolder);
+        state.put("entryGranted", entryGranted);
+        state.put("entryTimestamp", entryTimestamp);
+        state.put("entryStatus", entryStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal draughting model item association carrying an annotation placeholder.
  *
@@ -13,9 +14,7 @@ import java.util.Objects;
  * @param identifiedItem associated item
  * @param annotationPlaceholder annotation placeholder occurrence
  */
-public final class StepDraughtingModelItemAssociationWithPlaceholder implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDraughtingModelItemAssociationWithPlaceholder extends AbstractStepEntity {
     private final String description;
     private final StepEntity definition;
     private final StepRepresentation usedRepresentation;
@@ -23,21 +22,12 @@ public final class StepDraughtingModelItemAssociationWithPlaceholder implements 
     private final StepAnnotationPlaceholderOccurrence annotationPlaceholder;
 
     public StepDraughtingModelItemAssociationWithPlaceholder(int id, String name, String description, StepEntity definition, StepRepresentation usedRepresentation, StepEntity identifiedItem, StepAnnotationPlaceholderOccurrence annotationPlaceholder) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.definition = definition;
         this.usedRepresentation = usedRepresentation;
         this.identifiedItem = identifiedItem;
         this.annotationPlaceholder = annotationPlaceholder;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -62,7 +52,7 @@ public final class StepDraughtingModelItemAssociationWithPlaceholder implements 
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public String description() {
@@ -86,20 +76,15 @@ public final class StepDraughtingModelItemAssociationWithPlaceholder implements 
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDraughtingModelItemAssociationWithPlaceholder that = (StepDraughtingModelItemAssociationWithPlaceholder) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(definition, that.definition) && Objects.equals(usedRepresentation, that.usedRepresentation) && Objects.equals(identifiedItem, that.identifiedItem) && Objects.equals(annotationPlaceholder, that.annotationPlaceholder);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, definition, usedRepresentation, identifiedItem, annotationPlaceholder);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDraughtingModelItemAssociationWithPlaceholder{" + "id=" + id + "name=" + name + "description=" + description + "definition=" + definition + "usedRepresentation=" + usedRepresentation + "identifiedItem=" + identifiedItem + "annotationPlaceholder=" + annotationPlaceholder + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("definition", definition);
+        state.put("usedRepresentation", usedRepresentation);
+        state.put("identifiedItem", identifiedItem);
+        state.put("annotationPlaceholder", annotationPlaceholder);
+        return state;
     }
 }

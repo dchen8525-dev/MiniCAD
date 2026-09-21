@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MOTION_PATH.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param startPosition start position point
  * @param endPosition end position point
  */
-public final class StepMotionPath implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMotionPath extends AbstractStepEntity {
     private final StepEntity pathGeometry;
     private final String motionType;
     private final StepEntity motionSpeed;
@@ -27,22 +26,13 @@ public final class StepMotionPath implements StepEntity {
     private final StepEntity endPosition;
 
     public StepMotionPath(int id, String name, StepEntity pathGeometry, String motionType, StepEntity motionSpeed, StepEntity motionAcceleration, StepEntity startPosition, StepEntity endPosition) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.pathGeometry = pathGeometry;
         this.motionType = motionType;
         this.motionSpeed = motionSpeed;
         this.motionAcceleration = motionAcceleration;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPathGeometry() {
@@ -70,20 +60,16 @@ public final class StepMotionPath implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMotionPath that = (StepMotionPath) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(pathGeometry, that.pathGeometry) && Objects.equals(motionType, that.motionType) && Objects.equals(motionSpeed, that.motionSpeed) && Objects.equals(motionAcceleration, that.motionAcceleration) && Objects.equals(startPosition, that.startPosition) && Objects.equals(endPosition, that.endPosition);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, pathGeometry, motionType, motionSpeed, motionAcceleration, startPosition, endPosition);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMotionPath{" + "id=" + id + "name=" + name + "pathGeometry=" + pathGeometry + "motionType=" + motionType + "motionSpeed=" + motionSpeed + "motionAcceleration=" + motionAcceleration + "startPosition=" + startPosition + "endPosition=" + endPosition + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("pathGeometry", pathGeometry);
+        state.put("motionType", motionType);
+        state.put("motionSpeed", motionSpeed);
+        state.put("motionAcceleration", motionAcceleration);
+        state.put("startPosition", startPosition);
+        state.put("endPosition", endPosition);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal link from a representation to an identified item.
  *
@@ -12,29 +13,18 @@ import java.util.Objects;
  * @param usedRepresentation representation carrying the item
  * @param identifiedItem identified item reference
  */
-public final class StepItemIdentifiedRepresentationUsage implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepItemIdentifiedRepresentationUsage extends AbstractStepEntity {
     private final String description;
     private final StepEntity definition;
     private final StepRepresentation usedRepresentation;
     private final StepEntity identifiedItem;
 
     public StepItemIdentifiedRepresentationUsage(int id, String name, String description, StepEntity definition, StepRepresentation usedRepresentation, StepEntity identifiedItem) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.definition = definition;
         this.usedRepresentation = usedRepresentation;
         this.identifiedItem = identifiedItem;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -55,7 +45,7 @@ public final class StepItemIdentifiedRepresentationUsage implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public String description() {
@@ -75,20 +65,14 @@ public final class StepItemIdentifiedRepresentationUsage implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepItemIdentifiedRepresentationUsage that = (StepItemIdentifiedRepresentationUsage) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(definition, that.definition) && Objects.equals(usedRepresentation, that.usedRepresentation) && Objects.equals(identifiedItem, that.identifiedItem);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, definition, usedRepresentation, identifiedItem);
-    }
-
-    @Override
-    public String toString() {
-        return "StepItemIdentifiedRepresentationUsage{" + "id=" + id + "name=" + name + "description=" + description + "definition=" + definition + "usedRepresentation=" + usedRepresentation + "identifiedItem=" + identifiedItem + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("definition", definition);
+        state.put("usedRepresentation", usedRepresentation);
+        state.put("identifiedItem", identifiedItem);
+        return state;
     }
 }

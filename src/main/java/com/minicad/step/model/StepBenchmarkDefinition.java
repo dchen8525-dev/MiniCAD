@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BENCHMARK_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param benchmarkDescription benchmark variance description
  * @param benchmarkStatus benchmark variance status
  */
-public final class StepBenchmarkDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBenchmarkDefinition extends AbstractStepEntity {
     private final String benchmarkType;
     private final List<StepEntity> benchmarkMetrics;
     private final List<Double> benchmarkReference;
@@ -25,21 +24,12 @@ public final class StepBenchmarkDefinition implements StepEntity {
     private final String benchmarkStatus;
 
     public StepBenchmarkDefinition(int id, String name, String benchmarkType, List<StepEntity> benchmarkMetrics, List<Double> benchmarkReference, String benchmarkDescription, String benchmarkStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.benchmarkType = benchmarkType;
         this.benchmarkMetrics = benchmarkMetrics == null ? null : java.util.List.copyOf(benchmarkMetrics);
         this.benchmarkReference = benchmarkReference == null ? null : java.util.List.copyOf(benchmarkReference);
         this.benchmarkDescription = benchmarkDescription;
         this.benchmarkStatus = benchmarkStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getBenchmarkType() {
@@ -63,20 +53,15 @@ public final class StepBenchmarkDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBenchmarkDefinition that = (StepBenchmarkDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(benchmarkType, that.benchmarkType) && Objects.equals(benchmarkMetrics, that.benchmarkMetrics) && Objects.equals(benchmarkReference, that.benchmarkReference) && Objects.equals(benchmarkDescription, that.benchmarkDescription) && Objects.equals(benchmarkStatus, that.benchmarkStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, benchmarkType, benchmarkMetrics, benchmarkReference, benchmarkDescription, benchmarkStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBenchmarkDefinition{" + "id=" + id + "name=" + name + "benchmarkType=" + benchmarkType + "benchmarkMetrics=" + benchmarkMetrics + "benchmarkReference=" + benchmarkReference + "benchmarkDescription=" + benchmarkDescription + "benchmarkStatus=" + benchmarkStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("benchmarkType", benchmarkType);
+        state.put("benchmarkMetrics", benchmarkMetrics);
+        state.put("benchmarkReference", benchmarkReference);
+        state.put("benchmarkDescription", benchmarkDescription);
+        state.put("benchmarkStatus", benchmarkStatus);
+        return state;
     }
 }

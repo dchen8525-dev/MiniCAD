@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved WORKPIECE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param setupReference setup reference coordinate system
  * @param workpieceType workpiece type (raw, in-process, finished)
  */
-public final class StepWorkpiece implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepWorkpiece extends AbstractStepEntity {
     private final StepEntity workpieceGeometry;
     private final StepEntity rawMaterial;
     private final List<Double> stockDimensions;
@@ -27,22 +26,13 @@ public final class StepWorkpiece implements StepEntity {
     private final String workpieceType;
 
     public StepWorkpiece(int id, String name, StepEntity workpieceGeometry, StepEntity rawMaterial, List<Double> stockDimensions, List<StepEntity> features, StepEntity setupReference, String workpieceType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.workpieceGeometry = workpieceGeometry;
         this.rawMaterial = rawMaterial;
         this.stockDimensions = stockDimensions == null ? null : java.util.List.copyOf(stockDimensions);
         this.features = features == null ? null : java.util.List.copyOf(features);
         this.setupReference = setupReference;
         this.workpieceType = workpieceType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getWorkpieceGeometry() {
@@ -70,20 +60,16 @@ public final class StepWorkpiece implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepWorkpiece that = (StepWorkpiece) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(workpieceGeometry, that.workpieceGeometry) && Objects.equals(rawMaterial, that.rawMaterial) && Objects.equals(stockDimensions, that.stockDimensions) && Objects.equals(features, that.features) && Objects.equals(setupReference, that.setupReference) && Objects.equals(workpieceType, that.workpieceType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, workpieceGeometry, rawMaterial, stockDimensions, features, setupReference, workpieceType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepWorkpiece{" + "id=" + id + "name=" + name + "workpieceGeometry=" + workpieceGeometry + "rawMaterial=" + rawMaterial + "stockDimensions=" + stockDimensions + "features=" + features + "setupReference=" + setupReference + "workpieceType=" + workpieceType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("workpieceGeometry", workpieceGeometry);
+        state.put("rawMaterial", rawMaterial);
+        state.put("stockDimensions", stockDimensions);
+        state.put("features", features);
+        state.put("setupReference", setupReference);
+        state.put("workpieceType", workpieceType);
+        return state;
     }
 }

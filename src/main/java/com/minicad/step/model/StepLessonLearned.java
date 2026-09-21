@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LESSON_LEARNED.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceDate documented variance date
  * @varianceStatus lesson variance status
  */
-public final class StepLessonLearned implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLessonLearned extends AbstractStepEntity {
     private final StepEntity varianceProject;
     private final String varianceSituation;
     private final String varianceLesson;
@@ -29,8 +28,7 @@ public final class StepLessonLearned implements StepEntity {
     private final String varianceStatus;
 
     public StepLessonLearned(int id, String name, StepEntity varianceProject, String varianceSituation, String varianceLesson, String varianceRecommendation, String varianceCategory, StepEntity varianceDate, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceProject = varianceProject;
         this.varianceSituation = varianceSituation;
         this.varianceLesson = varianceLesson;
@@ -38,14 +36,6 @@ public final class StepLessonLearned implements StepEntity {
         this.varianceCategory = varianceCategory;
         this.varianceDate = varianceDate;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceProject() {
@@ -77,20 +67,17 @@ public final class StepLessonLearned implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLessonLearned that = (StepLessonLearned) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceProject, that.varianceProject) && Objects.equals(varianceSituation, that.varianceSituation) && Objects.equals(varianceLesson, that.varianceLesson) && Objects.equals(varianceRecommendation, that.varianceRecommendation) && Objects.equals(varianceCategory, that.varianceCategory) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceProject, varianceSituation, varianceLesson, varianceRecommendation, varianceCategory, varianceDate, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLessonLearned{" + "id=" + id + "name=" + name + "varianceProject=" + varianceProject + "varianceSituation=" + varianceSituation + "varianceLesson=" + varianceLesson + "varianceRecommendation=" + varianceRecommendation + "varianceCategory=" + varianceCategory + "varianceDate=" + varianceDate + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceProject", varianceProject);
+        state.put("varianceSituation", varianceSituation);
+        state.put("varianceLesson", varianceLesson);
+        state.put("varianceRecommendation", varianceRecommendation);
+        state.put("varianceCategory", varianceCategory);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

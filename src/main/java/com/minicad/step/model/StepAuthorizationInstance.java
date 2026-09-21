@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved AUTHORIZATION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param authorizationGrantedTime authorization variance granted time
  * @param authorizationStatus authorization variance status
  */
-public final class StepAuthorizationInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAuthorizationInstance extends AbstractStepEntity {
     private final StepEntity authorizationDefinition;
     private final StepEntity authorizationHolder;
     private final String authorizationState;
@@ -25,21 +24,12 @@ public final class StepAuthorizationInstance implements StepEntity {
     private final String authorizationStatus;
 
     public StepAuthorizationInstance(int id, String name, StepEntity authorizationDefinition, StepEntity authorizationHolder, String authorizationState, StepEntity authorizationGrantedTime, String authorizationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.authorizationDefinition = authorizationDefinition;
         this.authorizationHolder = authorizationHolder;
         this.authorizationState = authorizationState;
         this.authorizationGrantedTime = authorizationGrantedTime;
         this.authorizationStatus = authorizationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getAuthorizationDefinition() {
@@ -63,20 +53,15 @@ public final class StepAuthorizationInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAuthorizationInstance that = (StepAuthorizationInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(authorizationDefinition, that.authorizationDefinition) && Objects.equals(authorizationHolder, that.authorizationHolder) && Objects.equals(authorizationState, that.authorizationState) && Objects.equals(authorizationGrantedTime, that.authorizationGrantedTime) && Objects.equals(authorizationStatus, that.authorizationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, authorizationDefinition, authorizationHolder, authorizationState, authorizationGrantedTime, authorizationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAuthorizationInstance{" + "id=" + id + "name=" + name + "authorizationDefinition=" + authorizationDefinition + "authorizationHolder=" + authorizationHolder + "authorizationState=" + authorizationState + "authorizationGrantedTime=" + authorizationGrantedTime + "authorizationStatus=" + authorizationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("authorizationDefinition", authorizationDefinition);
+        state.put("authorizationHolder", authorizationHolder);
+        state.put("authorizationState", authorizationState);
+        state.put("authorizationGrantedTime", authorizationGrantedTime);
+        state.put("authorizationStatus", authorizationStatus);
+        return state;
     }
 }

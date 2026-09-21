@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_CLASSIFICATION_ASSIGNMENT metadata.
@@ -11,25 +12,16 @@ import java.util.Objects;
  * @param role assignment role
  * @param items assigned target items
  */
-public final class StepAppliedClassificationAssignment implements StepEntity {
-    private final int id;
+public final class StepAppliedClassificationAssignment extends AbstractStepEntity {
     private final StepGroup assignedClass;
     private final StepClassificationRole role;
     private final List<StepEntity> items;
 
     public StepAppliedClassificationAssignment(int id, StepGroup assignedClass, StepClassificationRole role, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.assignedClass = assignedClass;
         this.role = role;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepGroup getAssignedClass() {
@@ -58,20 +50,12 @@ public final class StepAppliedClassificationAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedClassificationAssignment that = (StepAppliedClassificationAssignment) o;
-        return id == that.id && Objects.equals(assignedClass, that.assignedClass) && Objects.equals(role, that.role) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedClass, role, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedClassificationAssignment{" + "id=" + id + "assignedClass=" + assignedClass + "role=" + role + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedClass", assignedClass);
+        state.put("role", role);
+        state.put("items", items);
+        return state;
     }
 }

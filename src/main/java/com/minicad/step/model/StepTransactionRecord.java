@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRANSACTION_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param transactionResult transaction variance result
  * @param transactionStatus transaction variance status
  */
-public final class StepTransactionRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTransactionRecord extends AbstractStepEntity {
     private final String transactionType;
     private final String transactionId;
     private final StepEntity transactionTarget;
@@ -29,8 +28,7 @@ public final class StepTransactionRecord implements StepEntity {
     private final String transactionStatus;
 
     public StepTransactionRecord(int id, String name, String transactionType, String transactionId, StepEntity transactionTarget, StepEntity transactionStartTime, StepEntity transactionEndTime, String transactionResult, String transactionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.transactionType = transactionType;
         this.transactionId = transactionId;
         this.transactionTarget = transactionTarget;
@@ -38,14 +36,6 @@ public final class StepTransactionRecord implements StepEntity {
         this.transactionEndTime = transactionEndTime;
         this.transactionResult = transactionResult;
         this.transactionStatus = transactionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTransactionType() {
@@ -77,20 +67,17 @@ public final class StepTransactionRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTransactionRecord that = (StepTransactionRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(transactionType, that.transactionType) && Objects.equals(transactionId, that.transactionId) && Objects.equals(transactionTarget, that.transactionTarget) && Objects.equals(transactionStartTime, that.transactionStartTime) && Objects.equals(transactionEndTime, that.transactionEndTime) && Objects.equals(transactionResult, that.transactionResult) && Objects.equals(transactionStatus, that.transactionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, transactionType, transactionId, transactionTarget, transactionStartTime, transactionEndTime, transactionResult, transactionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTransactionRecord{" + "id=" + id + "name=" + name + "transactionType=" + transactionType + "transactionId=" + transactionId + "transactionTarget=" + transactionTarget + "transactionStartTime=" + transactionStartTime + "transactionEndTime=" + transactionEndTime + "transactionResult=" + transactionResult + "transactionStatus=" + transactionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("transactionType", transactionType);
+        state.put("transactionId", transactionId);
+        state.put("transactionTarget", transactionTarget);
+        state.put("transactionStartTime", transactionStartTime);
+        state.put("transactionEndTime", transactionEndTime);
+        state.put("transactionResult", transactionResult);
+        state.put("transactionStatus", transactionStatus);
+        return state;
     }
 }

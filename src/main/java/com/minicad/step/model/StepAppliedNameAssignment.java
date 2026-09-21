@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_NAME_ASSIGNMENT metadata.
@@ -10,19 +11,14 @@ import java.util.Objects;
  * @param assignedName assigned name
  * @param items assigned target items
  */
-public final class StepAppliedNameAssignment implements StepEntity {
-    private final int id;
+public final class StepAppliedNameAssignment extends AbstractStepEntity {
     private final String assignedName;
     private final List<StepEntity> items;
 
     public StepAppliedNameAssignment(int id, String assignedName, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.assignedName = assignedName;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {
@@ -47,20 +43,11 @@ public final class StepAppliedNameAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedNameAssignment that = (StepAppliedNameAssignment) o;
-        return id == that.id && Objects.equals(assignedName, that.assignedName) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedName, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedNameAssignment{" + "id=" + id + "assignedName=" + assignedName + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedName", assignedName);
+        state.put("items", items);
+        return state;
     }
 }

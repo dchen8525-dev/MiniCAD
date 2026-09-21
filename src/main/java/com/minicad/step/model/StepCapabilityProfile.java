@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CAPABILITY_PROFILE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @varianceAccuracy accuracy variance specifications
  * @varianceStatus profile variance status
  */
-public final class StepCapabilityProfile implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCapabilityProfile extends AbstractStepEntity {
     private final StepEntity varianceResource;
     private final List<String> varianceCapabilities;
     private final List<Double> varianceCapacities;
@@ -25,21 +24,12 @@ public final class StepCapabilityProfile implements StepEntity {
     private final String varianceStatus;
 
     public StepCapabilityProfile(int id, String name, StepEntity varianceResource, List<String> varianceCapabilities, List<Double> varianceCapacities, List<Double> varianceAccuracy, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceResource = varianceResource;
         this.varianceCapabilities = varianceCapabilities == null ? null : java.util.List.copyOf(varianceCapabilities);
         this.varianceCapacities = varianceCapacities == null ? null : java.util.List.copyOf(varianceCapacities);
         this.varianceAccuracy = varianceAccuracy == null ? null : java.util.List.copyOf(varianceAccuracy);
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceResource() {
@@ -63,20 +53,15 @@ public final class StepCapabilityProfile implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCapabilityProfile that = (StepCapabilityProfile) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceResource, that.varianceResource) && Objects.equals(varianceCapabilities, that.varianceCapabilities) && Objects.equals(varianceCapacities, that.varianceCapacities) && Objects.equals(varianceAccuracy, that.varianceAccuracy) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceResource, varianceCapabilities, varianceCapacities, varianceAccuracy, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCapabilityProfile{" + "id=" + id + "name=" + name + "varianceResource=" + varianceResource + "varianceCapabilities=" + varianceCapabilities + "varianceCapacities=" + varianceCapacities + "varianceAccuracy=" + varianceAccuracy + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceResource", varianceResource);
+        state.put("varianceCapabilities", varianceCapabilities);
+        state.put("varianceCapacities", varianceCapacities);
+        state.put("varianceAccuracy", varianceAccuracy);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CIRCLE_2D.
  * A circle in 2D parameter space.
@@ -10,25 +12,14 @@ import java.util.Objects;
  * @param position 2D placement (center and direction)
  * @param radius circle radius
  */
-public final class StepCircle2D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCircle2D extends AbstractStepEntity {
     private final StepAxis2Placement2D position;
     private final double radius;
 
     public StepCircle2D(int id, String name, StepAxis2Placement2D position, double radius) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.radius = radius;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepAxis2Placement2D getPosition() {
@@ -46,20 +37,12 @@ public final class StepCircle2D implements StepEntity {
     public double radius() { return getRadius(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCircle2D that = (StepCircle2D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && radius == that.radius;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, radius);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCircle2D{" + "id=" + id + "name=" + name + "position=" + position + "radius=" + radius + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("radius", radius);
+        return state;
     }
 }

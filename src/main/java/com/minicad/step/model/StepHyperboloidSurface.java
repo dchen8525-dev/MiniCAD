@@ -1,31 +1,22 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved HYPERBOLOID_SURFACE.
  * A quadric surface defined by a hyperboloid shape (one-sheet or two-sheet).
  */
-public final class StepHyperboloidSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepHyperboloidSurface extends AbstractStepEntity {
     private final StepEntity position;
     private final Double radius;
     private final Double semiAxis;
 
     public StepHyperboloidSurface(int id, String name, StepEntity position, Double radius, Double semiAxis) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.radius = radius;
         this.semiAxis = semiAxis;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -46,20 +37,13 @@ public final class StepHyperboloidSurface implements StepEntity {
     public Double semiAxis() { return getSemiAxis(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepHyperboloidSurface that = (StepHyperboloidSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && Objects.equals(radius, that.radius) && Objects.equals(semiAxis, that.semiAxis);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, radius, semiAxis);
-    }
-
-    @Override
-    public String toString() {
-        return "StepHyperboloidSurface{" + "id=" + id + "name=" + name + "position=" + position + "radius=" + radius + "semiAxis=" + semiAxis + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("radius", radius);
+        state.put("semiAxis", semiAxis);
+        return state;
     }
 }

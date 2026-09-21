@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SESSION_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param sessionDuration session variance duration
  * @param sessionStatus session variance status
  */
-public final class StepSessionRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSessionRecord extends AbstractStepEntity {
     private final String sessionType;
     private final StepEntity sessionHolder;
     private final StepEntity sessionStartTime;
@@ -27,22 +26,13 @@ public final class StepSessionRecord implements StepEntity {
     private final String sessionStatus;
 
     public StepSessionRecord(int id, String name, String sessionType, StepEntity sessionHolder, StepEntity sessionStartTime, StepEntity sessionEndTime, int sessionDuration, String sessionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sessionType = sessionType;
         this.sessionHolder = sessionHolder;
         this.sessionStartTime = sessionStartTime;
         this.sessionEndTime = sessionEndTime;
         this.sessionDuration = sessionDuration;
         this.sessionStatus = sessionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSessionType() {
@@ -70,20 +60,16 @@ public final class StepSessionRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSessionRecord that = (StepSessionRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sessionType, that.sessionType) && Objects.equals(sessionHolder, that.sessionHolder) && Objects.equals(sessionStartTime, that.sessionStartTime) && Objects.equals(sessionEndTime, that.sessionEndTime) && sessionDuration == that.sessionDuration && Objects.equals(sessionStatus, that.sessionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sessionType, sessionHolder, sessionStartTime, sessionEndTime, sessionDuration, sessionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSessionRecord{" + "id=" + id + "name=" + name + "sessionType=" + sessionType + "sessionHolder=" + sessionHolder + "sessionStartTime=" + sessionStartTime + "sessionEndTime=" + sessionEndTime + "sessionDuration=" + sessionDuration + "sessionStatus=" + sessionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sessionType", sessionType);
+        state.put("sessionHolder", sessionHolder);
+        state.put("sessionStartTime", sessionStartTime);
+        state.put("sessionEndTime", sessionEndTime);
+        state.put("sessionDuration", sessionDuration);
+        state.put("sessionStatus", sessionStatus);
+        return state;
     }
 }

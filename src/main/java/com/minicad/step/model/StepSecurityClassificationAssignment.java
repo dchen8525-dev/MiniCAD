@@ -1,27 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal SECURITY_CLASSIFICATION_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
  * @param assignedSecurityClassification assigned security classification
  */
-public final class StepSecurityClassificationAssignment implements StepEntity {
-    private final int id;
+public final class StepSecurityClassificationAssignment extends AbstractStepEntity {
     private final StepSecurityClassification assignedSecurityClassification;
 
     public StepSecurityClassificationAssignment(int id, StepSecurityClassification assignedSecurityClassification) {
-        this.id = id;
+        super(id, "");
         this.assignedSecurityClassification = assignedSecurityClassification;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepSecurityClassification getAssignedSecurityClassification() {
@@ -34,20 +27,10 @@ public final class StepSecurityClassificationAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSecurityClassificationAssignment that = (StepSecurityClassificationAssignment) o;
-        return id == that.id && Objects.equals(assignedSecurityClassification, that.assignedSecurityClassification);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedSecurityClassification);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSecurityClassificationAssignment{" + "id=" + id + "assignedSecurityClassification=" + assignedSecurityClassification + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedSecurityClassification", assignedSecurityClassification);
+        return state;
     }
 }

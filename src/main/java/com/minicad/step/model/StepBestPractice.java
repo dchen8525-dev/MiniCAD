@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BEST_PRACTICE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceAdoption adoption variance level
  * @varianceStatus practice variance status
  */
-public final class StepBestPractice implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBestPractice extends AbstractStepEntity {
     private final String variancePractice;
     private final String varianceArea;
     private final List<String> varianceBenefits;
@@ -27,22 +26,13 @@ public final class StepBestPractice implements StepEntity {
     private final String varianceStatus;
 
     public StepBestPractice(int id, String name, String variancePractice, String varianceArea, List<String> varianceBenefits, StepEntity varianceReference, int varianceAdoption, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.variancePractice = variancePractice;
         this.varianceArea = varianceArea;
         this.varianceBenefits = varianceBenefits == null ? null : java.util.List.copyOf(varianceBenefits);
         this.varianceReference = varianceReference;
         this.varianceAdoption = varianceAdoption;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVariancePractice() {
@@ -70,20 +60,16 @@ public final class StepBestPractice implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBestPractice that = (StepBestPractice) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(variancePractice, that.variancePractice) && Objects.equals(varianceArea, that.varianceArea) && Objects.equals(varianceBenefits, that.varianceBenefits) && Objects.equals(varianceReference, that.varianceReference) && varianceAdoption == that.varianceAdoption && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, variancePractice, varianceArea, varianceBenefits, varianceReference, varianceAdoption, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBestPractice{" + "id=" + id + "name=" + name + "variancePractice=" + variancePractice + "varianceArea=" + varianceArea + "varianceBenefits=" + varianceBenefits + "varianceReference=" + varianceReference + "varianceAdoption=" + varianceAdoption + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("variancePractice", variancePractice);
+        state.put("varianceArea", varianceArea);
+        state.put("varianceBenefits", varianceBenefits);
+        state.put("varianceReference", varianceReference);
+        state.put("varianceAdoption", varianceAdoption);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

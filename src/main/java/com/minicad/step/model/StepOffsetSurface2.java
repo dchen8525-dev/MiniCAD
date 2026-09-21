@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved OFFSET_SURFACE_2.
  * An offset surface at a given distance from a basis surface.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param distance the offset distance
  * @param sameSense whether the offset surface has the same orientation as the basis surface
  */
-public final class StepOffsetSurface2 implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOffsetSurface2 extends AbstractStepEntity {
     private final StepEntity basisSurface;
     private final double distance;
     private final boolean sameSense;
 
     public StepOffsetSurface2(int id, String name, StepEntity basisSurface, double distance, boolean sameSense) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.basisSurface = basisSurface;
         this.distance = distance;
         this.sameSense = sameSense;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBasisSurface() {
@@ -54,20 +45,13 @@ public final class StepOffsetSurface2 implements StepEntity {
     public boolean sameSense() { return isSameSense(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOffsetSurface2 that = (StepOffsetSurface2) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(basisSurface, that.basisSurface) && distance == that.distance && sameSense == that.sameSense;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, basisSurface, distance, sameSense);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOffsetSurface2{" + "id=" + id + "name=" + name + "basisSurface=" + basisSurface + "distance=" + distance + "sameSense=" + sameSense + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("basisSurface", basisSurface);
+        state.put("distance", distance);
+        state.put("sameSense", sameSense);
+        return state;
     }
 }

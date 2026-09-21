@@ -1,28 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DATUM_REFERENCE_MODIFIER_WITH_SIGN.
  */
-public final class StepDatumReferenceModifierWithSign implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDatumReferenceModifierWithSign extends AbstractStepEntity {
     private final StepEntity modifier;
     private final String sign;
 
     public StepDatumReferenceModifierWithSign(int id, String name, StepEntity modifier, String sign) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.modifier = modifier;
         this.sign = sign;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getModifier() {
@@ -34,20 +25,12 @@ public final class StepDatumReferenceModifierWithSign implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDatumReferenceModifierWithSign that = (StepDatumReferenceModifierWithSign) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(modifier, that.modifier) && Objects.equals(sign, that.sign);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, modifier, sign);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDatumReferenceModifierWithSign{" + "id=" + id + "name=" + name + "modifier=" + modifier + "sign=" + sign + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("modifier", modifier);
+        state.put("sign", sign);
+        return state;
     }
 }

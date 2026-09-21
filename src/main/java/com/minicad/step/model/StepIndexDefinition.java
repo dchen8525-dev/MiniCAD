@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INDEX_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param indexOrder index variance ordering
  * @param indexStatus index variance status
  */
-public final class StepIndexDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepIndexDefinition extends AbstractStepEntity {
     private final String indexType;
     private final String indexKey;
     private final List<String> indexFields;
@@ -25,21 +24,12 @@ public final class StepIndexDefinition implements StepEntity {
     private final String indexStatus;
 
     public StepIndexDefinition(int id, String name, String indexType, String indexKey, List<String> indexFields, String indexOrder, String indexStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.indexType = indexType;
         this.indexKey = indexKey;
         this.indexFields = indexFields == null ? null : java.util.List.copyOf(indexFields);
         this.indexOrder = indexOrder;
         this.indexStatus = indexStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getIndexType() {
@@ -63,20 +53,15 @@ public final class StepIndexDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepIndexDefinition that = (StepIndexDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(indexType, that.indexType) && Objects.equals(indexKey, that.indexKey) && Objects.equals(indexFields, that.indexFields) && Objects.equals(indexOrder, that.indexOrder) && Objects.equals(indexStatus, that.indexStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, indexType, indexKey, indexFields, indexOrder, indexStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepIndexDefinition{" + "id=" + id + "name=" + name + "indexType=" + indexType + "indexKey=" + indexKey + "indexFields=" + indexFields + "indexOrder=" + indexOrder + "indexStatus=" + indexStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("indexType", indexType);
+        state.put("indexKey", indexKey);
+        state.put("indexFields", indexFields);
+        state.put("indexOrder", indexOrder);
+        state.put("indexStatus", indexStatus);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DOCUMENT_RELATIONSHIP metadata.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param relatingDocument source document
  * @param relatedDocument target document
  */
-public final class StepDocumentRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDocumentRelationship extends AbstractStepEntity {
     private final String description;
     private final StepDocument relatingDocument;
     private final StepDocument relatedDocument;
 
     public StepDocumentRelationship(int id, String name, String description, StepDocument relatingDocument, StepDocument relatedDocument) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.relatingDocument = relatingDocument;
         this.relatedDocument = relatedDocument;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -55,20 +46,13 @@ public final class StepDocumentRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDocumentRelationship that = (StepDocumentRelationship) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingDocument, that.relatingDocument) && Objects.equals(relatedDocument, that.relatedDocument);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, relatingDocument, relatedDocument);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDocumentRelationship{" + "id=" + id + "name=" + name + "description=" + description + "relatingDocument=" + relatingDocument + "relatedDocument=" + relatedDocument + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingDocument", relatingDocument);
+        state.put("relatedDocument", relatedDocument);
+        return state;
     }
 }

@@ -1,33 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved MATERIAL.
  * A material definition entity.
  */
-public final class StepMaterial implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMaterial extends AbstractStepEntity {
     private final String materialType;
     private final double youngsModulus;
     private final double poissonsRatio;
     private final double density;
 
     public StepMaterial(int id, String name, String materialType, double youngsModulus, double poissonsRatio, double density) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.materialType = materialType;
         this.youngsModulus = youngsModulus;
         this.poissonsRatio = poissonsRatio;
         this.density = density;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMaterialType() {
@@ -47,20 +38,14 @@ public final class StepMaterial implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMaterial that = (StepMaterial) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(materialType, that.materialType) && youngsModulus == that.youngsModulus && poissonsRatio == that.poissonsRatio && density == that.density;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, materialType, youngsModulus, poissonsRatio, density);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMaterial{" + "id=" + id + "name=" + name + "materialType=" + materialType + "youngsModulus=" + youngsModulus + "poissonsRatio=" + poissonsRatio + "density=" + density + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("materialType", materialType);
+        state.put("youngsModulus", youngsModulus);
+        state.put("poissonsRatio", poissonsRatio);
+        state.put("density", density);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ZONE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param zoneResources zone variance resources within
  * @param zoneStatus zone variance status
  */
-public final class StepZoneInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepZoneInstance extends AbstractStepEntity {
     private final StepEntity zoneDefinition;
     private final String zoneState;
     private final double zoneOccupancy;
@@ -25,21 +24,12 @@ public final class StepZoneInstance implements StepEntity {
     private final String zoneStatus;
 
     public StepZoneInstance(int id, String name, StepEntity zoneDefinition, String zoneState, double zoneOccupancy, List<StepEntity> zoneResources, String zoneStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.zoneDefinition = zoneDefinition;
         this.zoneState = zoneState;
         this.zoneOccupancy = zoneOccupancy;
         this.zoneResources = zoneResources == null ? null : java.util.List.copyOf(zoneResources);
         this.zoneStatus = zoneStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getZoneDefinition() {
@@ -63,20 +53,15 @@ public final class StepZoneInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepZoneInstance that = (StepZoneInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(zoneDefinition, that.zoneDefinition) && Objects.equals(zoneState, that.zoneState) && zoneOccupancy == that.zoneOccupancy && Objects.equals(zoneResources, that.zoneResources) && Objects.equals(zoneStatus, that.zoneStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, zoneDefinition, zoneState, zoneOccupancy, zoneResources, zoneStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepZoneInstance{" + "id=" + id + "name=" + name + "zoneDefinition=" + zoneDefinition + "zoneState=" + zoneState + "zoneOccupancy=" + zoneOccupancy + "zoneResources=" + zoneResources + "zoneStatus=" + zoneStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("zoneDefinition", zoneDefinition);
+        state.put("zoneState", zoneState);
+        state.put("zoneOccupancy", zoneOccupancy);
+        state.put("zoneResources", zoneResources);
+        state.put("zoneStatus", zoneStatus);
+        return state;
     }
 }

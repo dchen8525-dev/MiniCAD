@@ -2,9 +2,9 @@ package com.minicad.step.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ORIENTED_OPEN_SHELL.
@@ -14,25 +14,14 @@ import java.util.Objects;
  * @param openShellElement referenced base open shell
  * @param orientation orientation flag
  */
-public final class StepOrientedOpenShell implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOrientedOpenShell extends AbstractStepEntity {
     private final StepEntity openShellElement;
     private final boolean orientation;
 
     public StepOrientedOpenShell(int id, String name, StepEntity openShellElement, boolean orientation) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.openShellElement = openShellElement;
         this.orientation = orientation;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getOpenShellElement() {
@@ -70,20 +59,12 @@ public final class StepOrientedOpenShell implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOrientedOpenShell that = (StepOrientedOpenShell) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(openShellElement, that.openShellElement) && orientation == that.orientation;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, openShellElement, orientation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOrientedOpenShell{" + "id=" + id + "name=" + name + "openShellElement=" + openShellElement + "orientation=" + orientation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("openShellElement", openShellElement);
+        state.put("orientation", orientation);
+        return state;
     }
 }

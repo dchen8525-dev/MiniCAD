@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal annotation point occurrence for presentation PMI.
@@ -11,25 +12,14 @@ import java.util.Objects;
  * @param styles style assignments
  * @param item annotated point item
  */
-public final class StepAnnotationPointOccurrence implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnnotationPointOccurrence extends AbstractStepEntity {
     private final List<StepPresentationStyleAssignment> styles;
     private final StepEntity item;
 
     public StepAnnotationPointOccurrence(int id, String name, List<StepPresentationStyleAssignment> styles, StepEntity item) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.styles = styles == null ? null : java.util.List.copyOf(styles);
         this.item = item;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepPresentationStyleAssignment> getStyles() {
@@ -42,7 +32,7 @@ public final class StepAnnotationPointOccurrence implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public List<StepPresentationStyleAssignment> styles() {
@@ -54,20 +44,12 @@ public final class StepAnnotationPointOccurrence implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnnotationPointOccurrence that = (StepAnnotationPointOccurrence) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(styles, that.styles) && Objects.equals(item, that.item);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, styles, item);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnnotationPointOccurrence{" + "id=" + id + "name=" + name + "styles=" + styles + "item=" + item + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("styles", styles);
+        state.put("item", item);
+        return state;
     }
 }

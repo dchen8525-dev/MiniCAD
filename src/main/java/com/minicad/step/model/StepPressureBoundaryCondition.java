@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved PRESSURE_BOUNDARY_CONDITION.
  * Pressure boundary condition for FEA.
  */
-public final class StepPressureBoundaryCondition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPressureBoundaryCondition extends AbstractStepEntity {
     private final StepEntity appliedTo;
     private final double pressure;
 
     public StepPressureBoundaryCondition(int id, String name, StepEntity appliedTo, double pressure) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.appliedTo = appliedTo;
         this.pressure = pressure;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getAppliedTo() {
@@ -35,20 +26,12 @@ public final class StepPressureBoundaryCondition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPressureBoundaryCondition that = (StepPressureBoundaryCondition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(appliedTo, that.appliedTo) && pressure == that.pressure;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, appliedTo, pressure);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPressureBoundaryCondition{" + "id=" + id + "name=" + name + "appliedTo=" + appliedTo + "pressure=" + pressure + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("appliedTo", appliedTo);
+        state.put("pressure", pressure);
+        return state;
     }
 }

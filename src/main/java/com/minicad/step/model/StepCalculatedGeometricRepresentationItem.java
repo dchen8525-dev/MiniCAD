@@ -1,27 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CALCULATED_GEOMETRIC_REPRESENTATION_ITEM.
  * A geometric representation item whose values are computed from other geometry.
  */
-public final class StepCalculatedGeometricRepresentationItem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCalculatedGeometricRepresentationItem extends AbstractStepEntity {
     private final StepEntity sourceGeometry;
 
     public StepCalculatedGeometricRepresentationItem(int id, String name, StepEntity sourceGeometry) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sourceGeometry = sourceGeometry;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSourceGeometry() {
@@ -29,20 +20,11 @@ public final class StepCalculatedGeometricRepresentationItem implements StepEnti
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCalculatedGeometricRepresentationItem that = (StepCalculatedGeometricRepresentationItem) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sourceGeometry, that.sourceGeometry);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sourceGeometry);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCalculatedGeometricRepresentationItem{" + "id=" + id + "name=" + name + "sourceGeometry=" + sourceGeometry + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sourceGeometry", sourceGeometry);
+        return state;
     }
 }

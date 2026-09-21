@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved FORMULA_INSTANCE.
  * A formula instance entity.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param formulaResult formula variance result value
  * @param formulaStatus formula variance status
  */
-public final class StepFormulaInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFormulaInstance extends AbstractStepEntity {
     private final StepEntity formulaDefinition;
     private final double formulaResult;
     private final String formulaStatus;
 
     public StepFormulaInstance(int id, String name, StepEntity formulaDefinition, double formulaResult, String formulaStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.formulaDefinition = formulaDefinition;
         this.formulaResult = formulaResult;
         this.formulaStatus = formulaStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getFormulaDefinition() {
@@ -47,20 +38,13 @@ public final class StepFormulaInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFormulaInstance that = (StepFormulaInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(formulaDefinition, that.formulaDefinition) && formulaResult == that.formulaResult && Objects.equals(formulaStatus, that.formulaStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, formulaDefinition, formulaResult, formulaStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFormulaInstance{" + "id=" + id + "name=" + name + "formulaDefinition=" + formulaDefinition + "formulaResult=" + formulaResult + "formulaStatus=" + formulaStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("formulaDefinition", formulaDefinition);
+        state.put("formulaResult", formulaResult);
+        state.put("formulaStatus", formulaStatus);
+        return state;
     }
 }

@@ -1,27 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved GENERALIZED_AREA_PROFILE.
  */
-public final class StepGeneralizedAreaProfile implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGeneralizedAreaProfile extends AbstractStepEntity {
     private final StepEntity profileDef;
 
     public StepGeneralizedAreaProfile(int id, String name, StepEntity profileDef) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.profileDef = profileDef;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getProfileDef() {
@@ -32,20 +22,11 @@ public final class StepGeneralizedAreaProfile implements StepEntity {
     public StepEntity profileDef() { return profileDef; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGeneralizedAreaProfile that = (StepGeneralizedAreaProfile) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(profileDef, that.profileDef);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, profileDef);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGeneralizedAreaProfile{" + "id=" + id + "name=" + name + "profileDef=" + profileDef + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("profileDef", profileDef);
+        return state;
     }
 }

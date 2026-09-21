@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MATERIAL_PROPERTY_REPRESENTATION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param propertyUnit property variance unit reference
  * @param propertyStatus property variance status
  */
-public final class StepMaterialPropertyRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMaterialPropertyRepresentation extends AbstractStepEntity {
     private final String propertyName;
     private final double propertyValue;
     private final StepEntity propertyUnit;
     private final String propertyStatus;
 
     public StepMaterialPropertyRepresentation(int id, String name, String propertyName, double propertyValue, StepEntity propertyUnit, String propertyStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.propertyName = propertyName;
         this.propertyValue = propertyValue;
         this.propertyUnit = propertyUnit;
         this.propertyStatus = propertyStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPropertyName() {
@@ -56,20 +46,14 @@ public final class StepMaterialPropertyRepresentation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMaterialPropertyRepresentation that = (StepMaterialPropertyRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(propertyName, that.propertyName) && propertyValue == that.propertyValue && Objects.equals(propertyUnit, that.propertyUnit) && Objects.equals(propertyStatus, that.propertyStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, propertyName, propertyValue, propertyUnit, propertyStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMaterialPropertyRepresentation{" + "id=" + id + "name=" + name + "propertyName=" + propertyName + "propertyValue=" + propertyValue + "propertyUnit=" + propertyUnit + "propertyStatus=" + propertyStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("propertyName", propertyName);
+        state.put("propertyValue", propertyValue);
+        state.put("propertyUnit", propertyUnit);
+        state.put("propertyStatus", propertyStatus);
+        return state;
     }
 }

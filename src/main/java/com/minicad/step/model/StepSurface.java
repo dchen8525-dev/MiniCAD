@@ -1,44 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal surface marker.
  *
  * @param id STEP instance id
  * @param name inherited geometric-representation-item name when available
  */
-public final class StepSurface implements StepEntity {
-    private final int id;
-    private final String name;
-
+public final class StepSurface extends AbstractStepEntity {
     public StepSurface(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+        super(id, name);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurface that = (StepSurface) o;
-        return id == that.id && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurface{" + "id=" + id + "name=" + name + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        return state;
     }
 }

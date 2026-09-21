@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved EVENT_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @variancePriority event variance priority
  * @varianceStatus definition variance status
  */
-public final class StepEventDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEventDefinition extends AbstractStepEntity {
     private final String varianceEvent;
     private final String varianceType;
     private final String varianceTrigger;
@@ -27,22 +26,13 @@ public final class StepEventDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepEventDefinition(int id, String name, String varianceEvent, String varianceType, String varianceTrigger, StepEntity varianceResponse, int variancePriority, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceEvent = varianceEvent;
         this.varianceType = varianceType;
         this.varianceTrigger = varianceTrigger;
         this.varianceResponse = varianceResponse;
         this.variancePriority = variancePriority;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceEvent() {
@@ -70,20 +60,16 @@ public final class StepEventDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEventDefinition that = (StepEventDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceEvent, that.varianceEvent) && Objects.equals(varianceType, that.varianceType) && Objects.equals(varianceTrigger, that.varianceTrigger) && Objects.equals(varianceResponse, that.varianceResponse) && variancePriority == that.variancePriority && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceEvent, varianceType, varianceTrigger, varianceResponse, variancePriority, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEventDefinition{" + "id=" + id + "name=" + name + "varianceEvent=" + varianceEvent + "varianceType=" + varianceType + "varianceTrigger=" + varianceTrigger + "varianceResponse=" + varianceResponse + "variancePriority=" + variancePriority + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceEvent", varianceEvent);
+        state.put("varianceType", varianceType);
+        state.put("varianceTrigger", varianceTrigger);
+        state.put("varianceResponse", varianceResponse);
+        state.put("variancePriority", variancePriority);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

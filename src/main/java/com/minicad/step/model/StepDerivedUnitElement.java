@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal derived unit element.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param unit referenced unit
  * @param exponent exponent value
  */
-public final class StepDerivedUnitElement implements StepEntity {
-    private final int id;
+public final class StepDerivedUnitElement extends AbstractStepEntity {
     private final StepEntity unit;
     private final double exponent;
 
     public StepDerivedUnitElement(int id, StepEntity unit, double exponent) {
-        this.id = id;
+        super(id, "");
         this.unit = unit;
         this.exponent = exponent;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepEntity getUnit() {
@@ -41,20 +34,11 @@ public final class StepDerivedUnitElement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDerivedUnitElement that = (StepDerivedUnitElement) o;
-        return id == that.id && Objects.equals(unit, that.unit) && exponent == that.exponent;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, unit, exponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDerivedUnitElement{" + "id=" + id + "unit=" + unit + "exponent=" + exponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("unit", unit);
+        state.put("exponent", exponent);
+        return state;
     }
 }

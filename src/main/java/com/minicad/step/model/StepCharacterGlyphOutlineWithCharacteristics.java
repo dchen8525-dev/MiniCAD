@@ -1,31 +1,21 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved CHARACTER_GLYPH_OUTLINE_WITH_CHARACTERISTICS.
  */
-public final class StepCharacterGlyphOutlineWithCharacteristics implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCharacterGlyphOutlineWithCharacteristics extends AbstractStepEntity {
     private final StepEntity glyph;
     private final StepEntity outline;
     private final StepEntity characteristics;
 
     public StepCharacterGlyphOutlineWithCharacteristics(int id, String name, StepEntity glyph, StepEntity outline, StepEntity characteristics) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.glyph = glyph;
         this.outline = outline;
         this.characteristics = characteristics;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getGlyph() {
@@ -41,20 +31,13 @@ public final class StepCharacterGlyphOutlineWithCharacteristics implements StepE
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCharacterGlyphOutlineWithCharacteristics that = (StepCharacterGlyphOutlineWithCharacteristics) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(glyph, that.glyph) && Objects.equals(outline, that.outline) && Objects.equals(characteristics, that.characteristics);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, glyph, outline, characteristics);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCharacterGlyphOutlineWithCharacteristics{" + "id=" + id + "name=" + name + "glyph=" + glyph + "outline=" + outline + "characteristics=" + characteristics + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("glyph", glyph);
+        state.put("outline", outline);
+        state.put("characteristics", characteristics);
+        return state;
     }
 }

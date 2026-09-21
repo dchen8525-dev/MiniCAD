@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved JOB_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param jobDetails job variance details
  * @param jobStatus job variance status
  */
-public final class StepJobRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepJobRecord extends AbstractStepEntity {
     private final String jobType;
     private final StepEntity jobTarget;
     private final StepEntity jobStartTime;
@@ -29,8 +28,7 @@ public final class StepJobRecord implements StepEntity {
     private final String jobStatus;
 
     public StepJobRecord(int id, String name, String jobType, StepEntity jobTarget, StepEntity jobStartTime, StepEntity jobEndTime, String jobResult, List<String> jobDetails, String jobStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.jobType = jobType;
         this.jobTarget = jobTarget;
         this.jobStartTime = jobStartTime;
@@ -38,14 +36,6 @@ public final class StepJobRecord implements StepEntity {
         this.jobResult = jobResult;
         this.jobDetails = jobDetails == null ? null : java.util.List.copyOf(jobDetails);
         this.jobStatus = jobStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getJobType() {
@@ -77,20 +67,17 @@ public final class StepJobRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepJobRecord that = (StepJobRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(jobType, that.jobType) && Objects.equals(jobTarget, that.jobTarget) && Objects.equals(jobStartTime, that.jobStartTime) && Objects.equals(jobEndTime, that.jobEndTime) && Objects.equals(jobResult, that.jobResult) && Objects.equals(jobDetails, that.jobDetails) && Objects.equals(jobStatus, that.jobStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, jobType, jobTarget, jobStartTime, jobEndTime, jobResult, jobDetails, jobStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepJobRecord{" + "id=" + id + "name=" + name + "jobType=" + jobType + "jobTarget=" + jobTarget + "jobStartTime=" + jobStartTime + "jobEndTime=" + jobEndTime + "jobResult=" + jobResult + "jobDetails=" + jobDetails + "jobStatus=" + jobStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("jobType", jobType);
+        state.put("jobTarget", jobTarget);
+        state.put("jobStartTime", jobStartTime);
+        state.put("jobEndTime", jobEndTime);
+        state.put("jobResult", jobResult);
+        state.put("jobDetails", jobDetails);
+        state.put("jobStatus", jobStatus);
+        return state;
     }
 }

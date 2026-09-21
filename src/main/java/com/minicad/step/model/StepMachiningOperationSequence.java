@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MACHINING_OPERATION_SEQUENCE.
@@ -12,25 +13,14 @@ import java.util.Objects;
  * @param operations list of machining operations
  * @param sequenceType sequence type classification
  */
-public final class StepMachiningOperationSequence implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMachiningOperationSequence extends AbstractStepEntity {
     private final List<StepEntity> operations;
     private final String sequenceType;
 
     public StepMachiningOperationSequence(int id, String name, List<StepEntity> operations, String sequenceType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.operations = operations == null ? null : java.util.List.copyOf(operations);
         this.sequenceType = sequenceType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getOperations() {
@@ -42,20 +32,12 @@ public final class StepMachiningOperationSequence implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMachiningOperationSequence that = (StepMachiningOperationSequence) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(operations, that.operations) && Objects.equals(sequenceType, that.sequenceType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, operations, sequenceType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMachiningOperationSequence{" + "id=" + id + "name=" + name + "operations=" + operations + "sequenceType=" + sequenceType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("operations", operations);
+        state.put("sequenceType", sequenceType);
+        return state;
     }
 }

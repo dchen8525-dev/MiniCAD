@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CASE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param caseExpectedOutputs case variance expected outputs
  * @param caseStatus case variance status
  */
-public final class StepCaseDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCaseDefinition extends AbstractStepEntity {
     private final String caseType;
     private final StepEntity caseScenario;
     private final List<String> caseInputs;
@@ -25,21 +24,12 @@ public final class StepCaseDefinition implements StepEntity {
     private final String caseStatus;
 
     public StepCaseDefinition(int id, String name, String caseType, StepEntity caseScenario, List<String> caseInputs, List<String> caseExpectedOutputs, String caseStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.caseType = caseType;
         this.caseScenario = caseScenario;
         this.caseInputs = caseInputs == null ? null : java.util.List.copyOf(caseInputs);
         this.caseExpectedOutputs = caseExpectedOutputs == null ? null : java.util.List.copyOf(caseExpectedOutputs);
         this.caseStatus = caseStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCaseType() {
@@ -63,20 +53,15 @@ public final class StepCaseDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCaseDefinition that = (StepCaseDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(caseType, that.caseType) && Objects.equals(caseScenario, that.caseScenario) && Objects.equals(caseInputs, that.caseInputs) && Objects.equals(caseExpectedOutputs, that.caseExpectedOutputs) && Objects.equals(caseStatus, that.caseStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, caseType, caseScenario, caseInputs, caseExpectedOutputs, caseStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCaseDefinition{" + "id=" + id + "name=" + name + "caseType=" + caseType + "caseScenario=" + caseScenario + "caseInputs=" + caseInputs + "caseExpectedOutputs=" + caseExpectedOutputs + "caseStatus=" + caseStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("caseType", caseType);
+        state.put("caseScenario", caseScenario);
+        state.put("caseInputs", caseInputs);
+        state.put("caseExpectedOutputs", caseExpectedOutputs);
+        state.put("caseStatus", caseStatus);
+        return state;
     }
 }

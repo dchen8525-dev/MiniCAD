@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CHANGE_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param changeTimestamp change variance timestamp
  * @param changeStatus change variance status
  */
-public final class StepChangeRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepChangeRecord extends AbstractStepEntity {
     private final String changeType;
     private final String changeDescription;
     private final StepEntity changeTarget;
@@ -27,22 +26,13 @@ public final class StepChangeRecord implements StepEntity {
     private final String changeStatus;
 
     public StepChangeRecord(int id, String name, String changeType, String changeDescription, StepEntity changeTarget, String changeReason, StepEntity changeTimestamp, String changeStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.changeType = changeType;
         this.changeDescription = changeDescription;
         this.changeTarget = changeTarget;
         this.changeReason = changeReason;
         this.changeTimestamp = changeTimestamp;
         this.changeStatus = changeStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getChangeType() {
@@ -70,20 +60,16 @@ public final class StepChangeRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepChangeRecord that = (StepChangeRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(changeType, that.changeType) && Objects.equals(changeDescription, that.changeDescription) && Objects.equals(changeTarget, that.changeTarget) && Objects.equals(changeReason, that.changeReason) && Objects.equals(changeTimestamp, that.changeTimestamp) && Objects.equals(changeStatus, that.changeStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, changeType, changeDescription, changeTarget, changeReason, changeTimestamp, changeStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepChangeRecord{" + "id=" + id + "name=" + name + "changeType=" + changeType + "changeDescription=" + changeDescription + "changeTarget=" + changeTarget + "changeReason=" + changeReason + "changeTimestamp=" + changeTimestamp + "changeStatus=" + changeStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("changeType", changeType);
+        state.put("changeDescription", changeDescription);
+        state.put("changeTarget", changeTarget);
+        state.put("changeReason", changeReason);
+        state.put("changeTimestamp", changeTimestamp);
+        state.put("changeStatus", changeStatus);
+        return state;
     }
 }

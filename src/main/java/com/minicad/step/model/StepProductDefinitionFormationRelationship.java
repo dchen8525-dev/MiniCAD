@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal PRODUCT_DEFINITION_FORMATION_RELATIONSHIP metadata.
  *
@@ -11,33 +13,22 @@ import java.util.Objects;
  * @param relatingFormation source formation
  * @param relatedFormation target formation
  */
-public final class StepProductDefinitionFormationRelationship implements StepEntity {
-    private final int id;
+public final class StepProductDefinitionFormationRelationship extends AbstractStepEntity {
     private final String identifier;
-    private final String name;
     private final String description;
     private final StepProductDefinitionFormation relatingFormation;
     private final StepProductDefinitionFormation relatedFormation;
 
     public StepProductDefinitionFormationRelationship(int id, String identifier, String name, String description, StepProductDefinitionFormation relatingFormation, StepProductDefinitionFormation relatedFormation) {
-        this.id = id;
+        super(id, name);
         this.identifier = identifier;
-        this.name = name;
         this.description = description;
         this.relatingFormation = relatingFormation;
         this.relatedFormation = relatedFormation;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getIdentifier() {
         return identifier;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -62,20 +53,14 @@ public final class StepProductDefinitionFormationRelationship implements StepEnt
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductDefinitionFormationRelationship that = (StepProductDefinitionFormationRelationship) o;
-        return id == that.id && Objects.equals(identifier, that.identifier) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingFormation, that.relatingFormation) && Objects.equals(relatedFormation, that.relatedFormation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, identifier, name, description, relatingFormation, relatedFormation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductDefinitionFormationRelationship{" + "id=" + id + "identifier=" + identifier + "name=" + name + "description=" + description + "relatingFormation=" + relatingFormation + "relatedFormation=" + relatedFormation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("identifier", identifier);
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingFormation", relatingFormation);
+        state.put("relatedFormation", relatedFormation);
+        return state;
     }
 }

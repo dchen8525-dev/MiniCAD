@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved KPI_MEASUREMENT.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceStatus measurement variance status
  * @varianceComment measurement variance comment
  */
-public final class StepKpiMeasurement implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepKpiMeasurement extends AbstractStepEntity {
     private final StepEntity varianceKpi;
     private final double varianceValue;
     private final StepEntity varianceDate;
@@ -27,22 +26,13 @@ public final class StepKpiMeasurement implements StepEntity {
     private final String varianceComment;
 
     public StepKpiMeasurement(int id, String name, StepEntity varianceKpi, double varianceValue, StepEntity varianceDate, String variancePeriod, String varianceStatus, String varianceComment) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceKpi = varianceKpi;
         this.varianceValue = varianceValue;
         this.varianceDate = varianceDate;
         this.variancePeriod = variancePeriod;
         this.varianceStatus = varianceStatus;
         this.varianceComment = varianceComment;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceKpi() {
@@ -70,20 +60,16 @@ public final class StepKpiMeasurement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepKpiMeasurement that = (StepKpiMeasurement) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceKpi, that.varianceKpi) && varianceValue == that.varianceValue && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(variancePeriod, that.variancePeriod) && Objects.equals(varianceStatus, that.varianceStatus) && Objects.equals(varianceComment, that.varianceComment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceKpi, varianceValue, varianceDate, variancePeriod, varianceStatus, varianceComment);
-    }
-
-    @Override
-    public String toString() {
-        return "StepKpiMeasurement{" + "id=" + id + "name=" + name + "varianceKpi=" + varianceKpi + "varianceValue=" + varianceValue + "varianceDate=" + varianceDate + "variancePeriod=" + variancePeriod + "varianceStatus=" + varianceStatus + "varianceComment=" + varianceComment + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceKpi", varianceKpi);
+        state.put("varianceValue", varianceValue);
+        state.put("varianceDate", varianceDate);
+        state.put("variancePeriod", variancePeriod);
+        state.put("varianceStatus", varianceStatus);
+        state.put("varianceComment", varianceComment);
+        return state;
     }
 }

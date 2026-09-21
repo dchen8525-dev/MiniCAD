@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DEPRESSION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param direction depression direction
  * @param taperAngle optional taper angle
  */
-public final class StepDepression implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDepression extends AbstractStepEntity {
     private final StepEntity profile;
     private final Double depth;
     private final StepEntity direction;
     private final Double taperAngle;
 
     public StepDepression(int id, String name, StepEntity profile, Double depth, StepEntity direction, Double taperAngle) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.profile = profile;
         this.depth = depth;
         this.direction = direction;
         this.taperAngle = taperAngle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getProfile() {
@@ -56,20 +46,14 @@ public final class StepDepression implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDepression that = (StepDepression) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(profile, that.profile) && Objects.equals(depth, that.depth) && Objects.equals(direction, that.direction) && Objects.equals(taperAngle, that.taperAngle);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, profile, depth, direction, taperAngle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDepression{" + "id=" + id + "name=" + name + "profile=" + profile + "depth=" + depth + "direction=" + direction + "taperAngle=" + taperAngle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("profile", profile);
+        state.put("depth", depth);
+        state.put("direction", direction);
+        state.put("taperAngle", taperAngle);
+        return state;
     }
 }

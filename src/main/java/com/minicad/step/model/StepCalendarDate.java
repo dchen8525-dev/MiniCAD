@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CALENDAR_DATE metadata.
  *
@@ -9,21 +11,16 @@ import java.util.Objects;
  * @param dayComponent day of month
  * @param monthComponent month of year
  */
-public final class StepCalendarDate implements StepEntity {
-    private final int id;
+public final class StepCalendarDate extends AbstractStepEntity {
     private final int yearComponent;
     private final int dayComponent;
     private final int monthComponent;
 
     public StepCalendarDate(int id, int yearComponent, int dayComponent, int monthComponent) {
-        this.id = id;
+        super(id, "");
         this.yearComponent = yearComponent;
         this.dayComponent = dayComponent;
         this.monthComponent = monthComponent;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public int getYearComponent() {
@@ -43,20 +40,12 @@ public final class StepCalendarDate implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCalendarDate that = (StepCalendarDate) o;
-        return id == that.id && yearComponent == that.yearComponent && dayComponent == that.dayComponent && monthComponent == that.monthComponent;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, yearComponent, dayComponent, monthComponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCalendarDate{" + "id=" + id + "yearComponent=" + yearComponent + "dayComponent=" + dayComponent + "monthComponent=" + monthComponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("yearComponent", yearComponent);
+        state.put("dayComponent", dayComponent);
+        state.put("monthComponent", monthComponent);
+        return state;
     }
 }

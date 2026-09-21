@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal context-dependent unit definition.
  *
@@ -8,23 +10,12 @@ import java.util.Objects;
  * @param name unit label
  * @param unitKind derived unit kind such as LENGTH_UNIT
  */
-public final class StepContextDependentUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepContextDependentUnit extends AbstractStepEntity {
     private final String unitKind;
 
     public StepContextDependentUnit(int id, String name, String unitKind) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.unitKind = unitKind;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getUnitKind() {
@@ -35,20 +26,11 @@ public final class StepContextDependentUnit implements StepEntity {
     public String unitKind() { return unitKind; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepContextDependentUnit that = (StepContextDependentUnit) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(unitKind, that.unitKind);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, unitKind);
-    }
-
-    @Override
-    public String toString() {
-        return "StepContextDependentUnit{" + "id=" + id + "name=" + name + "unitKind=" + unitKind + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("unitKind", unitKind);
+        return state;
     }
 }

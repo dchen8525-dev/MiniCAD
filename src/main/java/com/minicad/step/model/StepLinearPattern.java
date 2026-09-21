@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LINEAR_PATTERN.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param spacing spacing between features
  * @param count number of features
  */
-public final class StepLinearPattern implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLinearPattern extends AbstractStepEntity {
     private final StepEntity baseFeature;
     private final StepEntity direction;
     private final Double spacing;
     private final Integer count;
 
     public StepLinearPattern(int id, String name, StepEntity baseFeature, StepEntity direction, Double spacing, Integer count) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.baseFeature = baseFeature;
         this.direction = direction;
         this.spacing = spacing;
         this.count = count;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBaseFeature() {
@@ -56,20 +46,14 @@ public final class StepLinearPattern implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLinearPattern that = (StepLinearPattern) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(baseFeature, that.baseFeature) && Objects.equals(direction, that.direction) && Objects.equals(spacing, that.spacing) && Objects.equals(count, that.count);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, baseFeature, direction, spacing, count);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLinearPattern{" + "id=" + id + "name=" + name + "baseFeature=" + baseFeature + "direction=" + direction + "spacing=" + spacing + "count=" + count + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("baseFeature", baseFeature);
+        state.put("direction", direction);
+        state.put("spacing", spacing);
+        state.put("count", count);
+        return state;
     }
 }

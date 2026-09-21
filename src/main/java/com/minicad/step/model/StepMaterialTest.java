@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MATERIAL_TEST.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param testDate test execution date
  * @param testStatus test status result
  */
-public final class StepMaterialTest implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMaterialTest extends AbstractStepEntity {
     private final String testType;
     private final StepEntity testSample;
     private final List<Double> testParameters;
@@ -29,8 +28,7 @@ public final class StepMaterialTest implements StepEntity {
     private final String testStatus;
 
     public StepMaterialTest(int id, String name, String testType, StepEntity testSample, List<Double> testParameters, List<Double> testResults, String testStandard, StepEntity testDate, String testStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.testType = testType;
         this.testSample = testSample;
         this.testParameters = testParameters == null ? null : java.util.List.copyOf(testParameters);
@@ -38,14 +36,6 @@ public final class StepMaterialTest implements StepEntity {
         this.testStandard = testStandard;
         this.testDate = testDate;
         this.testStatus = testStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTestType() {
@@ -77,20 +67,17 @@ public final class StepMaterialTest implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMaterialTest that = (StepMaterialTest) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(testType, that.testType) && Objects.equals(testSample, that.testSample) && Objects.equals(testParameters, that.testParameters) && Objects.equals(testResults, that.testResults) && Objects.equals(testStandard, that.testStandard) && Objects.equals(testDate, that.testDate) && Objects.equals(testStatus, that.testStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, testType, testSample, testParameters, testResults, testStandard, testDate, testStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMaterialTest{" + "id=" + id + "name=" + name + "testType=" + testType + "testSample=" + testSample + "testParameters=" + testParameters + "testResults=" + testResults + "testStandard=" + testStandard + "testDate=" + testDate + "testStatus=" + testStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("testType", testType);
+        state.put("testSample", testSample);
+        state.put("testParameters", testParameters);
+        state.put("testResults", testResults);
+        state.put("testStandard", testStandard);
+        state.put("testDate", testDate);
+        state.put("testStatus", testStatus);
+        return state;
     }
 }

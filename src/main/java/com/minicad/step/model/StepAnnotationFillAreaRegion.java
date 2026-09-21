@@ -1,28 +1,18 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ANNOTATION_FILL_AREA_REGION.
  */
-public final class StepAnnotationFillAreaRegion implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnnotationFillAreaRegion extends AbstractStepEntity {
     private final List<StepEntity> regions;
 
     public StepAnnotationFillAreaRegion(int id, String name, List<StepEntity> regions) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.regions = regions == null ? null : java.util.List.copyOf(regions);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getRegions() {
@@ -30,20 +20,11 @@ public final class StepAnnotationFillAreaRegion implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnnotationFillAreaRegion that = (StepAnnotationFillAreaRegion) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(regions, that.regions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, regions);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnnotationFillAreaRegion{" + "id=" + id + "name=" + name + "regions=" + regions + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("regions", regions);
+        return state;
     }
 }

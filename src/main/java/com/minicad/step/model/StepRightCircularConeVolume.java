@@ -1,34 +1,25 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved RIGHT_CIRCULAR_CONE_VOLUME.
  * A CSG cone primitive volume (special case of ECCENTRIC_CONICAL_VOLUME
  * where x_offset=y_offset=0 and semi_axis_1=semi_axis_2).
  */
-public final class StepRightCircularConeVolume implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRightCircularConeVolume extends AbstractStepEntity {
     private final StepEntity position;
     private final Double height;
     private final Double bottomRadius;
     private final Double topRadius;
 
     public StepRightCircularConeVolume(int id, String name, StepEntity position, Double height, Double bottomRadius, Double topRadius) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.height = height;
         this.bottomRadius = bottomRadius;
         this.topRadius = topRadius;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -56,20 +47,14 @@ public final class StepRightCircularConeVolume implements StepEntity {
     public Double topRadius() { return getTopRadius(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRightCircularConeVolume that = (StepRightCircularConeVolume) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && Objects.equals(height, that.height) && Objects.equals(bottomRadius, that.bottomRadius) && Objects.equals(topRadius, that.topRadius);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, height, bottomRadius, topRadius);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRightCircularConeVolume{" + "id=" + id + "name=" + name + "position=" + position + "height=" + height + "bottomRadius=" + bottomRadius + "topRadius=" + topRadius + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("height", height);
+        state.put("bottomRadius", bottomRadius);
+        state.put("topRadius", topRadius);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COOLING_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param coolingChannels cooling channel features
  * @param operatingTemperature operating temperature range
  */
-public final class StepCoolingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCoolingFeature extends AbstractStepEntity {
     private final String coolingType;
     private final StepEntity coolingGeometry;
     private final double coolingCapacity;
@@ -27,22 +26,13 @@ public final class StepCoolingFeature implements StepEntity {
     private final List<Double> operatingTemperature;
 
     public StepCoolingFeature(int id, String name, String coolingType, StepEntity coolingGeometry, double coolingCapacity, StepEntity coolantType, List<StepEntity> coolingChannels, List<Double> operatingTemperature) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.coolingType = coolingType;
         this.coolingGeometry = coolingGeometry;
         this.coolingCapacity = coolingCapacity;
         this.coolantType = coolantType;
         this.coolingChannels = coolingChannels == null ? null : java.util.List.copyOf(coolingChannels);
         this.operatingTemperature = operatingTemperature == null ? null : java.util.List.copyOf(operatingTemperature);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCoolingType() {
@@ -70,20 +60,16 @@ public final class StepCoolingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCoolingFeature that = (StepCoolingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(coolingType, that.coolingType) && Objects.equals(coolingGeometry, that.coolingGeometry) && coolingCapacity == that.coolingCapacity && Objects.equals(coolantType, that.coolantType) && Objects.equals(coolingChannels, that.coolingChannels) && Objects.equals(operatingTemperature, that.operatingTemperature);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, coolingType, coolingGeometry, coolingCapacity, coolantType, coolingChannels, operatingTemperature);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCoolingFeature{" + "id=" + id + "name=" + name + "coolingType=" + coolingType + "coolingGeometry=" + coolingGeometry + "coolingCapacity=" + coolingCapacity + "coolantType=" + coolantType + "coolingChannels=" + coolingChannels + "operatingTemperature=" + operatingTemperature + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("coolingType", coolingType);
+        state.put("coolingGeometry", coolingGeometry);
+        state.put("coolingCapacity", coolingCapacity);
+        state.put("coolantType", coolantType);
+        state.put("coolingChannels", coolingChannels);
+        state.put("operatingTemperature", operatingTemperature);
+        return state;
     }
 }

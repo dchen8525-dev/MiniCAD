@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal PRODUCT_CATEGORY_RELATIONSHIP metadata.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param category parent category
  * @param subCategory child category
  */
-public final class StepProductCategoryRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProductCategoryRelationship extends AbstractStepEntity {
     private final String description;
     private final StepProductCategory category;
     private final StepProductCategory subCategory;
 
     public StepProductCategoryRelationship(int id, String name, String description, StepProductCategory category, StepProductCategory subCategory) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.category = category;
         this.subCategory = subCategory;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -55,20 +46,13 @@ public final class StepProductCategoryRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductCategoryRelationship that = (StepProductCategoryRelationship) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(category, that.category) && Objects.equals(subCategory, that.subCategory);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, category, subCategory);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductCategoryRelationship{" + "id=" + id + "name=" + name + "description=" + description + "category=" + category + "subCategory=" + subCategory + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("category", category);
+        state.put("subCategory", subCategory);
+        return state;
     }
 }

@@ -1,27 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved THERMAL_ANALYSIS.
  * Thermal analysis type for FEA.
  */
-public final class StepThermalAnalysis implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepThermalAnalysis extends AbstractStepEntity {
     private final String thermalAnalysisType;
 
     public StepThermalAnalysis(int id, String name, String thermalAnalysisType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.thermalAnalysisType = thermalAnalysisType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getThermalAnalysisType() {
@@ -29,20 +20,11 @@ public final class StepThermalAnalysis implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepThermalAnalysis that = (StepThermalAnalysis) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(thermalAnalysisType, that.thermalAnalysisType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, thermalAnalysisType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepThermalAnalysis{" + "id=" + id + "name=" + name + "thermalAnalysisType=" + thermalAnalysisType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("thermalAnalysisType", thermalAnalysisType);
+        return state;
     }
 }

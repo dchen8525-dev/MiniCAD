@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal SURFACE_STYLE_REFLECTANCE_AMBIENT_DIFFUSE_SPECULAR.
  *
@@ -11,8 +13,7 @@ import java.util.Objects;
  * @param specularExponent specular exponent
  * @param specularColour specular colour
  */
-public final class StepSurfaceStyleReflectanceAmbientDiffuseSpecular implements StepEntity {
-    private final int id;
+public final class StepSurfaceStyleReflectanceAmbientDiffuseSpecular extends AbstractStepEntity {
     private final double ambientReflectance;
     private final double diffuseReflectance;
     private final double specularReflectance;
@@ -20,20 +21,12 @@ public final class StepSurfaceStyleReflectanceAmbientDiffuseSpecular implements 
     private final StepEntity specularColour;
 
     public StepSurfaceStyleReflectanceAmbientDiffuseSpecular(int id, double ambientReflectance, double diffuseReflectance, double specularReflectance, double specularExponent, StepEntity specularColour) {
-        this.id = id;
+        super(id, "");
         this.ambientReflectance = ambientReflectance;
         this.diffuseReflectance = diffuseReflectance;
         this.specularReflectance = specularReflectance;
         this.specularExponent = specularExponent;
         this.specularColour = specularColour;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public double getAmbientReflectance() {
@@ -78,20 +71,14 @@ public final class StepSurfaceStyleReflectanceAmbientDiffuseSpecular implements 
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceStyleReflectanceAmbientDiffuseSpecular that = (StepSurfaceStyleReflectanceAmbientDiffuseSpecular) o;
-        return id == that.id && ambientReflectance == that.ambientReflectance && diffuseReflectance == that.diffuseReflectance && specularReflectance == that.specularReflectance && specularExponent == that.specularExponent && Objects.equals(specularColour, that.specularColour);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, ambientReflectance, diffuseReflectance, specularReflectance, specularExponent, specularColour);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceStyleReflectanceAmbientDiffuseSpecular{" + "id=" + id + "ambientReflectance=" + ambientReflectance + "diffuseReflectance=" + diffuseReflectance + "specularReflectance=" + specularReflectance + "specularExponent=" + specularExponent + "specularColour=" + specularColour + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("ambientReflectance", ambientReflectance);
+        state.put("diffuseReflectance", diffuseReflectance);
+        state.put("specularReflectance", specularReflectance);
+        state.put("specularExponent", specularExponent);
+        state.put("specularColour", specularColour);
+        return state;
     }
 }

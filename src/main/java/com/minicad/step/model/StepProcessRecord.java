@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PROCESS_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param processDetails process variance details
  * @param processStatus process variance status
  */
-public final class StepProcessRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProcessRecord extends AbstractStepEntity {
     private final String processType;
     private final StepEntity processTarget;
     private final StepEntity processStartTime;
@@ -29,8 +28,7 @@ public final class StepProcessRecord implements StepEntity {
     private final String processStatus;
 
     public StepProcessRecord(int id, String name, String processType, StepEntity processTarget, StepEntity processStartTime, StepEntity processEndTime, String processResult, List<String> processDetails, String processStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.processType = processType;
         this.processTarget = processTarget;
         this.processStartTime = processStartTime;
@@ -38,14 +36,6 @@ public final class StepProcessRecord implements StepEntity {
         this.processResult = processResult;
         this.processDetails = processDetails == null ? null : java.util.List.copyOf(processDetails);
         this.processStatus = processStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getProcessType() {
@@ -77,20 +67,17 @@ public final class StepProcessRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProcessRecord that = (StepProcessRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(processType, that.processType) && Objects.equals(processTarget, that.processTarget) && Objects.equals(processStartTime, that.processStartTime) && Objects.equals(processEndTime, that.processEndTime) && Objects.equals(processResult, that.processResult) && Objects.equals(processDetails, that.processDetails) && Objects.equals(processStatus, that.processStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, processType, processTarget, processStartTime, processEndTime, processResult, processDetails, processStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProcessRecord{" + "id=" + id + "name=" + name + "processType=" + processType + "processTarget=" + processTarget + "processStartTime=" + processStartTime + "processEndTime=" + processEndTime + "processResult=" + processResult + "processDetails=" + processDetails + "processStatus=" + processStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("processType", processType);
+        state.put("processTarget", processTarget);
+        state.put("processStartTime", processStartTime);
+        state.put("processEndTime", processEndTime);
+        state.put("processResult", processResult);
+        state.put("processDetails", processDetails);
+        state.put("processStatus", processStatus);
+        return state;
     }
 }

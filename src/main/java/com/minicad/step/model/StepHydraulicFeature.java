@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved HYDRAULIC_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param portSize port size specification
  * @varianceConnections variance connections count
  */
-public final class StepHydraulicFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepHydraulicFeature extends AbstractStepEntity {
     private final String hydraulicType;
     private final StepEntity hydraulicGeometry;
     private final double variancePressure;
@@ -27,22 +26,13 @@ public final class StepHydraulicFeature implements StepEntity {
     private final int varianceConnections;
 
     public StepHydraulicFeature(int id, String name, String hydraulicType, StepEntity hydraulicGeometry, double variancePressure, double flowRate, String portSize, int varianceConnections) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.hydraulicType = hydraulicType;
         this.hydraulicGeometry = hydraulicGeometry;
         this.variancePressure = variancePressure;
         this.flowRate = flowRate;
         this.portSize = portSize;
         this.varianceConnections = varianceConnections;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getHydraulicType() {
@@ -70,20 +60,16 @@ public final class StepHydraulicFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepHydraulicFeature that = (StepHydraulicFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(hydraulicType, that.hydraulicType) && Objects.equals(hydraulicGeometry, that.hydraulicGeometry) && variancePressure == that.variancePressure && flowRate == that.flowRate && Objects.equals(portSize, that.portSize) && varianceConnections == that.varianceConnections;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, hydraulicType, hydraulicGeometry, variancePressure, flowRate, portSize, varianceConnections);
-    }
-
-    @Override
-    public String toString() {
-        return "StepHydraulicFeature{" + "id=" + id + "name=" + name + "hydraulicType=" + hydraulicType + "hydraulicGeometry=" + hydraulicGeometry + "variancePressure=" + variancePressure + "flowRate=" + flowRate + "portSize=" + portSize + "varianceConnections=" + varianceConnections + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("hydraulicType", hydraulicType);
+        state.put("hydraulicGeometry", hydraulicGeometry);
+        state.put("variancePressure", variancePressure);
+        state.put("flowRate", flowRate);
+        state.put("portSize", portSize);
+        state.put("varianceConnections", varianceConnections);
+        return state;
     }
 }

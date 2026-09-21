@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved VERSION_CONTROL.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param previousVersion previous version reference
  * @param versionChanges changes from previous version
  */
-public final class StepVersionControl implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepVersionControl extends AbstractStepEntity {
     private final String versionNumber;
     private final String versionDescription;
     private final StepEntity versionDate;
@@ -29,8 +28,7 @@ public final class StepVersionControl implements StepEntity {
     private final List<StepEntity> versionChanges;
 
     public StepVersionControl(int id, String name, String versionNumber, String versionDescription, StepEntity versionDate, StepEntity versionAuthor, String versionStatus, StepEntity previousVersion, List<StepEntity> versionChanges) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.versionNumber = versionNumber;
         this.versionDescription = versionDescription;
         this.versionDate = versionDate;
@@ -38,14 +36,6 @@ public final class StepVersionControl implements StepEntity {
         this.versionStatus = versionStatus;
         this.previousVersion = previousVersion;
         this.versionChanges = versionChanges == null ? null : java.util.List.copyOf(versionChanges);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVersionNumber() {
@@ -77,20 +67,17 @@ public final class StepVersionControl implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVersionControl that = (StepVersionControl) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(versionNumber, that.versionNumber) && Objects.equals(versionDescription, that.versionDescription) && Objects.equals(versionDate, that.versionDate) && Objects.equals(versionAuthor, that.versionAuthor) && Objects.equals(versionStatus, that.versionStatus) && Objects.equals(previousVersion, that.previousVersion) && Objects.equals(versionChanges, that.versionChanges);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, versionNumber, versionDescription, versionDate, versionAuthor, versionStatus, previousVersion, versionChanges);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVersionControl{" + "id=" + id + "name=" + name + "versionNumber=" + versionNumber + "versionDescription=" + versionDescription + "versionDate=" + versionDate + "versionAuthor=" + versionAuthor + "versionStatus=" + versionStatus + "previousVersion=" + previousVersion + "versionChanges=" + versionChanges + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("versionNumber", versionNumber);
+        state.put("versionDescription", versionDescription);
+        state.put("versionDate", versionDate);
+        state.put("versionAuthor", versionAuthor);
+        state.put("versionStatus", versionStatus);
+        state.put("previousVersion", previousVersion);
+        state.put("versionChanges", versionChanges);
+        return state;
     }
 }

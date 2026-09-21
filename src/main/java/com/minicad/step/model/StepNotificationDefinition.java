@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved NOTIFICATION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param notificationMessage notification variance message template
  * @param notificationStatus notification variance status
  */
-public final class StepNotificationDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepNotificationDefinition extends AbstractStepEntity {
     private final String notificationType;
     private final String notificationTrigger;
     private final List<String> notificationRecipients;
@@ -25,21 +24,12 @@ public final class StepNotificationDefinition implements StepEntity {
     private final String notificationStatus;
 
     public StepNotificationDefinition(int id, String name, String notificationType, String notificationTrigger, List<String> notificationRecipients, String notificationMessage, String notificationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.notificationType = notificationType;
         this.notificationTrigger = notificationTrigger;
         this.notificationRecipients = notificationRecipients == null ? null : java.util.List.copyOf(notificationRecipients);
         this.notificationMessage = notificationMessage;
         this.notificationStatus = notificationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getNotificationType() {
@@ -63,20 +53,15 @@ public final class StepNotificationDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNotificationDefinition that = (StepNotificationDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(notificationType, that.notificationType) && Objects.equals(notificationTrigger, that.notificationTrigger) && Objects.equals(notificationRecipients, that.notificationRecipients) && Objects.equals(notificationMessage, that.notificationMessage) && Objects.equals(notificationStatus, that.notificationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, notificationType, notificationTrigger, notificationRecipients, notificationMessage, notificationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNotificationDefinition{" + "id=" + id + "name=" + name + "notificationType=" + notificationType + "notificationTrigger=" + notificationTrigger + "notificationRecipients=" + notificationRecipients + "notificationMessage=" + notificationMessage + "notificationStatus=" + notificationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("notificationType", notificationType);
+        state.put("notificationTrigger", notificationTrigger);
+        state.put("notificationRecipients", notificationRecipients);
+        state.put("notificationMessage", notificationMessage);
+        state.put("notificationStatus", notificationStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INSTRUCTION_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param instructionResult instruction variance result
  * @param instructionStatus instruction variance status
  */
-public final class StepInstructionInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInstructionInstance extends AbstractStepEntity {
     private final StepEntity instructionDefinition;
     private final String instructionState;
     private final long instructionAddress;
@@ -27,22 +26,13 @@ public final class StepInstructionInstance implements StepEntity {
     private final String instructionStatus;
 
     public StepInstructionInstance(int id, String name, StepEntity instructionDefinition, String instructionState, long instructionAddress, boolean instructionExecuted, String instructionResult, String instructionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.instructionDefinition = instructionDefinition;
         this.instructionState = instructionState;
         this.instructionAddress = instructionAddress;
         this.instructionExecuted = instructionExecuted;
         this.instructionResult = instructionResult;
         this.instructionStatus = instructionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getInstructionDefinition() {
@@ -70,20 +60,16 @@ public final class StepInstructionInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInstructionInstance that = (StepInstructionInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(instructionDefinition, that.instructionDefinition) && Objects.equals(instructionState, that.instructionState) && instructionAddress == that.instructionAddress && instructionExecuted == that.instructionExecuted && Objects.equals(instructionResult, that.instructionResult) && Objects.equals(instructionStatus, that.instructionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, instructionDefinition, instructionState, instructionAddress, instructionExecuted, instructionResult, instructionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInstructionInstance{" + "id=" + id + "name=" + name + "instructionDefinition=" + instructionDefinition + "instructionState=" + instructionState + "instructionAddress=" + instructionAddress + "instructionExecuted=" + instructionExecuted + "instructionResult=" + instructionResult + "instructionStatus=" + instructionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("instructionDefinition", instructionDefinition);
+        state.put("instructionState", instructionState);
+        state.put("instructionAddress", instructionAddress);
+        state.put("instructionExecuted", instructionExecuted);
+        state.put("instructionResult", instructionResult);
+        state.put("instructionStatus", instructionStatus);
+        return state;
     }
 }

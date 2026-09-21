@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal PROPERTY_DEFINITION_RELATIONSHIP metadata.
  *
@@ -11,29 +13,18 @@ import java.util.Objects;
  * @param relatedPropertyDefinition target property definition
  * @param entityName concrete STEP entity name
  */
-public final class StepPropertyDefinitionRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPropertyDefinitionRelationship extends AbstractStepEntity {
     private final String description;
     private final StepPropertyDefinition relatingPropertyDefinition;
     private final StepPropertyDefinition relatedPropertyDefinition;
     private final String entityName;
 
     public StepPropertyDefinitionRelationship(int id, String name, String description, StepPropertyDefinition relatingPropertyDefinition, StepPropertyDefinition relatedPropertyDefinition, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.relatingPropertyDefinition = relatingPropertyDefinition;
         this.relatedPropertyDefinition = relatedPropertyDefinition;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -66,20 +57,14 @@ public final class StepPropertyDefinitionRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPropertyDefinitionRelationship that = (StepPropertyDefinitionRelationship) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingPropertyDefinition, that.relatingPropertyDefinition) && Objects.equals(relatedPropertyDefinition, that.relatedPropertyDefinition) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, relatingPropertyDefinition, relatedPropertyDefinition, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPropertyDefinitionRelationship{" + "id=" + id + "name=" + name + "description=" + description + "relatingPropertyDefinition=" + relatingPropertyDefinition + "relatedPropertyDefinition=" + relatedPropertyDefinition + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingPropertyDefinition", relatingPropertyDefinition);
+        state.put("relatedPropertyDefinition", relatedPropertyDefinition);
+        state.put("entityName", entityName);
+        return state;
     }
 }

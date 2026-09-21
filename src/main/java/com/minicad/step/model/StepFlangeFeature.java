@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FLANGE_FEATURE.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param numberOfBoltHoles number of bolt holes
  * @param flangeStandard flange standard specification
  */
-public final class StepFlangeFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFlangeFeature extends AbstractStepEntity {
     private final String flangeType;
     private final double flangeDiameter;
     private final double flangeThickness;
@@ -29,8 +28,7 @@ public final class StepFlangeFeature implements StepEntity {
     private final String flangeStandard;
 
     public StepFlangeFeature(int id, String name, String flangeType, double flangeDiameter, double flangeThickness, List<StepEntity> boltHoles, double boltCircle, int numberOfBoltHoles, String flangeStandard) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.flangeType = flangeType;
         this.flangeDiameter = flangeDiameter;
         this.flangeThickness = flangeThickness;
@@ -38,14 +36,6 @@ public final class StepFlangeFeature implements StepEntity {
         this.boltCircle = boltCircle;
         this.numberOfBoltHoles = numberOfBoltHoles;
         this.flangeStandard = flangeStandard;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFlangeType() {
@@ -77,20 +67,17 @@ public final class StepFlangeFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFlangeFeature that = (StepFlangeFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(flangeType, that.flangeType) && flangeDiameter == that.flangeDiameter && flangeThickness == that.flangeThickness && Objects.equals(boltHoles, that.boltHoles) && boltCircle == that.boltCircle && numberOfBoltHoles == that.numberOfBoltHoles && Objects.equals(flangeStandard, that.flangeStandard);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, flangeType, flangeDiameter, flangeThickness, boltHoles, boltCircle, numberOfBoltHoles, flangeStandard);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFlangeFeature{" + "id=" + id + "name=" + name + "flangeType=" + flangeType + "flangeDiameter=" + flangeDiameter + "flangeThickness=" + flangeThickness + "boltHoles=" + boltHoles + "boltCircle=" + boltCircle + "numberOfBoltHoles=" + numberOfBoltHoles + "flangeStandard=" + flangeStandard + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("flangeType", flangeType);
+        state.put("flangeDiameter", flangeDiameter);
+        state.put("flangeThickness", flangeThickness);
+        state.put("boltHoles", boltHoles);
+        state.put("boltCircle", boltCircle);
+        state.put("numberOfBoltHoles", numberOfBoltHoles);
+        state.put("flangeStandard", flangeStandard);
+        return state;
     }
 }

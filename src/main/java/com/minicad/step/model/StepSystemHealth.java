@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SYSTEM_HEALTH.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceLastCheck last variance check date
  * @varianceStatus2 record variance status
  */
-public final class StepSystemHealth implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSystemHealth extends AbstractStepEntity {
     private final StepEntity varianceSystem;
     private final String varianceStatus;
     private final List<String> varianceIssues;
@@ -27,22 +26,13 @@ public final class StepSystemHealth implements StepEntity {
     private final String varianceStatus2;
 
     public StepSystemHealth(int id, String name, StepEntity varianceSystem, String varianceStatus, List<String> varianceIssues, List<Double> varianceMetrics, StepEntity varianceLastCheck, String varianceStatus2) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceSystem = varianceSystem;
         this.varianceStatus = varianceStatus;
         this.varianceIssues = varianceIssues == null ? null : java.util.List.copyOf(varianceIssues);
         this.varianceMetrics = varianceMetrics == null ? null : java.util.List.copyOf(varianceMetrics);
         this.varianceLastCheck = varianceLastCheck;
         this.varianceStatus2 = varianceStatus2;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceSystem() {
@@ -70,20 +60,16 @@ public final class StepSystemHealth implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSystemHealth that = (StepSystemHealth) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceSystem, that.varianceSystem) && Objects.equals(varianceStatus, that.varianceStatus) && Objects.equals(varianceIssues, that.varianceIssues) && Objects.equals(varianceMetrics, that.varianceMetrics) && Objects.equals(varianceLastCheck, that.varianceLastCheck) && Objects.equals(varianceStatus2, that.varianceStatus2);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceSystem, varianceStatus, varianceIssues, varianceMetrics, varianceLastCheck, varianceStatus2);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSystemHealth{" + "id=" + id + "name=" + name + "varianceSystem=" + varianceSystem + "varianceStatus=" + varianceStatus + "varianceIssues=" + varianceIssues + "varianceMetrics=" + varianceMetrics + "varianceLastCheck=" + varianceLastCheck + "varianceStatus2=" + varianceStatus2 + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceSystem", varianceSystem);
+        state.put("varianceStatus", varianceStatus);
+        state.put("varianceIssues", varianceIssues);
+        state.put("varianceMetrics", varianceMetrics);
+        state.put("varianceLastCheck", varianceLastCheck);
+        state.put("varianceStatus2", varianceStatus2);
+        return state;
     }
 }

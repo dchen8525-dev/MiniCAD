@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal annotation plane occurrence.
@@ -13,27 +13,16 @@ import java.util.Objects;
  * @param item referenced plane
  * @param elements optional annotation plane elements
  */
-public final class StepAnnotationPlane implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnnotationPlane extends AbstractStepEntity {
     private final List<StepPresentationStyleAssignment> styles;
     private final StepPlane item;
     private final List<StepEntity> elements;
 
     public StepAnnotationPlane(int id, String name, List<StepPresentationStyleAssignment> styles, StepPlane item, List<StepEntity> elements) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.styles = styles == null ? null : java.util.List.copyOf(styles);
         this.item = item;
         this.elements = elements == null ? null : java.util.List.copyOf(elements);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepPresentationStyleAssignment> getStyles() {
@@ -62,20 +51,13 @@ public final class StepAnnotationPlane implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnnotationPlane that = (StepAnnotationPlane) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(styles, that.styles) && Objects.equals(item, that.item) && Objects.equals(elements, that.elements);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, styles, item, elements);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnnotationPlane{" + "id=" + id + "name=" + name + "styles=" + styles + "item=" + item + "elements=" + elements + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("styles", styles);
+        state.put("item", item);
+        state.put("elements", elements);
+        return state;
     }
 }

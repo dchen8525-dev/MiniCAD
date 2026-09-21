@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SECURITY_SPECIFICATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceAuthentication authentication variance specification
  * @varianceStatus specification variance status
  */
-public final class StepSecuritySpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSecuritySpecification extends AbstractStepEntity {
     private final int varianceLevel;
     private final List<String> varianceRequirements;
     private final StepEntity varianceAccess;
@@ -27,22 +26,13 @@ public final class StepSecuritySpecification implements StepEntity {
     private final String varianceStatus;
 
     public StepSecuritySpecification(int id, String name, int varianceLevel, List<String> varianceRequirements, StepEntity varianceAccess, StepEntity varianceEncryption, StepEntity varianceAuthentication, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceLevel = varianceLevel;
         this.varianceRequirements = varianceRequirements == null ? null : java.util.List.copyOf(varianceRequirements);
         this.varianceAccess = varianceAccess;
         this.varianceEncryption = varianceEncryption;
         this.varianceAuthentication = varianceAuthentication;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public int getVarianceLevel() {
@@ -70,20 +60,16 @@ public final class StepSecuritySpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSecuritySpecification that = (StepSecuritySpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && varianceLevel == that.varianceLevel && Objects.equals(varianceRequirements, that.varianceRequirements) && Objects.equals(varianceAccess, that.varianceAccess) && Objects.equals(varianceEncryption, that.varianceEncryption) && Objects.equals(varianceAuthentication, that.varianceAuthentication) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceLevel, varianceRequirements, varianceAccess, varianceEncryption, varianceAuthentication, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSecuritySpecification{" + "id=" + id + "name=" + name + "varianceLevel=" + varianceLevel + "varianceRequirements=" + varianceRequirements + "varianceAccess=" + varianceAccess + "varianceEncryption=" + varianceEncryption + "varianceAuthentication=" + varianceAuthentication + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceLevel", varianceLevel);
+        state.put("varianceRequirements", varianceRequirements);
+        state.put("varianceAccess", varianceAccess);
+        state.put("varianceEncryption", varianceEncryption);
+        state.put("varianceAuthentication", varianceAuthentication);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

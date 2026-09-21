@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REGULATORY_COMPLIANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceDate certification variance date
  * @varianceRequirements compliance variance requirements
  */
-public final class StepRegulatoryCompliance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRegulatoryCompliance extends AbstractStepEntity {
     private final String regulationType;
     private final String regulationDescription;
     private final String varianceStatus;
@@ -27,22 +26,13 @@ public final class StepRegulatoryCompliance implements StepEntity {
     private final List<StepEntity> varianceRequirements;
 
     public StepRegulatoryCompliance(int id, String name, String regulationType, String regulationDescription, String varianceStatus, String certificationReference, StepEntity varianceDate, List<StepEntity> varianceRequirements) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.regulationType = regulationType;
         this.regulationDescription = regulationDescription;
         this.varianceStatus = varianceStatus;
         this.certificationReference = certificationReference;
         this.varianceDate = varianceDate;
         this.varianceRequirements = varianceRequirements == null ? null : java.util.List.copyOf(varianceRequirements);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getRegulationType() {
@@ -70,20 +60,16 @@ public final class StepRegulatoryCompliance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRegulatoryCompliance that = (StepRegulatoryCompliance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(regulationType, that.regulationType) && Objects.equals(regulationDescription, that.regulationDescription) && Objects.equals(varianceStatus, that.varianceStatus) && Objects.equals(certificationReference, that.certificationReference) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceRequirements, that.varianceRequirements);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, regulationType, regulationDescription, varianceStatus, certificationReference, varianceDate, varianceRequirements);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRegulatoryCompliance{" + "id=" + id + "name=" + name + "regulationType=" + regulationType + "regulationDescription=" + regulationDescription + "varianceStatus=" + varianceStatus + "certificationReference=" + certificationReference + "varianceDate=" + varianceDate + "varianceRequirements=" + varianceRequirements + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("regulationType", regulationType);
+        state.put("regulationDescription", regulationDescription);
+        state.put("varianceStatus", varianceStatus);
+        state.put("certificationReference", certificationReference);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceRequirements", varianceRequirements);
+        return state;
     }
 }

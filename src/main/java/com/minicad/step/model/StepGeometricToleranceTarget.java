@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved GEOMETRIC_TOLERANCE_TARGET.
  * Specifies the target of a geometric tolerance application.
  */
-public final class StepGeometricToleranceTarget implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGeometricToleranceTarget extends AbstractStepEntity {
     private final StepEntity targetShape;
     private final double magnitude;
 
     public StepGeometricToleranceTarget(int id, String name, StepEntity targetShape, double magnitude) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.targetShape = targetShape;
         this.magnitude = magnitude;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getTargetShape() {
@@ -35,20 +26,12 @@ public final class StepGeometricToleranceTarget implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGeometricToleranceTarget that = (StepGeometricToleranceTarget) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(targetShape, that.targetShape) && magnitude == that.magnitude;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, targetShape, magnitude);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGeometricToleranceTarget{" + "id=" + id + "name=" + name + "targetShape=" + targetShape + "magnitude=" + magnitude + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("targetShape", targetShape);
+        state.put("magnitude", magnitude);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DEGENERATE_CURVE_2D.
  *
@@ -8,23 +10,12 @@ import java.util.Objects;
  * @param name step label
  * @param point the degenerate point
  */
-public final class StepDegenerateCurve2D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDegenerateCurve2D extends AbstractStepEntity {
     private final StepCartesianPoint point;
 
     public StepDegenerateCurve2D(int id, String name, StepCartesianPoint point) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.point = point;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepCartesianPoint getPoint() {
@@ -35,20 +26,11 @@ public final class StepDegenerateCurve2D implements StepEntity {
     public StepCartesianPoint point() { return getPoint(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDegenerateCurve2D that = (StepDegenerateCurve2D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(point, that.point);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, point);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDegenerateCurve2D{" + "id=" + id + "name=" + name + "point=" + point + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("point", point);
+        return state;
     }
 }

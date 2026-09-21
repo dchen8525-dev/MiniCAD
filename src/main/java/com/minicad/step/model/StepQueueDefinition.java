@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved QUEUE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param queuePriority queue variance priority support
  * @param queueStatus queue variance status
  */
-public final class StepQueueDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepQueueDefinition extends AbstractStepEntity {
     private final String queueType;
     private final int queueCapacity;
     private final String queuePolicy;
@@ -25,21 +24,12 @@ public final class StepQueueDefinition implements StepEntity {
     private final String queueStatus;
 
     public StepQueueDefinition(int id, String name, String queueType, int queueCapacity, String queuePolicy, boolean queuePriority, String queueStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.queueType = queueType;
         this.queueCapacity = queueCapacity;
         this.queuePolicy = queuePolicy;
         this.queuePriority = queuePriority;
         this.queueStatus = queueStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getQueueType() {
@@ -63,20 +53,15 @@ public final class StepQueueDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepQueueDefinition that = (StepQueueDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(queueType, that.queueType) && queueCapacity == that.queueCapacity && Objects.equals(queuePolicy, that.queuePolicy) && queuePriority == that.queuePriority && Objects.equals(queueStatus, that.queueStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, queueType, queueCapacity, queuePolicy, queuePriority, queueStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepQueueDefinition{" + "id=" + id + "name=" + name + "queueType=" + queueType + "queueCapacity=" + queueCapacity + "queuePolicy=" + queuePolicy + "queuePriority=" + queuePriority + "queueStatus=" + queueStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("queueType", queueType);
+        state.put("queueCapacity", queueCapacity);
+        state.put("queuePolicy", queuePolicy);
+        state.put("queuePriority", queuePriority);
+        state.put("queueStatus", queueStatus);
+        return state;
     }
 }

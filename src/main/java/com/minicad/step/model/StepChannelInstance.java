@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CHANNEL_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param channelMessages channel variance message count
  * @param channelStatus channel variance status
  */
-public final class StepChannelInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepChannelInstance extends AbstractStepEntity {
     private final StepEntity channelDefinition;
     private final String channelState;
     private final double channelOccupancy;
@@ -25,21 +24,12 @@ public final class StepChannelInstance implements StepEntity {
     private final String channelStatus;
 
     public StepChannelInstance(int id, String name, StepEntity channelDefinition, String channelState, double channelOccupancy, int channelMessages, String channelStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.channelDefinition = channelDefinition;
         this.channelState = channelState;
         this.channelOccupancy = channelOccupancy;
         this.channelMessages = channelMessages;
         this.channelStatus = channelStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getChannelDefinition() {
@@ -63,20 +53,15 @@ public final class StepChannelInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepChannelInstance that = (StepChannelInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(channelDefinition, that.channelDefinition) && Objects.equals(channelState, that.channelState) && channelOccupancy == that.channelOccupancy && channelMessages == that.channelMessages && Objects.equals(channelStatus, that.channelStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, channelDefinition, channelState, channelOccupancy, channelMessages, channelStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepChannelInstance{" + "id=" + id + "name=" + name + "channelDefinition=" + channelDefinition + "channelState=" + channelState + "channelOccupancy=" + channelOccupancy + "channelMessages=" + channelMessages + "channelStatus=" + channelStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("channelDefinition", channelDefinition);
+        state.put("channelState", channelState);
+        state.put("channelOccupancy", channelOccupancy);
+        state.put("channelMessages", channelMessages);
+        state.put("channelStatus", channelStatus);
+        return state;
     }
 }

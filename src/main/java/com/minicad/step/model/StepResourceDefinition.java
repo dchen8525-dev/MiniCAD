@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RESOURCE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param resourceConstraints resource variance constraints
  * @param resourceStatus resource variance status
  */
-public final class StepResourceDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepResourceDefinition extends AbstractStepEntity {
     private final String resourceType;
     private final String resourceCategory;
     private final List<String> resourceCapabilities;
@@ -25,21 +24,12 @@ public final class StepResourceDefinition implements StepEntity {
     private final String resourceStatus;
 
     public StepResourceDefinition(int id, String name, String resourceType, String resourceCategory, List<String> resourceCapabilities, List<String> resourceConstraints, String resourceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.resourceType = resourceType;
         this.resourceCategory = resourceCategory;
         this.resourceCapabilities = resourceCapabilities == null ? null : java.util.List.copyOf(resourceCapabilities);
         this.resourceConstraints = resourceConstraints == null ? null : java.util.List.copyOf(resourceConstraints);
         this.resourceStatus = resourceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getResourceType() {
@@ -63,20 +53,15 @@ public final class StepResourceDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepResourceDefinition that = (StepResourceDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(resourceType, that.resourceType) && Objects.equals(resourceCategory, that.resourceCategory) && Objects.equals(resourceCapabilities, that.resourceCapabilities) && Objects.equals(resourceConstraints, that.resourceConstraints) && Objects.equals(resourceStatus, that.resourceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, resourceType, resourceCategory, resourceCapabilities, resourceConstraints, resourceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepResourceDefinition{" + "id=" + id + "name=" + name + "resourceType=" + resourceType + "resourceCategory=" + resourceCategory + "resourceCapabilities=" + resourceCapabilities + "resourceConstraints=" + resourceConstraints + "resourceStatus=" + resourceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("resourceType", resourceType);
+        state.put("resourceCategory", resourceCategory);
+        state.put("resourceCapabilities", resourceCapabilities);
+        state.put("resourceConstraints", resourceConstraints);
+        state.put("resourceStatus", resourceStatus);
+        return state;
     }
 }

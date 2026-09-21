@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved EQUIPMENT_STOCK.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceMaintenance last variance maintenance date
  * @varianceStatus stock variance status
  */
-public final class StepEquipmentStock implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEquipmentStock extends AbstractStepEntity {
     private final String equipmentType;
     private final int varianceQuantity;
     private final String varianceCondition;
@@ -29,8 +28,7 @@ public final class StepEquipmentStock implements StepEntity {
     private final String varianceStatus;
 
     public StepEquipmentStock(int id, String name, String equipmentType, int varianceQuantity, String varianceCondition, String varianceLocation, double varianceValue, StepEntity varianceMaintenance, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.equipmentType = equipmentType;
         this.varianceQuantity = varianceQuantity;
         this.varianceCondition = varianceCondition;
@@ -38,14 +36,6 @@ public final class StepEquipmentStock implements StepEntity {
         this.varianceValue = varianceValue;
         this.varianceMaintenance = varianceMaintenance;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEquipmentType() {
@@ -77,20 +67,17 @@ public final class StepEquipmentStock implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEquipmentStock that = (StepEquipmentStock) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(equipmentType, that.equipmentType) && varianceQuantity == that.varianceQuantity && Objects.equals(varianceCondition, that.varianceCondition) && Objects.equals(varianceLocation, that.varianceLocation) && varianceValue == that.varianceValue && Objects.equals(varianceMaintenance, that.varianceMaintenance) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, equipmentType, varianceQuantity, varianceCondition, varianceLocation, varianceValue, varianceMaintenance, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEquipmentStock{" + "id=" + id + "name=" + name + "equipmentType=" + equipmentType + "varianceQuantity=" + varianceQuantity + "varianceCondition=" + varianceCondition + "varianceLocation=" + varianceLocation + "varianceValue=" + varianceValue + "varianceMaintenance=" + varianceMaintenance + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("equipmentType", equipmentType);
+        state.put("varianceQuantity", varianceQuantity);
+        state.put("varianceCondition", varianceCondition);
+        state.put("varianceLocation", varianceLocation);
+        state.put("varianceValue", varianceValue);
+        state.put("varianceMaintenance", varianceMaintenance);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

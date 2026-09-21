@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RULE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param ruleApplicationCount rule variance application count
  * @param ruleStatus rule variance status
  */
-public final class StepRuleInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRuleInstance extends AbstractStepEntity {
     private final StepEntity ruleDefinition;
     private final String ruleState;
     private final boolean ruleResult;
@@ -25,21 +24,12 @@ public final class StepRuleInstance implements StepEntity {
     private final String ruleStatus;
 
     public StepRuleInstance(int id, String name, StepEntity ruleDefinition, String ruleState, boolean ruleResult, int ruleApplicationCount, String ruleStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.ruleDefinition = ruleDefinition;
         this.ruleState = ruleState;
         this.ruleResult = ruleResult;
         this.ruleApplicationCount = ruleApplicationCount;
         this.ruleStatus = ruleStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRuleDefinition() {
@@ -63,20 +53,15 @@ public final class StepRuleInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRuleInstance that = (StepRuleInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(ruleDefinition, that.ruleDefinition) && Objects.equals(ruleState, that.ruleState) && ruleResult == that.ruleResult && ruleApplicationCount == that.ruleApplicationCount && Objects.equals(ruleStatus, that.ruleStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, ruleDefinition, ruleState, ruleResult, ruleApplicationCount, ruleStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRuleInstance{" + "id=" + id + "name=" + name + "ruleDefinition=" + ruleDefinition + "ruleState=" + ruleState + "ruleResult=" + ruleResult + "ruleApplicationCount=" + ruleApplicationCount + "ruleStatus=" + ruleStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("ruleDefinition", ruleDefinition);
+        state.put("ruleState", ruleState);
+        state.put("ruleResult", ruleResult);
+        state.put("ruleApplicationCount", ruleApplicationCount);
+        state.put("ruleStatus", ruleStatus);
+        return state;
     }
 }

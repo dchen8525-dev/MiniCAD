@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REPOSITORY_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param repositoryPolicy repository variance policy
  * @param repositoryStatus repository variance status
  */
-public final class StepRepositoryDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRepositoryDefinition extends AbstractStepEntity {
     private final String repositoryType;
     private final String repositoryDescription;
     private final List<StepEntity> repositoryContents;
@@ -25,21 +24,12 @@ public final class StepRepositoryDefinition implements StepEntity {
     private final String repositoryStatus;
 
     public StepRepositoryDefinition(int id, String name, String repositoryType, String repositoryDescription, List<StepEntity> repositoryContents, String repositoryPolicy, String repositoryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.repositoryType = repositoryType;
         this.repositoryDescription = repositoryDescription;
         this.repositoryContents = repositoryContents == null ? null : java.util.List.copyOf(repositoryContents);
         this.repositoryPolicy = repositoryPolicy;
         this.repositoryStatus = repositoryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getRepositoryType() {
@@ -63,20 +53,15 @@ public final class StepRepositoryDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRepositoryDefinition that = (StepRepositoryDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(repositoryType, that.repositoryType) && Objects.equals(repositoryDescription, that.repositoryDescription) && Objects.equals(repositoryContents, that.repositoryContents) && Objects.equals(repositoryPolicy, that.repositoryPolicy) && Objects.equals(repositoryStatus, that.repositoryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, repositoryType, repositoryDescription, repositoryContents, repositoryPolicy, repositoryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRepositoryDefinition{" + "id=" + id + "name=" + name + "repositoryType=" + repositoryType + "repositoryDescription=" + repositoryDescription + "repositoryContents=" + repositoryContents + "repositoryPolicy=" + repositoryPolicy + "repositoryStatus=" + repositoryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("repositoryType", repositoryType);
+        state.put("repositoryDescription", repositoryDescription);
+        state.put("repositoryContents", repositoryContents);
+        state.put("repositoryPolicy", repositoryPolicy);
+        state.put("repositoryStatus", repositoryStatus);
+        return state;
     }
 }

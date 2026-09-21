@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CONTROLLER_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param communicationProtocol communication protocol specification
  * @param controllerProgram controller program reference
  */
-public final class StepControllerFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepControllerFeature extends AbstractStepEntity {
     private final String controllerType;
     private final StepEntity controllerGeometry;
     private final int varianceInputs;
@@ -27,22 +26,13 @@ public final class StepControllerFeature implements StepEntity {
     private final StepEntity controllerProgram;
 
     public StepControllerFeature(int id, String name, String controllerType, StepEntity controllerGeometry, int varianceInputs, int varianceOutputs, String communicationProtocol, StepEntity controllerProgram) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.controllerType = controllerType;
         this.controllerGeometry = controllerGeometry;
         this.varianceInputs = varianceInputs;
         this.varianceOutputs = varianceOutputs;
         this.communicationProtocol = communicationProtocol;
         this.controllerProgram = controllerProgram;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getControllerType() {
@@ -70,20 +60,16 @@ public final class StepControllerFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepControllerFeature that = (StepControllerFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(controllerType, that.controllerType) && Objects.equals(controllerGeometry, that.controllerGeometry) && varianceInputs == that.varianceInputs && varianceOutputs == that.varianceOutputs && Objects.equals(communicationProtocol, that.communicationProtocol) && Objects.equals(controllerProgram, that.controllerProgram);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, controllerType, controllerGeometry, varianceInputs, varianceOutputs, communicationProtocol, controllerProgram);
-    }
-
-    @Override
-    public String toString() {
-        return "StepControllerFeature{" + "id=" + id + "name=" + name + "controllerType=" + controllerType + "controllerGeometry=" + controllerGeometry + "varianceInputs=" + varianceInputs + "varianceOutputs=" + varianceOutputs + "communicationProtocol=" + communicationProtocol + "controllerProgram=" + controllerProgram + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("controllerType", controllerType);
+        state.put("controllerGeometry", controllerGeometry);
+        state.put("varianceInputs", varianceInputs);
+        state.put("varianceOutputs", varianceOutputs);
+        state.put("communicationProtocol", communicationProtocol);
+        state.put("controllerProgram", controllerProgram);
+        return state;
     }
 }

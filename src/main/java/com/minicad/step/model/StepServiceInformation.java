@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SERVICE_INFORMATION.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param serviceStatus service status
  * @param serviceNotes service notes/comments
  */
-public final class StepServiceInformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepServiceInformation extends AbstractStepEntity {
     private final String serviceType;
     private final StepEntity serviceItem;
     private final StepEntity serviceProvider;
@@ -29,8 +28,7 @@ public final class StepServiceInformation implements StepEntity {
     private final String serviceNotes;
 
     public StepServiceInformation(int id, String name, String serviceType, StepEntity serviceItem, StepEntity serviceProvider, StepEntity varianceDate, double serviceCost, String serviceStatus, String serviceNotes) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.serviceType = serviceType;
         this.serviceItem = serviceItem;
         this.serviceProvider = serviceProvider;
@@ -38,14 +36,6 @@ public final class StepServiceInformation implements StepEntity {
         this.serviceCost = serviceCost;
         this.serviceStatus = serviceStatus;
         this.serviceNotes = serviceNotes;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getServiceType() {
@@ -77,20 +67,17 @@ public final class StepServiceInformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepServiceInformation that = (StepServiceInformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(serviceType, that.serviceType) && Objects.equals(serviceItem, that.serviceItem) && Objects.equals(serviceProvider, that.serviceProvider) && Objects.equals(varianceDate, that.varianceDate) && serviceCost == that.serviceCost && Objects.equals(serviceStatus, that.serviceStatus) && Objects.equals(serviceNotes, that.serviceNotes);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, serviceType, serviceItem, serviceProvider, varianceDate, serviceCost, serviceStatus, serviceNotes);
-    }
-
-    @Override
-    public String toString() {
-        return "StepServiceInformation{" + "id=" + id + "name=" + name + "serviceType=" + serviceType + "serviceItem=" + serviceItem + "serviceProvider=" + serviceProvider + "varianceDate=" + varianceDate + "serviceCost=" + serviceCost + "serviceStatus=" + serviceStatus + "serviceNotes=" + serviceNotes + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("serviceType", serviceType);
+        state.put("serviceItem", serviceItem);
+        state.put("serviceProvider", serviceProvider);
+        state.put("varianceDate", varianceDate);
+        state.put("serviceCost", serviceCost);
+        state.put("serviceStatus", serviceStatus);
+        state.put("serviceNotes", serviceNotes);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SIGNAL_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceFrequency signal variance frequency
  * @varianceStatus definition variance status
  */
-public final class StepSignalDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSignalDefinition extends AbstractStepEntity {
     private final String varianceSignal;
     private final String varianceType;
     private final List<Double> varianceRange;
@@ -27,22 +26,13 @@ public final class StepSignalDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepSignalDefinition(int id, String name, String varianceSignal, String varianceType, List<Double> varianceRange, StepEntity varianceUnit, double varianceFrequency, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceSignal = varianceSignal;
         this.varianceType = varianceType;
         this.varianceRange = varianceRange == null ? null : java.util.List.copyOf(varianceRange);
         this.varianceUnit = varianceUnit;
         this.varianceFrequency = varianceFrequency;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceSignal() {
@@ -70,20 +60,16 @@ public final class StepSignalDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSignalDefinition that = (StepSignalDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceSignal, that.varianceSignal) && Objects.equals(varianceType, that.varianceType) && Objects.equals(varianceRange, that.varianceRange) && Objects.equals(varianceUnit, that.varianceUnit) && varianceFrequency == that.varianceFrequency && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceSignal, varianceType, varianceRange, varianceUnit, varianceFrequency, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSignalDefinition{" + "id=" + id + "name=" + name + "varianceSignal=" + varianceSignal + "varianceType=" + varianceType + "varianceRange=" + varianceRange + "varianceUnit=" + varianceUnit + "varianceFrequency=" + varianceFrequency + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceSignal", varianceSignal);
+        state.put("varianceType", varianceType);
+        state.put("varianceRange", varianceRange);
+        state.put("varianceUnit", varianceUnit);
+        state.put("varianceFrequency", varianceFrequency);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

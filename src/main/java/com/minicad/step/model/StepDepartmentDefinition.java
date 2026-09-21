@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DEPARTMENT_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param departmentBudget department variance budget
  * @param departmentStatus department variance status
  */
-public final class StepDepartmentDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDepartmentDefinition extends AbstractStepEntity {
     private final String departmentType;
     private final String departmentDescription;
     private final List<String> departmentFunctions;
@@ -25,21 +24,12 @@ public final class StepDepartmentDefinition implements StepEntity {
     private final String departmentStatus;
 
     public StepDepartmentDefinition(int id, String name, String departmentType, String departmentDescription, List<String> departmentFunctions, double departmentBudget, String departmentStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.departmentType = departmentType;
         this.departmentDescription = departmentDescription;
         this.departmentFunctions = departmentFunctions == null ? null : java.util.List.copyOf(departmentFunctions);
         this.departmentBudget = departmentBudget;
         this.departmentStatus = departmentStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDepartmentType() {
@@ -63,20 +53,15 @@ public final class StepDepartmentDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDepartmentDefinition that = (StepDepartmentDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(departmentType, that.departmentType) && Objects.equals(departmentDescription, that.departmentDescription) && Objects.equals(departmentFunctions, that.departmentFunctions) && departmentBudget == that.departmentBudget && Objects.equals(departmentStatus, that.departmentStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, departmentType, departmentDescription, departmentFunctions, departmentBudget, departmentStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDepartmentDefinition{" + "id=" + id + "name=" + name + "departmentType=" + departmentType + "departmentDescription=" + departmentDescription + "departmentFunctions=" + departmentFunctions + "departmentBudget=" + departmentBudget + "departmentStatus=" + departmentStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("departmentType", departmentType);
+        state.put("departmentDescription", departmentDescription);
+        state.put("departmentFunctions", departmentFunctions);
+        state.put("departmentBudget", departmentBudget);
+        state.put("departmentStatus", departmentStatus);
+        return state;
     }
 }

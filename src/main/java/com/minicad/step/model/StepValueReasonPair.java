@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved VALUE_REASON_PAIR.
  * A value-reason pair for classification.
  */
-public final class StepValueReasonPair implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepValueReasonPair extends AbstractStepEntity {
     private final StepEntity value;
     private final String reason;
 
     public StepValueReasonPair(int id, String name, StepEntity value, String reason) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.value = value;
         this.reason = reason;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getValue() {
@@ -35,20 +26,12 @@ public final class StepValueReasonPair implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepValueReasonPair that = (StepValueReasonPair) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(value, that.value) && Objects.equals(reason, that.reason);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, value, reason);
-    }
-
-    @Override
-    public String toString() {
-        return "StepValueReasonPair{" + "id=" + id + "name=" + name + "value=" + value + "reason=" + reason + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("value", value);
+        state.put("reason", reason);
+        return state;
     }
 }

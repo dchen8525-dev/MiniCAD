@@ -1,27 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved EXTERNALLY_DEFINED_HATCH_STYLE.
  * A hatch style defined by an external source.
  */
-public final class StepExternallyDefinedHatchStyle implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepExternallyDefinedHatchStyle extends AbstractStepEntity {
     private final StepEntity externalSource;
 
     public StepExternallyDefinedHatchStyle(int id, String name, StepEntity externalSource) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.externalSource = externalSource;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getExternalSource() {
@@ -33,20 +24,11 @@ public final class StepExternallyDefinedHatchStyle implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepExternallyDefinedHatchStyle that = (StepExternallyDefinedHatchStyle) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(externalSource, that.externalSource);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, externalSource);
-    }
-
-    @Override
-    public String toString() {
-        return "StepExternallyDefinedHatchStyle{" + "id=" + id + "name=" + name + "externalSource=" + externalSource + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("externalSource", externalSource);
+        return state;
     }
 }

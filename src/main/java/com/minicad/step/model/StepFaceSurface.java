@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FACE_SURFACE.
@@ -13,27 +13,16 @@ import java.util.Objects;
  * @param faceGeometry supporting surface
  * @param sameSense orientation flag
  */
-public final class StepFaceSurface implements StepFaceEntity {
-    private final int id;
-    private final String name;
+public final class StepFaceSurface extends AbstractStepEntity implements StepFaceEntity {
     private final List<StepFaceBound> bounds;
     private final StepEntity faceGeometry;
     private final boolean sameSense;
 
     public StepFaceSurface(int id, String name, List<StepFaceBound> bounds, StepEntity faceGeometry, boolean sameSense) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.bounds = bounds == null ? null : java.util.List.copyOf(bounds);
         this.faceGeometry = faceGeometry;
         this.sameSense = sameSense;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepFaceBound> getBounds() {
@@ -56,20 +45,13 @@ public final class StepFaceSurface implements StepFaceEntity {
     public boolean sameSense() { return isSameSense(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFaceSurface that = (StepFaceSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(bounds, that.bounds) && Objects.equals(faceGeometry, that.faceGeometry) && sameSense == that.sameSense;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, bounds, faceGeometry, sameSense);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFaceSurface{" + "id=" + id + "name=" + name + "bounds=" + bounds + "faceGeometry=" + faceGeometry + "sameSense=" + sameSense + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("bounds", bounds);
+        state.put("faceGeometry", faceGeometry);
+        state.put("sameSense", sameSense);
+        return state;
     }
 }

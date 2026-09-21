@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FLOW_DEFINITION.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceUnit flow variance unit
  * @varianceStatus definition variance status
  */
-public final class StepFlowDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFlowDefinition extends AbstractStepEntity {
     private final StepEntity varianceFlow;
     private final StepEntity varianceFrom;
     private final StepEntity varianceTo;
@@ -29,8 +28,7 @@ public final class StepFlowDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepFlowDefinition(int id, String name, StepEntity varianceFlow, StepEntity varianceFrom, StepEntity varianceTo, String varianceType, double varianceRate, StepEntity varianceUnit, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceFlow = varianceFlow;
         this.varianceFrom = varianceFrom;
         this.varianceTo = varianceTo;
@@ -38,14 +36,6 @@ public final class StepFlowDefinition implements StepEntity {
         this.varianceRate = varianceRate;
         this.varianceUnit = varianceUnit;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceFlow() {
@@ -77,20 +67,17 @@ public final class StepFlowDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFlowDefinition that = (StepFlowDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceFlow, that.varianceFlow) && Objects.equals(varianceFrom, that.varianceFrom) && Objects.equals(varianceTo, that.varianceTo) && Objects.equals(varianceType, that.varianceType) && varianceRate == that.varianceRate && Objects.equals(varianceUnit, that.varianceUnit) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceFlow, varianceFrom, varianceTo, varianceType, varianceRate, varianceUnit, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFlowDefinition{" + "id=" + id + "name=" + name + "varianceFlow=" + varianceFlow + "varianceFrom=" + varianceFrom + "varianceTo=" + varianceTo + "varianceType=" + varianceType + "varianceRate=" + varianceRate + "varianceUnit=" + varianceUnit + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceFlow", varianceFlow);
+        state.put("varianceFrom", varianceFrom);
+        state.put("varianceTo", varianceTo);
+        state.put("varianceType", varianceType);
+        state.put("varianceRate", varianceRate);
+        state.put("varianceUnit", varianceUnit);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

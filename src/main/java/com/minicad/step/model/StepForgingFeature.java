@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FORGING_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param forgingMaterial forging material specification
  * @param forgingTemperature forging temperature range
  */
-public final class StepForgingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepForgingFeature extends AbstractStepEntity {
     private final String forgingType;
     private final StepEntity forgingGeometry;
     private final double dieFlash;
@@ -27,22 +26,13 @@ public final class StepForgingFeature implements StepEntity {
     private final List<Double> forgingTemperature;
 
     public StepForgingFeature(int id, String name, String forgingType, StepEntity forgingGeometry, double dieFlash, StepEntity forgingGrain, StepEntity forgingMaterial, List<Double> forgingTemperature) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.forgingType = forgingType;
         this.forgingGeometry = forgingGeometry;
         this.dieFlash = dieFlash;
         this.forgingGrain = forgingGrain;
         this.forgingMaterial = forgingMaterial;
         this.forgingTemperature = forgingTemperature == null ? null : java.util.List.copyOf(forgingTemperature);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getForgingType() {
@@ -70,20 +60,16 @@ public final class StepForgingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepForgingFeature that = (StepForgingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(forgingType, that.forgingType) && Objects.equals(forgingGeometry, that.forgingGeometry) && dieFlash == that.dieFlash && Objects.equals(forgingGrain, that.forgingGrain) && Objects.equals(forgingMaterial, that.forgingMaterial) && Objects.equals(forgingTemperature, that.forgingTemperature);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, forgingType, forgingGeometry, dieFlash, forgingGrain, forgingMaterial, forgingTemperature);
-    }
-
-    @Override
-    public String toString() {
-        return "StepForgingFeature{" + "id=" + id + "name=" + name + "forgingType=" + forgingType + "forgingGeometry=" + forgingGeometry + "dieFlash=" + dieFlash + "forgingGrain=" + forgingGrain + "forgingMaterial=" + forgingMaterial + "forgingTemperature=" + forgingTemperature + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("forgingType", forgingType);
+        state.put("forgingGeometry", forgingGeometry);
+        state.put("dieFlash", dieFlash);
+        state.put("forgingGrain", forgingGrain);
+        state.put("forgingMaterial", forgingMaterial);
+        state.put("forgingTemperature", forgingTemperature);
+        return state;
     }
 }

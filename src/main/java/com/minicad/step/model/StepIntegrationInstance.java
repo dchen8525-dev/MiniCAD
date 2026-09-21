@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INTEGRATION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param integrationErrors integration variance error count
  * @param integrationStatus integration variance status
  */
-public final class StepIntegrationInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepIntegrationInstance extends AbstractStepEntity {
     private final StepEntity integrationDefinition;
     private final String integrationState;
     private final StepEntity integrationLastSync;
@@ -25,21 +24,12 @@ public final class StepIntegrationInstance implements StepEntity {
     private final String integrationStatus;
 
     public StepIntegrationInstance(int id, String name, StepEntity integrationDefinition, String integrationState, StepEntity integrationLastSync, int integrationErrors, String integrationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.integrationDefinition = integrationDefinition;
         this.integrationState = integrationState;
         this.integrationLastSync = integrationLastSync;
         this.integrationErrors = integrationErrors;
         this.integrationStatus = integrationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getIntegrationDefinition() {
@@ -63,20 +53,15 @@ public final class StepIntegrationInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepIntegrationInstance that = (StepIntegrationInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(integrationDefinition, that.integrationDefinition) && Objects.equals(integrationState, that.integrationState) && Objects.equals(integrationLastSync, that.integrationLastSync) && integrationErrors == that.integrationErrors && Objects.equals(integrationStatus, that.integrationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, integrationDefinition, integrationState, integrationLastSync, integrationErrors, integrationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepIntegrationInstance{" + "id=" + id + "name=" + name + "integrationDefinition=" + integrationDefinition + "integrationState=" + integrationState + "integrationLastSync=" + integrationLastSync + "integrationErrors=" + integrationErrors + "integrationStatus=" + integrationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("integrationDefinition", integrationDefinition);
+        state.put("integrationState", integrationState);
+        state.put("integrationLastSync", integrationLastSync);
+        state.put("integrationErrors", integrationErrors);
+        state.put("integrationStatus", integrationStatus);
+        return state;
     }
 }

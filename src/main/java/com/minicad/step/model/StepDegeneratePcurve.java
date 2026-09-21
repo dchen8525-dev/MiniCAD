@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal resolved DEGENERATE_PCURVE.
  *
@@ -10,25 +11,14 @@ import java.util.Objects;
  * @param basisSurface basis surface
  * @param referenceToCurve referenced definitional representation
  */
-public final class StepDegeneratePcurve implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDegeneratePcurve extends AbstractStepEntity {
     private final StepEntity basisSurface;
     private final StepRepresentation referenceToCurve;
 
     public StepDegeneratePcurve(int id, String name, StepEntity basisSurface, StepRepresentation referenceToCurve) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.basisSurface = basisSurface;
         this.referenceToCurve = referenceToCurve;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBasisSurface() {
@@ -46,20 +36,12 @@ public final class StepDegeneratePcurve implements StepEntity {
     public StepRepresentation referenceToCurve() { return getReferenceToCurve(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDegeneratePcurve that = (StepDegeneratePcurve) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(basisSurface, that.basisSurface) && Objects.equals(referenceToCurve, that.referenceToCurve);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, basisSurface, referenceToCurve);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDegeneratePcurve{" + "id=" + id + "name=" + name + "basisSurface=" + basisSurface + "referenceToCurve=" + referenceToCurve + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("basisSurface", basisSurface);
+        state.put("referenceToCurve", referenceToCurve);
+        return state;
     }
 }

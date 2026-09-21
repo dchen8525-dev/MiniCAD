@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PACKET_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param packetHeader packet variance header format
  * @param packetStatus packet variance status
  */
-public final class StepPacketDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPacketDefinition extends AbstractStepEntity {
     private final String packetType;
     private final String packetFormat;
     private final int packetSize;
@@ -25,21 +24,12 @@ public final class StepPacketDefinition implements StepEntity {
     private final String packetStatus;
 
     public StepPacketDefinition(int id, String name, String packetType, String packetFormat, int packetSize, String packetHeader, String packetStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.packetType = packetType;
         this.packetFormat = packetFormat;
         this.packetSize = packetSize;
         this.packetHeader = packetHeader;
         this.packetStatus = packetStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPacketType() {
@@ -63,20 +53,15 @@ public final class StepPacketDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPacketDefinition that = (StepPacketDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(packetType, that.packetType) && Objects.equals(packetFormat, that.packetFormat) && packetSize == that.packetSize && Objects.equals(packetHeader, that.packetHeader) && Objects.equals(packetStatus, that.packetStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, packetType, packetFormat, packetSize, packetHeader, packetStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPacketDefinition{" + "id=" + id + "name=" + name + "packetType=" + packetType + "packetFormat=" + packetFormat + "packetSize=" + packetSize + "packetHeader=" + packetHeader + "packetStatus=" + packetStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("packetType", packetType);
+        state.put("packetFormat", packetFormat);
+        state.put("packetSize", packetSize);
+        state.put("packetHeader", packetHeader);
+        state.put("packetStatus", packetStatus);
+        return state;
     }
 }

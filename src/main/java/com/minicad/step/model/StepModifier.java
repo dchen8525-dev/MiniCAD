@@ -1,26 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved MODIFIER.
  */
-public final class StepModifier implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepModifier extends AbstractStepEntity {
     private final String modifierValue;
 
     public StepModifier(int id, String name, String modifierValue) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.modifierValue = modifierValue;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getModifierValue() {
@@ -28,20 +19,11 @@ public final class StepModifier implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepModifier that = (StepModifier) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(modifierValue, that.modifierValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, modifierValue);
-    }
-
-    @Override
-    public String toString() {
-        return "StepModifier{" + "id=" + id + "name=" + name + "modifierValue=" + modifierValue + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("modifierValue", modifierValue);
+        return state;
     }
 }

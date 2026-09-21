@@ -1,44 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal PRE_DEFINED_TERMINATOR_SYMBOL.
  *
  * @param id step id
  * @param name predefined terminator symbol name
  */
-public final class StepPreDefinedTerminatorSymbol implements StepEntity {
-    private final int id;
-    private final String name;
-
+public final class StepPreDefinedTerminatorSymbol extends AbstractStepEntity {
     public StepPreDefinedTerminatorSymbol(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+        super(id, name);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPreDefinedTerminatorSymbol that = (StepPreDefinedTerminatorSymbol) o;
-        return id == that.id && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPreDefinedTerminatorSymbol{" + "id=" + id + "name=" + name + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        return state;
     }
 }

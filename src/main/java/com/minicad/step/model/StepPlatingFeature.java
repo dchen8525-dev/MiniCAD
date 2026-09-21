@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PLATING_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param platingParameters plating process parameters
  * @param platingQuality plating quality grade
  */
-public final class StepPlatingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPlatingFeature extends AbstractStepEntity {
     private final String platingType;
     private final StepEntity platingMaterial;
     private final double platingThickness;
@@ -27,22 +26,13 @@ public final class StepPlatingFeature implements StepEntity {
     private final String platingQuality;
 
     public StepPlatingFeature(int id, String name, String platingType, StepEntity platingMaterial, double platingThickness, List<StepEntity> appliedSurfaces, List<Double> platingParameters, String platingQuality) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.platingType = platingType;
         this.platingMaterial = platingMaterial;
         this.platingThickness = platingThickness;
         this.appliedSurfaces = appliedSurfaces == null ? null : java.util.List.copyOf(appliedSurfaces);
         this.platingParameters = platingParameters == null ? null : java.util.List.copyOf(platingParameters);
         this.platingQuality = platingQuality;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPlatingType() {
@@ -70,20 +60,16 @@ public final class StepPlatingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPlatingFeature that = (StepPlatingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(platingType, that.platingType) && Objects.equals(platingMaterial, that.platingMaterial) && platingThickness == that.platingThickness && Objects.equals(appliedSurfaces, that.appliedSurfaces) && Objects.equals(platingParameters, that.platingParameters) && Objects.equals(platingQuality, that.platingQuality);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, platingType, platingMaterial, platingThickness, appliedSurfaces, platingParameters, platingQuality);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPlatingFeature{" + "id=" + id + "name=" + name + "platingType=" + platingType + "platingMaterial=" + platingMaterial + "platingThickness=" + platingThickness + "appliedSurfaces=" + appliedSurfaces + "platingParameters=" + platingParameters + "platingQuality=" + platingQuality + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("platingType", platingType);
+        state.put("platingMaterial", platingMaterial);
+        state.put("platingThickness", platingThickness);
+        state.put("appliedSurfaces", appliedSurfaces);
+        state.put("platingParameters", platingParameters);
+        state.put("platingQuality", platingQuality);
+        return state;
     }
 }

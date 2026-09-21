@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved SWEPT_DISK_SOLID.
  * A solid formed by sweeping a circular disk along a curve.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param radius disk radius
  * @param innerRadius inner disk radius (0 for solid disk)
  */
-public final class StepSweptDiskSolid implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSweptDiskSolid extends AbstractStepEntity {
     private final StepEntity sweptCurve;
     private final double radius;
     private final Double innerRadius;
 
     public StepSweptDiskSolid(int id, String name, StepEntity sweptCurve, double radius, Double innerRadius) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sweptCurve = sweptCurve;
         this.radius = radius;
         this.innerRadius = innerRadius;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSweptCurve() {
@@ -52,20 +43,13 @@ public final class StepSweptDiskSolid implements StepEntity {
     public Double innerRadius() { return innerRadius; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSweptDiskSolid that = (StepSweptDiskSolid) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sweptCurve, that.sweptCurve) && radius == that.radius && Objects.equals(innerRadius, that.innerRadius);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sweptCurve, radius, innerRadius);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSweptDiskSolid{" + "id=" + id + "name=" + name + "sweptCurve=" + sweptCurve + "radius=" + radius + "innerRadius=" + innerRadius + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sweptCurve", sweptCurve);
+        state.put("radius", radius);
+        state.put("innerRadius", innerRadius);
+        return state;
     }
 }

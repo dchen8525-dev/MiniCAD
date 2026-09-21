@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MARKING_FEATURE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param markingDepth marking depth for engraving
  * @param markingPosition marking position placement
  */
-public final class StepMarkingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMarkingFeature extends AbstractStepEntity {
     private final String markingType;
     private final StepEntity markingGeometry;
     private final String markingContent;
@@ -25,21 +24,12 @@ public final class StepMarkingFeature implements StepEntity {
     private final StepEntity markingPosition;
 
     public StepMarkingFeature(int id, String name, String markingType, StepEntity markingGeometry, String markingContent, double markingDepth, StepEntity markingPosition) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.markingType = markingType;
         this.markingGeometry = markingGeometry;
         this.markingContent = markingContent;
         this.markingDepth = markingDepth;
         this.markingPosition = markingPosition;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMarkingType() {
@@ -63,20 +53,15 @@ public final class StepMarkingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMarkingFeature that = (StepMarkingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(markingType, that.markingType) && Objects.equals(markingGeometry, that.markingGeometry) && Objects.equals(markingContent, that.markingContent) && markingDepth == that.markingDepth && Objects.equals(markingPosition, that.markingPosition);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, markingType, markingGeometry, markingContent, markingDepth, markingPosition);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMarkingFeature{" + "id=" + id + "name=" + name + "markingType=" + markingType + "markingGeometry=" + markingGeometry + "markingContent=" + markingContent + "markingDepth=" + markingDepth + "markingPosition=" + markingPosition + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("markingType", markingType);
+        state.put("markingGeometry", markingGeometry);
+        state.put("markingContent", markingContent);
+        state.put("markingDepth", markingDepth);
+        state.put("markingPosition", markingPosition);
+        return state;
     }
 }

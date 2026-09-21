@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRAIL_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param trailRetention trail variance retention period
  * @param trailStatus trail variance status
  */
-public final class StepTrailDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTrailDefinition extends AbstractStepEntity {
     private final String trailType;
     private final String trailDescription;
     private final List<String> trailEvents;
@@ -25,21 +24,12 @@ public final class StepTrailDefinition implements StepEntity {
     private final String trailStatus;
 
     public StepTrailDefinition(int id, String name, String trailType, String trailDescription, List<String> trailEvents, int trailRetention, String trailStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.trailType = trailType;
         this.trailDescription = trailDescription;
         this.trailEvents = trailEvents == null ? null : java.util.List.copyOf(trailEvents);
         this.trailRetention = trailRetention;
         this.trailStatus = trailStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTrailType() {
@@ -63,20 +53,15 @@ public final class StepTrailDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTrailDefinition that = (StepTrailDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(trailType, that.trailType) && Objects.equals(trailDescription, that.trailDescription) && Objects.equals(trailEvents, that.trailEvents) && trailRetention == that.trailRetention && Objects.equals(trailStatus, that.trailStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, trailType, trailDescription, trailEvents, trailRetention, trailStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTrailDefinition{" + "id=" + id + "name=" + name + "trailType=" + trailType + "trailDescription=" + trailDescription + "trailEvents=" + trailEvents + "trailRetention=" + trailRetention + "trailStatus=" + trailStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("trailType", trailType);
+        state.put("trailDescription", trailDescription);
+        state.put("trailEvents", trailEvents);
+        state.put("trailRetention", trailRetention);
+        state.put("trailStatus", trailStatus);
+        return state;
     }
 }

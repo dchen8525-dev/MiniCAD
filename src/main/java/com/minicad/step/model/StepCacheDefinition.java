@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CACHE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param cacheTtl cache variance TTL in seconds
  * @param cacheStatus cache variance status
  */
-public final class StepCacheDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCacheDefinition extends AbstractStepEntity {
     private final String cacheType;
     private final int cacheCapacity;
     private final String cachePolicy;
@@ -25,21 +24,12 @@ public final class StepCacheDefinition implements StepEntity {
     private final String cacheStatus;
 
     public StepCacheDefinition(int id, String name, String cacheType, int cacheCapacity, String cachePolicy, int cacheTtl, String cacheStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.cacheType = cacheType;
         this.cacheCapacity = cacheCapacity;
         this.cachePolicy = cachePolicy;
         this.cacheTtl = cacheTtl;
         this.cacheStatus = cacheStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCacheType() {
@@ -63,20 +53,15 @@ public final class StepCacheDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCacheDefinition that = (StepCacheDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(cacheType, that.cacheType) && cacheCapacity == that.cacheCapacity && Objects.equals(cachePolicy, that.cachePolicy) && cacheTtl == that.cacheTtl && Objects.equals(cacheStatus, that.cacheStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, cacheType, cacheCapacity, cachePolicy, cacheTtl, cacheStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCacheDefinition{" + "id=" + id + "name=" + name + "cacheType=" + cacheType + "cacheCapacity=" + cacheCapacity + "cachePolicy=" + cachePolicy + "cacheTtl=" + cacheTtl + "cacheStatus=" + cacheStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("cacheType", cacheType);
+        state.put("cacheCapacity", cacheCapacity);
+        state.put("cachePolicy", cachePolicy);
+        state.put("cacheTtl", cacheTtl);
+        state.put("cacheStatus", cacheStatus);
+        return state;
     }
 }

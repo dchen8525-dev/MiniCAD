@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMMAND_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param commandReturnType command variance return type
  * @param commandStatus command variance status
  */
-public final class StepCommandDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCommandDefinition extends AbstractStepEntity {
     private final String commandType;
     private final String commandDescription;
     private final List<String> commandParameters;
@@ -25,21 +24,12 @@ public final class StepCommandDefinition implements StepEntity {
     private final String commandStatus;
 
     public StepCommandDefinition(int id, String name, String commandType, String commandDescription, List<String> commandParameters, String commandReturnType, String commandStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.commandType = commandType;
         this.commandDescription = commandDescription;
         this.commandParameters = commandParameters == null ? null : java.util.List.copyOf(commandParameters);
         this.commandReturnType = commandReturnType;
         this.commandStatus = commandStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCommandType() {
@@ -63,20 +53,15 @@ public final class StepCommandDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCommandDefinition that = (StepCommandDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(commandType, that.commandType) && Objects.equals(commandDescription, that.commandDescription) && Objects.equals(commandParameters, that.commandParameters) && Objects.equals(commandReturnType, that.commandReturnType) && Objects.equals(commandStatus, that.commandStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, commandType, commandDescription, commandParameters, commandReturnType, commandStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCommandDefinition{" + "id=" + id + "name=" + name + "commandType=" + commandType + "commandDescription=" + commandDescription + "commandParameters=" + commandParameters + "commandReturnType=" + commandReturnType + "commandStatus=" + commandStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("commandType", commandType);
+        state.put("commandDescription", commandDescription);
+        state.put("commandParameters", commandParameters);
+        state.put("commandReturnType", commandReturnType);
+        state.put("commandStatus", commandStatus);
+        return state;
     }
 }

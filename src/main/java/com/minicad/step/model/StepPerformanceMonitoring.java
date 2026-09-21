@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PERFORMANCE_MONITORING.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceInterval monitoring variance interval
  * @varianceStatus monitoring variance status
  */
-public final class StepPerformanceMonitoring implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPerformanceMonitoring extends AbstractStepEntity {
     private final StepEntity varianceSystem;
     private final List<String> varianceMetrics;
     private final List<Double> varianceThresholds;
@@ -27,22 +26,13 @@ public final class StepPerformanceMonitoring implements StepEntity {
     private final String varianceStatus;
 
     public StepPerformanceMonitoring(int id, String name, StepEntity varianceSystem, List<String> varianceMetrics, List<Double> varianceThresholds, List<StepEntity> varianceAlerts, double varianceInterval, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceSystem = varianceSystem;
         this.varianceMetrics = varianceMetrics == null ? null : java.util.List.copyOf(varianceMetrics);
         this.varianceThresholds = varianceThresholds == null ? null : java.util.List.copyOf(varianceThresholds);
         this.varianceAlerts = varianceAlerts == null ? null : java.util.List.copyOf(varianceAlerts);
         this.varianceInterval = varianceInterval;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceSystem() {
@@ -70,20 +60,16 @@ public final class StepPerformanceMonitoring implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPerformanceMonitoring that = (StepPerformanceMonitoring) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceSystem, that.varianceSystem) && Objects.equals(varianceMetrics, that.varianceMetrics) && Objects.equals(varianceThresholds, that.varianceThresholds) && Objects.equals(varianceAlerts, that.varianceAlerts) && varianceInterval == that.varianceInterval && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceSystem, varianceMetrics, varianceThresholds, varianceAlerts, varianceInterval, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPerformanceMonitoring{" + "id=" + id + "name=" + name + "varianceSystem=" + varianceSystem + "varianceMetrics=" + varianceMetrics + "varianceThresholds=" + varianceThresholds + "varianceAlerts=" + varianceAlerts + "varianceInterval=" + varianceInterval + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceSystem", varianceSystem);
+        state.put("varianceMetrics", varianceMetrics);
+        state.put("varianceThresholds", varianceThresholds);
+        state.put("varianceAlerts", varianceAlerts);
+        state.put("varianceInterval", varianceInterval);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

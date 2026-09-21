@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOCK_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param lockExpiresTime lock variance expires time
  * @param lockStatus lock variance status
  */
-public final class StepLockRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLockRecord extends AbstractStepEntity {
     private final String lockType;
     private final StepEntity lockTarget;
     private final StepEntity lockHolder;
@@ -27,22 +26,13 @@ public final class StepLockRecord implements StepEntity {
     private final String lockStatus;
 
     public StepLockRecord(int id, String name, String lockType, StepEntity lockTarget, StepEntity lockHolder, StepEntity lockAcquiredTime, StepEntity lockExpiresTime, String lockStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.lockType = lockType;
         this.lockTarget = lockTarget;
         this.lockHolder = lockHolder;
         this.lockAcquiredTime = lockAcquiredTime;
         this.lockExpiresTime = lockExpiresTime;
         this.lockStatus = lockStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLockType() {
@@ -70,20 +60,16 @@ public final class StepLockRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLockRecord that = (StepLockRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(lockType, that.lockType) && Objects.equals(lockTarget, that.lockTarget) && Objects.equals(lockHolder, that.lockHolder) && Objects.equals(lockAcquiredTime, that.lockAcquiredTime) && Objects.equals(lockExpiresTime, that.lockExpiresTime) && Objects.equals(lockStatus, that.lockStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, lockType, lockTarget, lockHolder, lockAcquiredTime, lockExpiresTime, lockStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLockRecord{" + "id=" + id + "name=" + name + "lockType=" + lockType + "lockTarget=" + lockTarget + "lockHolder=" + lockHolder + "lockAcquiredTime=" + lockAcquiredTime + "lockExpiresTime=" + lockExpiresTime + "lockStatus=" + lockStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("lockType", lockType);
+        state.put("lockTarget", lockTarget);
+        state.put("lockHolder", lockHolder);
+        state.put("lockAcquiredTime", lockAcquiredTime);
+        state.put("lockExpiresTime", lockExpiresTime);
+        state.put("lockStatus", lockStatus);
+        return state;
     }
 }

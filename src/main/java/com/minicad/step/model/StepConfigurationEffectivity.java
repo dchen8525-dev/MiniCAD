@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CONFIGURATION_EFFECTIVITY.
  * Specifies when a configuration-managed item becomes effective.
@@ -10,25 +12,14 @@ import java.util.Objects;
  * @param configuration configuration item reference
  * @param itemConceived product definition being configured
  */
-public final class StepConfigurationEffectivity implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConfigurationEffectivity extends AbstractStepEntity {
     private final StepEntity configuration;
     private final StepEntity itemConceived;
 
     public StepConfigurationEffectivity(int id, String name, StepEntity configuration, StepEntity itemConceived) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.configuration = configuration;
         this.itemConceived = itemConceived;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getConfiguration() {
@@ -40,20 +31,12 @@ public final class StepConfigurationEffectivity implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConfigurationEffectivity that = (StepConfigurationEffectivity) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(configuration, that.configuration) && Objects.equals(itemConceived, that.itemConceived);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, configuration, itemConceived);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConfigurationEffectivity{" + "id=" + id + "name=" + name + "configuration=" + configuration + "itemConceived=" + itemConceived + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("configuration", configuration);
+        state.put("itemConceived", itemConceived);
+        return state;
     }
 }

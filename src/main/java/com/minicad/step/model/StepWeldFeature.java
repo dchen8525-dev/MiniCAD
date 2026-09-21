@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved WELD_FEATURE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param featureSpecification feature variance specification reference
  * @param featureStatus feature variance status
  */
-public final class StepWeldFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepWeldFeature extends AbstractStepEntity {
     private final String featureType;
     private final StepEntity featureGeometry;
     private final StepEntity featureSpecification;
     private final String featureStatus;
 
     public StepWeldFeature(int id, String name, String featureType, StepEntity featureGeometry, StepEntity featureSpecification, String featureStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.featureType = featureType;
         this.featureGeometry = featureGeometry;
         this.featureSpecification = featureSpecification;
         this.featureStatus = featureStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFeatureType() {
@@ -56,20 +46,14 @@ public final class StepWeldFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepWeldFeature that = (StepWeldFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(featureType, that.featureType) && Objects.equals(featureGeometry, that.featureGeometry) && Objects.equals(featureSpecification, that.featureSpecification) && Objects.equals(featureStatus, that.featureStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, featureType, featureGeometry, featureSpecification, featureStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepWeldFeature{" + "id=" + id + "name=" + name + "featureType=" + featureType + "featureGeometry=" + featureGeometry + "featureSpecification=" + featureSpecification + "featureStatus=" + featureStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("featureType", featureType);
+        state.put("featureGeometry", featureGeometry);
+        state.put("featureSpecification", featureSpecification);
+        state.put("featureStatus", featureStatus);
+        return state;
     }
 }

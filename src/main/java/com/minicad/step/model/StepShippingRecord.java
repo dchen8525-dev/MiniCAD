@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SHIPPING_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceTracking tracking variance number
  * @varianceStatus shipping variance status
  */
-public final class StepShippingRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepShippingRecord extends AbstractStepEntity {
     private final List<StepEntity> varianceItems;
     private final List<Integer> varianceQuantities;
     private final StepEntity varianceCustomer;
@@ -29,8 +28,7 @@ public final class StepShippingRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepShippingRecord(int id, String name, List<StepEntity> varianceItems, List<Integer> varianceQuantities, StepEntity varianceCustomer, StepEntity varianceDate, StepEntity varianceCarrier, String varianceTracking, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceItems = varianceItems == null ? null : java.util.List.copyOf(varianceItems);
         this.varianceQuantities = varianceQuantities == null ? null : java.util.List.copyOf(varianceQuantities);
         this.varianceCustomer = varianceCustomer;
@@ -38,14 +36,6 @@ public final class StepShippingRecord implements StepEntity {
         this.varianceCarrier = varianceCarrier;
         this.varianceTracking = varianceTracking;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getVarianceItems() {
@@ -77,20 +67,17 @@ public final class StepShippingRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepShippingRecord that = (StepShippingRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceItems, that.varianceItems) && Objects.equals(varianceQuantities, that.varianceQuantities) && Objects.equals(varianceCustomer, that.varianceCustomer) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceCarrier, that.varianceCarrier) && Objects.equals(varianceTracking, that.varianceTracking) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceItems, varianceQuantities, varianceCustomer, varianceDate, varianceCarrier, varianceTracking, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepShippingRecord{" + "id=" + id + "name=" + name + "varianceItems=" + varianceItems + "varianceQuantities=" + varianceQuantities + "varianceCustomer=" + varianceCustomer + "varianceDate=" + varianceDate + "varianceCarrier=" + varianceCarrier + "varianceTracking=" + varianceTracking + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceItems", varianceItems);
+        state.put("varianceQuantities", varianceQuantities);
+        state.put("varianceCustomer", varianceCustomer);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceCarrier", varianceCarrier);
+        state.put("varianceTracking", varianceTracking);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

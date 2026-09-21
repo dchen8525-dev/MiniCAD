@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal draughting callout relationship.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param relatingCallout source callout
  * @param relatedCallout target callout
  */
-public final class StepDraughtingCalloutRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDraughtingCalloutRelationship extends AbstractStepEntity {
     private final String description;
     private final StepDraughtingCallout relatingCallout;
     private final StepDraughtingCallout relatedCallout;
 
     public StepDraughtingCalloutRelationship(int id, String name, String description, StepDraughtingCallout relatingCallout, StepDraughtingCallout relatedCallout) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.relatingCallout = relatingCallout;
         this.relatedCallout = relatedCallout;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -55,20 +46,13 @@ public final class StepDraughtingCalloutRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDraughtingCalloutRelationship that = (StepDraughtingCalloutRelationship) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingCallout, that.relatingCallout) && Objects.equals(relatedCallout, that.relatedCallout);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, relatingCallout, relatedCallout);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDraughtingCalloutRelationship{" + "id=" + id + "name=" + name + "description=" + description + "relatingCallout=" + relatingCallout + "relatedCallout=" + relatedCallout + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingCallout", relatingCallout);
+        state.put("relatedCallout", relatedCallout);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal TEXT_STYLE_WITH_JUSTIFICATION.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param characterAppearance character appearance definition
  * @param justification justification token
  */
-public final class StepTextStyleWithJustification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTextStyleWithJustification extends AbstractStepEntity {
     private final StepEntity characterAppearance;
     private final String justification;
 
     public StepTextStyleWithJustification(int id, String name, StepEntity characterAppearance, String justification) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.characterAppearance = characterAppearance;
         this.justification = justification;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCharacterAppearance() {
@@ -48,20 +39,12 @@ public final class StepTextStyleWithJustification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTextStyleWithJustification that = (StepTextStyleWithJustification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(characterAppearance, that.characterAppearance) && Objects.equals(justification, that.justification);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, characterAppearance, justification);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTextStyleWithJustification{" + "id=" + id + "name=" + name + "characterAppearance=" + characterAppearance + "justification=" + justification + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("characterAppearance", characterAppearance);
+        state.put("justification", justification);
+        return state;
     }
 }

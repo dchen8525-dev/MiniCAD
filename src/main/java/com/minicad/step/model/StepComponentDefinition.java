@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMPONENT_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceProperties component variance properties
  * @varianceStatus definition variance status
  */
-public final class StepComponentDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepComponentDefinition extends AbstractStepEntity {
     private final StepEntity varianceComponent;
     private final String varianceFunction;
     private final StepEntity varianceInterface;
@@ -27,22 +26,13 @@ public final class StepComponentDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepComponentDefinition(int id, String name, StepEntity varianceComponent, String varianceFunction, StepEntity varianceInterface, List<StepEntity> varianceDependencies, List<StepEntity> varianceProperties, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceComponent = varianceComponent;
         this.varianceFunction = varianceFunction;
         this.varianceInterface = varianceInterface;
         this.varianceDependencies = varianceDependencies == null ? null : java.util.List.copyOf(varianceDependencies);
         this.varianceProperties = varianceProperties == null ? null : java.util.List.copyOf(varianceProperties);
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceComponent() {
@@ -70,20 +60,16 @@ public final class StepComponentDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepComponentDefinition that = (StepComponentDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceComponent, that.varianceComponent) && Objects.equals(varianceFunction, that.varianceFunction) && Objects.equals(varianceInterface, that.varianceInterface) && Objects.equals(varianceDependencies, that.varianceDependencies) && Objects.equals(varianceProperties, that.varianceProperties) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceComponent, varianceFunction, varianceInterface, varianceDependencies, varianceProperties, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepComponentDefinition{" + "id=" + id + "name=" + name + "varianceComponent=" + varianceComponent + "varianceFunction=" + varianceFunction + "varianceInterface=" + varianceInterface + "varianceDependencies=" + varianceDependencies + "varianceProperties=" + varianceProperties + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceComponent", varianceComponent);
+        state.put("varianceFunction", varianceFunction);
+        state.put("varianceInterface", varianceInterface);
+        state.put("varianceDependencies", varianceDependencies);
+        state.put("varianceProperties", varianceProperties);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

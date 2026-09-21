@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PROCEDURE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param procedureCompletedSteps procedure variance completed steps
  * @param procedureStatus procedure variance status
  */
-public final class StepProcedureInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProcedureInstance extends AbstractStepEntity {
     private final StepEntity procedureDefinition;
     private final String procedureState;
     private final int procedureCurrentStep;
@@ -25,21 +24,12 @@ public final class StepProcedureInstance implements StepEntity {
     private final String procedureStatus;
 
     public StepProcedureInstance(int id, String name, StepEntity procedureDefinition, String procedureState, int procedureCurrentStep, List<Integer> procedureCompletedSteps, String procedureStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.procedureDefinition = procedureDefinition;
         this.procedureState = procedureState;
         this.procedureCurrentStep = procedureCurrentStep;
         this.procedureCompletedSteps = procedureCompletedSteps == null ? null : java.util.List.copyOf(procedureCompletedSteps);
         this.procedureStatus = procedureStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getProcedureDefinition() {
@@ -63,20 +53,15 @@ public final class StepProcedureInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProcedureInstance that = (StepProcedureInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(procedureDefinition, that.procedureDefinition) && Objects.equals(procedureState, that.procedureState) && procedureCurrentStep == that.procedureCurrentStep && Objects.equals(procedureCompletedSteps, that.procedureCompletedSteps) && Objects.equals(procedureStatus, that.procedureStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, procedureDefinition, procedureState, procedureCurrentStep, procedureCompletedSteps, procedureStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProcedureInstance{" + "id=" + id + "name=" + name + "procedureDefinition=" + procedureDefinition + "procedureState=" + procedureState + "procedureCurrentStep=" + procedureCurrentStep + "procedureCompletedSteps=" + procedureCompletedSteps + "procedureStatus=" + procedureStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("procedureDefinition", procedureDefinition);
+        state.put("procedureState", procedureState);
+        state.put("procedureCurrentStep", procedureCurrentStep);
+        state.put("procedureCompletedSteps", procedureCompletedSteps);
+        state.put("procedureStatus", procedureStatus);
+        return state;
     }
 }

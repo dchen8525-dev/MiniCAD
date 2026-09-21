@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved POLICY_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param policyEnforcement policy variance enforcement level
  * @param policyStatus policy variance status
  */
-public final class StepPolicyDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPolicyDefinition extends AbstractStepEntity {
     private final String policyType;
     private final String policyScope;
     private final List<String> policyRules;
@@ -25,21 +24,12 @@ public final class StepPolicyDefinition implements StepEntity {
     private final String policyStatus;
 
     public StepPolicyDefinition(int id, String name, String policyType, String policyScope, List<String> policyRules, String policyEnforcement, String policyStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.policyType = policyType;
         this.policyScope = policyScope;
         this.policyRules = policyRules == null ? null : java.util.List.copyOf(policyRules);
         this.policyEnforcement = policyEnforcement;
         this.policyStatus = policyStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPolicyType() {
@@ -63,20 +53,15 @@ public final class StepPolicyDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPolicyDefinition that = (StepPolicyDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(policyType, that.policyType) && Objects.equals(policyScope, that.policyScope) && Objects.equals(policyRules, that.policyRules) && Objects.equals(policyEnforcement, that.policyEnforcement) && Objects.equals(policyStatus, that.policyStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, policyType, policyScope, policyRules, policyEnforcement, policyStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPolicyDefinition{" + "id=" + id + "name=" + name + "policyType=" + policyType + "policyScope=" + policyScope + "policyRules=" + policyRules + "policyEnforcement=" + policyEnforcement + "policyStatus=" + policyStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("policyType", policyType);
+        state.put("policyScope", policyScope);
+        state.put("policyRules", policyRules);
+        state.put("policyEnforcement", policyEnforcement);
+        state.put("policyStatus", policyStatus);
+        return state;
     }
 }

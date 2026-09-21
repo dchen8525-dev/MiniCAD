@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SIGNAL_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param signalHistory signal variance history samples
  * @param signalStatus signal variance status
  */
-public final class StepSignalInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSignalInstance extends AbstractStepEntity {
     private final StepEntity signalDefinition;
     private final StepEntity signalSource;
     private final double signalValue;
@@ -25,21 +24,12 @@ public final class StepSignalInstance implements StepEntity {
     private final String signalStatus;
 
     public StepSignalInstance(int id, String name, StepEntity signalDefinition, StepEntity signalSource, double signalValue, List<Double> signalHistory, String signalStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.signalDefinition = signalDefinition;
         this.signalSource = signalSource;
         this.signalValue = signalValue;
         this.signalHistory = signalHistory == null ? null : java.util.List.copyOf(signalHistory);
         this.signalStatus = signalStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSignalDefinition() {
@@ -63,20 +53,15 @@ public final class StepSignalInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSignalInstance that = (StepSignalInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(signalDefinition, that.signalDefinition) && Objects.equals(signalSource, that.signalSource) && signalValue == that.signalValue && Objects.equals(signalHistory, that.signalHistory) && Objects.equals(signalStatus, that.signalStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, signalDefinition, signalSource, signalValue, signalHistory, signalStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSignalInstance{" + "id=" + id + "name=" + name + "signalDefinition=" + signalDefinition + "signalSource=" + signalSource + "signalValue=" + signalValue + "signalHistory=" + signalHistory + "signalStatus=" + signalStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("signalDefinition", signalDefinition);
+        state.put("signalSource", signalSource);
+        state.put("signalValue", signalValue);
+        state.put("signalHistory", signalHistory);
+        state.put("signalStatus", signalStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TARGET_INSTANCE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param targetProgress target variance progress percentage
  * @param targetStatus target variance status
  */
-public final class StepTargetInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTargetInstance extends AbstractStepEntity {
     private final StepEntity targetDefinition;
     private final double targetCurrentValue;
     private final double targetProgress;
     private final String targetStatus;
 
     public StepTargetInstance(int id, String name, StepEntity targetDefinition, double targetCurrentValue, double targetProgress, String targetStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.targetDefinition = targetDefinition;
         this.targetCurrentValue = targetCurrentValue;
         this.targetProgress = targetProgress;
         this.targetStatus = targetStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getTargetDefinition() {
@@ -56,20 +46,14 @@ public final class StepTargetInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTargetInstance that = (StepTargetInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(targetDefinition, that.targetDefinition) && targetCurrentValue == that.targetCurrentValue && targetProgress == that.targetProgress && Objects.equals(targetStatus, that.targetStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, targetDefinition, targetCurrentValue, targetProgress, targetStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTargetInstance{" + "id=" + id + "name=" + name + "targetDefinition=" + targetDefinition + "targetCurrentValue=" + targetCurrentValue + "targetProgress=" + targetProgress + "targetStatus=" + targetStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("targetDefinition", targetDefinition);
+        state.put("targetCurrentValue", targetCurrentValue);
+        state.put("targetProgress", targetProgress);
+        state.put("targetStatus", targetStatus);
+        return state;
     }
 }

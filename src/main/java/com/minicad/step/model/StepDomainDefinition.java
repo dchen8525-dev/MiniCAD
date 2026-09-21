@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DOMAIN_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param domainAuthority domain variance authority
  * @param domainStatus domain variance status
  */
-public final class StepDomainDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDomainDefinition extends AbstractStepEntity {
     private final String domainType;
     private final String domainDescription;
     private final String domainScope;
@@ -25,21 +24,12 @@ public final class StepDomainDefinition implements StepEntity {
     private final String domainStatus;
 
     public StepDomainDefinition(int id, String name, String domainType, String domainDescription, String domainScope, String domainAuthority, String domainStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.domainType = domainType;
         this.domainDescription = domainDescription;
         this.domainScope = domainScope;
         this.domainAuthority = domainAuthority;
         this.domainStatus = domainStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDomainType() {
@@ -63,20 +53,15 @@ public final class StepDomainDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDomainDefinition that = (StepDomainDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(domainType, that.domainType) && Objects.equals(domainDescription, that.domainDescription) && Objects.equals(domainScope, that.domainScope) && Objects.equals(domainAuthority, that.domainAuthority) && Objects.equals(domainStatus, that.domainStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, domainType, domainDescription, domainScope, domainAuthority, domainStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDomainDefinition{" + "id=" + id + "name=" + name + "domainType=" + domainType + "domainDescription=" + domainDescription + "domainScope=" + domainScope + "domainAuthority=" + domainAuthority + "domainStatus=" + domainStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("domainType", domainType);
+        state.put("domainDescription", domainDescription);
+        state.put("domainScope", domainScope);
+        state.put("domainAuthority", domainAuthority);
+        state.put("domainStatus", domainStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal APPROVAL_DATE_TIME assignment.
  *
@@ -9,23 +10,14 @@ import java.util.Objects;
  * @param dateTime approval date and time
  * @param datedApproval approval being dated
  */
-public final class StepApprovalDateTime implements StepEntity {
-    private final int id;
+public final class StepApprovalDateTime extends AbstractStepEntity {
     private final StepDateAndTime dateTime;
     private final StepApproval datedApproval;
 
     public StepApprovalDateTime(int id, StepDateAndTime dateTime, StepApproval datedApproval) {
-        this.id = id;
+        super(id, "");
         this.dateTime = dateTime;
         this.datedApproval = datedApproval;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepDateAndTime getDateTime() {
@@ -46,20 +38,11 @@ public final class StepApprovalDateTime implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepApprovalDateTime that = (StepApprovalDateTime) o;
-        return id == that.id && Objects.equals(dateTime, that.dateTime) && Objects.equals(datedApproval, that.datedApproval);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, dateTime, datedApproval);
-    }
-
-    @Override
-    public String toString() {
-        return "StepApprovalDateTime{" + "id=" + id + "dateTime=" + dateTime + "datedApproval=" + datedApproval + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("dateTime", dateTime);
+        state.put("datedApproval", datedApproval);
+        return state;
     }
 }

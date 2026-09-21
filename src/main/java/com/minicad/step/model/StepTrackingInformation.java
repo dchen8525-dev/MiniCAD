@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRACKING_INFORMATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceHistory tracking variance history events
  * @param trackingService tracking service reference
  */
-public final class StepTrackingInformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTrackingInformation extends AbstractStepEntity {
     private final String trackingId;
     private final List<StepEntity> trackingItems;
     private final String varianceLocation;
@@ -27,22 +26,13 @@ public final class StepTrackingInformation implements StepEntity {
     private final StepEntity trackingService;
 
     public StepTrackingInformation(int id, String name, String trackingId, List<StepEntity> trackingItems, String varianceLocation, String varianceStatus, List<StepEntity> varianceHistory, StepEntity trackingService) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.trackingId = trackingId;
         this.trackingItems = trackingItems == null ? null : java.util.List.copyOf(trackingItems);
         this.varianceLocation = varianceLocation;
         this.varianceStatus = varianceStatus;
         this.varianceHistory = varianceHistory == null ? null : java.util.List.copyOf(varianceHistory);
         this.trackingService = trackingService;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTrackingId() {
@@ -70,20 +60,16 @@ public final class StepTrackingInformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTrackingInformation that = (StepTrackingInformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(trackingId, that.trackingId) && Objects.equals(trackingItems, that.trackingItems) && Objects.equals(varianceLocation, that.varianceLocation) && Objects.equals(varianceStatus, that.varianceStatus) && Objects.equals(varianceHistory, that.varianceHistory) && Objects.equals(trackingService, that.trackingService);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, trackingId, trackingItems, varianceLocation, varianceStatus, varianceHistory, trackingService);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTrackingInformation{" + "id=" + id + "name=" + name + "trackingId=" + trackingId + "trackingItems=" + trackingItems + "varianceLocation=" + varianceLocation + "varianceStatus=" + varianceStatus + "varianceHistory=" + varianceHistory + "trackingService=" + trackingService + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("trackingId", trackingId);
+        state.put("trackingItems", trackingItems);
+        state.put("varianceLocation", varianceLocation);
+        state.put("varianceStatus", varianceStatus);
+        state.put("varianceHistory", varianceHistory);
+        state.put("trackingService", trackingService);
+        return state;
     }
 }

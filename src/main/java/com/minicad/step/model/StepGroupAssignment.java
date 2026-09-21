@@ -1,27 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal GROUP_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
  * @param assignedGroup assigned group
  */
-public final class StepGroupAssignment implements StepEntity {
-    private final int id;
+public final class StepGroupAssignment extends AbstractStepEntity {
     private final StepGroup assignedGroup;
 
     public StepGroupAssignment(int id, StepGroup assignedGroup) {
-        this.id = id;
+        super(id, "");
         this.assignedGroup = assignedGroup;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepGroup getAssignedGroup() {
@@ -34,20 +27,10 @@ public final class StepGroupAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGroupAssignment that = (StepGroupAssignment) o;
-        return id == that.id && Objects.equals(assignedGroup, that.assignedGroup);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedGroup);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGroupAssignment{" + "id=" + id + "assignedGroup=" + assignedGroup + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedGroup", assignedGroup);
+        return state;
     }
 }

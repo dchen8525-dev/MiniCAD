@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal profile definition used by swept area solids.
@@ -14,8 +15,7 @@ import java.util.Objects;
  * @param parameters numeric profile parameters in STEP order
  * @param entityName concrete STEP entity name
  */
-public final class StepProfileDef implements StepEntity {
-    private final int id;
+public final class StepProfileDef extends AbstractStepEntity {
     private final String profileType;
     private final String profileName;
     private final StepEntity position;
@@ -24,17 +24,13 @@ public final class StepProfileDef implements StepEntity {
     private final String entityName;
 
     public StepProfileDef(int id, String profileType, String profileName, StepEntity position, List<StepEntity> curves, List<Double> parameters, String entityName) {
-        this.id = id;
+        super(id, "");
         this.profileType = profileType;
         this.profileName = profileName;
         this.position = position;
         this.curves = curves == null ? null : java.util.List.copyOf(curves);
         this.parameters = parameters == null ? null : java.util.List.copyOf(parameters);
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {
@@ -76,20 +72,15 @@ public final class StepProfileDef implements StepEntity {
     public List<Double> parameters() { return getParameters(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProfileDef that = (StepProfileDef) o;
-        return id == that.id && Objects.equals(profileType, that.profileType) && Objects.equals(profileName, that.profileName) && Objects.equals(position, that.position) && Objects.equals(curves, that.curves) && Objects.equals(parameters, that.parameters) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, profileType, profileName, position, curves, parameters, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProfileDef{" + "id=" + id + "profileType=" + profileType + "profileName=" + profileName + "position=" + position + "curves=" + curves + "parameters=" + parameters + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("profileType", profileType);
+        state.put("profileName", profileName);
+        state.put("position", position);
+        state.put("curves", curves);
+        state.put("parameters", parameters);
+        state.put("entityName", entityName);
+        return state;
     }
 }

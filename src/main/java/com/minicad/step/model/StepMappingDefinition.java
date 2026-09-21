@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MAPPING_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param mappingRules mapping variance mapping rules
  * @param mappingStatus mapping variance status
  */
-public final class StepMappingDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMappingDefinition extends AbstractStepEntity {
     private final String mappingType;
     private final String mappingSource;
     private final String mappingTarget;
@@ -25,21 +24,12 @@ public final class StepMappingDefinition implements StepEntity {
     private final String mappingStatus;
 
     public StepMappingDefinition(int id, String name, String mappingType, String mappingSource, String mappingTarget, List<String> mappingRules, String mappingStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.mappingType = mappingType;
         this.mappingSource = mappingSource;
         this.mappingTarget = mappingTarget;
         this.mappingRules = mappingRules == null ? null : java.util.List.copyOf(mappingRules);
         this.mappingStatus = mappingStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMappingType() {
@@ -63,20 +53,15 @@ public final class StepMappingDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMappingDefinition that = (StepMappingDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(mappingType, that.mappingType) && Objects.equals(mappingSource, that.mappingSource) && Objects.equals(mappingTarget, that.mappingTarget) && Objects.equals(mappingRules, that.mappingRules) && Objects.equals(mappingStatus, that.mappingStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, mappingType, mappingSource, mappingTarget, mappingRules, mappingStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMappingDefinition{" + "id=" + id + "name=" + name + "mappingType=" + mappingType + "mappingSource=" + mappingSource + "mappingTarget=" + mappingTarget + "mappingRules=" + mappingRules + "mappingStatus=" + mappingStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("mappingType", mappingType);
+        state.put("mappingSource", mappingSource);
+        state.put("mappingTarget", mappingTarget);
+        state.put("mappingRules", mappingRules);
+        state.put("mappingStatus", mappingStatus);
+        return state;
     }
 }

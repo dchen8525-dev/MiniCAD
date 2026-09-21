@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ERROR_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param errorResolved error variance resolved flag
  * @param errorStatus error variance status
  */
-public final class StepErrorInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepErrorInstance extends AbstractStepEntity {
     private final StepEntity errorDefinition;
     private final String errorContext;
     private final StepEntity errorTime;
@@ -27,22 +26,13 @@ public final class StepErrorInstance implements StepEntity {
     private final String errorStatus;
 
     public StepErrorInstance(int id, String name, StepEntity errorDefinition, String errorContext, StepEntity errorTime, String errorStackTrace, boolean errorResolved, String errorStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.errorDefinition = errorDefinition;
         this.errorContext = errorContext;
         this.errorTime = errorTime;
         this.errorStackTrace = errorStackTrace;
         this.errorResolved = errorResolved;
         this.errorStatus = errorStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getErrorDefinition() {
@@ -70,20 +60,16 @@ public final class StepErrorInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepErrorInstance that = (StepErrorInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(errorDefinition, that.errorDefinition) && Objects.equals(errorContext, that.errorContext) && Objects.equals(errorTime, that.errorTime) && Objects.equals(errorStackTrace, that.errorStackTrace) && errorResolved == that.errorResolved && Objects.equals(errorStatus, that.errorStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, errorDefinition, errorContext, errorTime, errorStackTrace, errorResolved, errorStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepErrorInstance{" + "id=" + id + "name=" + name + "errorDefinition=" + errorDefinition + "errorContext=" + errorContext + "errorTime=" + errorTime + "errorStackTrace=" + errorStackTrace + "errorResolved=" + errorResolved + "errorStatus=" + errorStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("errorDefinition", errorDefinition);
+        state.put("errorContext", errorContext);
+        state.put("errorTime", errorTime);
+        state.put("errorStackTrace", errorStackTrace);
+        state.put("errorResolved", errorResolved);
+        state.put("errorStatus", errorStatus);
+        return state;
     }
 }

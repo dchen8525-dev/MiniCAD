@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved BOUNDED_CURVE_2D.
  * A 2D curve with bounded extent.
@@ -9,23 +11,12 @@ import java.util.Objects;
  * @param name step label
  * @param curve the underlying 2D curve
  */
-public final class StepBoundedCurve2D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBoundedCurve2D extends AbstractStepEntity {
     private final StepCurve curve;
 
     public StepBoundedCurve2D(int id, String name, StepCurve curve) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.curve = curve;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepCurve getCurve() {
@@ -38,20 +29,11 @@ public final class StepBoundedCurve2D implements StepEntity {
     public StepCurve curve() { return getCurve(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBoundedCurve2D that = (StepBoundedCurve2D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(curve, that.curve);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, curve);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBoundedCurve2D{" + "id=" + id + "name=" + name + "curve=" + curve + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("curve", curve);
+        return state;
     }
 }

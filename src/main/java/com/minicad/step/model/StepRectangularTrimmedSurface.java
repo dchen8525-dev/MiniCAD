@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal RECTANGULAR_TRIMMED_SURFACE parse-only surface.
  *
@@ -14,9 +16,7 @@ import java.util.Objects;
  * @param usense u direction sense
  * @param vsense v direction sense
  */
-public final class StepRectangularTrimmedSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRectangularTrimmedSurface extends AbstractStepEntity {
     private final StepEntity basisSurface;
     private final double u1;
     private final double u2;
@@ -26,8 +26,7 @@ public final class StepRectangularTrimmedSurface implements StepEntity {
     private final boolean vsense;
 
     public StepRectangularTrimmedSurface(int id, String name, StepEntity basisSurface, double u1, double u2, double v1, double v2, boolean usense, boolean vsense) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.basisSurface = basisSurface;
         this.u1 = u1;
         this.u2 = u2;
@@ -35,14 +34,6 @@ public final class StepRectangularTrimmedSurface implements StepEntity {
         this.v2 = v2;
         this.usense = usense;
         this.vsense = vsense;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBasisSurface() {
@@ -85,20 +76,17 @@ public final class StepRectangularTrimmedSurface implements StepEntity {
     public boolean vsense() { return isVsense(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRectangularTrimmedSurface that = (StepRectangularTrimmedSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(basisSurface, that.basisSurface) && u1 == that.u1 && u2 == that.u2 && v1 == that.v1 && v2 == that.v2 && usense == that.usense && vsense == that.vsense;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, basisSurface, u1, u2, v1, v2, usense, vsense);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRectangularTrimmedSurface{" + "id=" + id + "name=" + name + "basisSurface=" + basisSurface + "u1=" + u1 + "u2=" + u2 + "v1=" + v1 + "v2=" + v2 + "usense=" + usense + "vsense=" + vsense + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("basisSurface", basisSurface);
+        state.put("u1", u1);
+        state.put("u2", u2);
+        state.put("v1", v1);
+        state.put("v2", v2);
+        state.put("usense", usense);
+        state.put("vsense", vsense);
+        return state;
     }
 }

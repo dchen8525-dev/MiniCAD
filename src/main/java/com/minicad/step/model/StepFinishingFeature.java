@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FINISHING_FEATURE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param finishingParameters finishing process parameters
  * @param finishingMaterial finishing material/tool reference
  */
-public final class StepFinishingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFinishingFeature extends AbstractStepEntity {
     private final String finishingType;
     private final StepEntity surfaceGeometry;
     private final double surfaceRoughness;
@@ -25,21 +24,12 @@ public final class StepFinishingFeature implements StepEntity {
     private final StepEntity finishingMaterial;
 
     public StepFinishingFeature(int id, String name, String finishingType, StepEntity surfaceGeometry, double surfaceRoughness, List<Double> finishingParameters, StepEntity finishingMaterial) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.finishingType = finishingType;
         this.surfaceGeometry = surfaceGeometry;
         this.surfaceRoughness = surfaceRoughness;
         this.finishingParameters = finishingParameters == null ? null : java.util.List.copyOf(finishingParameters);
         this.finishingMaterial = finishingMaterial;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFinishingType() {
@@ -63,20 +53,15 @@ public final class StepFinishingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFinishingFeature that = (StepFinishingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(finishingType, that.finishingType) && Objects.equals(surfaceGeometry, that.surfaceGeometry) && surfaceRoughness == that.surfaceRoughness && Objects.equals(finishingParameters, that.finishingParameters) && Objects.equals(finishingMaterial, that.finishingMaterial);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, finishingType, surfaceGeometry, surfaceRoughness, finishingParameters, finishingMaterial);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFinishingFeature{" + "id=" + id + "name=" + name + "finishingType=" + finishingType + "surfaceGeometry=" + surfaceGeometry + "surfaceRoughness=" + surfaceRoughness + "finishingParameters=" + finishingParameters + "finishingMaterial=" + finishingMaterial + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("finishingType", finishingType);
+        state.put("surfaceGeometry", surfaceGeometry);
+        state.put("surfaceRoughness", surfaceRoughness);
+        state.put("finishingParameters", finishingParameters);
+        state.put("finishingMaterial", finishingMaterial);
+        return state;
     }
 }

@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved POLYGONAL_BOUNDED_HALF_SPACE.
@@ -15,29 +15,18 @@ import java.util.Objects;
  * @param polygonPoints vertices of the bounding polygon
  * @param sameSense orientation flag
  */
-public final class StepPolygonalBoundedHalfSpace implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPolygonalBoundedHalfSpace extends AbstractStepEntity {
     private final StepEntity basisSurface;
     private final StepAxis2Placement3D position;
     private final List<StepCartesianPoint> polygonPoints;
     private final boolean sameSense;
 
     public StepPolygonalBoundedHalfSpace(int id, String name, StepEntity basisSurface, StepAxis2Placement3D position, List<StepCartesianPoint> polygonPoints, boolean sameSense) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.basisSurface = basisSurface;
         this.position = position;
         this.polygonPoints = polygonPoints == null ? null : java.util.List.copyOf(polygonPoints);
         this.sameSense = sameSense;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBasisSurface() {
@@ -65,20 +54,14 @@ public final class StepPolygonalBoundedHalfSpace implements StepEntity {
     public boolean sameSense() { return isSameSense(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPolygonalBoundedHalfSpace that = (StepPolygonalBoundedHalfSpace) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(basisSurface, that.basisSurface) && Objects.equals(position, that.position) && Objects.equals(polygonPoints, that.polygonPoints) && sameSense == that.sameSense;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, basisSurface, position, polygonPoints, sameSense);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPolygonalBoundedHalfSpace{" + "id=" + id + "name=" + name + "basisSurface=" + basisSurface + "position=" + position + "polygonPoints=" + polygonPoints + "sameSense=" + sameSense + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("basisSurface", basisSurface);
+        state.put("position", position);
+        state.put("polygonPoints", polygonPoints);
+        state.put("sameSense", sameSense);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved WAIT_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param waitAction wait variance action on timeout
  * @param waitStatus wait variance status
  */
-public final class StepWaitDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepWaitDefinition extends AbstractStepEntity {
     private final String waitType;
     private final String waitCondition;
     private final int waitTimeout;
@@ -25,21 +24,12 @@ public final class StepWaitDefinition implements StepEntity {
     private final String waitStatus;
 
     public StepWaitDefinition(int id, String name, String waitType, String waitCondition, int waitTimeout, StepEntity waitAction, String waitStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.waitType = waitType;
         this.waitCondition = waitCondition;
         this.waitTimeout = waitTimeout;
         this.waitAction = waitAction;
         this.waitStatus = waitStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getWaitType() {
@@ -63,20 +53,15 @@ public final class StepWaitDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepWaitDefinition that = (StepWaitDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(waitType, that.waitType) && Objects.equals(waitCondition, that.waitCondition) && waitTimeout == that.waitTimeout && Objects.equals(waitAction, that.waitAction) && Objects.equals(waitStatus, that.waitStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, waitType, waitCondition, waitTimeout, waitAction, waitStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepWaitDefinition{" + "id=" + id + "name=" + name + "waitType=" + waitType + "waitCondition=" + waitCondition + "waitTimeout=" + waitTimeout + "waitAction=" + waitAction + "waitStatus=" + waitStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("waitType", waitType);
+        state.put("waitCondition", waitCondition);
+        state.put("waitTimeout", waitTimeout);
+        state.put("waitAction", waitAction);
+        state.put("waitStatus", waitStatus);
+        return state;
     }
 }

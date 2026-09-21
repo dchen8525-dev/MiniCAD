@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved COMPOSITE_CURVE_SEGMENT.
  *
@@ -9,16 +11,13 @@ import java.util.Objects;
  * @param sameSense same-sense flag
  * @param parentCurve parent curve
  */
-public final class StepCompositeCurveSegment implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCompositeCurveSegment extends AbstractStepEntity {
     private final String transition;
     private final boolean sameSense;
     private final StepEntity parentCurve;
 
     public StepCompositeCurveSegment(int id, String name, String transition, boolean sameSense, StepEntity parentCurve) {
-        this.id = id;
-        this.name = name != null ? name : "";
+        super(id, name != null ? name : "");
         this.transition = transition;
         this.sameSense = sameSense;
         this.parentCurve = parentCurve;
@@ -26,14 +25,6 @@ public final class StepCompositeCurveSegment implements StepEntity {
 
     public StepCompositeCurveSegment(int id, String transition, boolean sameSense, StepEntity parentCurve) {
         this(id, "", transition, sameSense, parentCurve);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTransition() {
@@ -56,20 +47,13 @@ public final class StepCompositeCurveSegment implements StepEntity {
     public StepEntity parentCurve() { return getParentCurve(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCompositeCurveSegment that = (StepCompositeCurveSegment) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(transition, that.transition) && sameSense == that.sameSense && Objects.equals(parentCurve, that.parentCurve);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, transition, sameSense, parentCurve);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCompositeCurveSegment{" + "id=" + id + "name=" + name + "transition=" + transition + "sameSense=" + sameSense + "parentCurve=" + parentCurve + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("transition", transition);
+        state.put("sameSense", sameSense);
+        state.put("parentCurve", parentCurve);
+        return state;
     }
 }

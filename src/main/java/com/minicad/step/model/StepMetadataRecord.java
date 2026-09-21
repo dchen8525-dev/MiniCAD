@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved METADATA_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param metadataTimestamp metadata variance timestamp
  * @param metadataStatus metadata variance status
  */
-public final class StepMetadataRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMetadataRecord extends AbstractStepEntity {
     private final String metadataType;
     private final String metadataKey;
     private final String metadataValue;
@@ -27,22 +26,13 @@ public final class StepMetadataRecord implements StepEntity {
     private final String metadataStatus;
 
     public StepMetadataRecord(int id, String name, String metadataType, String metadataKey, String metadataValue, StepEntity metadataSource, StepEntity metadataTimestamp, String metadataStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.metadataType = metadataType;
         this.metadataKey = metadataKey;
         this.metadataValue = metadataValue;
         this.metadataSource = metadataSource;
         this.metadataTimestamp = metadataTimestamp;
         this.metadataStatus = metadataStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMetadataType() {
@@ -70,20 +60,16 @@ public final class StepMetadataRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMetadataRecord that = (StepMetadataRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(metadataType, that.metadataType) && Objects.equals(metadataKey, that.metadataKey) && Objects.equals(metadataValue, that.metadataValue) && Objects.equals(metadataSource, that.metadataSource) && Objects.equals(metadataTimestamp, that.metadataTimestamp) && Objects.equals(metadataStatus, that.metadataStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, metadataType, metadataKey, metadataValue, metadataSource, metadataTimestamp, metadataStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMetadataRecord{" + "id=" + id + "name=" + name + "metadataType=" + metadataType + "metadataKey=" + metadataKey + "metadataValue=" + metadataValue + "metadataSource=" + metadataSource + "metadataTimestamp=" + metadataTimestamp + "metadataStatus=" + metadataStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("metadataType", metadataType);
+        state.put("metadataKey", metadataKey);
+        state.put("metadataValue", metadataValue);
+        state.put("metadataSource", metadataSource);
+        state.put("metadataTimestamp", metadataTimestamp);
+        state.put("metadataStatus", metadataStatus);
+        return state;
     }
 }

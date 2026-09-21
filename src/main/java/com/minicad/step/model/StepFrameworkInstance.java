@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FRAMEWORK_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param frameworkConfig framework variance configuration
  * @param frameworkStatus framework variance status
  */
-public final class StepFrameworkInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFrameworkInstance extends AbstractStepEntity {
     private final StepEntity frameworkDefinition;
     private final String frameworkState;
     private final String frameworkVersion;
@@ -25,21 +24,12 @@ public final class StepFrameworkInstance implements StepEntity {
     private final String frameworkStatus;
 
     public StepFrameworkInstance(int id, String name, StepEntity frameworkDefinition, String frameworkState, String frameworkVersion, List<String> frameworkConfig, String frameworkStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.frameworkDefinition = frameworkDefinition;
         this.frameworkState = frameworkState;
         this.frameworkVersion = frameworkVersion;
         this.frameworkConfig = frameworkConfig == null ? null : java.util.List.copyOf(frameworkConfig);
         this.frameworkStatus = frameworkStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getFrameworkDefinition() {
@@ -63,20 +53,15 @@ public final class StepFrameworkInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFrameworkInstance that = (StepFrameworkInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(frameworkDefinition, that.frameworkDefinition) && Objects.equals(frameworkState, that.frameworkState) && Objects.equals(frameworkVersion, that.frameworkVersion) && Objects.equals(frameworkConfig, that.frameworkConfig) && Objects.equals(frameworkStatus, that.frameworkStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, frameworkDefinition, frameworkState, frameworkVersion, frameworkConfig, frameworkStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFrameworkInstance{" + "id=" + id + "name=" + name + "frameworkDefinition=" + frameworkDefinition + "frameworkState=" + frameworkState + "frameworkVersion=" + frameworkVersion + "frameworkConfig=" + frameworkConfig + "frameworkStatus=" + frameworkStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("frameworkDefinition", frameworkDefinition);
+        state.put("frameworkState", frameworkState);
+        state.put("frameworkVersion", frameworkVersion);
+        state.put("frameworkConfig", frameworkConfig);
+        state.put("frameworkStatus", frameworkStatus);
+        return state;
     }
 }

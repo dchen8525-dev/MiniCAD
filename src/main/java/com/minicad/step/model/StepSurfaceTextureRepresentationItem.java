@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SURFACE_TEXTURE_REPRESENTATION_ITEM.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param roughnessUnit roughness unit
  * @param measurementMethod measurement method
  */
-public final class StepSurfaceTextureRepresentationItem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSurfaceTextureRepresentationItem extends AbstractStepEntity {
     private final Double roughnessValue;
     private final StepEntity roughnessUnit;
     private final String measurementMethod;
 
     public StepSurfaceTextureRepresentationItem(int id, String name, Double roughnessValue, StepEntity roughnessUnit, String measurementMethod) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.roughnessValue = roughnessValue;
         this.roughnessUnit = roughnessUnit;
         this.measurementMethod = measurementMethod;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Double getRoughnessValue() {
@@ -49,20 +39,13 @@ public final class StepSurfaceTextureRepresentationItem implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceTextureRepresentationItem that = (StepSurfaceTextureRepresentationItem) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(roughnessValue, that.roughnessValue) && Objects.equals(roughnessUnit, that.roughnessUnit) && Objects.equals(measurementMethod, that.measurementMethod);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, roughnessValue, roughnessUnit, measurementMethod);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceTextureRepresentationItem{" + "id=" + id + "name=" + name + "roughnessValue=" + roughnessValue + "roughnessUnit=" + roughnessUnit + "measurementMethod=" + measurementMethod + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("roughnessValue", roughnessValue);
+        state.put("roughnessUnit", roughnessUnit);
+        state.put("measurementMethod", measurementMethod);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RECOVERY_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param recoveryTimeout recovery variance timeout
  * @param recoveryStatus recovery variance status
  */
-public final class StepRecoveryDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRecoveryDefinition extends AbstractStepEntity {
     private final String recoveryType;
     private final String recoveryStrategy;
     private final List<String> recoverySteps;
@@ -25,21 +24,12 @@ public final class StepRecoveryDefinition implements StepEntity {
     private final String recoveryStatus;
 
     public StepRecoveryDefinition(int id, String name, String recoveryType, String recoveryStrategy, List<String> recoverySteps, int recoveryTimeout, String recoveryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.recoveryType = recoveryType;
         this.recoveryStrategy = recoveryStrategy;
         this.recoverySteps = recoverySteps == null ? null : java.util.List.copyOf(recoverySteps);
         this.recoveryTimeout = recoveryTimeout;
         this.recoveryStatus = recoveryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getRecoveryType() {
@@ -63,20 +53,15 @@ public final class StepRecoveryDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRecoveryDefinition that = (StepRecoveryDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(recoveryType, that.recoveryType) && Objects.equals(recoveryStrategy, that.recoveryStrategy) && Objects.equals(recoverySteps, that.recoverySteps) && recoveryTimeout == that.recoveryTimeout && Objects.equals(recoveryStatus, that.recoveryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, recoveryType, recoveryStrategy, recoverySteps, recoveryTimeout, recoveryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRecoveryDefinition{" + "id=" + id + "name=" + name + "recoveryType=" + recoveryType + "recoveryStrategy=" + recoveryStrategy + "recoverySteps=" + recoverySteps + "recoveryTimeout=" + recoveryTimeout + "recoveryStatus=" + recoveryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("recoveryType", recoveryType);
+        state.put("recoveryStrategy", recoveryStrategy);
+        state.put("recoverySteps", recoverySteps);
+        state.put("recoveryTimeout", recoveryTimeout);
+        state.put("recoveryStatus", recoveryStatus);
+        return state;
     }
 }

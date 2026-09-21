@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SHEET_METAL_BEND.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param bendAllowance bend allowance factor
  * @param kFactor k-factor for bend calculation
  */
-public final class StepSheetMetalBend implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSheetMetalBend extends AbstractStepEntity {
     private final StepEntity bendLine;
     private final double bendAngle;
     private final double bendRadius;
@@ -27,22 +26,13 @@ public final class StepSheetMetalBend implements StepEntity {
     private final double kFactor;
 
     public StepSheetMetalBend(int id, String name, StepEntity bendLine, double bendAngle, double bendRadius, String bendDirection, double bendAllowance, double kFactor) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.bendLine = bendLine;
         this.bendAngle = bendAngle;
         this.bendRadius = bendRadius;
         this.bendDirection = bendDirection;
         this.bendAllowance = bendAllowance;
         this.kFactor = kFactor;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBendLine() {
@@ -70,20 +60,16 @@ public final class StepSheetMetalBend implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSheetMetalBend that = (StepSheetMetalBend) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(bendLine, that.bendLine) && bendAngle == that.bendAngle && bendRadius == that.bendRadius && Objects.equals(bendDirection, that.bendDirection) && bendAllowance == that.bendAllowance && kFactor == that.kFactor;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, bendLine, bendAngle, bendRadius, bendDirection, bendAllowance, kFactor);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSheetMetalBend{" + "id=" + id + "name=" + name + "bendLine=" + bendLine + "bendAngle=" + bendAngle + "bendRadius=" + bendRadius + "bendDirection=" + bendDirection + "bendAllowance=" + bendAllowance + "kFactor=" + kFactor + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("bendLine", bendLine);
+        state.put("bendAngle", bendAngle);
+        state.put("bendRadius", bendRadius);
+        state.put("bendDirection", bendDirection);
+        state.put("bendAllowance", bendAllowance);
+        state.put("kFactor", kFactor);
+        return state;
     }
 }

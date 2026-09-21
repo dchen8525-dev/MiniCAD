@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMPOSITE_TEXT.
@@ -11,23 +12,12 @@ import java.util.Objects;
  * @param name text name
  * @param collection collection of text elements
  */
-public final class StepCompositeText implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCompositeText extends AbstractStepEntity {
     private final List<StepEntity> collection;
 
     public StepCompositeText(int id, String name, List<StepEntity> collection) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.collection = collection == null ? null : java.util.List.copyOf(collection);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getCollection() {
@@ -35,20 +25,11 @@ public final class StepCompositeText implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCompositeText that = (StepCompositeText) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(collection, that.collection);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, collection);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCompositeText{" + "id=" + id + "name=" + name + "collection=" + collection + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("collection", collection);
+        return state;
     }
 }

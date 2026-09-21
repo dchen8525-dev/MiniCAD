@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved QUALITY_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param recordStatus record status (approved, pending)
  * @param attachments record attachments/references
  */
-public final class StepQualityRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepQualityRecord extends AbstractStepEntity {
     private final String recordType;
     private final List<StepEntity> recordItems;
     private final StepEntity recordContext;
@@ -29,8 +28,7 @@ public final class StepQualityRecord implements StepEntity {
     private final List<StepEntity> attachments;
 
     public StepQualityRecord(int id, String name, String recordType, List<StepEntity> recordItems, StepEntity recordContext, StepEntity recordDate, StepEntity recordAuthor, String recordStatus, List<StepEntity> attachments) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.recordType = recordType;
         this.recordItems = recordItems == null ? null : java.util.List.copyOf(recordItems);
         this.recordContext = recordContext;
@@ -38,14 +36,6 @@ public final class StepQualityRecord implements StepEntity {
         this.recordAuthor = recordAuthor;
         this.recordStatus = recordStatus;
         this.attachments = attachments == null ? null : java.util.List.copyOf(attachments);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getRecordType() {
@@ -77,20 +67,17 @@ public final class StepQualityRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepQualityRecord that = (StepQualityRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(recordType, that.recordType) && Objects.equals(recordItems, that.recordItems) && Objects.equals(recordContext, that.recordContext) && Objects.equals(recordDate, that.recordDate) && Objects.equals(recordAuthor, that.recordAuthor) && Objects.equals(recordStatus, that.recordStatus) && Objects.equals(attachments, that.attachments);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, recordType, recordItems, recordContext, recordDate, recordAuthor, recordStatus, attachments);
-    }
-
-    @Override
-    public String toString() {
-        return "StepQualityRecord{" + "id=" + id + "name=" + name + "recordType=" + recordType + "recordItems=" + recordItems + "recordContext=" + recordContext + "recordDate=" + recordDate + "recordAuthor=" + recordAuthor + "recordStatus=" + recordStatus + "attachments=" + attachments + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("recordType", recordType);
+        state.put("recordItems", recordItems);
+        state.put("recordContext", recordContext);
+        state.put("recordDate", recordDate);
+        state.put("recordAuthor", recordAuthor);
+        state.put("recordStatus", recordStatus);
+        state.put("attachments", attachments);
+        return state;
     }
 }

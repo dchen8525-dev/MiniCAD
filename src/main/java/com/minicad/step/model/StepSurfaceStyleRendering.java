@@ -1,30 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public final class StepSurfaceStyleRendering implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSurfaceStyleRendering extends AbstractStepEntity {
     private final StepEntity surfaceStyle;
     private final double transparency;
     private final double diffuseReflection;
     private final double specularReflection;
 
     public StepSurfaceStyleRendering(int id, String name, StepEntity surfaceStyle, double transparency, double diffuseReflection, double specularReflection) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.surfaceStyle = surfaceStyle;
         this.transparency = transparency;
         this.diffuseReflection = diffuseReflection;
         this.specularReflection = specularReflection;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSurfaceStyle() {
@@ -45,7 +35,7 @@ public final class StepSurfaceStyleRendering implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public StepEntity surfaceStyle() {
@@ -65,20 +55,14 @@ public final class StepSurfaceStyleRendering implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceStyleRendering that = (StepSurfaceStyleRendering) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(surfaceStyle, that.surfaceStyle) && transparency == that.transparency && diffuseReflection == that.diffuseReflection && specularReflection == that.specularReflection;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, surfaceStyle, transparency, diffuseReflection, specularReflection);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceStyleRendering{" + "id=" + id + "name=" + name + "surfaceStyle=" + surfaceStyle + "transparency=" + transparency + "diffuseReflection=" + diffuseReflection + "specularReflection=" + specularReflection + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("surfaceStyle", surfaceStyle);
+        state.put("transparency", transparency);
+        state.put("diffuseReflection", diffuseReflection);
+        state.put("specularReflection", specularReflection);
+        return state;
     }
 }

@@ -1,31 +1,22 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DESIGN_MAKE_FROM.
  * Design-to-manufacturing mapping.
  */
-public final class StepDesignMakeFrom implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDesignMakeFrom extends AbstractStepEntity {
     private final String description;
     private final StepEntity design;
     private final StepEntity manufacturing;
 
     public StepDesignMakeFrom(int id, String name, String description, StepEntity design, StepEntity manufacturing) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.design = design;
         this.manufacturing = manufacturing;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -41,20 +32,13 @@ public final class StepDesignMakeFrom implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDesignMakeFrom that = (StepDesignMakeFrom) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(design, that.design) && Objects.equals(manufacturing, that.manufacturing);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, design, manufacturing);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDesignMakeFrom{" + "id=" + id + "name=" + name + "description=" + description + "design=" + design + "manufacturing=" + manufacturing + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("design", design);
+        state.put("manufacturing", manufacturing);
+        return state;
     }
 }

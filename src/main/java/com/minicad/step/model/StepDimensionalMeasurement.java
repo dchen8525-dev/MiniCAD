@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DIMENSIONAL_MEASUREMENT.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param measuredValue measured value
  * @param measurementUnit measurement unit reference
  */
-public final class StepDimensionalMeasurement implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDimensionalMeasurement extends AbstractStepEntity {
     private final StepEntity measurementGeometry;
     private final String measurementType;
     private final double nominalValue;
@@ -29,8 +28,7 @@ public final class StepDimensionalMeasurement implements StepEntity {
     private final StepEntity measurementUnit;
 
     public StepDimensionalMeasurement(int id, String name, StepEntity measurementGeometry, String measurementType, double nominalValue, double upperTolerance, double lowerTolerance, double measuredValue, StepEntity measurementUnit) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.measurementGeometry = measurementGeometry;
         this.measurementType = measurementType;
         this.nominalValue = nominalValue;
@@ -38,14 +36,6 @@ public final class StepDimensionalMeasurement implements StepEntity {
         this.lowerTolerance = lowerTolerance;
         this.measuredValue = measuredValue;
         this.measurementUnit = measurementUnit;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMeasurementGeometry() {
@@ -77,20 +67,17 @@ public final class StepDimensionalMeasurement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDimensionalMeasurement that = (StepDimensionalMeasurement) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(measurementGeometry, that.measurementGeometry) && Objects.equals(measurementType, that.measurementType) && nominalValue == that.nominalValue && upperTolerance == that.upperTolerance && lowerTolerance == that.lowerTolerance && measuredValue == that.measuredValue && Objects.equals(measurementUnit, that.measurementUnit);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, measurementGeometry, measurementType, nominalValue, upperTolerance, lowerTolerance, measuredValue, measurementUnit);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDimensionalMeasurement{" + "id=" + id + "name=" + name + "measurementGeometry=" + measurementGeometry + "measurementType=" + measurementType + "nominalValue=" + nominalValue + "upperTolerance=" + upperTolerance + "lowerTolerance=" + lowerTolerance + "measuredValue=" + measuredValue + "measurementUnit=" + measurementUnit + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("measurementGeometry", measurementGeometry);
+        state.put("measurementType", measurementType);
+        state.put("nominalValue", nominalValue);
+        state.put("upperTolerance", upperTolerance);
+        state.put("lowerTolerance", lowerTolerance);
+        state.put("measuredValue", measuredValue);
+        state.put("measurementUnit", measurementUnit);
+        return state;
     }
 }

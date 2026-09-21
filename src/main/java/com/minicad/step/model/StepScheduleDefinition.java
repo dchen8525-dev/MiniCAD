@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SCHEDULE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param scheduleResources schedule variance resources
  * @param scheduleStatus schedule variance status
  */
-public final class StepScheduleDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepScheduleDefinition extends AbstractStepEntity {
     private final String scheduleType;
     private final List<StepEntity> scheduleMilestones;
     private final List<String> scheduleConstraints;
@@ -25,21 +24,12 @@ public final class StepScheduleDefinition implements StepEntity {
     private final String scheduleStatus;
 
     public StepScheduleDefinition(int id, String name, String scheduleType, List<StepEntity> scheduleMilestones, List<String> scheduleConstraints, List<StepEntity> scheduleResources, String scheduleStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.scheduleType = scheduleType;
         this.scheduleMilestones = scheduleMilestones == null ? null : java.util.List.copyOf(scheduleMilestones);
         this.scheduleConstraints = scheduleConstraints == null ? null : java.util.List.copyOf(scheduleConstraints);
         this.scheduleResources = scheduleResources == null ? null : java.util.List.copyOf(scheduleResources);
         this.scheduleStatus = scheduleStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getScheduleType() {
@@ -63,20 +53,15 @@ public final class StepScheduleDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepScheduleDefinition that = (StepScheduleDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(scheduleType, that.scheduleType) && Objects.equals(scheduleMilestones, that.scheduleMilestones) && Objects.equals(scheduleConstraints, that.scheduleConstraints) && Objects.equals(scheduleResources, that.scheduleResources) && Objects.equals(scheduleStatus, that.scheduleStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, scheduleType, scheduleMilestones, scheduleConstraints, scheduleResources, scheduleStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepScheduleDefinition{" + "id=" + id + "name=" + name + "scheduleType=" + scheduleType + "scheduleMilestones=" + scheduleMilestones + "scheduleConstraints=" + scheduleConstraints + "scheduleResources=" + scheduleResources + "scheduleStatus=" + scheduleStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("scheduleType", scheduleType);
+        state.put("scheduleMilestones", scheduleMilestones);
+        state.put("scheduleConstraints", scheduleConstraints);
+        state.put("scheduleResources", scheduleResources);
+        state.put("scheduleStatus", scheduleStatus);
+        return state;
     }
 }

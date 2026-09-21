@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ACTUATOR_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param strokeLength actuator stroke length
  * @varianceSpeed actuator variance speed
  */
-public final class StepActuatorFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepActuatorFeature extends AbstractStepEntity {
     private final String actuatorType;
     private final StepEntity actuatorGeometry;
     private final StepEntity actuatorPosition;
@@ -27,22 +26,13 @@ public final class StepActuatorFeature implements StepEntity {
     private final double varianceSpeed;
 
     public StepActuatorFeature(int id, String name, String actuatorType, StepEntity actuatorGeometry, StepEntity actuatorPosition, double actuatorForce, double strokeLength, double varianceSpeed) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.actuatorType = actuatorType;
         this.actuatorGeometry = actuatorGeometry;
         this.actuatorPosition = actuatorPosition;
         this.actuatorForce = actuatorForce;
         this.strokeLength = strokeLength;
         this.varianceSpeed = varianceSpeed;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getActuatorType() {
@@ -70,20 +60,16 @@ public final class StepActuatorFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepActuatorFeature that = (StepActuatorFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(actuatorType, that.actuatorType) && Objects.equals(actuatorGeometry, that.actuatorGeometry) && Objects.equals(actuatorPosition, that.actuatorPosition) && actuatorForce == that.actuatorForce && strokeLength == that.strokeLength && varianceSpeed == that.varianceSpeed;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, actuatorType, actuatorGeometry, actuatorPosition, actuatorForce, strokeLength, varianceSpeed);
-    }
-
-    @Override
-    public String toString() {
-        return "StepActuatorFeature{" + "id=" + id + "name=" + name + "actuatorType=" + actuatorType + "actuatorGeometry=" + actuatorGeometry + "actuatorPosition=" + actuatorPosition + "actuatorForce=" + actuatorForce + "strokeLength=" + strokeLength + "varianceSpeed=" + varianceSpeed + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("actuatorType", actuatorType);
+        state.put("actuatorGeometry", actuatorGeometry);
+        state.put("actuatorPosition", actuatorPosition);
+        state.put("actuatorForce", actuatorForce);
+        state.put("strokeLength", strokeLength);
+        state.put("varianceSpeed", varianceSpeed);
+        return state;
     }
 }

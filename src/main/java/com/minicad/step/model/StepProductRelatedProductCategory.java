@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal product category metadata.
@@ -11,25 +12,14 @@ import java.util.Objects;
  * @param description category description
  * @param products categorized products
  */
-public final class StepProductRelatedProductCategory implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProductRelatedProductCategory extends AbstractStepEntity {
     private final String description;
     private final List<StepProduct> products;
 
     public StepProductRelatedProductCategory(int id, String name, String description, List<StepProduct> products) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.products = products == null ? null : java.util.List.copyOf(products);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -42,7 +32,7 @@ public final class StepProductRelatedProductCategory implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public String description() {
@@ -54,20 +44,12 @@ public final class StepProductRelatedProductCategory implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductRelatedProductCategory that = (StepProductRelatedProductCategory) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(products, that.products);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, products);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductRelatedProductCategory{" + "id=" + id + "name=" + name + "description=" + description + "products=" + products + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("products", products);
+        return state;
     }
 }

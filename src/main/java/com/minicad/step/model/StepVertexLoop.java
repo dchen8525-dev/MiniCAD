@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved VERTEX_LOOP.
@@ -9,23 +10,12 @@ import java.util.Objects;
  * @param name step label
  * @param loopVertex referenced single vertex
  */
-public final class StepVertexLoop implements StepLoop {
-    private final int id;
-    private final String name;
+public final class StepVertexLoop extends AbstractStepEntity implements StepLoop {
     private final StepVertexPoint loopVertex;
 
     public StepVertexLoop(int id, String name, StepVertexPoint loopVertex) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.loopVertex = loopVertex;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepVertexPoint getLoopVertex() {
@@ -38,20 +28,11 @@ public final class StepVertexLoop implements StepLoop {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVertexLoop that = (StepVertexLoop) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(loopVertex, that.loopVertex);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, loopVertex);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVertexLoop{" + "id=" + id + "name=" + name + "loopVertex=" + loopVertex + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("loopVertex", loopVertex);
+        return state;
     }
 }

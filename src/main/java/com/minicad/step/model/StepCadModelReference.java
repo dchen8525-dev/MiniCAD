@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CAD_MODEL_REFERENCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param modelAuthor model author reference
  * @param modelStatus model status
  */
-public final class StepCadModelReference implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCadModelReference extends AbstractStepEntity {
     private final String modelId;
     private final String modelType;
     private final StepEntity modelGeometry;
@@ -27,22 +26,13 @@ public final class StepCadModelReference implements StepEntity {
     private final String modelStatus;
 
     public StepCadModelReference(int id, String name, String modelId, String modelType, StepEntity modelGeometry, StepEntity modelVersion, StepEntity modelAuthor, String modelStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.modelId = modelId;
         this.modelType = modelType;
         this.modelGeometry = modelGeometry;
         this.modelVersion = modelVersion;
         this.modelAuthor = modelAuthor;
         this.modelStatus = modelStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getModelId() {
@@ -70,20 +60,16 @@ public final class StepCadModelReference implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCadModelReference that = (StepCadModelReference) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(modelId, that.modelId) && Objects.equals(modelType, that.modelType) && Objects.equals(modelGeometry, that.modelGeometry) && Objects.equals(modelVersion, that.modelVersion) && Objects.equals(modelAuthor, that.modelAuthor) && Objects.equals(modelStatus, that.modelStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, modelId, modelType, modelGeometry, modelVersion, modelAuthor, modelStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCadModelReference{" + "id=" + id + "name=" + name + "modelId=" + modelId + "modelType=" + modelType + "modelGeometry=" + modelGeometry + "modelVersion=" + modelVersion + "modelAuthor=" + modelAuthor + "modelStatus=" + modelStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("modelId", modelId);
+        state.put("modelType", modelType);
+        state.put("modelGeometry", modelGeometry);
+        state.put("modelVersion", modelVersion);
+        state.put("modelAuthor", modelAuthor);
+        state.put("modelStatus", modelStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DATA_FLOW_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param flowProtocol flow variance protocol
  * @param flowStatus flow variance status
  */
-public final class StepDataFlowDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDataFlowDefinition extends AbstractStepEntity {
     private final String flowType;
     private final String flowDirection;
     private final StepEntity flowSource;
@@ -27,22 +26,13 @@ public final class StepDataFlowDefinition implements StepEntity {
     private final String flowStatus;
 
     public StepDataFlowDefinition(int id, String name, String flowType, String flowDirection, StepEntity flowSource, StepEntity flowTarget, String flowProtocol, String flowStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.flowType = flowType;
         this.flowDirection = flowDirection;
         this.flowSource = flowSource;
         this.flowTarget = flowTarget;
         this.flowProtocol = flowProtocol;
         this.flowStatus = flowStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFlowType() {
@@ -70,20 +60,16 @@ public final class StepDataFlowDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDataFlowDefinition that = (StepDataFlowDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(flowType, that.flowType) && Objects.equals(flowDirection, that.flowDirection) && Objects.equals(flowSource, that.flowSource) && Objects.equals(flowTarget, that.flowTarget) && Objects.equals(flowProtocol, that.flowProtocol) && Objects.equals(flowStatus, that.flowStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, flowType, flowDirection, flowSource, flowTarget, flowProtocol, flowStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDataFlowDefinition{" + "id=" + id + "name=" + name + "flowType=" + flowType + "flowDirection=" + flowDirection + "flowSource=" + flowSource + "flowTarget=" + flowTarget + "flowProtocol=" + flowProtocol + "flowStatus=" + flowStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("flowType", flowType);
+        state.put("flowDirection", flowDirection);
+        state.put("flowSource", flowSource);
+        state.put("flowTarget", flowTarget);
+        state.put("flowProtocol", flowProtocol);
+        state.put("flowStatus", flowStatus);
+        return state;
     }
 }

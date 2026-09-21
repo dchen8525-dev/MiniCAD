@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ANNOTATION_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param annotationTimestamp annotation variance timestamp
  * @param annotationStatus annotation variance status
  */
-public final class StepAnnotationRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnnotationRecord extends AbstractStepEntity {
     private final String annotationType;
     private final String annotationText;
     private final StepEntity annotationTarget;
@@ -27,22 +26,13 @@ public final class StepAnnotationRecord implements StepEntity {
     private final String annotationStatus;
 
     public StepAnnotationRecord(int id, String name, String annotationType, String annotationText, StepEntity annotationTarget, StepEntity annotationAuthor, StepEntity annotationTimestamp, String annotationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.annotationType = annotationType;
         this.annotationText = annotationText;
         this.annotationTarget = annotationTarget;
         this.annotationAuthor = annotationAuthor;
         this.annotationTimestamp = annotationTimestamp;
         this.annotationStatus = annotationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAnnotationType() {
@@ -70,20 +60,16 @@ public final class StepAnnotationRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnnotationRecord that = (StepAnnotationRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(annotationType, that.annotationType) && Objects.equals(annotationText, that.annotationText) && Objects.equals(annotationTarget, that.annotationTarget) && Objects.equals(annotationAuthor, that.annotationAuthor) && Objects.equals(annotationTimestamp, that.annotationTimestamp) && Objects.equals(annotationStatus, that.annotationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, annotationType, annotationText, annotationTarget, annotationAuthor, annotationTimestamp, annotationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnnotationRecord{" + "id=" + id + "name=" + name + "annotationType=" + annotationType + "annotationText=" + annotationText + "annotationTarget=" + annotationTarget + "annotationAuthor=" + annotationAuthor + "annotationTimestamp=" + annotationTimestamp + "annotationStatus=" + annotationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("annotationType", annotationType);
+        state.put("annotationText", annotationText);
+        state.put("annotationTarget", annotationTarget);
+        state.put("annotationAuthor", annotationAuthor);
+        state.put("annotationTimestamp", annotationTimestamp);
+        state.put("annotationStatus", annotationStatus);
+        return state;
     }
 }

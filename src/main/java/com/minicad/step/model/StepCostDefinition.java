@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COST_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param costCurrency cost variance currency
  * @param costStatus cost variance status
  */
-public final class StepCostDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCostDefinition extends AbstractStepEntity {
     private final String costType;
     private final String costCategory;
     private final List<String> costElements;
@@ -25,21 +24,12 @@ public final class StepCostDefinition implements StepEntity {
     private final String costStatus;
 
     public StepCostDefinition(int id, String name, String costType, String costCategory, List<String> costElements, StepEntity costCurrency, String costStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.costType = costType;
         this.costCategory = costCategory;
         this.costElements = costElements == null ? null : java.util.List.copyOf(costElements);
         this.costCurrency = costCurrency;
         this.costStatus = costStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCostType() {
@@ -63,20 +53,15 @@ public final class StepCostDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCostDefinition that = (StepCostDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(costType, that.costType) && Objects.equals(costCategory, that.costCategory) && Objects.equals(costElements, that.costElements) && Objects.equals(costCurrency, that.costCurrency) && Objects.equals(costStatus, that.costStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, costType, costCategory, costElements, costCurrency, costStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCostDefinition{" + "id=" + id + "name=" + name + "costType=" + costType + "costCategory=" + costCategory + "costElements=" + costElements + "costCurrency=" + costCurrency + "costStatus=" + costStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("costType", costType);
+        state.put("costCategory", costCategory);
+        state.put("costElements", costElements);
+        state.put("costCurrency", costCurrency);
+        state.put("costStatus", costStatus);
+        return state;
     }
 }

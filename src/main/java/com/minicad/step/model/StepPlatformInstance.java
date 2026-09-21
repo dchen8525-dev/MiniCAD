@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PLATFORM_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param platformHealth platform variance health status
  * @param platformStatus platform variance status
  */
-public final class StepPlatformInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPlatformInstance extends AbstractStepEntity {
     private final StepEntity platformDefinition;
     private final String platformState;
     private final String platformVersion;
@@ -25,21 +24,12 @@ public final class StepPlatformInstance implements StepEntity {
     private final String platformStatus;
 
     public StepPlatformInstance(int id, String name, StepEntity platformDefinition, String platformState, String platformVersion, String platformHealth, String platformStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.platformDefinition = platformDefinition;
         this.platformState = platformState;
         this.platformVersion = platformVersion;
         this.platformHealth = platformHealth;
         this.platformStatus = platformStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPlatformDefinition() {
@@ -63,20 +53,15 @@ public final class StepPlatformInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPlatformInstance that = (StepPlatformInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(platformDefinition, that.platformDefinition) && Objects.equals(platformState, that.platformState) && Objects.equals(platformVersion, that.platformVersion) && Objects.equals(platformHealth, that.platformHealth) && Objects.equals(platformStatus, that.platformStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, platformDefinition, platformState, platformVersion, platformHealth, platformStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPlatformInstance{" + "id=" + id + "name=" + name + "platformDefinition=" + platformDefinition + "platformState=" + platformState + "platformVersion=" + platformVersion + "platformHealth=" + platformHealth + "platformStatus=" + platformStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("platformDefinition", platformDefinition);
+        state.put("platformState", platformState);
+        state.put("platformVersion", platformVersion);
+        state.put("platformHealth", platformHealth);
+        state.put("platformStatus", platformStatus);
+        return state;
     }
 }

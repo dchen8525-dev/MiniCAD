@@ -1,27 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved STRUCTURAL_ANALYSIS_REPRESENTATION_PARAMETERS.
  * Parameters for structural analysis representation.
  */
-public final class StepStructuralAnalysisRepresentationParameters implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStructuralAnalysisRepresentationParameters extends AbstractStepEntity {
     private final String parameterType;
 
     public StepStructuralAnalysisRepresentationParameters(int id, String name, String parameterType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.parameterType = parameterType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getParameterType() {
@@ -29,20 +20,11 @@ public final class StepStructuralAnalysisRepresentationParameters implements Ste
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStructuralAnalysisRepresentationParameters that = (StepStructuralAnalysisRepresentationParameters) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(parameterType, that.parameterType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, parameterType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStructuralAnalysisRepresentationParameters{" + "id=" + id + "name=" + name + "parameterType=" + parameterType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("parameterType", parameterType);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FEATURE_PATTERN_INSTANCE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param instanceIndex instance index number
  * @param replicatedFeature replicated feature at this position
  */
-public final class StepFeaturePatternInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaturePatternInstance extends AbstractStepEntity {
     private final StepEntity patternDef;
     private final StepEntity instancePosition;
     private final int instanceIndex;
     private final StepEntity replicatedFeature;
 
     public StepFeaturePatternInstance(int id, String name, StepEntity patternDef, StepEntity instancePosition, int instanceIndex, StepEntity replicatedFeature) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.patternDef = patternDef;
         this.instancePosition = instancePosition;
         this.instanceIndex = instanceIndex;
         this.replicatedFeature = replicatedFeature;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPatternDef() {
@@ -56,20 +46,14 @@ public final class StepFeaturePatternInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaturePatternInstance that = (StepFeaturePatternInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(patternDef, that.patternDef) && Objects.equals(instancePosition, that.instancePosition) && instanceIndex == that.instanceIndex && Objects.equals(replicatedFeature, that.replicatedFeature);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, patternDef, instancePosition, instanceIndex, replicatedFeature);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaturePatternInstance{" + "id=" + id + "name=" + name + "patternDef=" + patternDef + "instancePosition=" + instancePosition + "instanceIndex=" + instanceIndex + "replicatedFeature=" + replicatedFeature + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("patternDef", patternDef);
+        state.put("instancePosition", instancePosition);
+        state.put("instanceIndex", instanceIndex);
+        state.put("replicatedFeature", replicatedFeature);
+        return state;
     }
 }

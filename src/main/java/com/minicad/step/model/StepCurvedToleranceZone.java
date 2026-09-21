@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CURVED_TOLERANCE_ZONE.
  * A curved tolerance zone definition.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param zoneForm the form of the tolerance zone
  * @param zoneCurve the curve defining the tolerance zone shape
  */
-public final class StepCurvedToleranceZone implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCurvedToleranceZone extends AbstractStepEntity {
     private final StepEntity definingTolerance;
     private final StepEntity zoneForm;
     private final StepEntity zoneCurve;
 
     public StepCurvedToleranceZone(int id, String name, StepEntity definingTolerance, StepEntity zoneForm, StepEntity zoneCurve) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.definingTolerance = definingTolerance;
         this.zoneForm = zoneForm;
         this.zoneCurve = zoneCurve;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getDefiningTolerance() {
@@ -47,20 +38,13 @@ public final class StepCurvedToleranceZone implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCurvedToleranceZone that = (StepCurvedToleranceZone) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(definingTolerance, that.definingTolerance) && Objects.equals(zoneForm, that.zoneForm) && Objects.equals(zoneCurve, that.zoneCurve);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, definingTolerance, zoneForm, zoneCurve);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCurvedToleranceZone{" + "id=" + id + "name=" + name + "definingTolerance=" + definingTolerance + "zoneForm=" + zoneForm + "zoneCurve=" + zoneCurve + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("definingTolerance", definingTolerance);
+        state.put("zoneForm", zoneForm);
+        state.put("zoneCurve", zoneCurve);
+        return state;
     }
 }

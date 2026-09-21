@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved AUTHENTICATION_SPECIFICATION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @varianceMultiFactor multi-factor variance authentication flag
  * @varianceStatus specification variance status
  */
-public final class StepAuthenticationSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAuthenticationSpecification extends AbstractStepEntity {
     private final String varianceMethod;
     private final StepEntity varianceProvider;
     private final StepEntity varianceSession;
@@ -25,21 +24,12 @@ public final class StepAuthenticationSpecification implements StepEntity {
     private final String varianceStatus;
 
     public StepAuthenticationSpecification(int id, String name, String varianceMethod, StepEntity varianceProvider, StepEntity varianceSession, boolean varianceMultiFactor, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceMethod = varianceMethod;
         this.varianceProvider = varianceProvider;
         this.varianceSession = varianceSession;
         this.varianceMultiFactor = varianceMultiFactor;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceMethod() {
@@ -63,20 +53,15 @@ public final class StepAuthenticationSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAuthenticationSpecification that = (StepAuthenticationSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceMethod, that.varianceMethod) && Objects.equals(varianceProvider, that.varianceProvider) && Objects.equals(varianceSession, that.varianceSession) && varianceMultiFactor == that.varianceMultiFactor && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceMethod, varianceProvider, varianceSession, varianceMultiFactor, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAuthenticationSpecification{" + "id=" + id + "name=" + name + "varianceMethod=" + varianceMethod + "varianceProvider=" + varianceProvider + "varianceSession=" + varianceSession + "varianceMultiFactor=" + varianceMultiFactor + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceMethod", varianceMethod);
+        state.put("varianceProvider", varianceProvider);
+        state.put("varianceSession", varianceSession);
+        state.put("varianceMultiFactor", varianceMultiFactor);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

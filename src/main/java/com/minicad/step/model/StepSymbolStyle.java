@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal SYMBOL_STYLE.
  *
@@ -8,23 +10,12 @@ import java.util.Objects;
  * @param name style name
  * @param styleOfSymbol symbol style payload
  */
-public final class StepSymbolStyle implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSymbolStyle extends AbstractStepEntity {
     private final StepEntity styleOfSymbol;
 
     public StepSymbolStyle(int id, String name, StepEntity styleOfSymbol) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.styleOfSymbol = styleOfSymbol;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getStyleOfSymbol() {
@@ -37,20 +28,11 @@ public final class StepSymbolStyle implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSymbolStyle that = (StepSymbolStyle) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(styleOfSymbol, that.styleOfSymbol);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, styleOfSymbol);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSymbolStyle{" + "id=" + id + "name=" + name + "styleOfSymbol=" + styleOfSymbol + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("styleOfSymbol", styleOfSymbol);
+        return state;
     }
 }

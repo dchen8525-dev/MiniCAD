@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved HISTORY_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param historyTimestamp history variance timestamp
  * @param historyStatus history variance status
  */
-public final class StepHistoryRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepHistoryRecord extends AbstractStepEntity {
     private final String historyType;
     private final String historyAction;
     private final StepEntity historyTarget;
@@ -27,22 +26,13 @@ public final class StepHistoryRecord implements StepEntity {
     private final String historyStatus;
 
     public StepHistoryRecord(int id, String name, String historyType, String historyAction, StepEntity historyTarget, StepEntity historyActor, StepEntity historyTimestamp, String historyStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.historyType = historyType;
         this.historyAction = historyAction;
         this.historyTarget = historyTarget;
         this.historyActor = historyActor;
         this.historyTimestamp = historyTimestamp;
         this.historyStatus = historyStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getHistoryType() {
@@ -70,20 +60,16 @@ public final class StepHistoryRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepHistoryRecord that = (StepHistoryRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(historyType, that.historyType) && Objects.equals(historyAction, that.historyAction) && Objects.equals(historyTarget, that.historyTarget) && Objects.equals(historyActor, that.historyActor) && Objects.equals(historyTimestamp, that.historyTimestamp) && Objects.equals(historyStatus, that.historyStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, historyType, historyAction, historyTarget, historyActor, historyTimestamp, historyStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepHistoryRecord{" + "id=" + id + "name=" + name + "historyType=" + historyType + "historyAction=" + historyAction + "historyTarget=" + historyTarget + "historyActor=" + historyActor + "historyTimestamp=" + historyTimestamp + "historyStatus=" + historyStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("historyType", historyType);
+        state.put("historyAction", historyAction);
+        state.put("historyTarget", historyTarget);
+        state.put("historyActor", historyActor);
+        state.put("historyTimestamp", historyTimestamp);
+        state.put("historyStatus", historyStatus);
+        return state;
     }
 }

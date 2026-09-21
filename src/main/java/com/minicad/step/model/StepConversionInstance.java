@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CONVERSION_INSTANCE.
  * A conversion instance entity.
@@ -12,29 +14,18 @@ import java.util.Objects;
  * @param conversionOutput conversion variance output value
  * @param conversionStatus conversion variance status
  */
-public final class StepConversionInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConversionInstance extends AbstractStepEntity {
     private final StepEntity conversionDefinition;
     private final double conversionInput;
     private final double conversionOutput;
     private final String conversionStatus;
 
     public StepConversionInstance(int id, String name, StepEntity conversionDefinition, double conversionInput, double conversionOutput, String conversionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.conversionDefinition = conversionDefinition;
         this.conversionInput = conversionInput;
         this.conversionOutput = conversionOutput;
         this.conversionStatus = conversionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getConversionDefinition() {
@@ -54,20 +45,14 @@ public final class StepConversionInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConversionInstance that = (StepConversionInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(conversionDefinition, that.conversionDefinition) && conversionInput == that.conversionInput && conversionOutput == that.conversionOutput && Objects.equals(conversionStatus, that.conversionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, conversionDefinition, conversionInput, conversionOutput, conversionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConversionInstance{" + "id=" + id + "name=" + name + "conversionDefinition=" + conversionDefinition + "conversionInput=" + conversionInput + "conversionOutput=" + conversionOutput + "conversionStatus=" + conversionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("conversionDefinition", conversionDefinition);
+        state.put("conversionInput", conversionInput);
+        state.put("conversionOutput", conversionOutput);
+        state.put("conversionStatus", conversionStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BEARING_FEATURE.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param bearingStandard bearing standard specification
  * @param bearingPlacement bearing position placement
  */
-public final class StepBearingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBearingFeature extends AbstractStepEntity {
     private final String bearingType;
     private final double boreDiameter;
     private final double outerDiameter;
@@ -29,8 +28,7 @@ public final class StepBearingFeature implements StepEntity {
     private final StepEntity bearingPlacement;
 
     public StepBearingFeature(int id, String name, String bearingType, double boreDiameter, double outerDiameter, double bearingWidth, int numberOfElements, String bearingStandard, StepEntity bearingPlacement) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.bearingType = bearingType;
         this.boreDiameter = boreDiameter;
         this.outerDiameter = outerDiameter;
@@ -38,14 +36,6 @@ public final class StepBearingFeature implements StepEntity {
         this.numberOfElements = numberOfElements;
         this.bearingStandard = bearingStandard;
         this.bearingPlacement = bearingPlacement;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getBearingType() {
@@ -77,20 +67,17 @@ public final class StepBearingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBearingFeature that = (StepBearingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(bearingType, that.bearingType) && boreDiameter == that.boreDiameter && outerDiameter == that.outerDiameter && bearingWidth == that.bearingWidth && numberOfElements == that.numberOfElements && Objects.equals(bearingStandard, that.bearingStandard) && Objects.equals(bearingPlacement, that.bearingPlacement);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, bearingType, boreDiameter, outerDiameter, bearingWidth, numberOfElements, bearingStandard, bearingPlacement);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBearingFeature{" + "id=" + id + "name=" + name + "bearingType=" + bearingType + "boreDiameter=" + boreDiameter + "outerDiameter=" + outerDiameter + "bearingWidth=" + bearingWidth + "numberOfElements=" + numberOfElements + "bearingStandard=" + bearingStandard + "bearingPlacement=" + bearingPlacement + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("bearingType", bearingType);
+        state.put("boreDiameter", boreDiameter);
+        state.put("outerDiameter", outerDiameter);
+        state.put("bearingWidth", bearingWidth);
+        state.put("numberOfElements", numberOfElements);
+        state.put("bearingStandard", bearingStandard);
+        state.put("bearingPlacement", bearingPlacement);
+        return state;
     }
 }

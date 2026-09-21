@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CREDENTIAL_RECORD.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param credentialExpiry credential variance expiry time
  * @param credentialStatus credential variance status
  */
-public final class StepCredentialRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCredentialRecord extends AbstractStepEntity {
     private final String credentialType;
     private final StepEntity credentialHolder;
     private final boolean credentialValid;
@@ -25,21 +24,12 @@ public final class StepCredentialRecord implements StepEntity {
     private final String credentialStatus;
 
     public StepCredentialRecord(int id, String name, String credentialType, StepEntity credentialHolder, boolean credentialValid, StepEntity credentialExpiry, String credentialStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.credentialType = credentialType;
         this.credentialHolder = credentialHolder;
         this.credentialValid = credentialValid;
         this.credentialExpiry = credentialExpiry;
         this.credentialStatus = credentialStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCredentialType() {
@@ -63,20 +53,15 @@ public final class StepCredentialRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCredentialRecord that = (StepCredentialRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(credentialType, that.credentialType) && Objects.equals(credentialHolder, that.credentialHolder) && credentialValid == that.credentialValid && Objects.equals(credentialExpiry, that.credentialExpiry) && Objects.equals(credentialStatus, that.credentialStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, credentialType, credentialHolder, credentialValid, credentialExpiry, credentialStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCredentialRecord{" + "id=" + id + "name=" + name + "credentialType=" + credentialType + "credentialHolder=" + credentialHolder + "credentialValid=" + credentialValid + "credentialExpiry=" + credentialExpiry + "credentialStatus=" + credentialStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("credentialType", credentialType);
+        state.put("credentialHolder", credentialHolder);
+        state.put("credentialValid", credentialValid);
+        state.put("credentialExpiry", credentialExpiry);
+        state.put("credentialStatus", credentialStatus);
+        return state;
     }
 }

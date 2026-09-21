@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MACHINING_PROCESS_PLAN.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param context representation context
  * @param operations machining operations sequence
  */
-public final class StepMachiningProcessPlan implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMachiningProcessPlan extends AbstractStepEntity {
     private final List<StepEntity> items;
     private final StepEntity context;
     private final List<StepEntity> operations;
 
     public StepMachiningProcessPlan(int id, String name, List<StepEntity> items, StepEntity context, List<StepEntity> operations) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.items = items == null ? null : java.util.List.copyOf(items);
         this.context = context;
         this.operations = operations == null ? null : java.util.List.copyOf(operations);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getItems() {
@@ -49,20 +39,13 @@ public final class StepMachiningProcessPlan implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMachiningProcessPlan that = (StepMachiningProcessPlan) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(items, that.items) && Objects.equals(context, that.context) && Objects.equals(operations, that.operations);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, items, context, operations);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMachiningProcessPlan{" + "id=" + id + "name=" + name + "items=" + items + "context=" + context + "operations=" + operations + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("items", items);
+        state.put("context", context);
+        state.put("operations", operations);
+        return state;
     }
 }

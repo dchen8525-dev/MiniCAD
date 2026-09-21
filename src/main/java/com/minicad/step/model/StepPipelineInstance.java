@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PIPELINE_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param pipelineEndTime pipeline variance end time
  * @param pipelineStatus pipeline variance status
  */
-public final class StepPipelineInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPipelineInstance extends AbstractStepEntity {
     private final StepEntity pipelineDefinition;
     private final String pipelineState;
     private final int pipelineCurrentStage;
@@ -27,22 +26,13 @@ public final class StepPipelineInstance implements StepEntity {
     private final String pipelineStatus;
 
     public StepPipelineInstance(int id, String name, StepEntity pipelineDefinition, String pipelineState, int pipelineCurrentStage, StepEntity pipelineStartTime, StepEntity pipelineEndTime, String pipelineStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.pipelineDefinition = pipelineDefinition;
         this.pipelineState = pipelineState;
         this.pipelineCurrentStage = pipelineCurrentStage;
         this.pipelineStartTime = pipelineStartTime;
         this.pipelineEndTime = pipelineEndTime;
         this.pipelineStatus = pipelineStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPipelineDefinition() {
@@ -70,20 +60,16 @@ public final class StepPipelineInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPipelineInstance that = (StepPipelineInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(pipelineDefinition, that.pipelineDefinition) && Objects.equals(pipelineState, that.pipelineState) && pipelineCurrentStage == that.pipelineCurrentStage && Objects.equals(pipelineStartTime, that.pipelineStartTime) && Objects.equals(pipelineEndTime, that.pipelineEndTime) && Objects.equals(pipelineStatus, that.pipelineStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, pipelineDefinition, pipelineState, pipelineCurrentStage, pipelineStartTime, pipelineEndTime, pipelineStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPipelineInstance{" + "id=" + id + "name=" + name + "pipelineDefinition=" + pipelineDefinition + "pipelineState=" + pipelineState + "pipelineCurrentStage=" + pipelineCurrentStage + "pipelineStartTime=" + pipelineStartTime + "pipelineEndTime=" + pipelineEndTime + "pipelineStatus=" + pipelineStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("pipelineDefinition", pipelineDefinition);
+        state.put("pipelineState", pipelineState);
+        state.put("pipelineCurrentStage", pipelineCurrentStage);
+        state.put("pipelineStartTime", pipelineStartTime);
+        state.put("pipelineEndTime", pipelineEndTime);
+        state.put("pipelineStatus", pipelineStatus);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved PLANE.
  *
@@ -8,23 +10,12 @@ import java.util.Objects;
  * @param name step label
  * @param position plane placement
  */
-public final class StepPlane implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPlane extends AbstractStepEntity {
     private final StepAxis2Placement3D position;
 
     public StepPlane(int id, String name, StepAxis2Placement3D position) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepAxis2Placement3D getPosition() {
@@ -37,20 +28,11 @@ public final class StepPlane implements StepEntity {
     public StepAxis2Placement3D position() { return getPosition(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPlane that = (StepPlane) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPlane{" + "id=" + id + "name=" + name + "position=" + position + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        return state;
     }
 }

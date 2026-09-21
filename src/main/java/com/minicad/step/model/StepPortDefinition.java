@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PORT_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param portProtocol port variance protocol
  * @param portStatus port variance status
  */
-public final class StepPortDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPortDefinition extends AbstractStepEntity {
     private final String portType;
     private final String portDirection;
     private final String portDataType;
@@ -25,21 +24,12 @@ public final class StepPortDefinition implements StepEntity {
     private final String portStatus;
 
     public StepPortDefinition(int id, String name, String portType, String portDirection, String portDataType, String portProtocol, String portStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.portType = portType;
         this.portDirection = portDirection;
         this.portDataType = portDataType;
         this.portProtocol = portProtocol;
         this.portStatus = portStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPortType() {
@@ -63,20 +53,15 @@ public final class StepPortDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPortDefinition that = (StepPortDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(portType, that.portType) && Objects.equals(portDirection, that.portDirection) && Objects.equals(portDataType, that.portDataType) && Objects.equals(portProtocol, that.portProtocol) && Objects.equals(portStatus, that.portStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, portType, portDirection, portDataType, portProtocol, portStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPortDefinition{" + "id=" + id + "name=" + name + "portType=" + portType + "portDirection=" + portDirection + "portDataType=" + portDataType + "portProtocol=" + portProtocol + "portStatus=" + portStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("portType", portType);
+        state.put("portDirection", portDirection);
+        state.put("portDataType", portDataType);
+        state.put("portProtocol", portProtocol);
+        state.put("portStatus", portStatus);
+        return state;
     }
 }

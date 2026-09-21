@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved METRIC_ENTRY.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param entryTags entry variance tags
  * @param entryStatus entry variance status
  */
-public final class StepMetricEntry implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMetricEntry extends AbstractStepEntity {
     private final String entryType;
     private final String entryName;
     private final double entryValue;
@@ -27,22 +26,13 @@ public final class StepMetricEntry implements StepEntity {
     private final String entryStatus;
 
     public StepMetricEntry(int id, String name, String entryType, String entryName, double entryValue, StepEntity entryTimestamp, List<String> entryTags, String entryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.entryType = entryType;
         this.entryName = entryName;
         this.entryValue = entryValue;
         this.entryTimestamp = entryTimestamp;
         this.entryTags = entryTags == null ? null : java.util.List.copyOf(entryTags);
         this.entryStatus = entryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEntryType() {
@@ -70,20 +60,16 @@ public final class StepMetricEntry implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMetricEntry that = (StepMetricEntry) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(entryType, that.entryType) && Objects.equals(entryName, that.entryName) && entryValue == that.entryValue && Objects.equals(entryTimestamp, that.entryTimestamp) && Objects.equals(entryTags, that.entryTags) && Objects.equals(entryStatus, that.entryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, entryType, entryName, entryValue, entryTimestamp, entryTags, entryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMetricEntry{" + "id=" + id + "name=" + name + "entryType=" + entryType + "entryName=" + entryName + "entryValue=" + entryValue + "entryTimestamp=" + entryTimestamp + "entryTags=" + entryTags + "entryStatus=" + entryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("entryType", entryType);
+        state.put("entryName", entryName);
+        state.put("entryValue", entryValue);
+        state.put("entryTimestamp", entryTimestamp);
+        state.put("entryTags", entryTags);
+        state.put("entryStatus", entryStatus);
+        return state;
     }
 }

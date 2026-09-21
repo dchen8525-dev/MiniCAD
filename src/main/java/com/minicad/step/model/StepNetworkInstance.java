@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved NETWORK_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param networkBandwidth network variance bandwidth
  * @param networkStatus network variance status
  */
-public final class StepNetworkInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepNetworkInstance extends AbstractStepEntity {
     private final StepEntity networkDefinition;
     private final String networkState;
     private final double networkTraffic;
@@ -25,21 +24,12 @@ public final class StepNetworkInstance implements StepEntity {
     private final String networkStatus;
 
     public StepNetworkInstance(int id, String name, StepEntity networkDefinition, String networkState, double networkTraffic, double networkBandwidth, String networkStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.networkDefinition = networkDefinition;
         this.networkState = networkState;
         this.networkTraffic = networkTraffic;
         this.networkBandwidth = networkBandwidth;
         this.networkStatus = networkStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getNetworkDefinition() {
@@ -63,20 +53,15 @@ public final class StepNetworkInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNetworkInstance that = (StepNetworkInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(networkDefinition, that.networkDefinition) && Objects.equals(networkState, that.networkState) && networkTraffic == that.networkTraffic && networkBandwidth == that.networkBandwidth && Objects.equals(networkStatus, that.networkStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, networkDefinition, networkState, networkTraffic, networkBandwidth, networkStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNetworkInstance{" + "id=" + id + "name=" + name + "networkDefinition=" + networkDefinition + "networkState=" + networkState + "networkTraffic=" + networkTraffic + "networkBandwidth=" + networkBandwidth + "networkStatus=" + networkStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("networkDefinition", networkDefinition);
+        state.put("networkState", networkState);
+        state.put("networkTraffic", networkTraffic);
+        state.put("networkBandwidth", networkBandwidth);
+        state.put("networkStatus", networkStatus);
+        return state;
     }
 }

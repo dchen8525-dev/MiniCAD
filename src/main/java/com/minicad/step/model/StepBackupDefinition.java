@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BACKUP_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param backupRetention backup variance retention period
  * @param backupStatus backup variance status
  */
-public final class StepBackupDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBackupDefinition extends AbstractStepEntity {
     private final String backupType;
     private final StepEntity backupSource;
     private final StepEntity backupTarget;
@@ -27,22 +26,13 @@ public final class StepBackupDefinition implements StepEntity {
     private final String backupStatus;
 
     public StepBackupDefinition(int id, String name, String backupType, StepEntity backupSource, StepEntity backupTarget, String backupSchedule, int backupRetention, String backupStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.backupType = backupType;
         this.backupSource = backupSource;
         this.backupTarget = backupTarget;
         this.backupSchedule = backupSchedule;
         this.backupRetention = backupRetention;
         this.backupStatus = backupStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getBackupType() {
@@ -70,20 +60,16 @@ public final class StepBackupDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBackupDefinition that = (StepBackupDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(backupType, that.backupType) && Objects.equals(backupSource, that.backupSource) && Objects.equals(backupTarget, that.backupTarget) && Objects.equals(backupSchedule, that.backupSchedule) && backupRetention == that.backupRetention && Objects.equals(backupStatus, that.backupStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, backupType, backupSource, backupTarget, backupSchedule, backupRetention, backupStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBackupDefinition{" + "id=" + id + "name=" + name + "backupType=" + backupType + "backupSource=" + backupSource + "backupTarget=" + backupTarget + "backupSchedule=" + backupSchedule + "backupRetention=" + backupRetention + "backupStatus=" + backupStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("backupType", backupType);
+        state.put("backupSource", backupSource);
+        state.put("backupTarget", backupTarget);
+        state.put("backupSchedule", backupSchedule);
+        state.put("backupRetention", backupRetention);
+        state.put("backupStatus", backupStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PERMISSION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param permissionUsedCount permission variance usage count
  * @param permissionStatus permission variance status
  */
-public final class StepPermissionInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPermissionInstance extends AbstractStepEntity {
     private final StepEntity permissionDefinition;
     private final StepEntity permissionHolder;
     private final String permissionState;
@@ -25,21 +24,12 @@ public final class StepPermissionInstance implements StepEntity {
     private final String permissionStatus;
 
     public StepPermissionInstance(int id, String name, StepEntity permissionDefinition, StepEntity permissionHolder, String permissionState, int permissionUsedCount, String permissionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.permissionDefinition = permissionDefinition;
         this.permissionHolder = permissionHolder;
         this.permissionState = permissionState;
         this.permissionUsedCount = permissionUsedCount;
         this.permissionStatus = permissionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPermissionDefinition() {
@@ -63,20 +53,15 @@ public final class StepPermissionInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPermissionInstance that = (StepPermissionInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(permissionDefinition, that.permissionDefinition) && Objects.equals(permissionHolder, that.permissionHolder) && Objects.equals(permissionState, that.permissionState) && permissionUsedCount == that.permissionUsedCount && Objects.equals(permissionStatus, that.permissionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, permissionDefinition, permissionHolder, permissionState, permissionUsedCount, permissionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPermissionInstance{" + "id=" + id + "name=" + name + "permissionDefinition=" + permissionDefinition + "permissionHolder=" + permissionHolder + "permissionState=" + permissionState + "permissionUsedCount=" + permissionUsedCount + "permissionStatus=" + permissionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("permissionDefinition", permissionDefinition);
+        state.put("permissionHolder", permissionHolder);
+        state.put("permissionState", permissionState);
+        state.put("permissionUsedCount", permissionUsedCount);
+        state.put("permissionStatus", permissionStatus);
+        return state;
     }
 }

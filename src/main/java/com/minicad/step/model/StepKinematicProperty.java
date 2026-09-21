@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved KINEMATIC_PROPERTY.
  * A kinematic property definition.
  */
-public final class StepKinematicProperty implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepKinematicProperty extends AbstractStepEntity {
     private final String propertyType;
     private final StepEntity value;
 
     public StepKinematicProperty(int id, String name, String propertyType, StepEntity value) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.propertyType = propertyType;
         this.value = value;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPropertyType() {
@@ -35,20 +26,12 @@ public final class StepKinematicProperty implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepKinematicProperty that = (StepKinematicProperty) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(propertyType, that.propertyType) && Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, propertyType, value);
-    }
-
-    @Override
-    public String toString() {
-        return "StepKinematicProperty{" + "id=" + id + "name=" + name + "propertyType=" + propertyType + "value=" + value + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("propertyType", propertyType);
+        state.put("value", value);
+        return state;
     }
 }

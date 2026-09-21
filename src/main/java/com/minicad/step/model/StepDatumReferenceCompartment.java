@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DATUM_REFERENCE_COMPARTMENT.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param precedence datum precedence
  * @param referencedDatum referenced datum
  */
-public final class StepDatumReferenceCompartment implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDatumReferenceCompartment extends AbstractStepEntity {
     private final String description;
     private final StepEntity ofShape;
     private final int precedence;
     private final StepEntity referencedDatum;
 
     public StepDatumReferenceCompartment(int id, String name, String description, StepEntity ofShape, int precedence, StepEntity referencedDatum) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.ofShape = ofShape;
         this.precedence = precedence;
         this.referencedDatum = referencedDatum;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -56,20 +46,14 @@ public final class StepDatumReferenceCompartment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDatumReferenceCompartment that = (StepDatumReferenceCompartment) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(ofShape, that.ofShape) && precedence == that.precedence && Objects.equals(referencedDatum, that.referencedDatum);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, ofShape, precedence, referencedDatum);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDatumReferenceCompartment{" + "id=" + id + "name=" + name + "description=" + description + "ofShape=" + ofShape + "precedence=" + precedence + "referencedDatum=" + referencedDatum + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("ofShape", ofShape);
+        state.put("precedence", precedence);
+        state.put("referencedDatum", referencedDatum);
+        return state;
     }
 }

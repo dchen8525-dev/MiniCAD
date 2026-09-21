@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DATUM_REFERENCE_ELEMENT.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param ofShape product definition shape
  * @param compartments datum reference compartments
  */
-public final class StepDatumReferenceElement implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDatumReferenceElement extends AbstractStepEntity {
     private final String description;
     private final StepEntity ofShape;
     private final List<StepEntity> compartments;
 
     public StepDatumReferenceElement(int id, String name, String description, StepEntity ofShape, List<StepEntity> compartments) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.ofShape = ofShape;
         this.compartments = compartments == null ? null : java.util.List.copyOf(compartments);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -49,20 +39,13 @@ public final class StepDatumReferenceElement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDatumReferenceElement that = (StepDatumReferenceElement) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(ofShape, that.ofShape) && Objects.equals(compartments, that.compartments);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, ofShape, compartments);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDatumReferenceElement{" + "id=" + id + "name=" + name + "description=" + description + "ofShape=" + ofShape + "compartments=" + compartments + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("ofShape", ofShape);
+        state.put("compartments", compartments);
+        return state;
     }
 }

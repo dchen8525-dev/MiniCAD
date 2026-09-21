@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DELIVERY_INFORMATION.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceMethod delivery variance method
  * @param deliveryStatus delivery status
  */
-public final class StepDeliveryInformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDeliveryInformation extends AbstractStepEntity {
     private final String deliveryId;
     private final List<StepEntity> deliveryItems;
     private final StepEntity deliveryAddress;
@@ -29,8 +28,7 @@ public final class StepDeliveryInformation implements StepEntity {
     private final String deliveryStatus;
 
     public StepDeliveryInformation(int id, String name, String deliveryId, List<StepEntity> deliveryItems, StepEntity deliveryAddress, StepEntity shippingDate, StepEntity varianceDate, String varianceMethod, String deliveryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.deliveryId = deliveryId;
         this.deliveryItems = deliveryItems == null ? null : java.util.List.copyOf(deliveryItems);
         this.deliveryAddress = deliveryAddress;
@@ -38,14 +36,6 @@ public final class StepDeliveryInformation implements StepEntity {
         this.varianceDate = varianceDate;
         this.varianceMethod = varianceMethod;
         this.deliveryStatus = deliveryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDeliveryId() {
@@ -77,20 +67,17 @@ public final class StepDeliveryInformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDeliveryInformation that = (StepDeliveryInformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(deliveryId, that.deliveryId) && Objects.equals(deliveryItems, that.deliveryItems) && Objects.equals(deliveryAddress, that.deliveryAddress) && Objects.equals(shippingDate, that.shippingDate) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceMethod, that.varianceMethod) && Objects.equals(deliveryStatus, that.deliveryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, deliveryId, deliveryItems, deliveryAddress, shippingDate, varianceDate, varianceMethod, deliveryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDeliveryInformation{" + "id=" + id + "name=" + name + "deliveryId=" + deliveryId + "deliveryItems=" + deliveryItems + "deliveryAddress=" + deliveryAddress + "shippingDate=" + shippingDate + "varianceDate=" + varianceDate + "varianceMethod=" + varianceMethod + "deliveryStatus=" + deliveryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("deliveryId", deliveryId);
+        state.put("deliveryItems", deliveryItems);
+        state.put("deliveryAddress", deliveryAddress);
+        state.put("shippingDate", shippingDate);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceMethod", varianceMethod);
+        state.put("deliveryStatus", deliveryStatus);
+        return state;
     }
 }

@@ -1,33 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved PRISM_VOLUME.
  * A CSG prism (wedge) primitive volume.
  */
-public final class StepPrismVolume implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPrismVolume extends AbstractStepEntity {
     private final StepEntity position;
     private final Double width;
     private final Double depth;
     private final Double height;
 
     public StepPrismVolume(int id, String name, StepEntity position, Double width, Double depth, Double height) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.width = width;
         this.depth = depth;
         this.height = height;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -55,20 +46,14 @@ public final class StepPrismVolume implements StepEntity {
     public Double height() { return getHeight(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPrismVolume that = (StepPrismVolume) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && Objects.equals(width, that.width) && Objects.equals(depth, that.depth) && Objects.equals(height, that.height);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, width, depth, height);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPrismVolume{" + "id=" + id + "name=" + name + "position=" + position + "width=" + width + "depth=" + depth + "height=" + height + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("width", width);
+        state.put("depth", depth);
+        state.put("height", height);
+        return state;
     }
 }

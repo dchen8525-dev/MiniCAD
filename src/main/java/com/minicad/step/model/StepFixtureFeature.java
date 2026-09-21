@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FIXTURE_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param fixtureForce fixture force specification
  * @param fixtureMaterial fixture material reference
  */
-public final class StepFixtureFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFixtureFeature extends AbstractStepEntity {
     private final String fixtureType;
     private final StepEntity fixtureGeometry;
     private final List<StepEntity> clampingPoints;
@@ -27,22 +26,13 @@ public final class StepFixtureFeature implements StepEntity {
     private final StepEntity fixtureMaterial;
 
     public StepFixtureFeature(int id, String name, String fixtureType, StepEntity fixtureGeometry, List<StepEntity> clampingPoints, List<StepEntity> supportingPoints, double fixtureForce, StepEntity fixtureMaterial) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.fixtureType = fixtureType;
         this.fixtureGeometry = fixtureGeometry;
         this.clampingPoints = clampingPoints == null ? null : java.util.List.copyOf(clampingPoints);
         this.supportingPoints = supportingPoints == null ? null : java.util.List.copyOf(supportingPoints);
         this.fixtureForce = fixtureForce;
         this.fixtureMaterial = fixtureMaterial;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFixtureType() {
@@ -70,20 +60,16 @@ public final class StepFixtureFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFixtureFeature that = (StepFixtureFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(fixtureType, that.fixtureType) && Objects.equals(fixtureGeometry, that.fixtureGeometry) && Objects.equals(clampingPoints, that.clampingPoints) && Objects.equals(supportingPoints, that.supportingPoints) && fixtureForce == that.fixtureForce && Objects.equals(fixtureMaterial, that.fixtureMaterial);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, fixtureType, fixtureGeometry, clampingPoints, supportingPoints, fixtureForce, fixtureMaterial);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFixtureFeature{" + "id=" + id + "name=" + name + "fixtureType=" + fixtureType + "fixtureGeometry=" + fixtureGeometry + "clampingPoints=" + clampingPoints + "supportingPoints=" + supportingPoints + "fixtureForce=" + fixtureForce + "fixtureMaterial=" + fixtureMaterial + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("fixtureType", fixtureType);
+        state.put("fixtureGeometry", fixtureGeometry);
+        state.put("clampingPoints", clampingPoints);
+        state.put("supportingPoints", supportingPoints);
+        state.put("fixtureForce", fixtureForce);
+        state.put("fixtureMaterial", fixtureMaterial);
+        return state;
     }
 }

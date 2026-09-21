@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved THRESHOLD_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param thresholdViolations threshold variance violation count
  * @param thresholdStatus threshold variance status
  */
-public final class StepThresholdInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepThresholdInstance extends AbstractStepEntity {
     private final StepEntity thresholdDefinition;
     private final String thresholdState;
     private final double thresholdCurrentValue;
@@ -25,21 +24,12 @@ public final class StepThresholdInstance implements StepEntity {
     private final String thresholdStatus;
 
     public StepThresholdInstance(int id, String name, StepEntity thresholdDefinition, String thresholdState, double thresholdCurrentValue, int thresholdViolations, String thresholdStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.thresholdDefinition = thresholdDefinition;
         this.thresholdState = thresholdState;
         this.thresholdCurrentValue = thresholdCurrentValue;
         this.thresholdViolations = thresholdViolations;
         this.thresholdStatus = thresholdStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getThresholdDefinition() {
@@ -63,20 +53,15 @@ public final class StepThresholdInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepThresholdInstance that = (StepThresholdInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(thresholdDefinition, that.thresholdDefinition) && Objects.equals(thresholdState, that.thresholdState) && thresholdCurrentValue == that.thresholdCurrentValue && thresholdViolations == that.thresholdViolations && Objects.equals(thresholdStatus, that.thresholdStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, thresholdDefinition, thresholdState, thresholdCurrentValue, thresholdViolations, thresholdStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepThresholdInstance{" + "id=" + id + "name=" + name + "thresholdDefinition=" + thresholdDefinition + "thresholdState=" + thresholdState + "thresholdCurrentValue=" + thresholdCurrentValue + "thresholdViolations=" + thresholdViolations + "thresholdStatus=" + thresholdStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("thresholdDefinition", thresholdDefinition);
+        state.put("thresholdState", thresholdState);
+        state.put("thresholdCurrentValue", thresholdCurrentValue);
+        state.put("thresholdViolations", thresholdViolations);
+        state.put("thresholdStatus", thresholdStatus);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal GROUP_RELATIONSHIP metadata.
  *
@@ -11,29 +13,18 @@ import java.util.Objects;
  * @param relatedGroup target group
  * @param entityName concrete STEP entity name
  */
-public final class StepGroupRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGroupRelationship extends AbstractStepEntity {
     private final String description;
     private final StepGroup relatingGroup;
     private final StepGroup relatedGroup;
     private final String entityName;
 
     public StepGroupRelationship(int id, String name, String description, StepGroup relatingGroup, StepGroup relatedGroup, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.relatingGroup = relatingGroup;
         this.relatedGroup = relatedGroup;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -66,20 +57,14 @@ public final class StepGroupRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGroupRelationship that = (StepGroupRelationship) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingGroup, that.relatingGroup) && Objects.equals(relatedGroup, that.relatedGroup) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, relatingGroup, relatedGroup, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGroupRelationship{" + "id=" + id + "name=" + name + "description=" + description + "relatingGroup=" + relatingGroup + "relatedGroup=" + relatedGroup + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingGroup", relatingGroup);
+        state.put("relatedGroup", relatedGroup);
+        state.put("entityName", entityName);
+        return state;
     }
 }

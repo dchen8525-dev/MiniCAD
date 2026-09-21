@@ -1,26 +1,16 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public final class StepPlanarExtent implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPlanarExtent extends AbstractStepEntity {
     private final double width;
     private final double height;
 
     public StepPlanarExtent(int id, String name, double width, double height) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.width = width;
         this.height = height;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getWidth() {
@@ -41,20 +31,12 @@ public final class StepPlanarExtent implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPlanarExtent that = (StepPlanarExtent) o;
-        return id == that.id && Objects.equals(name, that.name) && width == that.width && height == that.height;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, width, height);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPlanarExtent{" + "id=" + id + "name=" + name + "width=" + width + "height=" + height + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("width", width);
+        state.put("height", height);
+        return state;
     }
 }

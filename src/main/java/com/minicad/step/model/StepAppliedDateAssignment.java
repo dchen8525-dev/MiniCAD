@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_DATE_ASSIGNMENT metadata.
@@ -12,23 +13,18 @@ import java.util.Objects;
  * @param role assignment role
  * @param items assigned target items
  */
-public final class StepAppliedDateAssignment implements StepEntity {
-    private final int id;
+public final class StepAppliedDateAssignment extends AbstractStepEntity {
     private final String entityName;
     private final StepCalendarDate assignedDate;
     private final StepDateRole role;
     private final List<StepEntity> items;
 
     public StepAppliedDateAssignment(int id, String entityName, StepCalendarDate assignedDate, StepDateRole role, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.entityName = entityName;
         this.assignedDate = assignedDate;
         this.role = role;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getEntityName() {
@@ -69,20 +65,13 @@ public final class StepAppliedDateAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedDateAssignment that = (StepAppliedDateAssignment) o;
-        return id == that.id && Objects.equals(entityName, that.entityName) && Objects.equals(assignedDate, that.assignedDate) && Objects.equals(role, that.role) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, entityName, assignedDate, role, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedDateAssignment{" + "id=" + id + "entityName=" + entityName + "assignedDate=" + assignedDate + "role=" + role + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("entityName", entityName);
+        state.put("assignedDate", assignedDate);
+        state.put("role", role);
+        state.put("items", items);
+        return state;
     }
 }

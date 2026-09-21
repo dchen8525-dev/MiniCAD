@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved OPERATION_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param operationResult operation variance result
  * @param operationStatus operation variance status
  */
-public final class StepOperationRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOperationRecord extends AbstractStepEntity {
     private final String operationType;
     private final String operationName;
     private final StepEntity operationTarget;
@@ -29,8 +28,7 @@ public final class StepOperationRecord implements StepEntity {
     private final String operationStatus;
 
     public StepOperationRecord(int id, String name, String operationType, String operationName, StepEntity operationTarget, StepEntity operationActor, StepEntity operationTimestamp, String operationResult, String operationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.operationType = operationType;
         this.operationName = operationName;
         this.operationTarget = operationTarget;
@@ -38,14 +36,6 @@ public final class StepOperationRecord implements StepEntity {
         this.operationTimestamp = operationTimestamp;
         this.operationResult = operationResult;
         this.operationStatus = operationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getOperationType() {
@@ -77,20 +67,17 @@ public final class StepOperationRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOperationRecord that = (StepOperationRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(operationType, that.operationType) && Objects.equals(operationName, that.operationName) && Objects.equals(operationTarget, that.operationTarget) && Objects.equals(operationActor, that.operationActor) && Objects.equals(operationTimestamp, that.operationTimestamp) && Objects.equals(operationResult, that.operationResult) && Objects.equals(operationStatus, that.operationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, operationType, operationName, operationTarget, operationActor, operationTimestamp, operationResult, operationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOperationRecord{" + "id=" + id + "name=" + name + "operationType=" + operationType + "operationName=" + operationName + "operationTarget=" + operationTarget + "operationActor=" + operationActor + "operationTimestamp=" + operationTimestamp + "operationResult=" + operationResult + "operationStatus=" + operationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("operationType", operationType);
+        state.put("operationName", operationName);
+        state.put("operationTarget", operationTarget);
+        state.put("operationActor", operationActor);
+        state.put("operationTimestamp", operationTimestamp);
+        state.put("operationResult", operationResult);
+        state.put("operationStatus", operationStatus);
+        return state;
     }
 }

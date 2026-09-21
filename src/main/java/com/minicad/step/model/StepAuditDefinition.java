@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved AUDIT_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param auditFrequency audit variance frequency
  * @param auditStatus audit variance status
  */
-public final class StepAuditDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAuditDefinition extends AbstractStepEntity {
     private final String auditType;
     private final String auditDescription;
     private final List<String> auditCriteria;
@@ -27,22 +26,13 @@ public final class StepAuditDefinition implements StepEntity {
     private final String auditStatus;
 
     public StepAuditDefinition(int id, String name, String auditType, String auditDescription, List<String> auditCriteria, String auditScope, String auditFrequency, String auditStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.auditType = auditType;
         this.auditDescription = auditDescription;
         this.auditCriteria = auditCriteria == null ? null : java.util.List.copyOf(auditCriteria);
         this.auditScope = auditScope;
         this.auditFrequency = auditFrequency;
         this.auditStatus = auditStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAuditType() {
@@ -70,20 +60,16 @@ public final class StepAuditDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAuditDefinition that = (StepAuditDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(auditType, that.auditType) && Objects.equals(auditDescription, that.auditDescription) && Objects.equals(auditCriteria, that.auditCriteria) && Objects.equals(auditScope, that.auditScope) && Objects.equals(auditFrequency, that.auditFrequency) && Objects.equals(auditStatus, that.auditStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, auditType, auditDescription, auditCriteria, auditScope, auditFrequency, auditStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAuditDefinition{" + "id=" + id + "name=" + name + "auditType=" + auditType + "auditDescription=" + auditDescription + "auditCriteria=" + auditCriteria + "auditScope=" + auditScope + "auditFrequency=" + auditFrequency + "auditStatus=" + auditStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("auditType", auditType);
+        state.put("auditDescription", auditDescription);
+        state.put("auditCriteria", auditCriteria);
+        state.put("auditScope", auditScope);
+        state.put("auditFrequency", auditFrequency);
+        state.put("auditStatus", auditStatus);
+        return state;
     }
 }

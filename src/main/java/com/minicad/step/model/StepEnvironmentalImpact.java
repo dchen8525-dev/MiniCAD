@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ENVIRONMENTAL_IMPACT.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param mitigationMeasures mitigation measures
  * @varianceStatus impact variance status
  */
-public final class StepEnvironmentalImpact implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEnvironmentalImpact extends AbstractStepEntity {
     private final String impactType;
     private final double impactValue;
     private final StepEntity impactUnit;
@@ -27,22 +26,13 @@ public final class StepEnvironmentalImpact implements StepEntity {
     private final String varianceStatus;
 
     public StepEnvironmentalImpact(int id, String name, String impactType, double impactValue, StepEntity impactUnit, double varianceTarget, List<StepEntity> mitigationMeasures, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.impactType = impactType;
         this.impactValue = impactValue;
         this.impactUnit = impactUnit;
         this.varianceTarget = varianceTarget;
         this.mitigationMeasures = mitigationMeasures == null ? null : java.util.List.copyOf(mitigationMeasures);
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getImpactType() {
@@ -70,20 +60,16 @@ public final class StepEnvironmentalImpact implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEnvironmentalImpact that = (StepEnvironmentalImpact) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(impactType, that.impactType) && impactValue == that.impactValue && Objects.equals(impactUnit, that.impactUnit) && varianceTarget == that.varianceTarget && Objects.equals(mitigationMeasures, that.mitigationMeasures) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, impactType, impactValue, impactUnit, varianceTarget, mitigationMeasures, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEnvironmentalImpact{" + "id=" + id + "name=" + name + "impactType=" + impactType + "impactValue=" + impactValue + "impactUnit=" + impactUnit + "varianceTarget=" + varianceTarget + "mitigationMeasures=" + mitigationMeasures + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("impactType", impactType);
+        state.put("impactValue", impactValue);
+        state.put("impactUnit", impactUnit);
+        state.put("varianceTarget", varianceTarget);
+        state.put("mitigationMeasures", mitigationMeasures);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

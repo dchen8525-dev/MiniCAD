@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal IDENTIFICATION_ASSIGNMENT metadata.
  *
@@ -8,19 +10,14 @@ import java.util.Objects;
  * @param assignedId assigned identifier
  * @param role assignment role
  */
-public final class StepIdentificationAssignment implements StepEntity {
-    private final int id;
+public final class StepIdentificationAssignment extends AbstractStepEntity {
     private final String assignedId;
     private final StepIdentificationRole role;
 
     public StepIdentificationAssignment(int id, String assignedId, StepIdentificationRole role) {
-        this.id = id;
+        super(id, "");
         this.assignedId = assignedId;
         this.role = role;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getAssignedId() {
@@ -32,27 +29,17 @@ public final class StepIdentificationAssignment implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String getName() { return ""; }
+    public int id() { return getId(); }
     public String assignedId() { return assignedId; }
     public StepIdentificationRole role() { return role; }
     public String identifiedItem() { return assignedId; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepIdentificationAssignment that = (StepIdentificationAssignment) o;
-        return id == that.id && Objects.equals(assignedId, that.assignedId) && Objects.equals(role, that.role);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedId, role);
-    }
-
-    @Override
-    public String toString() {
-        return "StepIdentificationAssignment{" + "id=" + id + "assignedId=" + assignedId + "role=" + role + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedId", assignedId);
+        state.put("role", role);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MESSAGE_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param messageSentTime message variance sent time
  * @param messageStatus message variance status
  */
-public final class StepMessageInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMessageInstance extends AbstractStepEntity {
     private final StepEntity messageDefinition;
     private final StepEntity messageSource;
     private final StepEntity messageDestination;
@@ -27,22 +26,13 @@ public final class StepMessageInstance implements StepEntity {
     private final String messageStatus;
 
     public StepMessageInstance(int id, String name, StepEntity messageDefinition, StepEntity messageSource, StepEntity messageDestination, String messagePayload, StepEntity messageSentTime, String messageStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.messageDefinition = messageDefinition;
         this.messageSource = messageSource;
         this.messageDestination = messageDestination;
         this.messagePayload = messagePayload;
         this.messageSentTime = messageSentTime;
         this.messageStatus = messageStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMessageDefinition() {
@@ -70,20 +60,16 @@ public final class StepMessageInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMessageInstance that = (StepMessageInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(messageDefinition, that.messageDefinition) && Objects.equals(messageSource, that.messageSource) && Objects.equals(messageDestination, that.messageDestination) && Objects.equals(messagePayload, that.messagePayload) && Objects.equals(messageSentTime, that.messageSentTime) && Objects.equals(messageStatus, that.messageStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, messageDefinition, messageSource, messageDestination, messagePayload, messageSentTime, messageStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMessageInstance{" + "id=" + id + "name=" + name + "messageDefinition=" + messageDefinition + "messageSource=" + messageSource + "messageDestination=" + messageDestination + "messagePayload=" + messagePayload + "messageSentTime=" + messageSentTime + "messageStatus=" + messageStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("messageDefinition", messageDefinition);
+        state.put("messageSource", messageSource);
+        state.put("messageDestination", messageDestination);
+        state.put("messagePayload", messagePayload);
+        state.put("messageSentTime", messageSentTime);
+        state.put("messageStatus", messageStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CHECKPOINT_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param checkpointValid checkpoint variance valid flag
  * @param checkpointStatus checkpoint variance status
  */
-public final class StepCheckpointInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCheckpointInstance extends AbstractStepEntity {
     private final StepEntity checkpointDefinition;
     private final StepEntity checkpointTime;
     private final long checkpointSize;
@@ -25,21 +24,12 @@ public final class StepCheckpointInstance implements StepEntity {
     private final String checkpointStatus;
 
     public StepCheckpointInstance(int id, String name, StepEntity checkpointDefinition, StepEntity checkpointTime, long checkpointSize, boolean checkpointValid, String checkpointStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.checkpointDefinition = checkpointDefinition;
         this.checkpointTime = checkpointTime;
         this.checkpointSize = checkpointSize;
         this.checkpointValid = checkpointValid;
         this.checkpointStatus = checkpointStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCheckpointDefinition() {
@@ -63,20 +53,15 @@ public final class StepCheckpointInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCheckpointInstance that = (StepCheckpointInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(checkpointDefinition, that.checkpointDefinition) && Objects.equals(checkpointTime, that.checkpointTime) && checkpointSize == that.checkpointSize && checkpointValid == that.checkpointValid && Objects.equals(checkpointStatus, that.checkpointStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, checkpointDefinition, checkpointTime, checkpointSize, checkpointValid, checkpointStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCheckpointInstance{" + "id=" + id + "name=" + name + "checkpointDefinition=" + checkpointDefinition + "checkpointTime=" + checkpointTime + "checkpointSize=" + checkpointSize + "checkpointValid=" + checkpointValid + "checkpointStatus=" + checkpointStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("checkpointDefinition", checkpointDefinition);
+        state.put("checkpointTime", checkpointTime);
+        state.put("checkpointSize", checkpointSize);
+        state.put("checkpointValid", checkpointValid);
+        state.put("checkpointStatus", checkpointStatus);
+        return state;
     }
 }

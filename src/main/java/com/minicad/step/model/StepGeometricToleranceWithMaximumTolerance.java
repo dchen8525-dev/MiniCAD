@@ -1,13 +1,13 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved GEOMETRIC_TOLERANCE_WITH_MAXIMUM_TOLERANCE.
  * A geometric tolerance with a specified maximum tolerance limit.
  */
-public final class StepGeometricToleranceWithMaximumTolerance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGeometricToleranceWithMaximumTolerance extends AbstractStepEntity {
     private final String toleranceType;
     private final Double magnitude;
     private final StepEntity magnitudeUnit;
@@ -15,21 +15,12 @@ public final class StepGeometricToleranceWithMaximumTolerance implements StepEnt
     private final Double maximumTolerance;
 
     public StepGeometricToleranceWithMaximumTolerance(int id, String name, String toleranceType, Double magnitude, StepEntity magnitudeUnit, StepEntity tolerancedFeature, Double maximumTolerance) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.toleranceType = toleranceType;
         this.magnitude = magnitude;
         this.magnitudeUnit = magnitudeUnit;
         this.tolerancedFeature = tolerancedFeature;
         this.maximumTolerance = maximumTolerance;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getToleranceType() {
@@ -70,20 +61,15 @@ public final class StepGeometricToleranceWithMaximumTolerance implements StepEnt
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGeometricToleranceWithMaximumTolerance that = (StepGeometricToleranceWithMaximumTolerance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(toleranceType, that.toleranceType) && Objects.equals(magnitude, that.magnitude) && Objects.equals(magnitudeUnit, that.magnitudeUnit) && Objects.equals(tolerancedFeature, that.tolerancedFeature) && Objects.equals(maximumTolerance, that.maximumTolerance);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, toleranceType, magnitude, magnitudeUnit, tolerancedFeature, maximumTolerance);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGeometricToleranceWithMaximumTolerance{" + "id=" + id + "name=" + name + "toleranceType=" + toleranceType + "magnitude=" + magnitude + "magnitudeUnit=" + magnitudeUnit + "tolerancedFeature=" + tolerancedFeature + "maximumTolerance=" + maximumTolerance + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("toleranceType", toleranceType);
+        state.put("magnitude", magnitude);
+        state.put("magnitudeUnit", magnitudeUnit);
+        state.put("tolerancedFeature", tolerancedFeature);
+        state.put("maximumTolerance", maximumTolerance);
+        return state;
     }
 }

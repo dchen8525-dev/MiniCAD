@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved POOL_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param poolAvailable pool variance available capacity
  * @param poolStatus pool variance status
  */
-public final class StepPoolInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPoolInstance extends AbstractStepEntity {
     private final StepEntity poolDefinition;
     private final String poolState;
     private final double poolUsed;
@@ -25,21 +24,12 @@ public final class StepPoolInstance implements StepEntity {
     private final String poolStatus;
 
     public StepPoolInstance(int id, String name, StepEntity poolDefinition, String poolState, double poolUsed, double poolAvailable, String poolStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.poolDefinition = poolDefinition;
         this.poolState = poolState;
         this.poolUsed = poolUsed;
         this.poolAvailable = poolAvailable;
         this.poolStatus = poolStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPoolDefinition() {
@@ -63,20 +53,15 @@ public final class StepPoolInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPoolInstance that = (StepPoolInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(poolDefinition, that.poolDefinition) && Objects.equals(poolState, that.poolState) && poolUsed == that.poolUsed && poolAvailable == that.poolAvailable && Objects.equals(poolStatus, that.poolStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, poolDefinition, poolState, poolUsed, poolAvailable, poolStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPoolInstance{" + "id=" + id + "name=" + name + "poolDefinition=" + poolDefinition + "poolState=" + poolState + "poolUsed=" + poolUsed + "poolAvailable=" + poolAvailable + "poolStatus=" + poolStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("poolDefinition", poolDefinition);
+        state.put("poolState", poolState);
+        state.put("poolUsed", poolUsed);
+        state.put("poolAvailable", poolAvailable);
+        state.put("poolStatus", poolStatus);
+        return state;
     }
 }

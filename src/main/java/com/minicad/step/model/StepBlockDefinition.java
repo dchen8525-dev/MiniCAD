@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BLOCK_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param blockChecksum block variance checksum type
  * @param blockStatus block variance status
  */
-public final class StepBlockDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBlockDefinition extends AbstractStepEntity {
     private final String blockType;
     private final int blockSize;
     private final int blockAlignment;
@@ -25,21 +24,12 @@ public final class StepBlockDefinition implements StepEntity {
     private final String blockStatus;
 
     public StepBlockDefinition(int id, String name, String blockType, int blockSize, int blockAlignment, String blockChecksum, String blockStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.blockType = blockType;
         this.blockSize = blockSize;
         this.blockAlignment = blockAlignment;
         this.blockChecksum = blockChecksum;
         this.blockStatus = blockStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getBlockType() {
@@ -63,20 +53,15 @@ public final class StepBlockDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBlockDefinition that = (StepBlockDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(blockType, that.blockType) && blockSize == that.blockSize && blockAlignment == that.blockAlignment && Objects.equals(blockChecksum, that.blockChecksum) && Objects.equals(blockStatus, that.blockStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, blockType, blockSize, blockAlignment, blockChecksum, blockStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBlockDefinition{" + "id=" + id + "name=" + name + "blockType=" + blockType + "blockSize=" + blockSize + "blockAlignment=" + blockAlignment + "blockChecksum=" + blockChecksum + "blockStatus=" + blockStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("blockType", blockType);
+        state.put("blockSize", blockSize);
+        state.put("blockAlignment", blockAlignment);
+        state.put("blockChecksum", blockChecksum);
+        state.put("blockStatus", blockStatus);
+        return state;
     }
 }

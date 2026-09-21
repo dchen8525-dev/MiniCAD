@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved MAKE_FROM_RELATIONSHIP.
  * Relationship indicating a product is made from another.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param relatingProduct source product
  * @param relatedProduct resulting product
  */
-public final class StepMakeFromRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMakeFromRelationship extends AbstractStepEntity {
     private final String description;
     private final StepEntity relatingProduct;
     private final StepEntity relatedProduct;
 
     public StepMakeFromRelationship(int id, String name, String description, StepEntity relatingProduct, StepEntity relatedProduct) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.relatingProduct = relatingProduct;
         this.relatedProduct = relatedProduct;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -47,20 +38,13 @@ public final class StepMakeFromRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMakeFromRelationship that = (StepMakeFromRelationship) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(relatingProduct, that.relatingProduct) && Objects.equals(relatedProduct, that.relatedProduct);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, relatingProduct, relatedProduct);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMakeFromRelationship{" + "id=" + id + "name=" + name + "description=" + description + "relatingProduct=" + relatingProduct + "relatedProduct=" + relatedProduct + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingProduct", relatingProduct);
+        state.put("relatedProduct", relatedProduct);
+        return state;
     }
 }

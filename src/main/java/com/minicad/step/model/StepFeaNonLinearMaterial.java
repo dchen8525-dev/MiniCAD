@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved FEA_NON_LINEAR_MATERIAL.
  * A non-linear material definition for FEA.
  */
-public final class StepFeaNonLinearMaterial implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaNonLinearMaterial extends AbstractStepEntity {
     private final StepEntity material;
     private final String nonLinearModel;
 
     public StepFeaNonLinearMaterial(int id, String name, StepEntity material, String nonLinearModel) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.material = material;
         this.nonLinearModel = nonLinearModel;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMaterial() {
@@ -35,20 +26,12 @@ public final class StepFeaNonLinearMaterial implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaNonLinearMaterial that = (StepFeaNonLinearMaterial) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(material, that.material) && Objects.equals(nonLinearModel, that.nonLinearModel);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, material, nonLinearModel);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaNonLinearMaterial{" + "id=" + id + "name=" + name + "material=" + material + "nonLinearModel=" + nonLinearModel + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("material", material);
+        state.put("nonLinearModel", nonLinearModel);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DEGENERATE_CURVE.
  * A curve that has degenerated to a point or line.
@@ -9,23 +11,12 @@ import java.util.Objects;
  * @param name curve name
  * @param basisCurve the original curve before degeneration
  */
-public final class StepDegenerateCurve implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDegenerateCurve extends AbstractStepEntity {
     private final StepEntity basisCurve;
 
     public StepDegenerateCurve(int id, String name, StepEntity basisCurve) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.basisCurve = basisCurve;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBasisCurve() {
@@ -38,20 +29,11 @@ public final class StepDegenerateCurve implements StepEntity {
     public StepEntity basisCurve() { return getBasisCurve(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDegenerateCurve that = (StepDegenerateCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(basisCurve, that.basisCurve);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, basisCurve);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDegenerateCurve{" + "id=" + id + "name=" + name + "basisCurve=" + basisCurve + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("basisCurve", basisCurve);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DOCUMENT metadata.
  *
@@ -10,31 +12,20 @@ import java.util.Objects;
  * @param description document description
  * @param kind document type
  */
-public final class StepDocument implements StepEntity {
-    private final int id;
+public final class StepDocument extends AbstractStepEntity {
     private final String identifier;
-    private final String name;
     private final String description;
     private final StepDocumentType kind;
 
     public StepDocument(int id, String identifier, String name, String description, StepDocumentType kind) {
-        this.id = id;
+        super(id, name);
         this.identifier = identifier;
-        this.name = name;
         this.description = description;
         this.kind = kind;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getIdentifier() {
         return identifier;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -55,20 +46,13 @@ public final class StepDocument implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDocument that = (StepDocument) o;
-        return id == that.id && Objects.equals(identifier, that.identifier) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(kind, that.kind);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, identifier, name, description, kind);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDocument{" + "id=" + id + "identifier=" + identifier + "name=" + name + "description=" + description + "kind=" + kind + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("identifier", identifier);
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("kind", kind);
+        return state;
     }
 }

@@ -1,8 +1,9 @@
 package com.minicad.step.model;
 
 import com.minicad.step.syntax.StepValue;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRIMMED_CURVE for supported basis curves.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param senseAgreement orientation agreement
  * @param masterRepresentation trimming preference enum
  */
-public final class StepTrimmedCurve implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTrimmedCurve extends AbstractStepEntity {
     private final StepEntity basisCurve;
     private final List<StepValue> trim1;
     private final List<StepValue> trim2;
@@ -26,21 +25,12 @@ public final class StepTrimmedCurve implements StepEntity {
     private final String masterRepresentation;
 
     public StepTrimmedCurve(int id, String name, StepEntity basisCurve, List<StepValue> trim1, List<StepValue> trim2, boolean senseAgreement, String masterRepresentation) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.basisCurve = basisCurve;
         this.trim1 = trim1 == null ? null : java.util.List.copyOf(trim1);
         this.trim2 = trim2 == null ? null : java.util.List.copyOf(trim2);
         this.senseAgreement = senseAgreement;
         this.masterRepresentation = masterRepresentation;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBasisCurve() {
@@ -73,20 +63,15 @@ public final class StepTrimmedCurve implements StepEntity {
     public String masterRepresentation() { return getMasterRepresentation(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTrimmedCurve that = (StepTrimmedCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(basisCurve, that.basisCurve) && Objects.equals(trim1, that.trim1) && Objects.equals(trim2, that.trim2) && senseAgreement == that.senseAgreement && Objects.equals(masterRepresentation, that.masterRepresentation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, basisCurve, trim1, trim2, senseAgreement, masterRepresentation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTrimmedCurve{" + "id=" + id + "name=" + name + "basisCurve=" + basisCurve + "trim1=" + trim1 + "trim2=" + trim2 + "senseAgreement=" + senseAgreement + "masterRepresentation=" + masterRepresentation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("basisCurve", basisCurve);
+        state.put("trim1", trim1);
+        state.put("trim2", trim2);
+        state.put("senseAgreement", senseAgreement);
+        state.put("masterRepresentation", masterRepresentation);
+        return state;
     }
 }

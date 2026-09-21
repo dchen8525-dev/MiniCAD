@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SURFACE_MEASUREMENT.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param measurementArea measurement area/location
  * @param passFailStatus pass/fail status result
  */
-public final class StepSurfaceMeasurement implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSurfaceMeasurement extends AbstractStepEntity {
     private final StepEntity surfaceGeometry;
     private final List<String> roughnessParameters;
     private final List<Double> measuredValues;
@@ -27,22 +26,13 @@ public final class StepSurfaceMeasurement implements StepEntity {
     private final String passFailStatus;
 
     public StepSurfaceMeasurement(int id, String name, StepEntity surfaceGeometry, List<String> roughnessParameters, List<Double> measuredValues, String measurementMethod, StepEntity measurementArea, String passFailStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.surfaceGeometry = surfaceGeometry;
         this.roughnessParameters = roughnessParameters == null ? null : java.util.List.copyOf(roughnessParameters);
         this.measuredValues = measuredValues == null ? null : java.util.List.copyOf(measuredValues);
         this.measurementMethod = measurementMethod;
         this.measurementArea = measurementArea;
         this.passFailStatus = passFailStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSurfaceGeometry() {
@@ -70,20 +60,16 @@ public final class StepSurfaceMeasurement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceMeasurement that = (StepSurfaceMeasurement) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(surfaceGeometry, that.surfaceGeometry) && Objects.equals(roughnessParameters, that.roughnessParameters) && Objects.equals(measuredValues, that.measuredValues) && Objects.equals(measurementMethod, that.measurementMethod) && Objects.equals(measurementArea, that.measurementArea) && Objects.equals(passFailStatus, that.passFailStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, surfaceGeometry, roughnessParameters, measuredValues, measurementMethod, measurementArea, passFailStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceMeasurement{" + "id=" + id + "name=" + name + "surfaceGeometry=" + surfaceGeometry + "roughnessParameters=" + roughnessParameters + "measuredValues=" + measuredValues + "measurementMethod=" + measurementMethod + "measurementArea=" + measurementArea + "passFailStatus=" + passFailStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("surfaceGeometry", surfaceGeometry);
+        state.put("roughnessParameters", roughnessParameters);
+        state.put("measuredValues", measuredValues);
+        state.put("measurementMethod", measurementMethod);
+        state.put("measurementArea", measurementArea);
+        state.put("passFailStatus", passFailStatus);
+        return state;
     }
 }

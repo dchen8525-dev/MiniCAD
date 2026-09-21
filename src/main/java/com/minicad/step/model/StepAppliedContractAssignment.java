@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_CONTRACT_ASSIGNMENT metadata.
@@ -11,25 +12,16 @@ import java.util.Objects;
  * @param assignedContract assigned contract
  * @param items assigned target items
  */
-public final class StepAppliedContractAssignment implements StepEntity {
-    private final int id;
+public final class StepAppliedContractAssignment extends AbstractStepEntity {
     private final String entityName;
     private final StepContract assignedContract;
     private final List<StepEntity> items;
 
     public StepAppliedContractAssignment(int id, String entityName, StepContract assignedContract, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.entityName = entityName;
         this.assignedContract = assignedContract;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public String getEntityName() {
@@ -58,20 +50,12 @@ public final class StepAppliedContractAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedContractAssignment that = (StepAppliedContractAssignment) o;
-        return id == that.id && Objects.equals(entityName, that.entityName) && Objects.equals(assignedContract, that.assignedContract) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, entityName, assignedContract, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedContractAssignment{" + "id=" + id + "entityName=" + entityName + "assignedContract=" + assignedContract + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("entityName", entityName);
+        state.put("assignedContract", assignedContract);
+        state.put("items", items);
+        return state;
     }
 }

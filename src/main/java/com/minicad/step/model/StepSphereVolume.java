@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved SPHERE_VOLUME.
  * A CSG sphere primitive volume.
  */
-public final class StepSphereVolume implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSphereVolume extends AbstractStepEntity {
     private final StepEntity center;
     private final Double radius;
 
     public StepSphereVolume(int id, String name, StepEntity center, Double radius) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.center = center;
         this.radius = radius;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCenter() {
@@ -41,20 +32,12 @@ public final class StepSphereVolume implements StepEntity {
     public Double radius() { return getRadius(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSphereVolume that = (StepSphereVolume) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(center, that.center) && Objects.equals(radius, that.radius);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, center, radius);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSphereVolume{" + "id=" + id + "name=" + name + "center=" + center + "radius=" + radius + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("center", center);
+        state.put("radius", radius);
+        return state;
     }
 }

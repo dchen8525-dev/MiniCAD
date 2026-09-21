@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved JIG_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param jigCapacity jig capacity/workpiece size
  * @param jigMaterial jig material reference
  */
-public final class StepJigFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepJigFeature extends AbstractStepEntity {
     private final String jigType;
     private final StepEntity jigGeometry;
     private final List<StepEntity> guideElements;
@@ -27,22 +26,13 @@ public final class StepJigFeature implements StepEntity {
     private final StepEntity jigMaterial;
 
     public StepJigFeature(int id, String name, String jigType, StepEntity jigGeometry, List<StepEntity> guideElements, List<StepEntity> referenceSurfaces, double jigCapacity, StepEntity jigMaterial) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.jigType = jigType;
         this.jigGeometry = jigGeometry;
         this.guideElements = guideElements == null ? null : java.util.List.copyOf(guideElements);
         this.referenceSurfaces = referenceSurfaces == null ? null : java.util.List.copyOf(referenceSurfaces);
         this.jigCapacity = jigCapacity;
         this.jigMaterial = jigMaterial;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getJigType() {
@@ -70,20 +60,16 @@ public final class StepJigFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepJigFeature that = (StepJigFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(jigType, that.jigType) && Objects.equals(jigGeometry, that.jigGeometry) && Objects.equals(guideElements, that.guideElements) && Objects.equals(referenceSurfaces, that.referenceSurfaces) && jigCapacity == that.jigCapacity && Objects.equals(jigMaterial, that.jigMaterial);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, jigType, jigGeometry, guideElements, referenceSurfaces, jigCapacity, jigMaterial);
-    }
-
-    @Override
-    public String toString() {
-        return "StepJigFeature{" + "id=" + id + "name=" + name + "jigType=" + jigType + "jigGeometry=" + jigGeometry + "guideElements=" + guideElements + "referenceSurfaces=" + referenceSurfaces + "jigCapacity=" + jigCapacity + "jigMaterial=" + jigMaterial + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("jigType", jigType);
+        state.put("jigGeometry", jigGeometry);
+        state.put("guideElements", guideElements);
+        state.put("referenceSurfaces", referenceSurfaces);
+        state.put("jigCapacity", jigCapacity);
+        state.put("jigMaterial", jigMaterial);
+        return state;
     }
 }

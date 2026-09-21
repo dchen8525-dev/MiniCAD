@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MONITOR_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param monitorAlerts monitor variance alert count
  * @param monitorStatus monitor variance status
  */
-public final class StepMonitorInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMonitorInstance extends AbstractStepEntity {
     private final StepEntity monitorDefinition;
     private final String monitorState;
     private final StepEntity monitorLastCheck;
@@ -25,21 +24,12 @@ public final class StepMonitorInstance implements StepEntity {
     private final String monitorStatus;
 
     public StepMonitorInstance(int id, String name, StepEntity monitorDefinition, String monitorState, StepEntity monitorLastCheck, int monitorAlerts, String monitorStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.monitorDefinition = monitorDefinition;
         this.monitorState = monitorState;
         this.monitorLastCheck = monitorLastCheck;
         this.monitorAlerts = monitorAlerts;
         this.monitorStatus = monitorStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMonitorDefinition() {
@@ -63,20 +53,15 @@ public final class StepMonitorInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMonitorInstance that = (StepMonitorInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(monitorDefinition, that.monitorDefinition) && Objects.equals(monitorState, that.monitorState) && Objects.equals(monitorLastCheck, that.monitorLastCheck) && monitorAlerts == that.monitorAlerts && Objects.equals(monitorStatus, that.monitorStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, monitorDefinition, monitorState, monitorLastCheck, monitorAlerts, monitorStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMonitorInstance{" + "id=" + id + "name=" + name + "monitorDefinition=" + monitorDefinition + "monitorState=" + monitorState + "monitorLastCheck=" + monitorLastCheck + "monitorAlerts=" + monitorAlerts + "monitorStatus=" + monitorStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("monitorDefinition", monitorDefinition);
+        state.put("monitorState", monitorState);
+        state.put("monitorLastCheck", monitorLastCheck);
+        state.put("monitorAlerts", monitorAlerts);
+        state.put("monitorStatus", monitorStatus);
+        return state;
     }
 }

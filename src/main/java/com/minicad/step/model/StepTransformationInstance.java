@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRANSFORMATION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param transformationOutputData transformation variance output data
  * @param transformationStatus transformation variance status
  */
-public final class StepTransformationInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTransformationInstance extends AbstractStepEntity {
     private final StepEntity transformationDefinition;
     private final String transformationState;
     private final List<String> transformationInputData;
@@ -25,21 +24,12 @@ public final class StepTransformationInstance implements StepEntity {
     private final String transformationStatus;
 
     public StepTransformationInstance(int id, String name, StepEntity transformationDefinition, String transformationState, List<String> transformationInputData, List<String> transformationOutputData, String transformationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.transformationDefinition = transformationDefinition;
         this.transformationState = transformationState;
         this.transformationInputData = transformationInputData == null ? null : java.util.List.copyOf(transformationInputData);
         this.transformationOutputData = transformationOutputData == null ? null : java.util.List.copyOf(transformationOutputData);
         this.transformationStatus = transformationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getTransformationDefinition() {
@@ -63,20 +53,15 @@ public final class StepTransformationInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTransformationInstance that = (StepTransformationInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(transformationDefinition, that.transformationDefinition) && Objects.equals(transformationState, that.transformationState) && Objects.equals(transformationInputData, that.transformationInputData) && Objects.equals(transformationOutputData, that.transformationOutputData) && Objects.equals(transformationStatus, that.transformationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, transformationDefinition, transformationState, transformationInputData, transformationOutputData, transformationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTransformationInstance{" + "id=" + id + "name=" + name + "transformationDefinition=" + transformationDefinition + "transformationState=" + transformationState + "transformationInputData=" + transformationInputData + "transformationOutputData=" + transformationOutputData + "transformationStatus=" + transformationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("transformationDefinition", transformationDefinition);
+        state.put("transformationState", transformationState);
+        state.put("transformationInputData", transformationInputData);
+        state.put("transformationOutputData", transformationOutputData);
+        state.put("transformationStatus", transformationStatus);
+        return state;
     }
 }

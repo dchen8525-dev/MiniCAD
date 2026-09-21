@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Resolved REVOLVED_AREA_SOLID_TAPERED.
  * A revolved solid with tapered profile.
@@ -13,29 +14,18 @@ import java.util.Objects;
  * @param angle revolution angle
  * @param taperAngle taper angle
  */
-public final class StepRevolvedAreaSolidTapered implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRevolvedAreaSolidTapered extends AbstractStepEntity {
     private final StepEntity sweptArea;
     private final StepAxis1Placement axis;
     private final double angle;
     private final double taperAngle;
 
     public StepRevolvedAreaSolidTapered(int id, String name, StepEntity sweptArea, StepAxis1Placement axis, double angle, double taperAngle) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sweptArea = sweptArea;
         this.axis = axis;
         this.angle = angle;
         this.taperAngle = taperAngle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSweptArea() {
@@ -61,20 +51,14 @@ public final class StepRevolvedAreaSolidTapered implements StepEntity {
     public double taperAngle() { return taperAngle; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRevolvedAreaSolidTapered that = (StepRevolvedAreaSolidTapered) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sweptArea, that.sweptArea) && Objects.equals(axis, that.axis) && angle == that.angle && taperAngle == that.taperAngle;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sweptArea, axis, angle, taperAngle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRevolvedAreaSolidTapered{" + "id=" + id + "name=" + name + "sweptArea=" + sweptArea + "axis=" + axis + "angle=" + angle + "taperAngle=" + taperAngle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sweptArea", sweptArea);
+        state.put("axis", axis);
+        state.put("angle", angle);
+        state.put("taperAngle", taperAngle);
+        return state;
     }
 }

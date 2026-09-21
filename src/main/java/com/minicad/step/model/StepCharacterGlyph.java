@@ -1,27 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved CHARACTER_GLYPH.
  */
-public final class StepCharacterGlyph implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCharacterGlyph extends AbstractStepEntity {
     private final String characterCode;
 
     public StepCharacterGlyph(int id, String name, String characterCode) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.characterCode = characterCode;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCharacterCode() {
@@ -29,20 +19,11 @@ public final class StepCharacterGlyph implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCharacterGlyph that = (StepCharacterGlyph) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(characterCode, that.characterCode);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, characterCode);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCharacterGlyph{" + "id=" + id + "name=" + name + "characterCode=" + characterCode + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("characterCode", characterCode);
+        return state;
     }
 }

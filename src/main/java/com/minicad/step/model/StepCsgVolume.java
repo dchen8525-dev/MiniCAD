@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CSG_VOLUME.
  * A CSG solid represented as a volume.
@@ -9,23 +11,12 @@ import java.util.Objects;
  * @param name volume name
  * @param treeRoot root of the CSG tree
  */
-public final class StepCsgVolume implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCsgVolume extends AbstractStepEntity {
     private final StepEntity treeRoot;
 
     public StepCsgVolume(int id, String name, StepEntity treeRoot) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.treeRoot = treeRoot;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getTreeRoot() {
@@ -38,20 +29,11 @@ public final class StepCsgVolume implements StepEntity {
     public StepEntity treeRoot() { return getTreeRoot(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCsgVolume that = (StepCsgVolume) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(treeRoot, that.treeRoot);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, treeRoot);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCsgVolume{" + "id=" + id + "name=" + name + "treeRoot=" + treeRoot + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("treeRoot", treeRoot);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved CYLINDRICAL_SURFACE_WITH_ELLIPTICAL_AXIS.
  * A cylindrical surface with an elliptical cross-section.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param semiAxisA first semi-axis of the ellipse
  * @param semiAxisB second semi-axis of the ellipse
  */
-public final class StepCylindricalSurfaceWithEllipticalAxis implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCylindricalSurfaceWithEllipticalAxis extends AbstractStepEntity {
     private final StepAxis2Placement3D position;
     private final double semiAxisA;
     private final double semiAxisB;
 
     public StepCylindricalSurfaceWithEllipticalAxis(int id, String name, StepAxis2Placement3D position, double semiAxisA, double semiAxisB) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.semiAxisA = semiAxisA;
         this.semiAxisB = semiAxisB;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepAxis2Placement3D getPosition() {
@@ -52,20 +43,13 @@ public final class StepCylindricalSurfaceWithEllipticalAxis implements StepEntit
     public double semiAxisB() { return getSemiAxisB(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCylindricalSurfaceWithEllipticalAxis that = (StepCylindricalSurfaceWithEllipticalAxis) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && semiAxisA == that.semiAxisA && semiAxisB == that.semiAxisB;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, semiAxisA, semiAxisB);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCylindricalSurfaceWithEllipticalAxis{" + "id=" + id + "name=" + name + "position=" + position + "semiAxisA=" + semiAxisA + "semiAxisB=" + semiAxisB + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("semiAxisA", semiAxisA);
+        state.put("semiAxisB", semiAxisB);
+        return state;
     }
 }

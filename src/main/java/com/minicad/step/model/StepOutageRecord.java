@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved OUTAGE_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceImpact impact variance description
  * @varianceStatus record variance status
  */
-public final class StepOutageRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOutageRecord extends AbstractStepEntity {
     private final StepEntity varianceSystem;
     private final String varianceCause;
     private final StepEntity varianceStartTime;
@@ -29,8 +28,7 @@ public final class StepOutageRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepOutageRecord(int id, String name, StepEntity varianceSystem, String varianceCause, StepEntity varianceStartTime, StepEntity varianceEndTime, double varianceDuration, String varianceImpact, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceSystem = varianceSystem;
         this.varianceCause = varianceCause;
         this.varianceStartTime = varianceStartTime;
@@ -38,14 +36,6 @@ public final class StepOutageRecord implements StepEntity {
         this.varianceDuration = varianceDuration;
         this.varianceImpact = varianceImpact;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceSystem() {
@@ -77,20 +67,17 @@ public final class StepOutageRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOutageRecord that = (StepOutageRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceSystem, that.varianceSystem) && Objects.equals(varianceCause, that.varianceCause) && Objects.equals(varianceStartTime, that.varianceStartTime) && Objects.equals(varianceEndTime, that.varianceEndTime) && varianceDuration == that.varianceDuration && Objects.equals(varianceImpact, that.varianceImpact) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceSystem, varianceCause, varianceStartTime, varianceEndTime, varianceDuration, varianceImpact, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOutageRecord{" + "id=" + id + "name=" + name + "varianceSystem=" + varianceSystem + "varianceCause=" + varianceCause + "varianceStartTime=" + varianceStartTime + "varianceEndTime=" + varianceEndTime + "varianceDuration=" + varianceDuration + "varianceImpact=" + varianceImpact + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceSystem", varianceSystem);
+        state.put("varianceCause", varianceCause);
+        state.put("varianceStartTime", varianceStartTime);
+        state.put("varianceEndTime", varianceEndTime);
+        state.put("varianceDuration", varianceDuration);
+        state.put("varianceImpact", varianceImpact);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

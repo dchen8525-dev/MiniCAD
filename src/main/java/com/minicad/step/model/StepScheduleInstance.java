@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SCHEDULE_INSTANCE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param scheduleActuals schedule variance actual values
  * @param scheduleStatus schedule variance status
  */
-public final class StepScheduleInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepScheduleInstance extends AbstractStepEntity {
     private final StepEntity scheduleDefinition;
     private final double scheduleProgress;
     private final List<String> scheduleActuals;
     private final String scheduleStatus;
 
     public StepScheduleInstance(int id, String name, StepEntity scheduleDefinition, double scheduleProgress, List<String> scheduleActuals, String scheduleStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.scheduleDefinition = scheduleDefinition;
         this.scheduleProgress = scheduleProgress;
         this.scheduleActuals = scheduleActuals == null ? null : java.util.List.copyOf(scheduleActuals);
         this.scheduleStatus = scheduleStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getScheduleDefinition() {
@@ -56,20 +46,14 @@ public final class StepScheduleInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepScheduleInstance that = (StepScheduleInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(scheduleDefinition, that.scheduleDefinition) && scheduleProgress == that.scheduleProgress && Objects.equals(scheduleActuals, that.scheduleActuals) && Objects.equals(scheduleStatus, that.scheduleStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, scheduleDefinition, scheduleProgress, scheduleActuals, scheduleStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepScheduleInstance{" + "id=" + id + "name=" + name + "scheduleDefinition=" + scheduleDefinition + "scheduleProgress=" + scheduleProgress + "scheduleActuals=" + scheduleActuals + "scheduleStatus=" + scheduleStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("scheduleDefinition", scheduleDefinition);
+        state.put("scheduleProgress", scheduleProgress);
+        state.put("scheduleActuals", scheduleActuals);
+        state.put("scheduleStatus", scheduleStatus);
+        return state;
     }
 }

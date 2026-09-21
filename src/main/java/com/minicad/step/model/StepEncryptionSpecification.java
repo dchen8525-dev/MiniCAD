@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ENCRYPTION_SPECIFICATION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @varianceKeyManagement key variance management specification
  * @varianceStatus specification variance status
  */
-public final class StepEncryptionSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEncryptionSpecification extends AbstractStepEntity {
     private final String varianceAlgorithm;
     private final int varianceKeySize;
     private final String varianceMode;
@@ -25,21 +24,12 @@ public final class StepEncryptionSpecification implements StepEntity {
     private final String varianceStatus;
 
     public StepEncryptionSpecification(int id, String name, String varianceAlgorithm, int varianceKeySize, String varianceMode, StepEntity varianceKeyManagement, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceAlgorithm = varianceAlgorithm;
         this.varianceKeySize = varianceKeySize;
         this.varianceMode = varianceMode;
         this.varianceKeyManagement = varianceKeyManagement;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceAlgorithm() {
@@ -63,20 +53,15 @@ public final class StepEncryptionSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEncryptionSpecification that = (StepEncryptionSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceAlgorithm, that.varianceAlgorithm) && varianceKeySize == that.varianceKeySize && Objects.equals(varianceMode, that.varianceMode) && Objects.equals(varianceKeyManagement, that.varianceKeyManagement) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceAlgorithm, varianceKeySize, varianceMode, varianceKeyManagement, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEncryptionSpecification{" + "id=" + id + "name=" + name + "varianceAlgorithm=" + varianceAlgorithm + "varianceKeySize=" + varianceKeySize + "varianceMode=" + varianceMode + "varianceKeyManagement=" + varianceKeyManagement + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceAlgorithm", varianceAlgorithm);
+        state.put("varianceKeySize", varianceKeySize);
+        state.put("varianceMode", varianceMode);
+        state.put("varianceKeyManagement", varianceKeyManagement);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

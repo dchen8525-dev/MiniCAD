@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CHANGE_REQUEST.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param requestAuthor request author
  * @param requestReason reason for change request
  */
-public final class StepChangeRequest implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepChangeRequest extends AbstractStepEntity {
     private final String requestType;
     private final String requestDescription;
     private final List<StepEntity> affectedItems;
@@ -29,8 +28,7 @@ public final class StepChangeRequest implements StepEntity {
     private final String requestReason;
 
     public StepChangeRequest(int id, String name, String requestType, String requestDescription, List<StepEntity> affectedItems, String requestStatus, StepEntity requestDate, StepEntity requestAuthor, String requestReason) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.requestType = requestType;
         this.requestDescription = requestDescription;
         this.affectedItems = affectedItems == null ? null : java.util.List.copyOf(affectedItems);
@@ -38,14 +36,6 @@ public final class StepChangeRequest implements StepEntity {
         this.requestDate = requestDate;
         this.requestAuthor = requestAuthor;
         this.requestReason = requestReason;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getRequestType() {
@@ -77,20 +67,17 @@ public final class StepChangeRequest implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepChangeRequest that = (StepChangeRequest) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(requestType, that.requestType) && Objects.equals(requestDescription, that.requestDescription) && Objects.equals(affectedItems, that.affectedItems) && Objects.equals(requestStatus, that.requestStatus) && Objects.equals(requestDate, that.requestDate) && Objects.equals(requestAuthor, that.requestAuthor) && Objects.equals(requestReason, that.requestReason);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, requestType, requestDescription, affectedItems, requestStatus, requestDate, requestAuthor, requestReason);
-    }
-
-    @Override
-    public String toString() {
-        return "StepChangeRequest{" + "id=" + id + "name=" + name + "requestType=" + requestType + "requestDescription=" + requestDescription + "affectedItems=" + affectedItems + "requestStatus=" + requestStatus + "requestDate=" + requestDate + "requestAuthor=" + requestAuthor + "requestReason=" + requestReason + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("requestType", requestType);
+        state.put("requestDescription", requestDescription);
+        state.put("affectedItems", affectedItems);
+        state.put("requestStatus", requestStatus);
+        state.put("requestDate", requestDate);
+        state.put("requestAuthor", requestAuthor);
+        state.put("requestReason", requestReason);
+        return state;
     }
 }

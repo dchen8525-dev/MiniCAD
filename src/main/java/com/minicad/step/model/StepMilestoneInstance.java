@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved MILESTONE_INSTANCE.
  * A milestone instance entity.
@@ -12,29 +14,18 @@ import java.util.Objects;
  * @param milestoneActual milestone variance actual date
  * @param milestoneStatus milestone variance status
  */
-public final class StepMilestoneInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMilestoneInstance extends AbstractStepEntity {
     private final StepEntity milestoneDefinition;
     private final String milestoneState;
     private final StepEntity milestoneActual;
     private final String milestoneStatus;
 
     public StepMilestoneInstance(int id, String name, StepEntity milestoneDefinition, String milestoneState, StepEntity milestoneActual, String milestoneStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.milestoneDefinition = milestoneDefinition;
         this.milestoneState = milestoneState;
         this.milestoneActual = milestoneActual;
         this.milestoneStatus = milestoneStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMilestoneDefinition() {
@@ -54,20 +45,14 @@ public final class StepMilestoneInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMilestoneInstance that = (StepMilestoneInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(milestoneDefinition, that.milestoneDefinition) && Objects.equals(milestoneState, that.milestoneState) && Objects.equals(milestoneActual, that.milestoneActual) && Objects.equals(milestoneStatus, that.milestoneStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, milestoneDefinition, milestoneState, milestoneActual, milestoneStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMilestoneInstance{" + "id=" + id + "name=" + name + "milestoneDefinition=" + milestoneDefinition + "milestoneState=" + milestoneState + "milestoneActual=" + milestoneActual + "milestoneStatus=" + milestoneStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("milestoneDefinition", milestoneDefinition);
+        state.put("milestoneState", milestoneState);
+        state.put("milestoneActual", milestoneActual);
+        state.put("milestoneStatus", milestoneStatus);
+        return state;
     }
 }

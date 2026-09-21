@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PLATFORM_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param platformCapabilities platform variance capabilities
  * @param platformStatus platform variance status
  */
-public final class StepPlatformDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPlatformDefinition extends AbstractStepEntity {
     private final String platformType;
     private final String platformDescription;
     private final List<StepEntity> platformComponents;
@@ -25,21 +24,12 @@ public final class StepPlatformDefinition implements StepEntity {
     private final String platformStatus;
 
     public StepPlatformDefinition(int id, String name, String platformType, String platformDescription, List<StepEntity> platformComponents, List<String> platformCapabilities, String platformStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.platformType = platformType;
         this.platformDescription = platformDescription;
         this.platformComponents = platformComponents == null ? null : java.util.List.copyOf(platformComponents);
         this.platformCapabilities = platformCapabilities == null ? null : java.util.List.copyOf(platformCapabilities);
         this.platformStatus = platformStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPlatformType() {
@@ -63,20 +53,15 @@ public final class StepPlatformDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPlatformDefinition that = (StepPlatformDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(platformType, that.platformType) && Objects.equals(platformDescription, that.platformDescription) && Objects.equals(platformComponents, that.platformComponents) && Objects.equals(platformCapabilities, that.platformCapabilities) && Objects.equals(platformStatus, that.platformStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, platformType, platformDescription, platformComponents, platformCapabilities, platformStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPlatformDefinition{" + "id=" + id + "name=" + name + "platformType=" + platformType + "platformDescription=" + platformDescription + "platformComponents=" + platformComponents + "platformCapabilities=" + platformCapabilities + "platformStatus=" + platformStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("platformType", platformType);
+        state.put("platformDescription", platformDescription);
+        state.put("platformComponents", platformComponents);
+        state.put("platformCapabilities", platformCapabilities);
+        state.put("platformStatus", platformStatus);
+        return state;
     }
 }

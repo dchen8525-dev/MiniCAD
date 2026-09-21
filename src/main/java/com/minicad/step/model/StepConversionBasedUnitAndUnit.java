@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved CONVERSION_BASED_UNIT_AND_UNIT.
  */
-public final class StepConversionBasedUnitAndUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConversionBasedUnitAndUnit extends AbstractStepEntity {
     private final StepEntity convertedUnit;
     private final StepEntity unitComponent;
 
     public StepConversionBasedUnitAndUnit(int id, String name, StepEntity convertedUnit, StepEntity unitComponent) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.convertedUnit = convertedUnit;
         this.unitComponent = unitComponent;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getConvertedUnit() {
@@ -35,20 +25,12 @@ public final class StepConversionBasedUnitAndUnit implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConversionBasedUnitAndUnit that = (StepConversionBasedUnitAndUnit) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(convertedUnit, that.convertedUnit) && Objects.equals(unitComponent, that.unitComponent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, convertedUnit, unitComponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConversionBasedUnitAndUnit{" + "id=" + id + "name=" + name + "convertedUnit=" + convertedUnit + "unitComponent=" + unitComponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("convertedUnit", convertedUnit);
+        state.put("unitComponent", unitComponent);
+        return state;
     }
 }

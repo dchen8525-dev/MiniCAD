@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DOCUMENT_REFERENCE_LINK.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param linkDescription link description
  * @param linkContext link context reference
  */
-public final class StepDocumentReferenceLink implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDocumentReferenceLink extends AbstractStepEntity {
     private final StepEntity sourceDocument;
     private final StepEntity targetDocument;
     private final String linkType;
@@ -25,21 +24,12 @@ public final class StepDocumentReferenceLink implements StepEntity {
     private final StepEntity linkContext;
 
     public StepDocumentReferenceLink(int id, String name, StepEntity sourceDocument, StepEntity targetDocument, String linkType, String linkDescription, StepEntity linkContext) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sourceDocument = sourceDocument;
         this.targetDocument = targetDocument;
         this.linkType = linkType;
         this.linkDescription = linkDescription;
         this.linkContext = linkContext;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSourceDocument() {
@@ -63,20 +53,15 @@ public final class StepDocumentReferenceLink implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDocumentReferenceLink that = (StepDocumentReferenceLink) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sourceDocument, that.sourceDocument) && Objects.equals(targetDocument, that.targetDocument) && Objects.equals(linkType, that.linkType) && Objects.equals(linkDescription, that.linkDescription) && Objects.equals(linkContext, that.linkContext);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sourceDocument, targetDocument, linkType, linkDescription, linkContext);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDocumentReferenceLink{" + "id=" + id + "name=" + name + "sourceDocument=" + sourceDocument + "targetDocument=" + targetDocument + "linkType=" + linkType + "linkDescription=" + linkDescription + "linkContext=" + linkContext + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sourceDocument", sourceDocument);
+        state.put("targetDocument", targetDocument);
+        state.put("linkType", linkType);
+        state.put("linkDescription", linkDescription);
+        state.put("linkContext", linkContext);
+        return state;
     }
 }

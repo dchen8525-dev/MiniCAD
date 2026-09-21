@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRACEABILITY_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceDate trace variance date
  * @varianceStatus record variance status
  */
-public final class StepTraceabilityRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTraceabilityRecord extends AbstractStepEntity {
     private final StepEntity varianceItem;
     private final StepEntity varianceOrigin;
     private final List<StepEntity> variancePath;
@@ -27,22 +26,13 @@ public final class StepTraceabilityRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepTraceabilityRecord(int id, String name, StepEntity varianceItem, StepEntity varianceOrigin, List<StepEntity> variancePath, StepEntity varianceDestination, StepEntity varianceDate, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceItem = varianceItem;
         this.varianceOrigin = varianceOrigin;
         this.variancePath = variancePath == null ? null : java.util.List.copyOf(variancePath);
         this.varianceDestination = varianceDestination;
         this.varianceDate = varianceDate;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceItem() {
@@ -70,20 +60,16 @@ public final class StepTraceabilityRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTraceabilityRecord that = (StepTraceabilityRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceItem, that.varianceItem) && Objects.equals(varianceOrigin, that.varianceOrigin) && Objects.equals(variancePath, that.variancePath) && Objects.equals(varianceDestination, that.varianceDestination) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceItem, varianceOrigin, variancePath, varianceDestination, varianceDate, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTraceabilityRecord{" + "id=" + id + "name=" + name + "varianceItem=" + varianceItem + "varianceOrigin=" + varianceOrigin + "variancePath=" + variancePath + "varianceDestination=" + varianceDestination + "varianceDate=" + varianceDate + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceItem", varianceItem);
+        state.put("varianceOrigin", varianceOrigin);
+        state.put("variancePath", variancePath);
+        state.put("varianceDestination", varianceDestination);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

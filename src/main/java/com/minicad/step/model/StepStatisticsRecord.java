@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STATISTICS_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceTrend trend variance analysis
  * @varianceStatus record variance status
  */
-public final class StepStatisticsRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStatisticsRecord extends AbstractStepEntity {
     private final String varianceSubject;
     private final List<String> varianceMetrics;
     private final List<Double> varianceValues;
@@ -27,22 +26,13 @@ public final class StepStatisticsRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepStatisticsRecord(int id, String name, String varianceSubject, List<String> varianceMetrics, List<Double> varianceValues, String variancePeriod, String varianceTrend, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceSubject = varianceSubject;
         this.varianceMetrics = varianceMetrics == null ? null : java.util.List.copyOf(varianceMetrics);
         this.varianceValues = varianceValues == null ? null : java.util.List.copyOf(varianceValues);
         this.variancePeriod = variancePeriod;
         this.varianceTrend = varianceTrend;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceSubject() {
@@ -70,20 +60,16 @@ public final class StepStatisticsRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStatisticsRecord that = (StepStatisticsRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceSubject, that.varianceSubject) && Objects.equals(varianceMetrics, that.varianceMetrics) && Objects.equals(varianceValues, that.varianceValues) && Objects.equals(variancePeriod, that.variancePeriod) && Objects.equals(varianceTrend, that.varianceTrend) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceSubject, varianceMetrics, varianceValues, variancePeriod, varianceTrend, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStatisticsRecord{" + "id=" + id + "name=" + name + "varianceSubject=" + varianceSubject + "varianceMetrics=" + varianceMetrics + "varianceValues=" + varianceValues + "variancePeriod=" + variancePeriod + "varianceTrend=" + varianceTrend + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceSubject", varianceSubject);
+        state.put("varianceMetrics", varianceMetrics);
+        state.put("varianceValues", varianceValues);
+        state.put("variancePeriod", variancePeriod);
+        state.put("varianceTrend", varianceTrend);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

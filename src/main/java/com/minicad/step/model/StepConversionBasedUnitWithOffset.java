@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal conversion-based unit with offset definition.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param conversionFactor referenced conversion factor
  * @param conversionOffset scalar offset
  */
-public final class StepConversionBasedUnitWithOffset implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConversionBasedUnitWithOffset extends AbstractStepEntity {
     private final String unitKind;
     private final StepMeasureWithUnit conversionFactor;
     private final double conversionOffset;
 
     public StepConversionBasedUnitWithOffset(int id, String name, String unitKind, StepMeasureWithUnit conversionFactor, double conversionOffset) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.unitKind = unitKind;
         this.conversionFactor = conversionFactor;
         this.conversionOffset = conversionOffset;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getUnitKind() {
@@ -59,20 +50,13 @@ public final class StepConversionBasedUnitWithOffset implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConversionBasedUnitWithOffset that = (StepConversionBasedUnitWithOffset) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(unitKind, that.unitKind) && Objects.equals(conversionFactor, that.conversionFactor) && conversionOffset == that.conversionOffset;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, unitKind, conversionFactor, conversionOffset);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConversionBasedUnitWithOffset{" + "id=" + id + "name=" + name + "unitKind=" + unitKind + "conversionFactor=" + conversionFactor + "conversionOffset=" + conversionOffset + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("unitKind", unitKind);
+        state.put("conversionFactor", conversionFactor);
+        state.put("conversionOffset", conversionOffset);
+        return state;
     }
 }

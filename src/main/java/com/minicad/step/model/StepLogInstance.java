@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOG_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param logEndTime log variance end time
  * @param logStatus log variance status
  */
-public final class StepLogInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLogInstance extends AbstractStepEntity {
     private final StepEntity logDefinition;
     private final List<String> logEntries;
     private final long logSize;
@@ -27,22 +26,13 @@ public final class StepLogInstance implements StepEntity {
     private final String logStatus;
 
     public StepLogInstance(int id, String name, StepEntity logDefinition, List<String> logEntries, long logSize, StepEntity logStartTime, StepEntity logEndTime, String logStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.logDefinition = logDefinition;
         this.logEntries = logEntries == null ? null : java.util.List.copyOf(logEntries);
         this.logSize = logSize;
         this.logStartTime = logStartTime;
         this.logEndTime = logEndTime;
         this.logStatus = logStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getLogDefinition() {
@@ -70,20 +60,16 @@ public final class StepLogInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLogInstance that = (StepLogInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(logDefinition, that.logDefinition) && Objects.equals(logEntries, that.logEntries) && logSize == that.logSize && Objects.equals(logStartTime, that.logStartTime) && Objects.equals(logEndTime, that.logEndTime) && Objects.equals(logStatus, that.logStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, logDefinition, logEntries, logSize, logStartTime, logEndTime, logStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLogInstance{" + "id=" + id + "name=" + name + "logDefinition=" + logDefinition + "logEntries=" + logEntries + "logSize=" + logSize + "logStartTime=" + logStartTime + "logEndTime=" + logEndTime + "logStatus=" + logStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("logDefinition", logDefinition);
+        state.put("logEntries", logEntries);
+        state.put("logSize", logSize);
+        state.put("logStartTime", logStartTime);
+        state.put("logEndTime", logEndTime);
+        state.put("logStatus", logStatus);
+        return state;
     }
 }

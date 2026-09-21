@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMPLEX_CLIPPING_RESULT.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param secondOperand second operand
  * @param operator boolean operator
  */
-public final class StepComplexClippingResult implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepComplexClippingResult extends AbstractStepEntity {
     private final StepEntity firstOperand;
     private final StepEntity secondOperand;
     private final String operator;
 
     public StepComplexClippingResult(int id, String name, StepEntity firstOperand, StepEntity secondOperand, String operator) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.firstOperand = firstOperand;
         this.secondOperand = secondOperand;
         this.operator = operator;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getFirstOperand() {
@@ -56,20 +46,13 @@ public final class StepComplexClippingResult implements StepEntity {
     public String operator() { return getOperator(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepComplexClippingResult that = (StepComplexClippingResult) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(firstOperand, that.firstOperand) && Objects.equals(secondOperand, that.secondOperand) && Objects.equals(operator, that.operator);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, firstOperand, secondOperand, operator);
-    }
-
-    @Override
-    public String toString() {
-        return "StepComplexClippingResult{" + "id=" + id + "name=" + name + "firstOperand=" + firstOperand + "secondOperand=" + secondOperand + "operator=" + operator + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("firstOperand", firstOperand);
+        state.put("secondOperand", secondOperand);
+        state.put("operator", operator);
+        return state;
     }
 }

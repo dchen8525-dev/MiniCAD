@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SIMULATION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param simulationDuration simulation variance duration
  * @param simulationStatus simulation variance status
  */
-public final class StepSimulationDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSimulationDefinition extends AbstractStepEntity {
     private final String simulationType;
     private final StepEntity simulationModel;
     private final List<String> simulationParameters;
@@ -25,21 +24,12 @@ public final class StepSimulationDefinition implements StepEntity {
     private final String simulationStatus;
 
     public StepSimulationDefinition(int id, String name, String simulationType, StepEntity simulationModel, List<String> simulationParameters, double simulationDuration, String simulationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.simulationType = simulationType;
         this.simulationModel = simulationModel;
         this.simulationParameters = simulationParameters == null ? null : java.util.List.copyOf(simulationParameters);
         this.simulationDuration = simulationDuration;
         this.simulationStatus = simulationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSimulationType() {
@@ -63,20 +53,15 @@ public final class StepSimulationDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSimulationDefinition that = (StepSimulationDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(simulationType, that.simulationType) && Objects.equals(simulationModel, that.simulationModel) && Objects.equals(simulationParameters, that.simulationParameters) && simulationDuration == that.simulationDuration && Objects.equals(simulationStatus, that.simulationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, simulationType, simulationModel, simulationParameters, simulationDuration, simulationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSimulationDefinition{" + "id=" + id + "name=" + name + "simulationType=" + simulationType + "simulationModel=" + simulationModel + "simulationParameters=" + simulationParameters + "simulationDuration=" + simulationDuration + "simulationStatus=" + simulationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("simulationType", simulationType);
+        state.put("simulationModel", simulationModel);
+        state.put("simulationParameters", simulationParameters);
+        state.put("simulationDuration", simulationDuration);
+        state.put("simulationStatus", simulationStatus);
+        return state;
     }
 }

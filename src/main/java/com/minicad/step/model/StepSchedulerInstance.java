@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SCHEDULER_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param schedulerCompletedJobs scheduler variance completed job count
  * @param schedulerStatus scheduler variance status
  */
-public final class StepSchedulerInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSchedulerInstance extends AbstractStepEntity {
     private final StepEntity schedulerDefinition;
     private final String schedulerState;
     private final int schedulerActiveJobs;
@@ -27,22 +26,13 @@ public final class StepSchedulerInstance implements StepEntity {
     private final String schedulerStatus;
 
     public StepSchedulerInstance(int id, String name, StepEntity schedulerDefinition, String schedulerState, int schedulerActiveJobs, int schedulerPendingJobs, int schedulerCompletedJobs, String schedulerStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.schedulerDefinition = schedulerDefinition;
         this.schedulerState = schedulerState;
         this.schedulerActiveJobs = schedulerActiveJobs;
         this.schedulerPendingJobs = schedulerPendingJobs;
         this.schedulerCompletedJobs = schedulerCompletedJobs;
         this.schedulerStatus = schedulerStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSchedulerDefinition() {
@@ -70,20 +60,16 @@ public final class StepSchedulerInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSchedulerInstance that = (StepSchedulerInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(schedulerDefinition, that.schedulerDefinition) && Objects.equals(schedulerState, that.schedulerState) && schedulerActiveJobs == that.schedulerActiveJobs && schedulerPendingJobs == that.schedulerPendingJobs && schedulerCompletedJobs == that.schedulerCompletedJobs && Objects.equals(schedulerStatus, that.schedulerStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, schedulerDefinition, schedulerState, schedulerActiveJobs, schedulerPendingJobs, schedulerCompletedJobs, schedulerStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSchedulerInstance{" + "id=" + id + "name=" + name + "schedulerDefinition=" + schedulerDefinition + "schedulerState=" + schedulerState + "schedulerActiveJobs=" + schedulerActiveJobs + "schedulerPendingJobs=" + schedulerPendingJobs + "schedulerCompletedJobs=" + schedulerCompletedJobs + "schedulerStatus=" + schedulerStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("schedulerDefinition", schedulerDefinition);
+        state.put("schedulerState", schedulerState);
+        state.put("schedulerActiveJobs", schedulerActiveJobs);
+        state.put("schedulerPendingJobs", schedulerPendingJobs);
+        state.put("schedulerCompletedJobs", schedulerCompletedJobs);
+        state.put("schedulerStatus", schedulerStatus);
+        return state;
     }
 }

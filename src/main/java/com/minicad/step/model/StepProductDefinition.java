@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal product definition.
  *
@@ -10,23 +12,18 @@ import java.util.Objects;
  * @param formation referenced formation
  * @param frameOfReference referenced definition context
  */
-public final class StepProductDefinition implements StepEntity {
-    private final int id;
+public final class StepProductDefinition extends AbstractStepEntity {
     private final String identifier;
     private final String description;
     private final StepProductDefinitionFormation formation;
     private final StepProductDefinitionContext frameOfReference;
 
     public StepProductDefinition(int id, String identifier, String description, StepProductDefinitionFormation formation, StepProductDefinitionContext frameOfReference) {
-        this.id = id;
+        super(id, "");
         this.identifier = identifier;
         this.description = description;
         this.formation = formation;
         this.frameOfReference = frameOfReference;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getIdentifier() {
@@ -50,7 +47,7 @@ public final class StepProductDefinition implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
+    public int id() { return getId(); }
     public String name() { return getName(); }
     public String identifier() { return identifier; }
     public String description() { return description; }
@@ -58,20 +55,13 @@ public final class StepProductDefinition implements StepEntity {
     public StepProductDefinitionContext frameOfReference() { return frameOfReference; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductDefinition that = (StepProductDefinition) o;
-        return id == that.id && Objects.equals(identifier, that.identifier) && Objects.equals(description, that.description) && Objects.equals(formation, that.formation) && Objects.equals(frameOfReference, that.frameOfReference);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, identifier, description, formation, frameOfReference);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductDefinition{" + "id=" + id + "identifier=" + identifier + "description=" + description + "formation=" + formation + "frameOfReference=" + frameOfReference + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("identifier", identifier);
+        state.put("description", description);
+        state.put("formation", formation);
+        state.put("frameOfReference", frameOfReference);
+        return state;
     }
 }

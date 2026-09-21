@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved WAIT_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param waitConditionMet wait variance condition met flag
  * @param waitStatus wait variance status
  */
-public final class StepWaitInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepWaitInstance extends AbstractStepEntity {
     private final StepEntity waitDefinition;
     private final String waitState;
     private final StepEntity waitStartTime;
@@ -25,21 +24,12 @@ public final class StepWaitInstance implements StepEntity {
     private final String waitStatus;
 
     public StepWaitInstance(int id, String name, StepEntity waitDefinition, String waitState, StepEntity waitStartTime, boolean waitConditionMet, String waitStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.waitDefinition = waitDefinition;
         this.waitState = waitState;
         this.waitStartTime = waitStartTime;
         this.waitConditionMet = waitConditionMet;
         this.waitStatus = waitStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getWaitDefinition() {
@@ -63,20 +53,15 @@ public final class StepWaitInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepWaitInstance that = (StepWaitInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(waitDefinition, that.waitDefinition) && Objects.equals(waitState, that.waitState) && Objects.equals(waitStartTime, that.waitStartTime) && waitConditionMet == that.waitConditionMet && Objects.equals(waitStatus, that.waitStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, waitDefinition, waitState, waitStartTime, waitConditionMet, waitStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepWaitInstance{" + "id=" + id + "name=" + name + "waitDefinition=" + waitDefinition + "waitState=" + waitState + "waitStartTime=" + waitStartTime + "waitConditionMet=" + waitConditionMet + "waitStatus=" + waitStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("waitDefinition", waitDefinition);
+        state.put("waitState", waitState);
+        state.put("waitStartTime", waitStartTime);
+        state.put("waitConditionMet", waitConditionMet);
+        state.put("waitStatus", waitStatus);
+        return state;
     }
 }

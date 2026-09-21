@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COUNTERSINK_HOLE_DEFINITION.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param countersinkDiameter diameter of the countersink
  * @param countersinkAngle angle of the countersink
  */
-public final class StepCountersinkHoleDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCountersinkHoleDefinition extends AbstractStepEntity {
     private final StepEntity throughHoleReference;
     private final Double countersinkDiameter;
     private final Double countersinkAngle;
 
     public StepCountersinkHoleDefinition(int id, String name, StepEntity throughHoleReference, Double countersinkDiameter, Double countersinkAngle) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.throughHoleReference = throughHoleReference;
         this.countersinkDiameter = countersinkDiameter;
         this.countersinkAngle = countersinkAngle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getThroughHoleReference() {
@@ -49,20 +39,13 @@ public final class StepCountersinkHoleDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCountersinkHoleDefinition that = (StepCountersinkHoleDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(throughHoleReference, that.throughHoleReference) && Objects.equals(countersinkDiameter, that.countersinkDiameter) && Objects.equals(countersinkAngle, that.countersinkAngle);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, throughHoleReference, countersinkDiameter, countersinkAngle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCountersinkHoleDefinition{" + "id=" + id + "name=" + name + "throughHoleReference=" + throughHoleReference + "countersinkDiameter=" + countersinkDiameter + "countersinkAngle=" + countersinkAngle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("throughHoleReference", throughHoleReference);
+        state.put("countersinkDiameter", countersinkDiameter);
+        state.put("countersinkAngle", countersinkAngle);
+        return state;
     }
 }

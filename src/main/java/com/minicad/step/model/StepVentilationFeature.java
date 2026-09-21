@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved VENTILATION_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param outletFeatures outlet features
  * @param ventilationControl ventilation control specification
  */
-public final class StepVentilationFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepVentilationFeature extends AbstractStepEntity {
     private final String ventilationType;
     private final StepEntity ventilationGeometry;
     private final double varianceAirflow;
@@ -27,22 +26,13 @@ public final class StepVentilationFeature implements StepEntity {
     private final StepEntity ventilationControl;
 
     public StepVentilationFeature(int id, String name, String ventilationType, StepEntity ventilationGeometry, double varianceAirflow, List<StepEntity> inletFeatures, List<StepEntity> outletFeatures, StepEntity ventilationControl) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.ventilationType = ventilationType;
         this.ventilationGeometry = ventilationGeometry;
         this.varianceAirflow = varianceAirflow;
         this.inletFeatures = inletFeatures == null ? null : java.util.List.copyOf(inletFeatures);
         this.outletFeatures = outletFeatures == null ? null : java.util.List.copyOf(outletFeatures);
         this.ventilationControl = ventilationControl;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVentilationType() {
@@ -70,20 +60,16 @@ public final class StepVentilationFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVentilationFeature that = (StepVentilationFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(ventilationType, that.ventilationType) && Objects.equals(ventilationGeometry, that.ventilationGeometry) && varianceAirflow == that.varianceAirflow && Objects.equals(inletFeatures, that.inletFeatures) && Objects.equals(outletFeatures, that.outletFeatures) && Objects.equals(ventilationControl, that.ventilationControl);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, ventilationType, ventilationGeometry, varianceAirflow, inletFeatures, outletFeatures, ventilationControl);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVentilationFeature{" + "id=" + id + "name=" + name + "ventilationType=" + ventilationType + "ventilationGeometry=" + ventilationGeometry + "varianceAirflow=" + varianceAirflow + "inletFeatures=" + inletFeatures + "outletFeatures=" + outletFeatures + "ventilationControl=" + ventilationControl + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("ventilationType", ventilationType);
+        state.put("ventilationGeometry", ventilationGeometry);
+        state.put("varianceAirflow", varianceAirflow);
+        state.put("inletFeatures", inletFeatures);
+        state.put("outletFeatures", outletFeatures);
+        state.put("ventilationControl", ventilationControl);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved PART_DEFINITION.
  * A part definition entity.
@@ -12,29 +14,18 @@ import java.util.Objects;
  * @param geometryDefinition geometry definition reference
  * @param material material reference
  */
-public final class StepPartDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPartDefinition extends AbstractStepEntity {
     private final String partId;
     private final String partType;
     private final StepEntity geometryDefinition;
     private final StepEntity material;
 
     public StepPartDefinition(int id, String name, String partId, String partType, StepEntity geometryDefinition, StepEntity material) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.partId = partId;
         this.partType = partType;
         this.geometryDefinition = geometryDefinition;
         this.material = material;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPartId() {
@@ -54,20 +45,14 @@ public final class StepPartDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPartDefinition that = (StepPartDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(partId, that.partId) && Objects.equals(partType, that.partType) && Objects.equals(geometryDefinition, that.geometryDefinition) && Objects.equals(material, that.material);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, partId, partType, geometryDefinition, material);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPartDefinition{" + "id=" + id + "name=" + name + "partId=" + partId + "partType=" + partType + "geometryDefinition=" + geometryDefinition + "material=" + material + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("partId", partId);
+        state.put("partType", partType);
+        state.put("geometryDefinition", geometryDefinition);
+        state.put("material", material);
+        return state;
     }
 }

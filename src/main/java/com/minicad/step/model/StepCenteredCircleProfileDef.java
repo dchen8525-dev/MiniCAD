@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Resolved CENTERED_CIRCLE_PROFILE_DEF.
  * A circular profile with explicit center offset.
@@ -12,27 +13,16 @@ import java.util.Objects;
  * @param radius circle radius
  * @param centerOffset center offset distance
  */
-public final class StepCenteredCircleProfileDef implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCenteredCircleProfileDef extends AbstractStepEntity {
     private final StepAxis2Placement2D position;
     private final double radius;
     private final double centerOffset;
 
     public StepCenteredCircleProfileDef(int id, String name, StepAxis2Placement2D position, double radius, double centerOffset) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.radius = radius;
         this.centerOffset = centerOffset;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepAxis2Placement2D getPosition() {
@@ -52,20 +42,13 @@ public final class StepCenteredCircleProfileDef implements StepEntity {
     public double centerOffset() { return centerOffset; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCenteredCircleProfileDef that = (StepCenteredCircleProfileDef) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && radius == that.radius && centerOffset == that.centerOffset;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, radius, centerOffset);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCenteredCircleProfileDef{" + "id=" + id + "name=" + name + "position=" + position + "radius=" + radius + "centerOffset=" + centerOffset + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("radius", radius);
+        state.put("centerOffset", centerOffset);
+        return state;
     }
 }

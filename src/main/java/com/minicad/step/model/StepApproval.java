@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal APPROVAL metadata.
  *
@@ -8,19 +10,14 @@ import java.util.Objects;
  * @param status approval status
  * @param level approval level
  */
-public final class StepApproval implements StepEntity {
-    private final int id;
+public final class StepApproval extends AbstractStepEntity {
     private final StepApprovalStatus status;
     private final String level;
 
     public StepApproval(int id, StepApprovalStatus status, String level) {
-        this.id = id;
+        super(id, "");
         this.status = status;
         this.level = level;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public StepApprovalStatus getStatus() {
@@ -49,20 +46,11 @@ public final class StepApproval implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepApproval that = (StepApproval) o;
-        return id == that.id && Objects.equals(status, that.status) && Objects.equals(level, that.level);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, status, level);
-    }
-
-    @Override
-    public String toString() {
-        return "StepApproval{" + "id=" + id + "status=" + status + "level=" + level + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("status", status);
+        state.put("level", level);
+        return state;
     }
 }

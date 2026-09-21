@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FACE_BASED_SURFACE_MODEL.
@@ -10,23 +11,12 @@ import java.util.Objects;
  * @param name STEP label
  * @param faceSets connected face sets
  */
-public final class StepFaceBasedSurfaceModel implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFaceBasedSurfaceModel extends AbstractStepEntity {
     private final List<StepEntity> faceSets;
 
     public StepFaceBasedSurfaceModel(int id, String name, List<StepEntity> faceSets) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.faceSets = faceSets == null ? null : java.util.List.copyOf(faceSets);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getFaceSets() {
@@ -39,20 +29,11 @@ public final class StepFaceBasedSurfaceModel implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFaceBasedSurfaceModel that = (StepFaceBasedSurfaceModel) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(faceSets, that.faceSets);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, faceSets);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFaceBasedSurfaceModel{" + "id=" + id + "name=" + name + "faceSets=" + faceSets + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("faceSets", faceSets);
+        return state;
     }
 }

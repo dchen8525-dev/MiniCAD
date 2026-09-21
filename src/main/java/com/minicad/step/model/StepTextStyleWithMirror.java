@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal TEXT_STYLE_WITH_MIRROR.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param characterAppearance character appearance definition
  * @param mirrorPlacement mirror axis placement
  */
-public final class StepTextStyleWithMirror implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTextStyleWithMirror extends AbstractStepEntity {
     private final StepEntity characterAppearance;
     private final StepEntity mirrorPlacement;
 
     public StepTextStyleWithMirror(int id, String name, StepEntity characterAppearance, StepEntity mirrorPlacement) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.characterAppearance = characterAppearance;
         this.mirrorPlacement = mirrorPlacement;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCharacterAppearance() {
@@ -48,20 +39,12 @@ public final class StepTextStyleWithMirror implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTextStyleWithMirror that = (StepTextStyleWithMirror) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(characterAppearance, that.characterAppearance) && Objects.equals(mirrorPlacement, that.mirrorPlacement);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, characterAppearance, mirrorPlacement);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTextStyleWithMirror{" + "id=" + id + "name=" + name + "characterAppearance=" + characterAppearance + "mirrorPlacement=" + mirrorPlacement + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("characterAppearance", characterAppearance);
+        state.put("mirrorPlacement", mirrorPlacement);
+        return state;
     }
 }

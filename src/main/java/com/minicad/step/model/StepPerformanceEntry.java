@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PERFORMANCE_ENTRY.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param entryContext entry variance context reference
  * @param entryStatus entry variance status
  */
-public final class StepPerformanceEntry implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPerformanceEntry extends AbstractStepEntity {
     private final String entryType;
     private final String entryMetric;
     private final double entryValue;
@@ -29,8 +28,7 @@ public final class StepPerformanceEntry implements StepEntity {
     private final String entryStatus;
 
     public StepPerformanceEntry(int id, String name, String entryType, String entryMetric, double entryValue, StepEntity entryUnit, StepEntity entryTimestamp, StepEntity entryContext, String entryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.entryType = entryType;
         this.entryMetric = entryMetric;
         this.entryValue = entryValue;
@@ -38,14 +36,6 @@ public final class StepPerformanceEntry implements StepEntity {
         this.entryTimestamp = entryTimestamp;
         this.entryContext = entryContext;
         this.entryStatus = entryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEntryType() {
@@ -77,20 +67,17 @@ public final class StepPerformanceEntry implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPerformanceEntry that = (StepPerformanceEntry) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(entryType, that.entryType) && Objects.equals(entryMetric, that.entryMetric) && entryValue == that.entryValue && Objects.equals(entryUnit, that.entryUnit) && Objects.equals(entryTimestamp, that.entryTimestamp) && Objects.equals(entryContext, that.entryContext) && Objects.equals(entryStatus, that.entryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, entryType, entryMetric, entryValue, entryUnit, entryTimestamp, entryContext, entryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPerformanceEntry{" + "id=" + id + "name=" + name + "entryType=" + entryType + "entryMetric=" + entryMetric + "entryValue=" + entryValue + "entryUnit=" + entryUnit + "entryTimestamp=" + entryTimestamp + "entryContext=" + entryContext + "entryStatus=" + entryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("entryType", entryType);
+        state.put("entryMetric", entryMetric);
+        state.put("entryValue", entryValue);
+        state.put("entryUnit", entryUnit);
+        state.put("entryTimestamp", entryTimestamp);
+        state.put("entryContext", entryContext);
+        state.put("entryStatus", entryStatus);
+        return state;
     }
 }

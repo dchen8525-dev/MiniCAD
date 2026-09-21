@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal placed datum target feature link.
  *
@@ -8,19 +10,14 @@ import java.util.Objects;
  * @param definition property definition
  * @param usedRepresentation referenced representation
  */
-public final class StepPlacedDatumTargetFeature implements StepEntity {
-    private final int id;
+public final class StepPlacedDatumTargetFeature extends AbstractStepEntity {
     private final StepPropertyDefinition definition;
     private final StepRepresentation usedRepresentation;
 
     public StepPlacedDatumTargetFeature(int id, StepPropertyDefinition definition, StepRepresentation usedRepresentation) {
-        this.id = id;
+        super(id, "");
         this.definition = definition;
         this.usedRepresentation = usedRepresentation;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public StepPropertyDefinition getDefinition() {
@@ -29,10 +26,6 @@ public final class StepPlacedDatumTargetFeature implements StepEntity {
 
     public StepRepresentation getUsedRepresentation() {
         return usedRepresentation;
-    }
-
-    public String getName() {
-        return "";
     }
 
     // Record-style accessors
@@ -50,20 +43,11 @@ public final class StepPlacedDatumTargetFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPlacedDatumTargetFeature that = (StepPlacedDatumTargetFeature) o;
-        return id == that.id && Objects.equals(definition, that.definition) && Objects.equals(usedRepresentation, that.usedRepresentation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, definition, usedRepresentation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPlacedDatumTargetFeature{" + "id=" + id + "definition=" + definition + "usedRepresentation=" + usedRepresentation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("definition", definition);
+        state.put("usedRepresentation", usedRepresentation);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal product context.
  *
@@ -11,27 +12,16 @@ import java.util.Objects;
  * @param frameOfReference referenced application context
  * @param entityName concrete STEP entity name
  */
-public final class StepProductContext implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProductContext extends AbstractStepEntity {
     private final String disciplineType;
     private final StepApplicationContext frameOfReference;
     private final String entityName;
 
     public StepProductContext(int id, String name, String disciplineType, StepApplicationContext frameOfReference, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.disciplineType = disciplineType;
         this.frameOfReference = frameOfReference;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDisciplineType() {
@@ -48,7 +38,7 @@ public final class StepProductContext implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public String disciplineType() {
@@ -64,20 +54,13 @@ public final class StepProductContext implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductContext that = (StepProductContext) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(disciplineType, that.disciplineType) && Objects.equals(frameOfReference, that.frameOfReference) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, disciplineType, frameOfReference, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductContext{" + "id=" + id + "name=" + name + "disciplineType=" + disciplineType + "frameOfReference=" + frameOfReference + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("disciplineType", disciplineType);
+        state.put("frameOfReference", frameOfReference);
+        state.put("entityName", entityName);
+        return state;
     }
 }

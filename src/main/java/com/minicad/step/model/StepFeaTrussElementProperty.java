@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved FEA_TRUSS_ELEMENT_PROPERTY.
  */
-public final class StepFeaTrussElementProperty implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaTrussElementProperty extends AbstractStepEntity {
     private final double area;
     private final StepEntity material;
 
     public StepFeaTrussElementProperty(int id, String name, double area, StepEntity material) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.area = area;
         this.material = material;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getArea() {
@@ -35,20 +25,12 @@ public final class StepFeaTrussElementProperty implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaTrussElementProperty that = (StepFeaTrussElementProperty) o;
-        return id == that.id && Objects.equals(name, that.name) && area == that.area && Objects.equals(material, that.material);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, area, material);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaTrussElementProperty{" + "id=" + id + "name=" + name + "area=" + area + "material=" + material + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("area", area);
+        state.put("material", material);
+        return state;
     }
 }

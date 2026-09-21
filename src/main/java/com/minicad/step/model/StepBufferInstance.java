@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved BUFFER_INSTANCE.
  * A buffer instance entity.
@@ -13,9 +15,7 @@ import java.util.Objects;
  * @param bufferAvailable buffer variance available bytes
  * @param bufferStatus buffer variance status
  */
-public final class StepBufferInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBufferInstance extends AbstractStepEntity {
     private final StepEntity bufferDefinition;
     private final String bufferState;
     private final long bufferUsed;
@@ -23,21 +23,12 @@ public final class StepBufferInstance implements StepEntity {
     private final String bufferStatus;
 
     public StepBufferInstance(int id, String name, StepEntity bufferDefinition, String bufferState, long bufferUsed, long bufferAvailable, String bufferStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.bufferDefinition = bufferDefinition;
         this.bufferState = bufferState;
         this.bufferUsed = bufferUsed;
         this.bufferAvailable = bufferAvailable;
         this.bufferStatus = bufferStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBufferDefinition() {
@@ -61,20 +52,15 @@ public final class StepBufferInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBufferInstance that = (StepBufferInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(bufferDefinition, that.bufferDefinition) && Objects.equals(bufferState, that.bufferState) && bufferUsed == that.bufferUsed && bufferAvailable == that.bufferAvailable && Objects.equals(bufferStatus, that.bufferStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, bufferDefinition, bufferState, bufferUsed, bufferAvailable, bufferStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBufferInstance{" + "id=" + id + "name=" + name + "bufferDefinition=" + bufferDefinition + "bufferState=" + bufferState + "bufferUsed=" + bufferUsed + "bufferAvailable=" + bufferAvailable + "bufferStatus=" + bufferStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("bufferDefinition", bufferDefinition);
+        state.put("bufferState", bufferState);
+        state.put("bufferUsed", bufferUsed);
+        state.put("bufferAvailable", bufferAvailable);
+        state.put("bufferStatus", bufferStatus);
+        return state;
     }
 }

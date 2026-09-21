@@ -1,33 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DISPLACEMENT_BOUNDARY_CONDITION.
  * Displacement boundary condition for FEA.
  */
-public final class StepDisplacementBoundaryCondition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDisplacementBoundaryCondition extends AbstractStepEntity {
     private final StepEntity appliedTo;
     private final double dx;
     private final double dy;
     private final double dz;
 
     public StepDisplacementBoundaryCondition(int id, String name, StepEntity appliedTo, double dx, double dy, double dz) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.appliedTo = appliedTo;
         this.dx = dx;
         this.dy = dy;
         this.dz = dz;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getAppliedTo() {
@@ -47,20 +38,14 @@ public final class StepDisplacementBoundaryCondition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDisplacementBoundaryCondition that = (StepDisplacementBoundaryCondition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(appliedTo, that.appliedTo) && dx == that.dx && dy == that.dy && dz == that.dz;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, appliedTo, dx, dy, dz);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDisplacementBoundaryCondition{" + "id=" + id + "name=" + name + "appliedTo=" + appliedTo + "dx=" + dx + "dy=" + dy + "dz=" + dz + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("appliedTo", appliedTo);
+        state.put("dx", dx);
+        state.put("dy", dy);
+        state.put("dz", dz);
+        return state;
     }
 }

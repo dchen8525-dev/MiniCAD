@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INSPECTION_RESULT.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param inspector inspector person/organization
  * @param inspectionDate date of inspection
  */
-public final class StepInspectionResult implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInspectionResult extends AbstractStepEntity {
     private final StepEntity inspectionItem;
     private final List<Double> measuredValues;
     private final List<Double> nominalValues;
@@ -29,8 +28,7 @@ public final class StepInspectionResult implements StepEntity {
     private final StepEntity inspectionDate;
 
     public StepInspectionResult(int id, String name, StepEntity inspectionItem, List<Double> measuredValues, List<Double> nominalValues, List<Double> deviationValues, List<String> passFailStatus, StepEntity inspector, StepEntity inspectionDate) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.inspectionItem = inspectionItem;
         this.measuredValues = measuredValues == null ? null : java.util.List.copyOf(measuredValues);
         this.nominalValues = nominalValues == null ? null : java.util.List.copyOf(nominalValues);
@@ -38,14 +36,6 @@ public final class StepInspectionResult implements StepEntity {
         this.passFailStatus = passFailStatus == null ? null : java.util.List.copyOf(passFailStatus);
         this.inspector = inspector;
         this.inspectionDate = inspectionDate;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getInspectionItem() {
@@ -77,20 +67,17 @@ public final class StepInspectionResult implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInspectionResult that = (StepInspectionResult) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(inspectionItem, that.inspectionItem) && Objects.equals(measuredValues, that.measuredValues) && Objects.equals(nominalValues, that.nominalValues) && Objects.equals(deviationValues, that.deviationValues) && Objects.equals(passFailStatus, that.passFailStatus) && Objects.equals(inspector, that.inspector) && Objects.equals(inspectionDate, that.inspectionDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, inspectionItem, measuredValues, nominalValues, deviationValues, passFailStatus, inspector, inspectionDate);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInspectionResult{" + "id=" + id + "name=" + name + "inspectionItem=" + inspectionItem + "measuredValues=" + measuredValues + "nominalValues=" + nominalValues + "deviationValues=" + deviationValues + "passFailStatus=" + passFailStatus + "inspector=" + inspector + "inspectionDate=" + inspectionDate + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("inspectionItem", inspectionItem);
+        state.put("measuredValues", measuredValues);
+        state.put("nominalValues", nominalValues);
+        state.put("deviationValues", deviationValues);
+        state.put("passFailStatus", passFailStatus);
+        state.put("inspector", inspector);
+        state.put("inspectionDate", inspectionDate);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REPORT_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param reportParameters report variance parameters
  * @param reportStatus report variance status
  */
-public final class StepReportDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepReportDefinition extends AbstractStepEntity {
     private final String reportType;
     private final String reportTemplate;
     private final List<String> reportSections;
@@ -25,21 +24,12 @@ public final class StepReportDefinition implements StepEntity {
     private final String reportStatus;
 
     public StepReportDefinition(int id, String name, String reportType, String reportTemplate, List<String> reportSections, List<String> reportParameters, String reportStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.reportType = reportType;
         this.reportTemplate = reportTemplate;
         this.reportSections = reportSections == null ? null : java.util.List.copyOf(reportSections);
         this.reportParameters = reportParameters == null ? null : java.util.List.copyOf(reportParameters);
         this.reportStatus = reportStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getReportType() {
@@ -63,20 +53,15 @@ public final class StepReportDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepReportDefinition that = (StepReportDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(reportType, that.reportType) && Objects.equals(reportTemplate, that.reportTemplate) && Objects.equals(reportSections, that.reportSections) && Objects.equals(reportParameters, that.reportParameters) && Objects.equals(reportStatus, that.reportStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, reportType, reportTemplate, reportSections, reportParameters, reportStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepReportDefinition{" + "id=" + id + "name=" + name + "reportType=" + reportType + "reportTemplate=" + reportTemplate + "reportSections=" + reportSections + "reportParameters=" + reportParameters + "reportStatus=" + reportStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("reportType", reportType);
+        state.put("reportTemplate", reportTemplate);
+        state.put("reportSections", reportSections);
+        state.put("reportParameters", reportParameters);
+        state.put("reportStatus", reportStatus);
+        return state;
     }
 }

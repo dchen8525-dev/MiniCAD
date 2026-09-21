@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LIFECYCLE_STAGE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param stageOwner stage owner/responsible party
  * @param stageRequirements stage-specific requirements
  */
-public final class StepLifecycleStage implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLifecycleStage extends AbstractStepEntity {
     private final String stageType;
     private final String stageDescription;
     private final StepEntity stageStartDate;
@@ -27,22 +26,13 @@ public final class StepLifecycleStage implements StepEntity {
     private final List<StepEntity> stageRequirements;
 
     public StepLifecycleStage(int id, String name, String stageType, String stageDescription, StepEntity stageStartDate, StepEntity stageEndDate, StepEntity stageOwner, List<StepEntity> stageRequirements) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.stageType = stageType;
         this.stageDescription = stageDescription;
         this.stageStartDate = stageStartDate;
         this.stageEndDate = stageEndDate;
         this.stageOwner = stageOwner;
         this.stageRequirements = stageRequirements == null ? null : java.util.List.copyOf(stageRequirements);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getStageType() {
@@ -70,20 +60,16 @@ public final class StepLifecycleStage implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLifecycleStage that = (StepLifecycleStage) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(stageType, that.stageType) && Objects.equals(stageDescription, that.stageDescription) && Objects.equals(stageStartDate, that.stageStartDate) && Objects.equals(stageEndDate, that.stageEndDate) && Objects.equals(stageOwner, that.stageOwner) && Objects.equals(stageRequirements, that.stageRequirements);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, stageType, stageDescription, stageStartDate, stageEndDate, stageOwner, stageRequirements);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLifecycleStage{" + "id=" + id + "name=" + name + "stageType=" + stageType + "stageDescription=" + stageDescription + "stageStartDate=" + stageStartDate + "stageEndDate=" + stageEndDate + "stageOwner=" + stageOwner + "stageRequirements=" + stageRequirements + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("stageType", stageType);
+        state.put("stageDescription", stageDescription);
+        state.put("stageStartDate", stageStartDate);
+        state.put("stageEndDate", stageEndDate);
+        state.put("stageOwner", stageOwner);
+        state.put("stageRequirements", stageRequirements);
+        return state;
     }
 }

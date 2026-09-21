@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOOP_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param loopMaxIterations loop variance max iterations
  * @param loopStatus loop variance status
  */
-public final class StepLoopDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLoopDefinition extends AbstractStepEntity {
     private final String loopType;
     private final String loopCondition;
     private final StepEntity loopBody;
@@ -25,21 +24,12 @@ public final class StepLoopDefinition implements StepEntity {
     private final String loopStatus;
 
     public StepLoopDefinition(int id, String name, String loopType, String loopCondition, StepEntity loopBody, int loopMaxIterations, String loopStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.loopType = loopType;
         this.loopCondition = loopCondition;
         this.loopBody = loopBody;
         this.loopMaxIterations = loopMaxIterations;
         this.loopStatus = loopStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLoopType() {
@@ -63,20 +53,15 @@ public final class StepLoopDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLoopDefinition that = (StepLoopDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(loopType, that.loopType) && Objects.equals(loopCondition, that.loopCondition) && Objects.equals(loopBody, that.loopBody) && loopMaxIterations == that.loopMaxIterations && Objects.equals(loopStatus, that.loopStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, loopType, loopCondition, loopBody, loopMaxIterations, loopStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLoopDefinition{" + "id=" + id + "name=" + name + "loopType=" + loopType + "loopCondition=" + loopCondition + "loopBody=" + loopBody + "loopMaxIterations=" + loopMaxIterations + "loopStatus=" + loopStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("loopType", loopType);
+        state.put("loopCondition", loopCondition);
+        state.put("loopBody", loopBody);
+        state.put("loopMaxIterations", loopMaxIterations);
+        state.put("loopStatus", loopStatus);
+        return state;
     }
 }

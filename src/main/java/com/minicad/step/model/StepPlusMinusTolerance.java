@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved PLUS_MINUS_TOLERANCE.
  * A plus/minus tolerance specification.
@@ -10,25 +12,14 @@ import java.util.Objects;
  * @param range tolerance range
  * @param tolerancedMeasure toleranced measure
  */
-public final class StepPlusMinusTolerance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPlusMinusTolerance extends AbstractStepEntity {
     private final StepEntity range;
     private final StepEntity tolerancedMeasure;
 
     public StepPlusMinusTolerance(int id, String name, StepEntity range, StepEntity tolerancedMeasure) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.range = range;
         this.tolerancedMeasure = tolerancedMeasure;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRange() {
@@ -40,20 +31,12 @@ public final class StepPlusMinusTolerance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPlusMinusTolerance that = (StepPlusMinusTolerance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(range, that.range) && Objects.equals(tolerancedMeasure, that.tolerancedMeasure);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, range, tolerancedMeasure);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPlusMinusTolerance{" + "id=" + id + "name=" + name + "range=" + range + "tolerancedMeasure=" + tolerancedMeasure + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("range", range);
+        state.put("tolerancedMeasure", tolerancedMeasure);
+        return state;
     }
 }

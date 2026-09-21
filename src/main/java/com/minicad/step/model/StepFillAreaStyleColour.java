@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal fill area style colour.
  *
@@ -8,23 +10,12 @@ import java.util.Objects;
  * @param name style name
  * @param colour referenced colour
  */
-public final class StepFillAreaStyleColour implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFillAreaStyleColour extends AbstractStepEntity {
     private final StepEntity colour;
 
     public StepFillAreaStyleColour(int id, String name, StepEntity colour) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.colour = colour;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getColour() {
@@ -37,20 +28,11 @@ public final class StepFillAreaStyleColour implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFillAreaStyleColour that = (StepFillAreaStyleColour) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(colour, that.colour);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, colour);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFillAreaStyleColour{" + "id=" + id + "name=" + name + "colour=" + colour + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("colour", colour);
+        return state;
     }
 }

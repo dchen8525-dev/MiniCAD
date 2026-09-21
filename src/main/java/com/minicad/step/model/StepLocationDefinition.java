@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOCATION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param locationDescription location variance description
  * @param locationStatus location variance status
  */
-public final class StepLocationDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLocationDefinition extends AbstractStepEntity {
     private final String locationType;
     private final StepEntity locationAddress;
     private final List<Double> locationCoordinates;
@@ -25,21 +24,12 @@ public final class StepLocationDefinition implements StepEntity {
     private final String locationStatus;
 
     public StepLocationDefinition(int id, String name, String locationType, StepEntity locationAddress, List<Double> locationCoordinates, String locationDescription, String locationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.locationType = locationType;
         this.locationAddress = locationAddress;
         this.locationCoordinates = locationCoordinates == null ? null : java.util.List.copyOf(locationCoordinates);
         this.locationDescription = locationDescription;
         this.locationStatus = locationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLocationType() {
@@ -63,20 +53,15 @@ public final class StepLocationDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLocationDefinition that = (StepLocationDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(locationType, that.locationType) && Objects.equals(locationAddress, that.locationAddress) && Objects.equals(locationCoordinates, that.locationCoordinates) && Objects.equals(locationDescription, that.locationDescription) && Objects.equals(locationStatus, that.locationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, locationType, locationAddress, locationCoordinates, locationDescription, locationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLocationDefinition{" + "id=" + id + "name=" + name + "locationType=" + locationType + "locationAddress=" + locationAddress + "locationCoordinates=" + locationCoordinates + "locationDescription=" + locationDescription + "locationStatus=" + locationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("locationType", locationType);
+        state.put("locationAddress", locationAddress);
+        state.put("locationCoordinates", locationCoordinates);
+        state.put("locationDescription", locationDescription);
+        state.put("locationStatus", locationStatus);
+        return state;
     }
 }

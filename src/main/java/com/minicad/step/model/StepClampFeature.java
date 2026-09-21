@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CLAMP_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param clampMaterial clamp material reference
  * @param clampingSequence clamping sequence order
  */
-public final class StepClampFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepClampFeature extends AbstractStepEntity {
     private final String clampType;
     private final StepEntity clampGeometry;
     private final double clampForce;
@@ -27,22 +26,13 @@ public final class StepClampFeature implements StepEntity {
     private final int clampingSequence;
 
     public StepClampFeature(int id, String name, String clampType, StepEntity clampGeometry, double clampForce, double clampOpening, StepEntity clampMaterial, int clampingSequence) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.clampType = clampType;
         this.clampGeometry = clampGeometry;
         this.clampForce = clampForce;
         this.clampOpening = clampOpening;
         this.clampMaterial = clampMaterial;
         this.clampingSequence = clampingSequence;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getClampType() {
@@ -70,20 +60,16 @@ public final class StepClampFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepClampFeature that = (StepClampFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(clampType, that.clampType) && Objects.equals(clampGeometry, that.clampGeometry) && clampForce == that.clampForce && clampOpening == that.clampOpening && Objects.equals(clampMaterial, that.clampMaterial) && clampingSequence == that.clampingSequence;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, clampType, clampGeometry, clampForce, clampOpening, clampMaterial, clampingSequence);
-    }
-
-    @Override
-    public String toString() {
-        return "StepClampFeature{" + "id=" + id + "name=" + name + "clampType=" + clampType + "clampGeometry=" + clampGeometry + "clampForce=" + clampForce + "clampOpening=" + clampOpening + "clampMaterial=" + clampMaterial + "clampingSequence=" + clampingSequence + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("clampType", clampType);
+        state.put("clampGeometry", clampGeometry);
+        state.put("clampForce", clampForce);
+        state.put("clampOpening", clampOpening);
+        state.put("clampMaterial", clampMaterial);
+        state.put("clampingSequence", clampingSequence);
+        return state;
     }
 }

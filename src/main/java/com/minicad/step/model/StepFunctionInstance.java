@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FUNCTION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param functionLastError function variance last error
  * @param functionStatus function variance status
  */
-public final class StepFunctionInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFunctionInstance extends AbstractStepEntity {
     private final StepEntity functionDefinition;
     private final String functionState;
     private final int functionCallCount;
@@ -25,21 +24,12 @@ public final class StepFunctionInstance implements StepEntity {
     private final String functionStatus;
 
     public StepFunctionInstance(int id, String name, StepEntity functionDefinition, String functionState, int functionCallCount, String functionLastError, String functionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.functionDefinition = functionDefinition;
         this.functionState = functionState;
         this.functionCallCount = functionCallCount;
         this.functionLastError = functionLastError;
         this.functionStatus = functionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getFunctionDefinition() {
@@ -63,20 +53,15 @@ public final class StepFunctionInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFunctionInstance that = (StepFunctionInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(functionDefinition, that.functionDefinition) && Objects.equals(functionState, that.functionState) && functionCallCount == that.functionCallCount && Objects.equals(functionLastError, that.functionLastError) && Objects.equals(functionStatus, that.functionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, functionDefinition, functionState, functionCallCount, functionLastError, functionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFunctionInstance{" + "id=" + id + "name=" + name + "functionDefinition=" + functionDefinition + "functionState=" + functionState + "functionCallCount=" + functionCallCount + "functionLastError=" + functionLastError + "functionStatus=" + functionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("functionDefinition", functionDefinition);
+        state.put("functionState", functionState);
+        state.put("functionCallCount", functionCallCount);
+        state.put("functionLastError", functionLastError);
+        state.put("functionStatus", functionStatus);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DOCUMENT_USAGE_CONSTRAINT metadata.
  *
@@ -9,21 +11,16 @@ import java.util.Objects;
  * @param subjectElement subject element
  * @param subjectElementValue subject element value
  */
-public final class StepDocumentUsageConstraint implements StepEntity {
-    private final int id;
+public final class StepDocumentUsageConstraint extends AbstractStepEntity {
     private final StepDocument source;
     private final String subjectElement;
     private final String subjectElementValue;
 
     public StepDocumentUsageConstraint(int id, StepDocument source, String subjectElement, String subjectElementValue) {
-        this.id = id;
+        super(id, "");
         this.source = source;
         this.subjectElement = subjectElement;
         this.subjectElementValue = subjectElementValue;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public StepDocument getSource() {
@@ -60,20 +57,12 @@ public final class StepDocumentUsageConstraint implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDocumentUsageConstraint that = (StepDocumentUsageConstraint) o;
-        return id == that.id && Objects.equals(source, that.source) && Objects.equals(subjectElement, that.subjectElement) && Objects.equals(subjectElementValue, that.subjectElementValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, source, subjectElement, subjectElementValue);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDocumentUsageConstraint{" + "id=" + id + "source=" + source + "subjectElement=" + subjectElement + "subjectElementValue=" + subjectElementValue + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("source", source);
+        state.put("subjectElement", subjectElement);
+        state.put("subjectElementValue", subjectElementValue);
+        return state;
     }
 }

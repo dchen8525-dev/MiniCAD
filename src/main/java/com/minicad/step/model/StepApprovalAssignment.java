@@ -1,27 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal APPROVAL_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
  * @param assignedApproval assigned approval
  */
-public final class StepApprovalAssignment implements StepEntity {
-    private final int id;
+public final class StepApprovalAssignment extends AbstractStepEntity {
     private final StepApproval assignedApproval;
 
     public StepApprovalAssignment(int id, StepApproval assignedApproval) {
-        this.id = id;
+        super(id, "");
         this.assignedApproval = assignedApproval;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepApproval getAssignedApproval() {
@@ -34,20 +27,10 @@ public final class StepApprovalAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepApprovalAssignment that = (StepApprovalAssignment) o;
-        return id == that.id && Objects.equals(assignedApproval, that.assignedApproval);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedApproval);
-    }
-
-    @Override
-    public String toString() {
-        return "StepApprovalAssignment{" + "id=" + id + "assignedApproval=" + assignedApproval + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedApproval", assignedApproval);
+        return state;
     }
 }

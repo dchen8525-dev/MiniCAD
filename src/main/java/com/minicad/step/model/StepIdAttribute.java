@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal ID_ATTRIBUTE metadata.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param attributeValue identifier value
  * @param identifiedItem identified entity
  */
-public final class StepIdAttribute implements StepEntity {
-    private final int id;
+public final class StepIdAttribute extends AbstractStepEntity {
     private final String attributeValue;
     private final StepEntity identifiedItem;
 
     public StepIdAttribute(int id, String attributeValue, StepEntity identifiedItem) {
-        this.id = id;
+        super(id, "");
         this.attributeValue = attributeValue;
         this.identifiedItem = identifiedItem;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public String getAttributeValue() {
@@ -41,20 +34,11 @@ public final class StepIdAttribute implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepIdAttribute that = (StepIdAttribute) o;
-        return id == that.id && Objects.equals(attributeValue, that.attributeValue) && Objects.equals(identifiedItem, that.identifiedItem);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, attributeValue, identifiedItem);
-    }
-
-    @Override
-    public String toString() {
-        return "StepIdAttribute{" + "id=" + id + "attributeValue=" + attributeValue + "identifiedItem=" + identifiedItem + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("attributeValue", attributeValue);
+        state.put("identifiedItem", identifiedItem);
+        return state;
     }
 }

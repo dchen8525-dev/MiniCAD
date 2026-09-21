@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved THREAD_FEATURE.
@@ -18,9 +19,7 @@ import java.util.Objects;
  * @param threadProfile thread profile shape
  * @param threadDirection thread direction (right-hand, left-hand)
  */
-public final class StepThreadFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepThreadFeature extends AbstractStepEntity {
     private final String threadType;
     private final String threadStandard;
     private final double nominalDiameter;
@@ -31,8 +30,7 @@ public final class StepThreadFeature implements StepEntity {
     private final String threadDirection;
 
     public StepThreadFeature(int id, String name, String threadType, String threadStandard, double nominalDiameter, double pitch, double threadLength, int numberOfStarts, StepEntity threadProfile, String threadDirection) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.threadType = threadType;
         this.threadStandard = threadStandard;
         this.nominalDiameter = nominalDiameter;
@@ -41,14 +39,6 @@ public final class StepThreadFeature implements StepEntity {
         this.numberOfStarts = numberOfStarts;
         this.threadProfile = threadProfile;
         this.threadDirection = threadDirection;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getThreadType() {
@@ -84,20 +74,18 @@ public final class StepThreadFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepThreadFeature that = (StepThreadFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(threadType, that.threadType) && Objects.equals(threadStandard, that.threadStandard) && nominalDiameter == that.nominalDiameter && pitch == that.pitch && threadLength == that.threadLength && numberOfStarts == that.numberOfStarts && Objects.equals(threadProfile, that.threadProfile) && Objects.equals(threadDirection, that.threadDirection);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, threadType, threadStandard, nominalDiameter, pitch, threadLength, numberOfStarts, threadProfile, threadDirection);
-    }
-
-    @Override
-    public String toString() {
-        return "StepThreadFeature{" + "id=" + id + "name=" + name + "threadType=" + threadType + "threadStandard=" + threadStandard + "nominalDiameter=" + nominalDiameter + "pitch=" + pitch + "threadLength=" + threadLength + "numberOfStarts=" + numberOfStarts + "threadProfile=" + threadProfile + "threadDirection=" + threadDirection + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("threadType", threadType);
+        state.put("threadStandard", threadStandard);
+        state.put("nominalDiameter", nominalDiameter);
+        state.put("pitch", pitch);
+        state.put("threadLength", threadLength);
+        state.put("numberOfStarts", numberOfStarts);
+        state.put("threadProfile", threadProfile);
+        state.put("threadDirection", threadDirection);
+        return state;
     }
 }

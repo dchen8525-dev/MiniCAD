@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MODULE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param moduleConfig module variance configuration
  * @param moduleStatus module variance status
  */
-public final class StepModuleInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepModuleInstance extends AbstractStepEntity {
     private final StepEntity moduleDefinition;
     private final String moduleState;
     private final String moduleVersion;
@@ -25,21 +24,12 @@ public final class StepModuleInstance implements StepEntity {
     private final String moduleStatus;
 
     public StepModuleInstance(int id, String name, StepEntity moduleDefinition, String moduleState, String moduleVersion, List<String> moduleConfig, String moduleStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.moduleDefinition = moduleDefinition;
         this.moduleState = moduleState;
         this.moduleVersion = moduleVersion;
         this.moduleConfig = moduleConfig == null ? null : java.util.List.copyOf(moduleConfig);
         this.moduleStatus = moduleStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getModuleDefinition() {
@@ -63,20 +53,15 @@ public final class StepModuleInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepModuleInstance that = (StepModuleInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(moduleDefinition, that.moduleDefinition) && Objects.equals(moduleState, that.moduleState) && Objects.equals(moduleVersion, that.moduleVersion) && Objects.equals(moduleConfig, that.moduleConfig) && Objects.equals(moduleStatus, that.moduleStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, moduleDefinition, moduleState, moduleVersion, moduleConfig, moduleStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepModuleInstance{" + "id=" + id + "name=" + name + "moduleDefinition=" + moduleDefinition + "moduleState=" + moduleState + "moduleVersion=" + moduleVersion + "moduleConfig=" + moduleConfig + "moduleStatus=" + moduleStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("moduleDefinition", moduleDefinition);
+        state.put("moduleState", moduleState);
+        state.put("moduleVersion", moduleVersion);
+        state.put("moduleConfig", moduleConfig);
+        state.put("moduleStatus", moduleStatus);
+        return state;
     }
 }

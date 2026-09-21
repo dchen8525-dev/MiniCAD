@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DATUM_TARGET.
  * A datum target used in geometric tolerancing.
@@ -10,25 +12,14 @@ import java.util.Objects;
  * @param targetId target identifier
  * @param targetShape target shape reference
  */
-public final class StepDatumTarget implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDatumTarget extends AbstractStepEntity {
     private final String targetId;
     private final StepEntity targetShape;
 
     public StepDatumTarget(int id, String name, String targetId, StepEntity targetShape) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.targetId = targetId;
         this.targetShape = targetShape;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTargetId() {
@@ -45,20 +36,12 @@ public final class StepDatumTarget implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDatumTarget that = (StepDatumTarget) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(targetId, that.targetId) && Objects.equals(targetShape, that.targetShape);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, targetId, targetShape);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDatumTarget{" + "id=" + id + "name=" + name + "targetId=" + targetId + "targetShape=" + targetShape + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("targetId", targetId);
+        state.put("targetShape", targetShape);
+        return state;
     }
 }

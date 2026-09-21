@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SIMULATION_MODEL.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param timeStep time step for transient simulation
  * @param duration simulation duration
  */
-public final class StepSimulationModel implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSimulationModel extends AbstractStepEntity {
     private final String simulationType;
     private final StepEntity simulationGeometry;
     private final List<StepEntity> simulationParameters;
@@ -27,22 +26,13 @@ public final class StepSimulationModel implements StepEntity {
     private final double duration;
 
     public StepSimulationModel(int id, String name, String simulationType, StepEntity simulationGeometry, List<StepEntity> simulationParameters, List<StepEntity> initialConditions, double timeStep, double duration) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.simulationType = simulationType;
         this.simulationGeometry = simulationGeometry;
         this.simulationParameters = simulationParameters == null ? null : java.util.List.copyOf(simulationParameters);
         this.initialConditions = initialConditions == null ? null : java.util.List.copyOf(initialConditions);
         this.timeStep = timeStep;
         this.duration = duration;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSimulationType() {
@@ -70,20 +60,16 @@ public final class StepSimulationModel implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSimulationModel that = (StepSimulationModel) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(simulationType, that.simulationType) && Objects.equals(simulationGeometry, that.simulationGeometry) && Objects.equals(simulationParameters, that.simulationParameters) && Objects.equals(initialConditions, that.initialConditions) && timeStep == that.timeStep && duration == that.duration;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, simulationType, simulationGeometry, simulationParameters, initialConditions, timeStep, duration);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSimulationModel{" + "id=" + id + "name=" + name + "simulationType=" + simulationType + "simulationGeometry=" + simulationGeometry + "simulationParameters=" + simulationParameters + "initialConditions=" + initialConditions + "timeStep=" + timeStep + "duration=" + duration + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("simulationType", simulationType);
+        state.put("simulationGeometry", simulationGeometry);
+        state.put("simulationParameters", simulationParameters);
+        state.put("initialConditions", initialConditions);
+        state.put("timeStep", timeStep);
+        state.put("duration", duration);
+        return state;
     }
 }

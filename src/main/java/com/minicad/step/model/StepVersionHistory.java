@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved VERSION_HISTORY.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @varianceAuthor version variance author
  * @varianceStatus history variance status
  */
-public final class StepVersionHistory implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepVersionHistory extends AbstractStepEntity {
     private final StepEntity varianceItem;
     private final List<StepEntity> varianceVersions;
     private final StepEntity varianceCurrent;
@@ -25,21 +24,12 @@ public final class StepVersionHistory implements StepEntity {
     private final String varianceStatus;
 
     public StepVersionHistory(int id, String name, StepEntity varianceItem, List<StepEntity> varianceVersions, StepEntity varianceCurrent, StepEntity varianceAuthor, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceItem = varianceItem;
         this.varianceVersions = varianceVersions == null ? null : java.util.List.copyOf(varianceVersions);
         this.varianceCurrent = varianceCurrent;
         this.varianceAuthor = varianceAuthor;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceItem() {
@@ -63,20 +53,15 @@ public final class StepVersionHistory implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVersionHistory that = (StepVersionHistory) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceItem, that.varianceItem) && Objects.equals(varianceVersions, that.varianceVersions) && Objects.equals(varianceCurrent, that.varianceCurrent) && Objects.equals(varianceAuthor, that.varianceAuthor) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceItem, varianceVersions, varianceCurrent, varianceAuthor, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVersionHistory{" + "id=" + id + "name=" + name + "varianceItem=" + varianceItem + "varianceVersions=" + varianceVersions + "varianceCurrent=" + varianceCurrent + "varianceAuthor=" + varianceAuthor + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceItem", varianceItem);
+        state.put("varianceVersions", varianceVersions);
+        state.put("varianceCurrent", varianceCurrent);
+        state.put("varianceAuthor", varianceAuthor);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ASSEMBLY_COMPONENT_USAGE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param usageType usage type classification
  * @param location placement location
  */
-public final class StepAssemblyComponentUsage implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAssemblyComponentUsage extends AbstractStepEntity {
     private final StepEntity parentAssembly;
     private final StepEntity childComponent;
     private final int quantity;
@@ -25,21 +24,12 @@ public final class StepAssemblyComponentUsage implements StepEntity {
     private final StepEntity location;
 
     public StepAssemblyComponentUsage(int id, String name, StepEntity parentAssembly, StepEntity childComponent, int quantity, String usageType, StepEntity location) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.parentAssembly = parentAssembly;
         this.childComponent = childComponent;
         this.quantity = quantity;
         this.usageType = usageType;
         this.location = location;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getParentAssembly() {
@@ -63,20 +53,15 @@ public final class StepAssemblyComponentUsage implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAssemblyComponentUsage that = (StepAssemblyComponentUsage) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(parentAssembly, that.parentAssembly) && Objects.equals(childComponent, that.childComponent) && quantity == that.quantity && Objects.equals(usageType, that.usageType) && Objects.equals(location, that.location);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, parentAssembly, childComponent, quantity, usageType, location);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAssemblyComponentUsage{" + "id=" + id + "name=" + name + "parentAssembly=" + parentAssembly + "childComponent=" + childComponent + "quantity=" + quantity + "usageType=" + usageType + "location=" + location + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("parentAssembly", parentAssembly);
+        state.put("childComponent", childComponent);
+        state.put("quantity", quantity);
+        state.put("usageType", usageType);
+        state.put("location", location);
+        return state;
     }
 }

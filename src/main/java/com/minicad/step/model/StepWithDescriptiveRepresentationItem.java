@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved WITH_DESCRIPTIVE_REPRESENTATION_ITEM.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param items representation items
  * @param context representation context
  */
-public final class StepWithDescriptiveRepresentationItem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepWithDescriptiveRepresentationItem extends AbstractStepEntity {
     private final String description;
     private final List<StepEntity> items;
     private final StepEntity context;
 
     public StepWithDescriptiveRepresentationItem(int id, String name, String description, List<StepEntity> items, StepEntity context) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.items = items == null ? null : java.util.List.copyOf(items);
         this.context = context;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -49,20 +39,13 @@ public final class StepWithDescriptiveRepresentationItem implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepWithDescriptiveRepresentationItem that = (StepWithDescriptiveRepresentationItem) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(items, that.items) && Objects.equals(context, that.context);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, items, context);
-    }
-
-    @Override
-    public String toString() {
-        return "StepWithDescriptiveRepresentationItem{" + "id=" + id + "name=" + name + "description=" + description + "items=" + items + "context=" + context + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("items", items);
+        state.put("context", context);
+        return state;
     }
 }

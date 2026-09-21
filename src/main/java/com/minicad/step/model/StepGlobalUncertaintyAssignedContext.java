@@ -1,8 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal global uncertainty assigned context.
@@ -10,21 +10,12 @@ import java.util.Objects;
  * @param id STEP instance id
  * @param uncertainties referenced uncertainty entities
  */
-public final class StepGlobalUncertaintyAssignedContext implements StepEntity {
-    private final int id;
+public final class StepGlobalUncertaintyAssignedContext extends AbstractStepEntity {
     private final List<StepUncertaintyMeasureWithUnit> uncertainties;
 
     public StepGlobalUncertaintyAssignedContext(int id, List<StepUncertaintyMeasureWithUnit> uncertainties) {
-        this.id = id;
+        super(id, "");
         this.uncertainties = uncertainties == null ? null : java.util.List.copyOf(uncertainties);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public List<StepUncertaintyMeasureWithUnit> getUncertainties() {
@@ -35,20 +26,10 @@ public final class StepGlobalUncertaintyAssignedContext implements StepEntity {
     public List<StepUncertaintyMeasureWithUnit> uncertainties() { return getUncertainties(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGlobalUncertaintyAssignedContext that = (StepGlobalUncertaintyAssignedContext) o;
-        return id == that.id && Objects.equals(uncertainties, that.uncertainties);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, uncertainties);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGlobalUncertaintyAssignedContext{" + "id=" + id + "uncertainties=" + uncertainties + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("uncertainties", uncertainties);
+        return state;
     }
 }

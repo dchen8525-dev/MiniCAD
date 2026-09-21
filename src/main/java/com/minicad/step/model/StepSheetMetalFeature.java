@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SHEET_METAL_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param featureGeometry feature geometry representation
  * @param flatPattern flat pattern geometry reference
  */
-public final class StepSheetMetalFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSheetMetalFeature extends AbstractStepEntity {
     private final String featureType;
     private final double sheetThickness;
     private final double bendRadius;
@@ -27,22 +26,13 @@ public final class StepSheetMetalFeature implements StepEntity {
     private final StepEntity flatPattern;
 
     public StepSheetMetalFeature(int id, String name, String featureType, double sheetThickness, double bendRadius, double bendAngle, StepEntity featureGeometry, StepEntity flatPattern) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.featureType = featureType;
         this.sheetThickness = sheetThickness;
         this.bendRadius = bendRadius;
         this.bendAngle = bendAngle;
         this.featureGeometry = featureGeometry;
         this.flatPattern = flatPattern;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFeatureType() {
@@ -70,20 +60,16 @@ public final class StepSheetMetalFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSheetMetalFeature that = (StepSheetMetalFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(featureType, that.featureType) && sheetThickness == that.sheetThickness && bendRadius == that.bendRadius && bendAngle == that.bendAngle && Objects.equals(featureGeometry, that.featureGeometry) && Objects.equals(flatPattern, that.flatPattern);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, featureType, sheetThickness, bendRadius, bendAngle, featureGeometry, flatPattern);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSheetMetalFeature{" + "id=" + id + "name=" + name + "featureType=" + featureType + "sheetThickness=" + sheetThickness + "bendRadius=" + bendRadius + "bendAngle=" + bendAngle + "featureGeometry=" + featureGeometry + "flatPattern=" + flatPattern + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("featureType", featureType);
+        state.put("sheetThickness", sheetThickness);
+        state.put("bendRadius", bendRadius);
+        state.put("bendAngle", bendAngle);
+        state.put("featureGeometry", featureGeometry);
+        state.put("flatPattern", flatPattern);
+        return state;
     }
 }

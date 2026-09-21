@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BACKUP_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param backupValid backup variance valid flag
  * @param backupStatus backup variance status
  */
-public final class StepBackupInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBackupInstance extends AbstractStepEntity {
     private final StepEntity backupDefinition;
     private final StepEntity backupStartTime;
     private final StepEntity backupEndTime;
@@ -27,22 +26,13 @@ public final class StepBackupInstance implements StepEntity {
     private final String backupStatus;
 
     public StepBackupInstance(int id, String name, StepEntity backupDefinition, StepEntity backupStartTime, StepEntity backupEndTime, long backupSize, boolean backupValid, String backupStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.backupDefinition = backupDefinition;
         this.backupStartTime = backupStartTime;
         this.backupEndTime = backupEndTime;
         this.backupSize = backupSize;
         this.backupValid = backupValid;
         this.backupStatus = backupStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBackupDefinition() {
@@ -70,20 +60,16 @@ public final class StepBackupInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBackupInstance that = (StepBackupInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(backupDefinition, that.backupDefinition) && Objects.equals(backupStartTime, that.backupStartTime) && Objects.equals(backupEndTime, that.backupEndTime) && backupSize == that.backupSize && backupValid == that.backupValid && Objects.equals(backupStatus, that.backupStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, backupDefinition, backupStartTime, backupEndTime, backupSize, backupValid, backupStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBackupInstance{" + "id=" + id + "name=" + name + "backupDefinition=" + backupDefinition + "backupStartTime=" + backupStartTime + "backupEndTime=" + backupEndTime + "backupSize=" + backupSize + "backupValid=" + backupValid + "backupStatus=" + backupStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("backupDefinition", backupDefinition);
+        state.put("backupStartTime", backupStartTime);
+        state.put("backupEndTime", backupEndTime);
+        state.put("backupSize", backupSize);
+        state.put("backupValid", backupValid);
+        state.put("backupStatus", backupStatus);
+        return state;
     }
 }

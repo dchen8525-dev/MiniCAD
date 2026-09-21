@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal geometric curve set for PMI leaders or outlines.
@@ -10,23 +11,12 @@ import java.util.Objects;
  * @param name set name
  * @param elements supported geometric elements
  */
-public final class StepGeometricCurveSet implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGeometricCurveSet extends AbstractStepEntity {
     private final List<StepEntity> elements;
 
     public StepGeometricCurveSet(int id, String name, List<StepEntity> elements) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.elements = elements == null ? null : java.util.List.copyOf(elements);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getElements() {
@@ -39,20 +29,11 @@ public final class StepGeometricCurveSet implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGeometricCurveSet that = (StepGeometricCurveSet) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(elements, that.elements);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, elements);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGeometricCurveSet{" + "id=" + id + "name=" + name + "elements=" + elements + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("elements", elements);
+        return state;
     }
 }

@@ -1,27 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal SYMBOL_COLOUR.
  *
  * @param id STEP instance id
  * @param colour referenced colour
  */
-public final class StepSymbolColour implements StepEntity {
-    private final int id;
+public final class StepSymbolColour extends AbstractStepEntity {
     private final StepEntity colour;
 
     public StepSymbolColour(int id, StepEntity colour) {
-        this.id = id;
+        super(id, "");
         this.colour = colour;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepEntity getColour() {
@@ -34,20 +27,10 @@ public final class StepSymbolColour implements StepEntity {
     public StepEntity colour() { return getColour(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSymbolColour that = (StepSymbolColour) o;
-        return id == that.id && Objects.equals(colour, that.colour);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, colour);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSymbolColour{" + "id=" + id + "colour=" + colour + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("colour", colour);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CALCULATION_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param calculationAccuracy calculation variance accuracy
  * @param calculationStatus calculation variance status
  */
-public final class StepCalculationDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCalculationDefinition extends AbstractStepEntity {
     private final String calculationType;
     private final String calculationMethod;
     private final List<String> calculationInputs;
@@ -27,22 +26,13 @@ public final class StepCalculationDefinition implements StepEntity {
     private final String calculationStatus;
 
     public StepCalculationDefinition(int id, String name, String calculationType, String calculationMethod, List<String> calculationInputs, List<String> calculationOutputs, double calculationAccuracy, String calculationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.calculationType = calculationType;
         this.calculationMethod = calculationMethod;
         this.calculationInputs = calculationInputs == null ? null : java.util.List.copyOf(calculationInputs);
         this.calculationOutputs = calculationOutputs == null ? null : java.util.List.copyOf(calculationOutputs);
         this.calculationAccuracy = calculationAccuracy;
         this.calculationStatus = calculationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCalculationType() {
@@ -70,20 +60,16 @@ public final class StepCalculationDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCalculationDefinition that = (StepCalculationDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(calculationType, that.calculationType) && Objects.equals(calculationMethod, that.calculationMethod) && Objects.equals(calculationInputs, that.calculationInputs) && Objects.equals(calculationOutputs, that.calculationOutputs) && calculationAccuracy == that.calculationAccuracy && Objects.equals(calculationStatus, that.calculationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, calculationType, calculationMethod, calculationInputs, calculationOutputs, calculationAccuracy, calculationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCalculationDefinition{" + "id=" + id + "name=" + name + "calculationType=" + calculationType + "calculationMethod=" + calculationMethod + "calculationInputs=" + calculationInputs + "calculationOutputs=" + calculationOutputs + "calculationAccuracy=" + calculationAccuracy + "calculationStatus=" + calculationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("calculationType", calculationType);
+        state.put("calculationMethod", calculationMethod);
+        state.put("calculationInputs", calculationInputs);
+        state.put("calculationOutputs", calculationOutputs);
+        state.put("calculationAccuracy", calculationAccuracy);
+        state.put("calculationStatus", calculationStatus);
+        return state;
     }
 }

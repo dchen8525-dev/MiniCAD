@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MACHINING_OPERATION.
@@ -12,25 +13,14 @@ import java.util.Objects;
  * @param status operation status
  * @param features features being machined
  */
-public final class StepMachiningOperation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMachiningOperation extends AbstractStepEntity {
     private final StepEntity status;
     private final List<StepEntity> features;
 
     public StepMachiningOperation(int id, String name, StepEntity status, List<StepEntity> features) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.status = status;
         this.features = features == null ? null : java.util.List.copyOf(features);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getStatus() {
@@ -42,20 +32,12 @@ public final class StepMachiningOperation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMachiningOperation that = (StepMachiningOperation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(status, that.status) && Objects.equals(features, that.features);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, status, features);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMachiningOperation{" + "id=" + id + "name=" + name + "status=" + status + "features=" + features + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("status", status);
+        state.put("features", features);
+        return state;
     }
 }

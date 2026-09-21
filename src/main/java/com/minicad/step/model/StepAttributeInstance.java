@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved ATTRIBUTE_INSTANCE.
  * An attribute instance entity.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param attributeValue attribute variance current value
  * @param attributeStatus attribute variance status
  */
-public final class StepAttributeInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAttributeInstance extends AbstractStepEntity {
     private final StepEntity attributeDefinition;
     private final String attributeValue;
     private final String attributeStatus;
 
     public StepAttributeInstance(int id, String name, StepEntity attributeDefinition, String attributeValue, String attributeStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.attributeDefinition = attributeDefinition;
         this.attributeValue = attributeValue;
         this.attributeStatus = attributeStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getAttributeDefinition() {
@@ -47,20 +38,13 @@ public final class StepAttributeInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAttributeInstance that = (StepAttributeInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(attributeDefinition, that.attributeDefinition) && Objects.equals(attributeValue, that.attributeValue) && Objects.equals(attributeStatus, that.attributeStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, attributeDefinition, attributeValue, attributeStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAttributeInstance{" + "id=" + id + "name=" + name + "attributeDefinition=" + attributeDefinition + "attributeValue=" + attributeValue + "attributeStatus=" + attributeStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("attributeDefinition", attributeDefinition);
+        state.put("attributeValue", attributeValue);
+        state.put("attributeStatus", attributeStatus);
+        return state;
     }
 }

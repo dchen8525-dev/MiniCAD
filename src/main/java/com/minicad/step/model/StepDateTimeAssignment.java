@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DATE_TIME_ASSIGNMENT metadata.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param assignedDateAndTime assigned timestamp
  * @param role assignment role
  */
-public final class StepDateTimeAssignment implements StepEntity {
-    private final int id;
+public final class StepDateTimeAssignment extends AbstractStepEntity {
     private final StepDateAndTime assignedDateAndTime;
     private final StepDateTimeRole role;
 
     public StepDateTimeAssignment(int id, StepDateAndTime assignedDateAndTime, StepDateTimeRole role) {
-        this.id = id;
+        super(id, "");
         this.assignedDateAndTime = assignedDateAndTime;
         this.role = role;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepDateAndTime getAssignedDateAndTime() {
@@ -45,20 +38,11 @@ public final class StepDateTimeAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDateTimeAssignment that = (StepDateTimeAssignment) o;
-        return id == that.id && Objects.equals(assignedDateAndTime, that.assignedDateAndTime) && Objects.equals(role, that.role);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedDateAndTime, role);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDateTimeAssignment{" + "id=" + id + "assignedDateAndTime=" + assignedDateAndTime + "role=" + role + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedDateAndTime", assignedDateAndTime);
+        state.put("role", role);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal BOX_DOMAIN.
@@ -10,29 +11,18 @@ import java.util.Objects;
  * @param corner box corner point
  * @param dimensions box dimensions in STEP order
  */
-public final class StepBoxDomain implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBoxDomain extends AbstractStepEntity {
     private final StepCartesianPoint corner;
     private final List<Double> dimensions;
 
     public StepBoxDomain(int id, String name, StepCartesianPoint corner, List<Double> dimensions) {
-        this.id = id;
-        this.name = name != null ? name : "";
+        super(id, name != null ? name : "");
         this.corner = corner;
         this.dimensions = dimensions == null ? null : java.util.List.copyOf(dimensions);
     }
 
     public StepBoxDomain(int id, StepCartesianPoint corner, List<Double> dimensions) {
         this(id, "", corner, dimensions);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepCartesianPoint getCorner() {
@@ -50,20 +40,12 @@ public final class StepBoxDomain implements StepEntity {
     public List<Double> dimensions() { return getDimensions(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBoxDomain that = (StepBoxDomain) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(corner, that.corner) && Objects.equals(dimensions, that.dimensions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, corner, dimensions);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBoxDomain{" + "id=" + id + "name=" + name + "corner=" + corner + "dimensions=" + dimensions + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("corner", corner);
+        state.put("dimensions", dimensions);
+        return state;
     }
 }

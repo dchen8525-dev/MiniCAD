@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FILTER_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceFlow variance flow capacity
  * @param replacementInterval replacement interval specification
  */
-public final class StepFilterFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFilterFeature extends AbstractStepEntity {
     private final String filterType;
     private final StepEntity filterGeometry;
     private final StepEntity filterMedia;
@@ -27,22 +26,13 @@ public final class StepFilterFeature implements StepEntity {
     private final String replacementInterval;
 
     public StepFilterFeature(int id, String name, String filterType, StepEntity filterGeometry, StepEntity filterMedia, double varianceMicron, double varianceFlow, String replacementInterval) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.filterType = filterType;
         this.filterGeometry = filterGeometry;
         this.filterMedia = filterMedia;
         this.varianceMicron = varianceMicron;
         this.varianceFlow = varianceFlow;
         this.replacementInterval = replacementInterval;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFilterType() {
@@ -70,20 +60,16 @@ public final class StepFilterFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFilterFeature that = (StepFilterFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(filterType, that.filterType) && Objects.equals(filterGeometry, that.filterGeometry) && Objects.equals(filterMedia, that.filterMedia) && varianceMicron == that.varianceMicron && varianceFlow == that.varianceFlow && Objects.equals(replacementInterval, that.replacementInterval);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, filterType, filterGeometry, filterMedia, varianceMicron, varianceFlow, replacementInterval);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFilterFeature{" + "id=" + id + "name=" + name + "filterType=" + filterType + "filterGeometry=" + filterGeometry + "filterMedia=" + filterMedia + "varianceMicron=" + varianceMicron + "varianceFlow=" + varianceFlow + "replacementInterval=" + replacementInterval + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("filterType", filterType);
+        state.put("filterGeometry", filterGeometry);
+        state.put("filterMedia", filterMedia);
+        state.put("varianceMicron", varianceMicron);
+        state.put("varianceFlow", varianceFlow);
+        state.put("replacementInterval", replacementInterval);
+        return state;
     }
 }

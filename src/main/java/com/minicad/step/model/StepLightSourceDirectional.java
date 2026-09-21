@@ -1,28 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public final class StepLightSourceDirectional implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLightSourceDirectional extends AbstractStepEntity {
     private final StepEntity color;
     private final double intensity;
     private final StepEntity orientation;
 
     public StepLightSourceDirectional(int id, String name, StepEntity color, double intensity, StepEntity orientation) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.color = color;
         this.intensity = intensity;
         this.orientation = orientation;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getColor() {
@@ -38,20 +28,13 @@ public final class StepLightSourceDirectional implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLightSourceDirectional that = (StepLightSourceDirectional) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(color, that.color) && intensity == that.intensity && Objects.equals(orientation, that.orientation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, color, intensity, orientation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLightSourceDirectional{" + "id=" + id + "name=" + name + "color=" + color + "intensity=" + intensity + "orientation=" + orientation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("color", color);
+        state.put("intensity", intensity);
+        state.put("orientation", orientation);
+        return state;
     }
 }

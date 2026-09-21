@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REQUIREMENT_SPECIFICATION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param specificationStatus specification status
  * @param specificationVersion specification version reference
  */
-public final class StepRequirementSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRequirementSpecification extends AbstractStepEntity {
     private final String specificationId;
     private final List<StepEntity> requirements;
     private final String specificationType;
@@ -25,21 +24,12 @@ public final class StepRequirementSpecification implements StepEntity {
     private final StepEntity specificationVersion;
 
     public StepRequirementSpecification(int id, String name, String specificationId, List<StepEntity> requirements, String specificationType, String specificationStatus, StepEntity specificationVersion) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.specificationId = specificationId;
         this.requirements = requirements == null ? null : java.util.List.copyOf(requirements);
         this.specificationType = specificationType;
         this.specificationStatus = specificationStatus;
         this.specificationVersion = specificationVersion;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSpecificationId() {
@@ -63,20 +53,15 @@ public final class StepRequirementSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRequirementSpecification that = (StepRequirementSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(specificationId, that.specificationId) && Objects.equals(requirements, that.requirements) && Objects.equals(specificationType, that.specificationType) && Objects.equals(specificationStatus, that.specificationStatus) && Objects.equals(specificationVersion, that.specificationVersion);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, specificationId, requirements, specificationType, specificationStatus, specificationVersion);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRequirementSpecification{" + "id=" + id + "name=" + name + "specificationId=" + specificationId + "requirements=" + requirements + "specificationType=" + specificationType + "specificationStatus=" + specificationStatus + "specificationVersion=" + specificationVersion + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("specificationId", specificationId);
+        state.put("requirements", requirements);
+        state.put("specificationType", specificationType);
+        state.put("specificationStatus", specificationStatus);
+        state.put("specificationVersion", specificationVersion);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CONNECTION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param connectionQuality connection variance quality requirements
  * @param connectionStatus connection variance status
  */
-public final class StepConnectionDefinition2 implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConnectionDefinition2 extends AbstractStepEntity {
     private final String connectionType;
     private final String connectionProtocol;
     private final List<String> connectionParameters;
@@ -25,21 +24,12 @@ public final class StepConnectionDefinition2 implements StepEntity {
     private final String connectionStatus;
 
     public StepConnectionDefinition2(int id, String name, String connectionType, String connectionProtocol, List<String> connectionParameters, String connectionQuality, String connectionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.connectionType = connectionType;
         this.connectionProtocol = connectionProtocol;
         this.connectionParameters = connectionParameters == null ? null : java.util.List.copyOf(connectionParameters);
         this.connectionQuality = connectionQuality;
         this.connectionStatus = connectionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getConnectionType() {
@@ -63,20 +53,15 @@ public final class StepConnectionDefinition2 implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConnectionDefinition2 that = (StepConnectionDefinition2) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(connectionType, that.connectionType) && Objects.equals(connectionProtocol, that.connectionProtocol) && Objects.equals(connectionParameters, that.connectionParameters) && Objects.equals(connectionQuality, that.connectionQuality) && Objects.equals(connectionStatus, that.connectionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, connectionType, connectionProtocol, connectionParameters, connectionQuality, connectionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConnectionDefinition2{" + "id=" + id + "name=" + name + "connectionType=" + connectionType + "connectionProtocol=" + connectionProtocol + "connectionParameters=" + connectionParameters + "connectionQuality=" + connectionQuality + "connectionStatus=" + connectionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("connectionType", connectionType);
+        state.put("connectionProtocol", connectionProtocol);
+        state.put("connectionParameters", connectionParameters);
+        state.put("connectionQuality", connectionQuality);
+        state.put("connectionStatus", connectionStatus);
+        return state;
     }
 }

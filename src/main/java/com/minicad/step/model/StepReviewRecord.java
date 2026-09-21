@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REVIEW_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param reviewTimestamp review variance timestamp
  * @param reviewStatus review variance status
  */
-public final class StepReviewRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepReviewRecord extends AbstractStepEntity {
     private final String reviewType;
     private final String reviewResult;
     private final List<String> reviewComments;
@@ -27,22 +26,13 @@ public final class StepReviewRecord implements StepEntity {
     private final String reviewStatus;
 
     public StepReviewRecord(int id, String name, String reviewType, String reviewResult, List<String> reviewComments, StepEntity reviewReviewer, StepEntity reviewTimestamp, String reviewStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.reviewType = reviewType;
         this.reviewResult = reviewResult;
         this.reviewComments = reviewComments == null ? null : java.util.List.copyOf(reviewComments);
         this.reviewReviewer = reviewReviewer;
         this.reviewTimestamp = reviewTimestamp;
         this.reviewStatus = reviewStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getReviewType() {
@@ -70,20 +60,16 @@ public final class StepReviewRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepReviewRecord that = (StepReviewRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(reviewType, that.reviewType) && Objects.equals(reviewResult, that.reviewResult) && Objects.equals(reviewComments, that.reviewComments) && Objects.equals(reviewReviewer, that.reviewReviewer) && Objects.equals(reviewTimestamp, that.reviewTimestamp) && Objects.equals(reviewStatus, that.reviewStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, reviewType, reviewResult, reviewComments, reviewReviewer, reviewTimestamp, reviewStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepReviewRecord{" + "id=" + id + "name=" + name + "reviewType=" + reviewType + "reviewResult=" + reviewResult + "reviewComments=" + reviewComments + "reviewReviewer=" + reviewReviewer + "reviewTimestamp=" + reviewTimestamp + "reviewStatus=" + reviewStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("reviewType", reviewType);
+        state.put("reviewResult", reviewResult);
+        state.put("reviewComments", reviewComments);
+        state.put("reviewReviewer", reviewReviewer);
+        state.put("reviewTimestamp", reviewTimestamp);
+        state.put("reviewStatus", reviewStatus);
+        return state;
     }
 }

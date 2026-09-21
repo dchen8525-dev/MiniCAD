@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Minimal CHARACTERIZED_OBJECT/FEATURE_DEFINITION metadata.
@@ -10,25 +11,14 @@ import java.util.Objects;
  * @param description object description
  * @param entityName concrete STEP entity name
  */
-public final class StepCharacterizedObject implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCharacterizedObject extends AbstractStepEntity {
     private final String description;
     private final String entityName;
 
     public StepCharacterizedObject(int id, String name, String description, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -45,20 +35,12 @@ public final class StepCharacterizedObject implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCharacterizedObject that = (StepCharacterizedObject) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCharacterizedObject{" + "id=" + id + "name=" + name + "description=" + description + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("entityName", entityName);
+        return state;
     }
 }

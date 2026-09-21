@@ -1,10 +1,9 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public final class StepViewVolume implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepViewVolume extends AbstractStepEntity {
     private final double clippingBack;
     private final double clippingFront;
     private final double viewPlaneDistance;
@@ -12,21 +11,12 @@ public final class StepViewVolume implements StepEntity {
     private final double viewPlaneHeight;
 
     public StepViewVolume(int id, String name, double clippingBack, double clippingFront, double viewPlaneDistance, double viewPlaneWidth, double viewPlaneHeight) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.clippingBack = clippingBack;
         this.clippingFront = clippingFront;
         this.viewPlaneDistance = viewPlaneDistance;
         this.viewPlaneWidth = viewPlaneWidth;
         this.viewPlaneHeight = viewPlaneHeight;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getClippingBack() {
@@ -50,20 +40,15 @@ public final class StepViewVolume implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepViewVolume that = (StepViewVolume) o;
-        return id == that.id && Objects.equals(name, that.name) && clippingBack == that.clippingBack && clippingFront == that.clippingFront && viewPlaneDistance == that.viewPlaneDistance && viewPlaneWidth == that.viewPlaneWidth && viewPlaneHeight == that.viewPlaneHeight;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, clippingBack, clippingFront, viewPlaneDistance, viewPlaneWidth, viewPlaneHeight);
-    }
-
-    @Override
-    public String toString() {
-        return "StepViewVolume{" + "id=" + id + "name=" + name + "clippingBack=" + clippingBack + "clippingFront=" + clippingFront + "viewPlaneDistance=" + viewPlaneDistance + "viewPlaneWidth=" + viewPlaneWidth + "viewPlaneHeight=" + viewPlaneHeight + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("clippingBack", clippingBack);
+        state.put("clippingFront", clippingFront);
+        state.put("viewPlaneDistance", viewPlaneDistance);
+        state.put("viewPlaneWidth", viewPlaneWidth);
+        state.put("viewPlaneHeight", viewPlaneHeight);
+        return state;
     }
 }

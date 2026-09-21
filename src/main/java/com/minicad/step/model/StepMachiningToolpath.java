@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MACHINING_TOOLPATH.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param pathParameters path parameters (speed, feed, etc.)
  * @param approachStrategy approach strategy configuration
  */
-public final class StepMachiningToolpath implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMachiningToolpath extends AbstractStepEntity {
     private final StepEntity pathGeometry;
     private final StepEntity tool;
     private final List<StepEntity> pathParameters;
     private final StepEntity approachStrategy;
 
     public StepMachiningToolpath(int id, String name, StepEntity pathGeometry, StepEntity tool, List<StepEntity> pathParameters, StepEntity approachStrategy) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.pathGeometry = pathGeometry;
         this.tool = tool;
         this.pathParameters = pathParameters == null ? null : java.util.List.copyOf(pathParameters);
         this.approachStrategy = approachStrategy;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPathGeometry() {
@@ -56,20 +46,14 @@ public final class StepMachiningToolpath implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMachiningToolpath that = (StepMachiningToolpath) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(pathGeometry, that.pathGeometry) && Objects.equals(tool, that.tool) && Objects.equals(pathParameters, that.pathParameters) && Objects.equals(approachStrategy, that.approachStrategy);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, pathGeometry, tool, pathParameters, approachStrategy);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMachiningToolpath{" + "id=" + id + "name=" + name + "pathGeometry=" + pathGeometry + "tool=" + tool + "pathParameters=" + pathParameters + "approachStrategy=" + approachStrategy + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("pathGeometry", pathGeometry);
+        state.put("tool", tool);
+        state.put("pathParameters", pathParameters);
+        state.put("approachStrategy", approachStrategy);
+        return state;
     }
 }

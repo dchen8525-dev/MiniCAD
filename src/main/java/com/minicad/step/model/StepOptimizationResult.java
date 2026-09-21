@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved OPTIMIZATION_RESULT.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param convergenceStatus convergence status (converged, not converged)
  * @param constraintsMet constraints satisfaction status
  */
-public final class StepOptimizationResult implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOptimizationResult extends AbstractStepEntity {
     private final StepEntity optimizedGeometry;
     private final List<Double> optimizedVariables;
     private final double objectiveValue;
@@ -27,22 +26,13 @@ public final class StepOptimizationResult implements StepEntity {
     private final List<Boolean> constraintsMet;
 
     public StepOptimizationResult(int id, String name, StepEntity optimizedGeometry, List<Double> optimizedVariables, double objectiveValue, int iterationCount, String convergenceStatus, List<Boolean> constraintsMet) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.optimizedGeometry = optimizedGeometry;
         this.optimizedVariables = optimizedVariables == null ? null : java.util.List.copyOf(optimizedVariables);
         this.objectiveValue = objectiveValue;
         this.iterationCount = iterationCount;
         this.convergenceStatus = convergenceStatus;
         this.constraintsMet = constraintsMet == null ? null : java.util.List.copyOf(constraintsMet);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getOptimizedGeometry() {
@@ -70,20 +60,16 @@ public final class StepOptimizationResult implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOptimizationResult that = (StepOptimizationResult) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(optimizedGeometry, that.optimizedGeometry) && Objects.equals(optimizedVariables, that.optimizedVariables) && objectiveValue == that.objectiveValue && iterationCount == that.iterationCount && Objects.equals(convergenceStatus, that.convergenceStatus) && Objects.equals(constraintsMet, that.constraintsMet);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, optimizedGeometry, optimizedVariables, objectiveValue, iterationCount, convergenceStatus, constraintsMet);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOptimizationResult{" + "id=" + id + "name=" + name + "optimizedGeometry=" + optimizedGeometry + "optimizedVariables=" + optimizedVariables + "objectiveValue=" + objectiveValue + "iterationCount=" + iterationCount + "convergenceStatus=" + convergenceStatus + "constraintsMet=" + constraintsMet + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("optimizedGeometry", optimizedGeometry);
+        state.put("optimizedVariables", optimizedVariables);
+        state.put("objectiveValue", objectiveValue);
+        state.put("iterationCount", iterationCount);
+        state.put("convergenceStatus", convergenceStatus);
+        state.put("constraintsMet", constraintsMet);
+        return state;
     }
 }

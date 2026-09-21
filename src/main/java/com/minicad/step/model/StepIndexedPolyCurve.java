@@ -1,32 +1,22 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INDEXED_POLY_CURVE / INDEXED_POLYCURVE (MiniCAD alias).
  */
-public final class StepIndexedPolyCurve implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepIndexedPolyCurve extends AbstractStepEntity {
     private final List<StepCartesianPoint> points;
     private final List<Integer> indices;
     private final boolean closed;
 
     public StepIndexedPolyCurve(int id, String name, List<StepCartesianPoint> points, List<Integer> indices, boolean closed) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.points = points == null ? null : java.util.List.copyOf(points);
         this.indices = indices == null ? null : java.util.List.copyOf(indices);
         this.closed = closed;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepCartesianPoint> getPoints() {
@@ -49,20 +39,13 @@ public final class StepIndexedPolyCurve implements StepEntity {
     public boolean closed() { return isClosed(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepIndexedPolyCurve that = (StepIndexedPolyCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(points, that.points) && Objects.equals(indices, that.indices) && closed == that.closed;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, points, indices, closed);
-    }
-
-    @Override
-    public String toString() {
-        return "StepIndexedPolyCurve{" + "id=" + id + "name=" + name + "points=" + points + "indices=" + indices + "closed=" + closed + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("points", points);
+        state.put("indices", indices);
+        state.put("closed", closed);
+        return state;
     }
 }

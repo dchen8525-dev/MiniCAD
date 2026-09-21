@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved JOB_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param jobDependencies job variance dependencies
  * @param jobStatus job variance status
  */
-public final class StepJobDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepJobDefinition extends AbstractStepEntity {
     private final String jobType;
     private final int jobPriority;
     private final String jobSchedule;
@@ -27,22 +26,13 @@ public final class StepJobDefinition implements StepEntity {
     private final String jobStatus;
 
     public StepJobDefinition(int id, String name, String jobType, int jobPriority, String jobSchedule, List<StepEntity> jobTasks, List<StepEntity> jobDependencies, String jobStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.jobType = jobType;
         this.jobPriority = jobPriority;
         this.jobSchedule = jobSchedule;
         this.jobTasks = jobTasks == null ? null : java.util.List.copyOf(jobTasks);
         this.jobDependencies = jobDependencies == null ? null : java.util.List.copyOf(jobDependencies);
         this.jobStatus = jobStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getJobType() {
@@ -70,20 +60,16 @@ public final class StepJobDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepJobDefinition that = (StepJobDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(jobType, that.jobType) && jobPriority == that.jobPriority && Objects.equals(jobSchedule, that.jobSchedule) && Objects.equals(jobTasks, that.jobTasks) && Objects.equals(jobDependencies, that.jobDependencies) && Objects.equals(jobStatus, that.jobStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, jobType, jobPriority, jobSchedule, jobTasks, jobDependencies, jobStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepJobDefinition{" + "id=" + id + "name=" + name + "jobType=" + jobType + "jobPriority=" + jobPriority + "jobSchedule=" + jobSchedule + "jobTasks=" + jobTasks + "jobDependencies=" + jobDependencies + "jobStatus=" + jobStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("jobType", jobType);
+        state.put("jobPriority", jobPriority);
+        state.put("jobSchedule", jobSchedule);
+        state.put("jobTasks", jobTasks);
+        state.put("jobDependencies", jobDependencies);
+        state.put("jobStatus", jobStatus);
+        return state;
     }
 }

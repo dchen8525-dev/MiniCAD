@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TOLERANCE_PAIR.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * * @param toleranceUnit tolerance unit
  * @param fitType fit type classification
  */
-public final class StepTolerancePair implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTolerancePair extends AbstractStepEntity {
     private final Double upperTolerance;
     private final Double lowerTolerance;
     private final StepEntity toleranceUnit;
     private final String fitType;
 
     public StepTolerancePair(int id, String name, Double upperTolerance, Double lowerTolerance, StepEntity toleranceUnit, String fitType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.upperTolerance = upperTolerance;
         this.lowerTolerance = lowerTolerance;
         this.toleranceUnit = toleranceUnit;
         this.fitType = fitType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Double getUpperTolerance() {
@@ -56,20 +46,14 @@ public final class StepTolerancePair implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTolerancePair that = (StepTolerancePair) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(upperTolerance, that.upperTolerance) && Objects.equals(lowerTolerance, that.lowerTolerance) && Objects.equals(toleranceUnit, that.toleranceUnit) && Objects.equals(fitType, that.fitType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, upperTolerance, lowerTolerance, toleranceUnit, fitType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTolerancePair{" + "id=" + id + "name=" + name + "upperTolerance=" + upperTolerance + "lowerTolerance=" + lowerTolerance + "toleranceUnit=" + toleranceUnit + "fitType=" + fitType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("upperTolerance", upperTolerance);
+        state.put("lowerTolerance", lowerTolerance);
+        state.put("toleranceUnit", toleranceUnit);
+        state.put("fitType", fitType);
+        return state;
     }
 }

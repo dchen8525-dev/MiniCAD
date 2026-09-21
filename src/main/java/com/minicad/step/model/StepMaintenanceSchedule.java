@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MAINTENANCE_SCHEDULE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceResources required variance resources
  * @param scheduleStatus schedule status
  */
-public final class StepMaintenanceSchedule implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMaintenanceSchedule extends AbstractStepEntity {
     private final String maintenanceType;
     private final List<StepEntity> maintenanceItems;
     private final String varianceInterval;
@@ -27,22 +26,13 @@ public final class StepMaintenanceSchedule implements StepEntity {
     private final String scheduleStatus;
 
     public StepMaintenanceSchedule(int id, String name, String maintenanceType, List<StepEntity> maintenanceItems, String varianceInterval, List<StepEntity> maintenanceTasks, List<StepEntity> varianceResources, String scheduleStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.maintenanceType = maintenanceType;
         this.maintenanceItems = maintenanceItems == null ? null : java.util.List.copyOf(maintenanceItems);
         this.varianceInterval = varianceInterval;
         this.maintenanceTasks = maintenanceTasks == null ? null : java.util.List.copyOf(maintenanceTasks);
         this.varianceResources = varianceResources == null ? null : java.util.List.copyOf(varianceResources);
         this.scheduleStatus = scheduleStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMaintenanceType() {
@@ -70,20 +60,16 @@ public final class StepMaintenanceSchedule implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMaintenanceSchedule that = (StepMaintenanceSchedule) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(maintenanceType, that.maintenanceType) && Objects.equals(maintenanceItems, that.maintenanceItems) && Objects.equals(varianceInterval, that.varianceInterval) && Objects.equals(maintenanceTasks, that.maintenanceTasks) && Objects.equals(varianceResources, that.varianceResources) && Objects.equals(scheduleStatus, that.scheduleStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, maintenanceType, maintenanceItems, varianceInterval, maintenanceTasks, varianceResources, scheduleStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMaintenanceSchedule{" + "id=" + id + "name=" + name + "maintenanceType=" + maintenanceType + "maintenanceItems=" + maintenanceItems + "varianceInterval=" + varianceInterval + "maintenanceTasks=" + maintenanceTasks + "varianceResources=" + varianceResources + "scheduleStatus=" + scheduleStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("maintenanceType", maintenanceType);
+        state.put("maintenanceItems", maintenanceItems);
+        state.put("varianceInterval", varianceInterval);
+        state.put("maintenanceTasks", maintenanceTasks);
+        state.put("varianceResources", varianceResources);
+        state.put("scheduleStatus", scheduleStatus);
+        return state;
     }
 }

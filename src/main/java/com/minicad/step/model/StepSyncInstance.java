@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SYNC_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param syncConflicts sync variance conflict count
  * @param syncStatus sync variance status
  */
-public final class StepSyncInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSyncInstance extends AbstractStepEntity {
     private final StepEntity syncDefinition;
     private final String syncState;
     private final StepEntity syncLastSync;
@@ -27,22 +26,13 @@ public final class StepSyncInstance implements StepEntity {
     private final String syncStatus;
 
     public StepSyncInstance(int id, String name, StepEntity syncDefinition, String syncState, StepEntity syncLastSync, int syncPending, int syncConflicts, String syncStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.syncDefinition = syncDefinition;
         this.syncState = syncState;
         this.syncLastSync = syncLastSync;
         this.syncPending = syncPending;
         this.syncConflicts = syncConflicts;
         this.syncStatus = syncStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSyncDefinition() {
@@ -70,20 +60,16 @@ public final class StepSyncInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSyncInstance that = (StepSyncInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(syncDefinition, that.syncDefinition) && Objects.equals(syncState, that.syncState) && Objects.equals(syncLastSync, that.syncLastSync) && syncPending == that.syncPending && syncConflicts == that.syncConflicts && Objects.equals(syncStatus, that.syncStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, syncDefinition, syncState, syncLastSync, syncPending, syncConflicts, syncStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSyncInstance{" + "id=" + id + "name=" + name + "syncDefinition=" + syncDefinition + "syncState=" + syncState + "syncLastSync=" + syncLastSync + "syncPending=" + syncPending + "syncConflicts=" + syncConflicts + "syncStatus=" + syncStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("syncDefinition", syncDefinition);
+        state.put("syncState", syncState);
+        state.put("syncLastSync", syncLastSync);
+        state.put("syncPending", syncPending);
+        state.put("syncConflicts", syncConflicts);
+        state.put("syncStatus", syncStatus);
+        return state;
     }
 }

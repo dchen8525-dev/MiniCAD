@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STORAGE_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param storageLocation storage location placement
  * @param storageEnvironment storage environment specification
  */
-public final class StepStorageFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStorageFeature extends AbstractStepEntity {
     private final String storageType;
     private final StepEntity storageGeometry;
     private final int varianceCapacity;
@@ -27,22 +26,13 @@ public final class StepStorageFeature implements StepEntity {
     private final String storageEnvironment;
 
     public StepStorageFeature(int id, String name, String storageType, StepEntity storageGeometry, int varianceCapacity, List<Double> storageDimensions, StepEntity storageLocation, String storageEnvironment) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.storageType = storageType;
         this.storageGeometry = storageGeometry;
         this.varianceCapacity = varianceCapacity;
         this.storageDimensions = storageDimensions == null ? null : java.util.List.copyOf(storageDimensions);
         this.storageLocation = storageLocation;
         this.storageEnvironment = storageEnvironment;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getStorageType() {
@@ -70,20 +60,16 @@ public final class StepStorageFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStorageFeature that = (StepStorageFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(storageType, that.storageType) && Objects.equals(storageGeometry, that.storageGeometry) && varianceCapacity == that.varianceCapacity && Objects.equals(storageDimensions, that.storageDimensions) && Objects.equals(storageLocation, that.storageLocation) && Objects.equals(storageEnvironment, that.storageEnvironment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, storageType, storageGeometry, varianceCapacity, storageDimensions, storageLocation, storageEnvironment);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStorageFeature{" + "id=" + id + "name=" + name + "storageType=" + storageType + "storageGeometry=" + storageGeometry + "varianceCapacity=" + varianceCapacity + "storageDimensions=" + storageDimensions + "storageLocation=" + storageLocation + "storageEnvironment=" + storageEnvironment + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("storageType", storageType);
+        state.put("storageGeometry", storageGeometry);
+        state.put("varianceCapacity", varianceCapacity);
+        state.put("storageDimensions", storageDimensions);
+        state.put("storageLocation", storageLocation);
+        state.put("storageEnvironment", storageEnvironment);
+        return state;
     }
 }

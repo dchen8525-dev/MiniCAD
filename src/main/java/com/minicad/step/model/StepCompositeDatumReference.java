@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMPOSITE_DATUM_REFERENCE.
@@ -12,25 +13,14 @@ import java.util.Objects;
  * @param datums list of datum entities
  * @param compositeType composite type (common, simultaneous, etc.)
  */
-public final class StepCompositeDatumReference implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCompositeDatumReference extends AbstractStepEntity {
     private final List<StepEntity> datums;
     private final String compositeType;
 
     public StepCompositeDatumReference(int id, String name, List<StepEntity> datums, String compositeType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.datums = datums == null ? null : java.util.List.copyOf(datums);
         this.compositeType = compositeType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getDatums() {
@@ -42,20 +32,12 @@ public final class StepCompositeDatumReference implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCompositeDatumReference that = (StepCompositeDatumReference) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(datums, that.datums) && Objects.equals(compositeType, that.compositeType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, datums, compositeType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCompositeDatumReference{" + "id=" + id + "name=" + name + "datums=" + datums + "compositeType=" + compositeType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("datums", datums);
+        state.put("compositeType", compositeType);
+        return state;
     }
 }

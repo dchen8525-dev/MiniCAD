@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal parse-only swept area solid.
  *
@@ -13,9 +14,7 @@ import java.util.Objects;
  * @param parameter depth or angle in STEP order
  * @param entityName concrete STEP entity name
  */
-public final class StepSweptAreaSolid implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSweptAreaSolid extends AbstractStepEntity {
     private final StepProfileDef sweptArea;
     private final StepAxis2Placement3D position;
     private final StepEntity sweepReference;
@@ -23,21 +22,12 @@ public final class StepSweptAreaSolid implements StepEntity {
     private final String entityName;
 
     public StepSweptAreaSolid(int id, String name, StepProfileDef sweptArea, StepAxis2Placement3D position, StepEntity sweepReference, double parameter, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sweptArea = sweptArea;
         this.position = position;
         this.sweepReference = sweepReference;
         this.parameter = parameter;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepProfileDef getSweptArea() {
@@ -70,20 +60,15 @@ public final class StepSweptAreaSolid implements StepEntity {
     public String entityName() { return getEntityName(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSweptAreaSolid that = (StepSweptAreaSolid) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sweptArea, that.sweptArea) && Objects.equals(position, that.position) && Objects.equals(sweepReference, that.sweepReference) && parameter == that.parameter && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sweptArea, position, sweepReference, parameter, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSweptAreaSolid{" + "id=" + id + "name=" + name + "sweptArea=" + sweptArea + "position=" + position + "sweepReference=" + sweepReference + "parameter=" + parameter + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sweptArea", sweptArea);
+        state.put("position", position);
+        state.put("sweepReference", sweepReference);
+        state.put("parameter", parameter);
+        state.put("entityName", entityName);
+        return state;
     }
 }

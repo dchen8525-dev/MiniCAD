@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SENSOR_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceResolution sensor variance resolution
  * @param sensorInterface sensor interface specification
  */
-public final class StepSensorFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSensorFeature extends AbstractStepEntity {
     private final String sensorType;
     private final StepEntity sensorGeometry;
     private final StepEntity sensorPosition;
@@ -27,22 +26,13 @@ public final class StepSensorFeature implements StepEntity {
     private final String sensorInterface;
 
     public StepSensorFeature(int id, String name, String sensorType, StepEntity sensorGeometry, StepEntity sensorPosition, List<Double> measurementRange, double varianceResolution, String sensorInterface) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sensorType = sensorType;
         this.sensorGeometry = sensorGeometry;
         this.sensorPosition = sensorPosition;
         this.measurementRange = measurementRange == null ? null : java.util.List.copyOf(measurementRange);
         this.varianceResolution = varianceResolution;
         this.sensorInterface = sensorInterface;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSensorType() {
@@ -70,20 +60,16 @@ public final class StepSensorFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSensorFeature that = (StepSensorFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sensorType, that.sensorType) && Objects.equals(sensorGeometry, that.sensorGeometry) && Objects.equals(sensorPosition, that.sensorPosition) && Objects.equals(measurementRange, that.measurementRange) && varianceResolution == that.varianceResolution && Objects.equals(sensorInterface, that.sensorInterface);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sensorType, sensorGeometry, sensorPosition, measurementRange, varianceResolution, sensorInterface);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSensorFeature{" + "id=" + id + "name=" + name + "sensorType=" + sensorType + "sensorGeometry=" + sensorGeometry + "sensorPosition=" + sensorPosition + "measurementRange=" + measurementRange + "varianceResolution=" + varianceResolution + "sensorInterface=" + sensorInterface + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sensorType", sensorType);
+        state.put("sensorGeometry", sensorGeometry);
+        state.put("sensorPosition", sensorPosition);
+        state.put("measurementRange", measurementRange);
+        state.put("varianceResolution", varianceResolution);
+        state.put("sensorInterface", sensorInterface);
+        return state;
     }
 }

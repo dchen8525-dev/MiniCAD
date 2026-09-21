@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ACTION_CHAIN_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param chainCompletedActions chain variance completed action count
  * @param chainStatus chain variance status
  */
-public final class StepActionChainInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepActionChainInstance extends AbstractStepEntity {
     private final StepEntity chainDefinition;
     private final String chainState;
     private final int chainCurrentAction;
@@ -25,21 +24,12 @@ public final class StepActionChainInstance implements StepEntity {
     private final String chainStatus;
 
     public StepActionChainInstance(int id, String name, StepEntity chainDefinition, String chainState, int chainCurrentAction, int chainCompletedActions, String chainStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.chainDefinition = chainDefinition;
         this.chainState = chainState;
         this.chainCurrentAction = chainCurrentAction;
         this.chainCompletedActions = chainCompletedActions;
         this.chainStatus = chainStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getChainDefinition() {
@@ -63,20 +53,15 @@ public final class StepActionChainInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepActionChainInstance that = (StepActionChainInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(chainDefinition, that.chainDefinition) && Objects.equals(chainState, that.chainState) && chainCurrentAction == that.chainCurrentAction && chainCompletedActions == that.chainCompletedActions && Objects.equals(chainStatus, that.chainStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, chainDefinition, chainState, chainCurrentAction, chainCompletedActions, chainStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepActionChainInstance{" + "id=" + id + "name=" + name + "chainDefinition=" + chainDefinition + "chainState=" + chainState + "chainCurrentAction=" + chainCurrentAction + "chainCompletedActions=" + chainCompletedActions + "chainStatus=" + chainStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("chainDefinition", chainDefinition);
+        state.put("chainState", chainState);
+        state.put("chainCurrentAction", chainCurrentAction);
+        state.put("chainCompletedActions", chainCompletedActions);
+        state.put("chainStatus", chainStatus);
+        return state;
     }
 }

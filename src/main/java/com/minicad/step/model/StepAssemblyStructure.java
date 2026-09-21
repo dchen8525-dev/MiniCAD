@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ASSEMBLY_STRUCTURE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param relationships component relationships
  * @param assemblyType assembly type classification
  */
-public final class StepAssemblyStructure implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAssemblyStructure extends AbstractStepEntity {
     private final StepEntity rootComponent;
     private final List<StepEntity> components;
     private final List<StepEntity> relationships;
     private final String assemblyType;
 
     public StepAssemblyStructure(int id, String name, StepEntity rootComponent, List<StepEntity> components, List<StepEntity> relationships, String assemblyType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.rootComponent = rootComponent;
         this.components = components == null ? null : java.util.List.copyOf(components);
         this.relationships = relationships == null ? null : java.util.List.copyOf(relationships);
         this.assemblyType = assemblyType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRootComponent() {
@@ -56,20 +46,14 @@ public final class StepAssemblyStructure implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAssemblyStructure that = (StepAssemblyStructure) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(rootComponent, that.rootComponent) && Objects.equals(components, that.components) && Objects.equals(relationships, that.relationships) && Objects.equals(assemblyType, that.assemblyType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, rootComponent, components, relationships, assemblyType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAssemblyStructure{" + "id=" + id + "name=" + name + "rootComponent=" + rootComponent + "components=" + components + "relationships=" + relationships + "assemblyType=" + assemblyType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("rootComponent", rootComponent);
+        state.put("components", components);
+        state.put("relationships", relationships);
+        state.put("assemblyType", assemblyType);
+        return state;
     }
 }

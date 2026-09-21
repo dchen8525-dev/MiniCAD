@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TEAM_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param teamMembers team variance member definitions
  * @param teamStatus team variance status
  */
-public final class StepTeamDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTeamDefinition extends AbstractStepEntity {
     private final String teamType;
     private final String teamPurpose;
     private final List<String> teamResponsibilities;
@@ -25,21 +24,12 @@ public final class StepTeamDefinition implements StepEntity {
     private final String teamStatus;
 
     public StepTeamDefinition(int id, String name, String teamType, String teamPurpose, List<String> teamResponsibilities, List<StepEntity> teamMembers, String teamStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.teamType = teamType;
         this.teamPurpose = teamPurpose;
         this.teamResponsibilities = teamResponsibilities == null ? null : java.util.List.copyOf(teamResponsibilities);
         this.teamMembers = teamMembers == null ? null : java.util.List.copyOf(teamMembers);
         this.teamStatus = teamStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTeamType() {
@@ -63,20 +53,15 @@ public final class StepTeamDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTeamDefinition that = (StepTeamDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(teamType, that.teamType) && Objects.equals(teamPurpose, that.teamPurpose) && Objects.equals(teamResponsibilities, that.teamResponsibilities) && Objects.equals(teamMembers, that.teamMembers) && Objects.equals(teamStatus, that.teamStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, teamType, teamPurpose, teamResponsibilities, teamMembers, teamStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTeamDefinition{" + "id=" + id + "name=" + name + "teamType=" + teamType + "teamPurpose=" + teamPurpose + "teamResponsibilities=" + teamResponsibilities + "teamMembers=" + teamMembers + "teamStatus=" + teamStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("teamType", teamType);
+        state.put("teamPurpose", teamPurpose);
+        state.put("teamResponsibilities", teamResponsibilities);
+        state.put("teamMembers", teamMembers);
+        state.put("teamStatus", teamStatus);
+        return state;
     }
 }

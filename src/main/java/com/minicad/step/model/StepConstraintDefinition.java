@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CONSTRAINT_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param constraintSeverity constraint variance severity level
  * @param constraintStatus constraint variance status
  */
-public final class StepConstraintDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConstraintDefinition extends AbstractStepEntity {
     private final String constraintType;
     private final String constraintExpression;
     private final List<String> constraintParameters;
@@ -25,21 +24,12 @@ public final class StepConstraintDefinition implements StepEntity {
     private final String constraintStatus;
 
     public StepConstraintDefinition(int id, String name, String constraintType, String constraintExpression, List<String> constraintParameters, int constraintSeverity, String constraintStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.constraintType = constraintType;
         this.constraintExpression = constraintExpression;
         this.constraintParameters = constraintParameters == null ? null : java.util.List.copyOf(constraintParameters);
         this.constraintSeverity = constraintSeverity;
         this.constraintStatus = constraintStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getConstraintType() {
@@ -63,20 +53,15 @@ public final class StepConstraintDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConstraintDefinition that = (StepConstraintDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(constraintType, that.constraintType) && Objects.equals(constraintExpression, that.constraintExpression) && Objects.equals(constraintParameters, that.constraintParameters) && constraintSeverity == that.constraintSeverity && Objects.equals(constraintStatus, that.constraintStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, constraintType, constraintExpression, constraintParameters, constraintSeverity, constraintStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConstraintDefinition{" + "id=" + id + "name=" + name + "constraintType=" + constraintType + "constraintExpression=" + constraintExpression + "constraintParameters=" + constraintParameters + "constraintSeverity=" + constraintSeverity + "constraintStatus=" + constraintStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("constraintType", constraintType);
+        state.put("constraintExpression", constraintExpression);
+        state.put("constraintParameters", constraintParameters);
+        state.put("constraintSeverity", constraintSeverity);
+        state.put("constraintStatus", constraintStatus);
+        return state;
     }
 }

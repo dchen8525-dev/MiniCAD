@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved GEOMETRIC_MEASUREMENT.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param measurementPoints measurement points used
  * @param passFailStatus pass/fail status result
  */
-public final class StepGeometricMeasurement implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGeometricMeasurement extends AbstractStepEntity {
     private final StepEntity measurementGeometry;
     private final String geometricType;
     private final StepEntity toleranceZone;
@@ -27,22 +26,13 @@ public final class StepGeometricMeasurement implements StepEntity {
     private final String passFailStatus;
 
     public StepGeometricMeasurement(int id, String name, StepEntity measurementGeometry, String geometricType, StepEntity toleranceZone, double measuredValue, List<StepEntity> measurementPoints, String passFailStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.measurementGeometry = measurementGeometry;
         this.geometricType = geometricType;
         this.toleranceZone = toleranceZone;
         this.measuredValue = measuredValue;
         this.measurementPoints = measurementPoints == null ? null : java.util.List.copyOf(measurementPoints);
         this.passFailStatus = passFailStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMeasurementGeometry() {
@@ -87,20 +77,16 @@ public final class StepGeometricMeasurement implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGeometricMeasurement that = (StepGeometricMeasurement) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(measurementGeometry, that.measurementGeometry) && Objects.equals(geometricType, that.geometricType) && Objects.equals(toleranceZone, that.toleranceZone) && measuredValue == that.measuredValue && Objects.equals(measurementPoints, that.measurementPoints) && Objects.equals(passFailStatus, that.passFailStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, measurementGeometry, geometricType, toleranceZone, measuredValue, measurementPoints, passFailStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGeometricMeasurement{" + "id=" + id + "name=" + name + "measurementGeometry=" + measurementGeometry + "geometricType=" + geometricType + "toleranceZone=" + toleranceZone + "measuredValue=" + measuredValue + "measurementPoints=" + measurementPoints + "passFailStatus=" + passFailStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("measurementGeometry", measurementGeometry);
+        state.put("geometricType", geometricType);
+        state.put("toleranceZone", toleranceZone);
+        state.put("measuredValue", measuredValue);
+        state.put("measurementPoints", measurementPoints);
+        state.put("passFailStatus", passFailStatus);
+        return state;
     }
 }

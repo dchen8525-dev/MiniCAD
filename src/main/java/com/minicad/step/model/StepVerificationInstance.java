@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved VERIFICATION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param verificationMeasurements verification variance measurements
  * @param verificationStatus verification variance status
  */
-public final class StepVerificationInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepVerificationInstance extends AbstractStepEntity {
     private final StepEntity verificationDefinition;
     private final StepEntity verificationTarget;
     private final boolean verificationResult;
@@ -25,21 +24,12 @@ public final class StepVerificationInstance implements StepEntity {
     private final String verificationStatus;
 
     public StepVerificationInstance(int id, String name, StepEntity verificationDefinition, StepEntity verificationTarget, boolean verificationResult, List<Double> verificationMeasurements, String verificationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.verificationDefinition = verificationDefinition;
         this.verificationTarget = verificationTarget;
         this.verificationResult = verificationResult;
         this.verificationMeasurements = verificationMeasurements == null ? null : java.util.List.copyOf(verificationMeasurements);
         this.verificationStatus = verificationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVerificationDefinition() {
@@ -63,20 +53,15 @@ public final class StepVerificationInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVerificationInstance that = (StepVerificationInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(verificationDefinition, that.verificationDefinition) && Objects.equals(verificationTarget, that.verificationTarget) && verificationResult == that.verificationResult && Objects.equals(verificationMeasurements, that.verificationMeasurements) && Objects.equals(verificationStatus, that.verificationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, verificationDefinition, verificationTarget, verificationResult, verificationMeasurements, verificationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVerificationInstance{" + "id=" + id + "name=" + name + "verificationDefinition=" + verificationDefinition + "verificationTarget=" + verificationTarget + "verificationResult=" + verificationResult + "verificationMeasurements=" + verificationMeasurements + "verificationStatus=" + verificationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("verificationDefinition", verificationDefinition);
+        state.put("verificationTarget", verificationTarget);
+        state.put("verificationResult", verificationResult);
+        state.put("verificationMeasurements", verificationMeasurements);
+        state.put("verificationStatus", verificationStatus);
+        return state;
     }
 }

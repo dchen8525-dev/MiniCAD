@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ASSET_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param assetLifecycle asset variance lifecycle info
  * @param assetStatus asset variance status
  */
-public final class StepAssetDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAssetDefinition extends AbstractStepEntity {
     private final String assetType;
     private final String assetCategory;
     private final List<String> assetProperties;
@@ -25,21 +24,12 @@ public final class StepAssetDefinition implements StepEntity {
     private final String assetStatus;
 
     public StepAssetDefinition(int id, String name, String assetType, String assetCategory, List<String> assetProperties, String assetLifecycle, String assetStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.assetType = assetType;
         this.assetCategory = assetCategory;
         this.assetProperties = assetProperties == null ? null : java.util.List.copyOf(assetProperties);
         this.assetLifecycle = assetLifecycle;
         this.assetStatus = assetStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAssetType() {
@@ -63,20 +53,15 @@ public final class StepAssetDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAssetDefinition that = (StepAssetDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(assetType, that.assetType) && Objects.equals(assetCategory, that.assetCategory) && Objects.equals(assetProperties, that.assetProperties) && Objects.equals(assetLifecycle, that.assetLifecycle) && Objects.equals(assetStatus, that.assetStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, assetType, assetCategory, assetProperties, assetLifecycle, assetStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAssetDefinition{" + "id=" + id + "name=" + name + "assetType=" + assetType + "assetCategory=" + assetCategory + "assetProperties=" + assetProperties + "assetLifecycle=" + assetLifecycle + "assetStatus=" + assetStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("assetType", assetType);
+        state.put("assetCategory", assetCategory);
+        state.put("assetProperties", assetProperties);
+        state.put("assetLifecycle", assetLifecycle);
+        state.put("assetStatus", assetStatus);
+        return state;
     }
 }

@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved LENGTH_UNIT_WITH_UNIT.
  */
-public final class StepLengthUnitWithUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLengthUnitWithUnit extends AbstractStepEntity {
     private final StepEntity lengthUnit;
     private final StepEntity unitComponent;
 
     public StepLengthUnitWithUnit(int id, String name, StepEntity lengthUnit, StepEntity unitComponent) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.lengthUnit = lengthUnit;
         this.unitComponent = unitComponent;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getLengthUnit() {
@@ -35,20 +25,12 @@ public final class StepLengthUnitWithUnit implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLengthUnitWithUnit that = (StepLengthUnitWithUnit) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(lengthUnit, that.lengthUnit) && Objects.equals(unitComponent, that.unitComponent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, lengthUnit, unitComponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLengthUnitWithUnit{" + "id=" + id + "name=" + name + "lengthUnit=" + lengthUnit + "unitComponent=" + unitComponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("lengthUnit", lengthUnit);
+        state.put("unitComponent", unitComponent);
+        return state;
     }
 }

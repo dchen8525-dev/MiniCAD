@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal point set.
@@ -10,23 +11,12 @@ import java.util.Objects;
  * @param name set name
  * @param points point elements
  */
-public final class StepPointSet implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPointSet extends AbstractStepEntity {
     private final List<StepEntity> points;
 
     public StepPointSet(int id, String name, List<StepEntity> points) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.points = points == null ? null : java.util.List.copyOf(points);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getPoints() {
@@ -39,20 +29,11 @@ public final class StepPointSet implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPointSet that = (StepPointSet) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(points, that.points);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, points);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPointSet{" + "id=" + id + "name=" + name + "points=" + points + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("points", points);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PRODUCT_VERSION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param product relating product
  * @param versionContext version context information
  */
-public final class StepProductVersion implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProductVersion extends AbstractStepEntity {
     private final String versionId;
     private final String description;
     private final StepEntity product;
     private final StepEntity versionContext;
 
     public StepProductVersion(int id, String name, String versionId, String description, StepEntity product, StepEntity versionContext) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.versionId = versionId;
         this.description = description;
         this.product = product;
         this.versionContext = versionContext;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVersionId() {
@@ -56,20 +46,14 @@ public final class StepProductVersion implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductVersion that = (StepProductVersion) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(versionId, that.versionId) && Objects.equals(description, that.description) && Objects.equals(product, that.product) && Objects.equals(versionContext, that.versionContext);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, versionId, description, product, versionContext);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductVersion{" + "id=" + id + "name=" + name + "versionId=" + versionId + "description=" + description + "product=" + product + "versionContext=" + versionContext + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("versionId", versionId);
+        state.put("description", description);
+        state.put("product", product);
+        state.put("versionContext", versionContext);
+        return state;
     }
 }

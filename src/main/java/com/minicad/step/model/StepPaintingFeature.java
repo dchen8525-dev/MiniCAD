@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PAINTING_FEATURE.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varnishCoat varnish/clear coat specification
  * @param paintStandard paint standard reference
  */
-public final class StepPaintingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPaintingFeature extends AbstractStepEntity {
     private final String paintType;
     private final StepEntity paintColor;
     private final double paintThickness;
@@ -29,8 +28,7 @@ public final class StepPaintingFeature implements StepEntity {
     private final String paintStandard;
 
     public StepPaintingFeature(int id, String name, String paintType, StepEntity paintColor, double paintThickness, List<StepEntity> appliedSurfaces, StepEntity primerCoat, StepEntity varnishCoat, String paintStandard) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.paintType = paintType;
         this.paintColor = paintColor;
         this.paintThickness = paintThickness;
@@ -38,14 +36,6 @@ public final class StepPaintingFeature implements StepEntity {
         this.primerCoat = primerCoat;
         this.varnishCoat = varnishCoat;
         this.paintStandard = paintStandard;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPaintType() {
@@ -77,20 +67,17 @@ public final class StepPaintingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPaintingFeature that = (StepPaintingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(paintType, that.paintType) && Objects.equals(paintColor, that.paintColor) && paintThickness == that.paintThickness && Objects.equals(appliedSurfaces, that.appliedSurfaces) && Objects.equals(primerCoat, that.primerCoat) && Objects.equals(varnishCoat, that.varnishCoat) && Objects.equals(paintStandard, that.paintStandard);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, paintType, paintColor, paintThickness, appliedSurfaces, primerCoat, varnishCoat, paintStandard);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPaintingFeature{" + "id=" + id + "name=" + name + "paintType=" + paintType + "paintColor=" + paintColor + "paintThickness=" + paintThickness + "appliedSurfaces=" + appliedSurfaces + "primerCoat=" + primerCoat + "varnishCoat=" + varnishCoat + "paintStandard=" + paintStandard + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("paintType", paintType);
+        state.put("paintColor", paintColor);
+        state.put("paintThickness", paintThickness);
+        state.put("appliedSurfaces", appliedSurfaces);
+        state.put("primerCoat", primerCoat);
+        state.put("varnishCoat", varnishCoat);
+        state.put("paintStandard", paintStandard);
+        return state;
     }
 }

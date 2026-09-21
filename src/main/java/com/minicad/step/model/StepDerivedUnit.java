@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal derived unit definition.
@@ -10,23 +11,14 @@ import java.util.Objects;
  * @param elements unit elements
  * @param unitKind derived unit kind such as FORCE_UNIT
  */
-public final class StepDerivedUnit implements StepEntity {
-    private final int id;
+public final class StepDerivedUnit extends AbstractStepEntity {
     private final List<StepDerivedUnitElement> elements;
     private final String unitKind;
 
     public StepDerivedUnit(int id, List<StepDerivedUnitElement> elements, String unitKind) {
-        this.id = id;
+        super(id, "");
         this.elements = elements == null ? null : java.util.List.copyOf(elements);
         this.unitKind = unitKind;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public List<StepDerivedUnitElement> getElements() {
@@ -41,23 +33,15 @@ public final class StepDerivedUnit implements StepEntity {
     public List<StepDerivedUnitElement> elements() {
         return elements;
     }
+
     public String unitKind() { return unitKind; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDerivedUnit that = (StepDerivedUnit) o;
-        return id == that.id && Objects.equals(elements, that.elements) && Objects.equals(unitKind, that.unitKind);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, elements, unitKind);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDerivedUnit{" + "id=" + id + "elements=" + elements + "unitKind=" + unitKind + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("elements", elements);
+        state.put("unitKind", unitKind);
+        return state;
     }
 }

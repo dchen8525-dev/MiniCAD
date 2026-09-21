@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved AUTHENTICATION_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param authDetails authentication variance details
  * @param authStatus authentication variance status
  */
-public final class StepAuthenticationRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAuthenticationRecord extends AbstractStepEntity {
     private final String authType;
     private final String authResult;
     private final StepEntity authHolder;
@@ -27,22 +26,13 @@ public final class StepAuthenticationRecord implements StepEntity {
     private final String authStatus;
 
     public StepAuthenticationRecord(int id, String name, String authType, String authResult, StepEntity authHolder, StepEntity authTimestamp, List<String> authDetails, String authStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.authType = authType;
         this.authResult = authResult;
         this.authHolder = authHolder;
         this.authTimestamp = authTimestamp;
         this.authDetails = authDetails == null ? null : java.util.List.copyOf(authDetails);
         this.authStatus = authStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAuthType() {
@@ -70,20 +60,16 @@ public final class StepAuthenticationRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAuthenticationRecord that = (StepAuthenticationRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(authType, that.authType) && Objects.equals(authResult, that.authResult) && Objects.equals(authHolder, that.authHolder) && Objects.equals(authTimestamp, that.authTimestamp) && Objects.equals(authDetails, that.authDetails) && Objects.equals(authStatus, that.authStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, authType, authResult, authHolder, authTimestamp, authDetails, authStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAuthenticationRecord{" + "id=" + id + "name=" + name + "authType=" + authType + "authResult=" + authResult + "authHolder=" + authHolder + "authTimestamp=" + authTimestamp + "authDetails=" + authDetails + "authStatus=" + authStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("authType", authType);
+        state.put("authResult", authResult);
+        state.put("authHolder", authHolder);
+        state.put("authTimestamp", authTimestamp);
+        state.put("authDetails", authDetails);
+        state.put("authStatus", authStatus);
+        return state;
     }
 }

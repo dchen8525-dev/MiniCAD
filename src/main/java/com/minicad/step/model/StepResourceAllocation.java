@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RESOURCE_ALLOCATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @variancePriority allocation variance priority
  * @param allocationStatus allocation status
  */
-public final class StepResourceAllocation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepResourceAllocation extends AbstractStepEntity {
     private final String allocationType;
     private final StepEntity allocatedResource;
     private final int allocationQuantity;
@@ -27,22 +26,13 @@ public final class StepResourceAllocation implements StepEntity {
     private final String allocationStatus;
 
     public StepResourceAllocation(int id, String name, String allocationType, StepEntity allocatedResource, int allocationQuantity, List<Double> allocationPeriod, int variancePriority, String allocationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.allocationType = allocationType;
         this.allocatedResource = allocatedResource;
         this.allocationQuantity = allocationQuantity;
         this.allocationPeriod = allocationPeriod == null ? null : java.util.List.copyOf(allocationPeriod);
         this.variancePriority = variancePriority;
         this.allocationStatus = allocationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAllocationType() {
@@ -70,20 +60,16 @@ public final class StepResourceAllocation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepResourceAllocation that = (StepResourceAllocation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(allocationType, that.allocationType) && Objects.equals(allocatedResource, that.allocatedResource) && allocationQuantity == that.allocationQuantity && Objects.equals(allocationPeriod, that.allocationPeriod) && variancePriority == that.variancePriority && Objects.equals(allocationStatus, that.allocationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, allocationType, allocatedResource, allocationQuantity, allocationPeriod, variancePriority, allocationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepResourceAllocation{" + "id=" + id + "name=" + name + "allocationType=" + allocationType + "allocatedResource=" + allocatedResource + "allocationQuantity=" + allocationQuantity + "allocationPeriod=" + allocationPeriod + "variancePriority=" + variancePriority + "allocationStatus=" + allocationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("allocationType", allocationType);
+        state.put("allocatedResource", allocatedResource);
+        state.put("allocationQuantity", allocationQuantity);
+        state.put("allocationPeriod", allocationPeriod);
+        state.put("variancePriority", variancePriority);
+        state.put("allocationStatus", allocationStatus);
+        return state;
     }
 }

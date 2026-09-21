@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved AUDIT_RECORD.
@@ -18,9 +19,7 @@ import java.util.Objects;
  * @varianceStatus audit variance status
  * @param auditScope audit scope description
  */
-public final class StepAuditRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAuditRecord extends AbstractStepEntity {
     private final String auditId;
     private final String auditType;
     private final List<String> varianceFindings;
@@ -31,8 +30,7 @@ public final class StepAuditRecord implements StepEntity {
     private final String auditScope;
 
     public StepAuditRecord(int id, String name, String auditId, String auditType, List<String> varianceFindings, List<StepEntity> varianceActions, StepEntity auditDate, StepEntity auditor, String varianceStatus, String auditScope) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.auditId = auditId;
         this.auditType = auditType;
         this.varianceFindings = varianceFindings == null ? null : java.util.List.copyOf(varianceFindings);
@@ -41,14 +39,6 @@ public final class StepAuditRecord implements StepEntity {
         this.auditor = auditor;
         this.varianceStatus = varianceStatus;
         this.auditScope = auditScope;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAuditId() {
@@ -84,20 +74,18 @@ public final class StepAuditRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAuditRecord that = (StepAuditRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(auditId, that.auditId) && Objects.equals(auditType, that.auditType) && Objects.equals(varianceFindings, that.varianceFindings) && Objects.equals(varianceActions, that.varianceActions) && Objects.equals(auditDate, that.auditDate) && Objects.equals(auditor, that.auditor) && Objects.equals(varianceStatus, that.varianceStatus) && Objects.equals(auditScope, that.auditScope);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, auditId, auditType, varianceFindings, varianceActions, auditDate, auditor, varianceStatus, auditScope);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAuditRecord{" + "id=" + id + "name=" + name + "auditId=" + auditId + "auditType=" + auditType + "varianceFindings=" + varianceFindings + "varianceActions=" + varianceActions + "auditDate=" + auditDate + "auditor=" + auditor + "varianceStatus=" + varianceStatus + "auditScope=" + auditScope + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("auditId", auditId);
+        state.put("auditType", auditType);
+        state.put("varianceFindings", varianceFindings);
+        state.put("varianceActions", varianceActions);
+        state.put("auditDate", auditDate);
+        state.put("auditor", auditor);
+        state.put("varianceStatus", varianceStatus);
+        state.put("auditScope", auditScope);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_GROUP_ASSIGNMENT metadata.
@@ -10,19 +11,14 @@ import java.util.Objects;
  * @param assignedGroup assigned group
  * @param items assigned target items
  */
-public final class StepAppliedGroupAssignment implements StepEntity {
-    private final int id;
+public final class StepAppliedGroupAssignment extends AbstractStepEntity {
     private final StepGroup assignedGroup;
     private final List<StepEntity> items;
 
     public StepAppliedGroupAssignment(int id, StepGroup assignedGroup, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.assignedGroup = assignedGroup;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public StepGroup getAssignedGroup() {
@@ -51,20 +47,11 @@ public final class StepAppliedGroupAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedGroupAssignment that = (StepAppliedGroupAssignment) o;
-        return id == that.id && Objects.equals(assignedGroup, that.assignedGroup) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedGroup, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedGroupAssignment{" + "id=" + id + "assignedGroup=" + assignedGroup + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedGroup", assignedGroup);
+        state.put("items", items);
+        return state;
     }
 }

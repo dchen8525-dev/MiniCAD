@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TRANSITION_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceAction transition variance action
  * @varianceStatus definition variance status
  */
-public final class StepTransitionDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTransitionDefinition extends AbstractStepEntity {
     private final StepEntity varianceFrom;
     private final StepEntity varianceTo;
     private final String varianceTrigger;
@@ -27,22 +26,13 @@ public final class StepTransitionDefinition implements StepEntity {
     private final String varianceStatus;
 
     public StepTransitionDefinition(int id, String name, StepEntity varianceFrom, StepEntity varianceTo, String varianceTrigger, String varianceGuard, StepEntity varianceAction, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceFrom = varianceFrom;
         this.varianceTo = varianceTo;
         this.varianceTrigger = varianceTrigger;
         this.varianceGuard = varianceGuard;
         this.varianceAction = varianceAction;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceFrom() {
@@ -70,20 +60,16 @@ public final class StepTransitionDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTransitionDefinition that = (StepTransitionDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceFrom, that.varianceFrom) && Objects.equals(varianceTo, that.varianceTo) && Objects.equals(varianceTrigger, that.varianceTrigger) && Objects.equals(varianceGuard, that.varianceGuard) && Objects.equals(varianceAction, that.varianceAction) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceFrom, varianceTo, varianceTrigger, varianceGuard, varianceAction, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTransitionDefinition{" + "id=" + id + "name=" + name + "varianceFrom=" + varianceFrom + "varianceTo=" + varianceTo + "varianceTrigger=" + varianceTrigger + "varianceGuard=" + varianceGuard + "varianceAction=" + varianceAction + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceFrom", varianceFrom);
+        state.put("varianceTo", varianceTo);
+        state.put("varianceTrigger", varianceTrigger);
+        state.put("varianceGuard", varianceGuard);
+        state.put("varianceAction", varianceAction);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

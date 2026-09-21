@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DIMENSIONAL_SIZE.
  * A dimensional size of a shape aspect.
@@ -10,25 +12,14 @@ import java.util.Objects;
  * @param description size description
  * @param ofShape shape aspect being measured
  */
-public final class StepDimensionalSize implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDimensionalSize extends AbstractStepEntity {
     private final String description;
     private final StepEntity ofShape;
 
     public StepDimensionalSize(int id, String name, String description, StepEntity ofShape) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.ofShape = ofShape;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -40,20 +31,12 @@ public final class StepDimensionalSize implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDimensionalSize that = (StepDimensionalSize) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(ofShape, that.ofShape);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, ofShape);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDimensionalSize{" + "id=" + id + "name=" + name + "description=" + description + "ofShape=" + ofShape + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("ofShape", ofShape);
+        return state;
     }
 }

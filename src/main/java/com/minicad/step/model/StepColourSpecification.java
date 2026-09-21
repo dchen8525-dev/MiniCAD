@@ -1,44 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal COLOUR_SPECIFICATION.
  *
  * @param id step id
  * @param name colour name
  */
-public final class StepColourSpecification implements StepEntity {
-    private final int id;
-    private final String name;
-
+public final class StepColourSpecification extends AbstractStepEntity {
     public StepColourSpecification(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+        super(id, name);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepColourSpecification that = (StepColourSpecification) o;
-        return id == that.id && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
-
-    @Override
-    public String toString() {
-        return "StepColourSpecification{" + "id=" + id + "name=" + name + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        return state;
     }
 }

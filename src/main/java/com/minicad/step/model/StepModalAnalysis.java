@@ -1,27 +1,18 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved MODAL_ANALYSIS.
  * Modal analysis type for FEA.
  */
-public final class StepModalAnalysis implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepModalAnalysis extends AbstractStepEntity {
     private final int numberOfModes;
 
     public StepModalAnalysis(int id, String name, int numberOfModes) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.numberOfModes = numberOfModes;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public int getNumberOfModes() {
@@ -29,20 +20,11 @@ public final class StepModalAnalysis implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepModalAnalysis that = (StepModalAnalysis) o;
-        return id == that.id && Objects.equals(name, that.name) && numberOfModes == that.numberOfModes;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, numberOfModes);
-    }
-
-    @Override
-    public String toString() {
-        return "StepModalAnalysis{" + "id=" + id + "name=" + name + "numberOfModes=" + numberOfModes + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("numberOfModes", numberOfModes);
+        return state;
     }
 }

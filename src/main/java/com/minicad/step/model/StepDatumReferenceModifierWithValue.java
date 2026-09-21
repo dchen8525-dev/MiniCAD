@@ -1,33 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DATUM_REFERENCE_MODIFIER_WITH_VALUE.
  * A datum reference modifier with an associated value (e.g., maximum material condition value).
  */
-public final class StepDatumReferenceModifierWithValue implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDatumReferenceModifierWithValue extends AbstractStepEntity {
     private final String modifierType;
     private final Double modifierValue;
     private final StepEntity modifierUnit;
     private final StepEntity referencedDatum;
 
     public StepDatumReferenceModifierWithValue(int id, String name, String modifierType, Double modifierValue, StepEntity modifierUnit, StepEntity referencedDatum) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.modifierType = modifierType;
         this.modifierValue = modifierValue;
         this.modifierUnit = modifierUnit;
         this.referencedDatum = referencedDatum;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getModifierType() {
@@ -47,20 +38,14 @@ public final class StepDatumReferenceModifierWithValue implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDatumReferenceModifierWithValue that = (StepDatumReferenceModifierWithValue) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(modifierType, that.modifierType) && Objects.equals(modifierValue, that.modifierValue) && Objects.equals(modifierUnit, that.modifierUnit) && Objects.equals(referencedDatum, that.referencedDatum);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, modifierType, modifierValue, modifierUnit, referencedDatum);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDatumReferenceModifierWithValue{" + "id=" + id + "name=" + name + "modifierType=" + modifierType + "modifierValue=" + modifierValue + "modifierUnit=" + modifierUnit + "referencedDatum=" + referencedDatum + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("modifierType", modifierType);
+        state.put("modifierValue", modifierValue);
+        state.put("modifierUnit", modifierUnit);
+        state.put("referencedDatum", referencedDatum);
+        return state;
     }
 }

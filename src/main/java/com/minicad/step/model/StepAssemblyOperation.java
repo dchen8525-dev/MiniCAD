@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ASSEMBLY_OPERATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param fixtureRequirement fixture requirement reference
  * @param operationTime estimated operation time
  */
-public final class StepAssemblyOperation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAssemblyOperation extends AbstractStepEntity {
     private final String operationType;
     private final List<Double> operationParameters;
     private final List<StepEntity> components;
@@ -27,22 +26,13 @@ public final class StepAssemblyOperation implements StepEntity {
     private final double operationTime;
 
     public StepAssemblyOperation(int id, String name, String operationType, List<Double> operationParameters, List<StepEntity> components, StepEntity toolRequirement, StepEntity fixtureRequirement, double operationTime) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.operationType = operationType;
         this.operationParameters = operationParameters == null ? null : java.util.List.copyOf(operationParameters);
         this.components = components == null ? null : java.util.List.copyOf(components);
         this.toolRequirement = toolRequirement;
         this.fixtureRequirement = fixtureRequirement;
         this.operationTime = operationTime;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getOperationType() {
@@ -70,20 +60,16 @@ public final class StepAssemblyOperation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAssemblyOperation that = (StepAssemblyOperation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(operationType, that.operationType) && Objects.equals(operationParameters, that.operationParameters) && Objects.equals(components, that.components) && Objects.equals(toolRequirement, that.toolRequirement) && Objects.equals(fixtureRequirement, that.fixtureRequirement) && operationTime == that.operationTime;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, operationType, operationParameters, components, toolRequirement, fixtureRequirement, operationTime);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAssemblyOperation{" + "id=" + id + "name=" + name + "operationType=" + operationType + "operationParameters=" + operationParameters + "components=" + components + "toolRequirement=" + toolRequirement + "fixtureRequirement=" + fixtureRequirement + "operationTime=" + operationTime + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("operationType", operationType);
+        state.put("operationParameters", operationParameters);
+        state.put("components", components);
+        state.put("toolRequirement", toolRequirement);
+        state.put("fixtureRequirement", fixtureRequirement);
+        state.put("operationTime", operationTime);
+        return state;
     }
 }

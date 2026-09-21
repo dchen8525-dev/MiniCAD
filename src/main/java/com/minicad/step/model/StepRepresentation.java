@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal representation or shape representation.
@@ -13,29 +14,18 @@ import java.util.Objects;
  * @param shapeRepresentation whether this entity originated from SHAPE_REPRESENTATION
  * @param entityName concrete STEP entity name
  */
-public final class StepRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRepresentation extends AbstractStepEntity {
     private final List<StepEntity> items;
     private final StepEntity context;
     private final boolean shapeRepresentation;
     private final String entityName;
 
     public StepRepresentation(int id, String name, List<StepEntity> items, StepEntity context, boolean shapeRepresentation, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.items = items == null ? null : java.util.List.copyOf(items);
         this.context = context;
         this.shapeRepresentation = shapeRepresentation;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getItems() {
@@ -63,20 +53,14 @@ public final class StepRepresentation implements StepEntity {
     public String entityName() { return getEntityName(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRepresentation that = (StepRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(items, that.items) && Objects.equals(context, that.context) && shapeRepresentation == that.shapeRepresentation && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, items, context, shapeRepresentation, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRepresentation{" + "id=" + id + "name=" + name + "items=" + items + "context=" + context + "shapeRepresentation=" + shapeRepresentation + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("items", items);
+        state.put("context", context);
+        state.put("shapeRepresentation", shapeRepresentation);
+        state.put("entityName", entityName);
+        return state;
     }
 }

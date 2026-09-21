@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved AXIS2_PLACEMENT_3D with explicit axis and ref direction.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param axis local Z direction
  * @param refDirection local X direction
  */
-public final class StepAxis2Placement3D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAxis2Placement3D extends AbstractStepEntity {
     private final StepCartesianPoint location;
     private final StepDirection axis;
     private final StepDirection refDirection;
 
     public StepAxis2Placement3D(int id, String name, StepCartesianPoint location, StepDirection axis, StepDirection refDirection) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.location = location;
         this.axis = axis;
         this.refDirection = refDirection;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepCartesianPoint getLocation() {
@@ -53,20 +44,13 @@ public final class StepAxis2Placement3D implements StepEntity {
     public StepDirection refDirection() { return getRefDirection(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAxis2Placement3D that = (StepAxis2Placement3D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(location, that.location) && Objects.equals(axis, that.axis) && Objects.equals(refDirection, that.refDirection);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, location, axis, refDirection);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAxis2Placement3D{" + "id=" + id + "name=" + name + "location=" + location + "axis=" + axis + "refDirection=" + refDirection + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("location", location);
+        state.put("axis", axis);
+        state.put("refDirection", refDirection);
+        return state;
     }
 }

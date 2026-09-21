@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal measure-with-unit value.
  *
@@ -8,19 +10,14 @@ import java.util.Objects;
  * @param valueComponent numeric value
  * @param unitComponent referenced unit entity
  */
-public final class StepMeasureWithUnit implements StepEntity {
-    private final int id;
+public final class StepMeasureWithUnit extends AbstractStepEntity {
     private final double valueComponent;
     private final StepEntity unitComponent;
 
     public StepMeasureWithUnit(int id, double valueComponent, StepEntity unitComponent) {
-        this.id = id;
+        super(id, "");
         this.valueComponent = valueComponent;
         this.unitComponent = unitComponent;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public double getValueComponent() {
@@ -32,26 +29,16 @@ public final class StepMeasureWithUnit implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String getName() { return ""; }
+    public int id() { return getId(); }
     public double valueComponent() { return valueComponent; }
     public StepEntity unitComponent() { return unitComponent; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMeasureWithUnit that = (StepMeasureWithUnit) o;
-        return id == that.id && valueComponent == that.valueComponent && Objects.equals(unitComponent, that.unitComponent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, valueComponent, unitComponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMeasureWithUnit{" + "id=" + id + "valueComponent=" + valueComponent + "unitComponent=" + unitComponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("valueComponent", valueComponent);
+        state.put("unitComponent", unitComponent);
+        return state;
     }
 }

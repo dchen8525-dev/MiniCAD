@@ -1,27 +1,17 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved FEATURE_ELEMENT_DEFINITION.
  */
-public final class StepFeatureElementDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeatureElementDefinition extends AbstractStepEntity {
     private final String featureType;
 
     public StepFeatureElementDefinition(int id, String name, String featureType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.featureType = featureType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getFeatureType() {
@@ -29,20 +19,11 @@ public final class StepFeatureElementDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeatureElementDefinition that = (StepFeatureElementDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(featureType, that.featureType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, featureType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeatureElementDefinition{" + "id=" + id + "name=" + name + "featureType=" + featureType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("featureType", featureType);
+        return state;
     }
 }

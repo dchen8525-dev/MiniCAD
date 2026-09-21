@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOCK_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param lockPolicy lock variance policy
  * @param lockStatus lock variance status
  */
-public final class StepLockDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLockDefinition extends AbstractStepEntity {
     private final String lockType;
     private final String lockScope;
     private final int lockTimeout;
@@ -25,21 +24,12 @@ public final class StepLockDefinition implements StepEntity {
     private final String lockStatus;
 
     public StepLockDefinition(int id, String name, String lockType, String lockScope, int lockTimeout, String lockPolicy, String lockStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.lockType = lockType;
         this.lockScope = lockScope;
         this.lockTimeout = lockTimeout;
         this.lockPolicy = lockPolicy;
         this.lockStatus = lockStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLockType() {
@@ -63,20 +53,15 @@ public final class StepLockDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLockDefinition that = (StepLockDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(lockType, that.lockType) && Objects.equals(lockScope, that.lockScope) && lockTimeout == that.lockTimeout && Objects.equals(lockPolicy, that.lockPolicy) && Objects.equals(lockStatus, that.lockStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, lockType, lockScope, lockTimeout, lockPolicy, lockStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLockDefinition{" + "id=" + id + "name=" + name + "lockType=" + lockType + "lockScope=" + lockScope + "lockTimeout=" + lockTimeout + "lockPolicy=" + lockPolicy + "lockStatus=" + lockStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("lockType", lockType);
+        state.put("lockScope", lockScope);
+        state.put("lockTimeout", lockTimeout);
+        state.put("lockPolicy", lockPolicy);
+        state.put("lockStatus", lockStatus);
+        return state;
     }
 }

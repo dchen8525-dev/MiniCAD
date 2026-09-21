@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MATERIAL_DESIGNATION.
@@ -11,23 +12,12 @@ import java.util.Objects;
  * @param name material name
  * @param definitions references defining the material properties
  */
-public final class StepMaterialDesignation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMaterialDesignation extends AbstractStepEntity {
     private final List<StepEntity> definitions;
 
     public StepMaterialDesignation(int id, String name, List<StepEntity> definitions) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.definitions = definitions == null ? null : java.util.List.copyOf(definitions);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getDefinitions() {
@@ -35,20 +25,11 @@ public final class StepMaterialDesignation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMaterialDesignation that = (StepMaterialDesignation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(definitions, that.definitions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, definitions);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMaterialDesignation{" + "id=" + id + "name=" + name + "definitions=" + definitions + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("definitions", definitions);
+        return state;
     }
 }

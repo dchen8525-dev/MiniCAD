@@ -1,27 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal surface style fill area wrapper.
  *
  * @param id STEP instance id
  * @param fillStyle referenced fill style
  */
-public final class StepSurfaceStyleFillArea implements StepEntity {
-    private final int id;
+public final class StepSurfaceStyleFillArea extends AbstractStepEntity {
     private final StepFillAreaStyle fillStyle;
 
     public StepSurfaceStyleFillArea(int id, StepFillAreaStyle fillStyle) {
-        this.id = id;
+        super(id, "");
         this.fillStyle = fillStyle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepFillAreaStyle getFillStyle() {
@@ -34,20 +27,10 @@ public final class StepSurfaceStyleFillArea implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceStyleFillArea that = (StepSurfaceStyleFillArea) o;
-        return id == that.id && Objects.equals(fillStyle, that.fillStyle);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, fillStyle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceStyleFillArea{" + "id=" + id + "fillStyle=" + fillStyle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("fillStyle", fillStyle);
+        return state;
     }
 }

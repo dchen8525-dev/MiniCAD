@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SERVICE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param serviceDependencies service variance dependencies
  * @param serviceStatus service variance status
  */
-public final class StepServiceDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepServiceDefinition extends AbstractStepEntity {
     private final String serviceType;
     private final String serviceDescription;
     private final StepEntity serviceInterface;
@@ -25,21 +24,12 @@ public final class StepServiceDefinition implements StepEntity {
     private final String serviceStatus;
 
     public StepServiceDefinition(int id, String name, String serviceType, String serviceDescription, StepEntity serviceInterface, List<StepEntity> serviceDependencies, String serviceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.serviceType = serviceType;
         this.serviceDescription = serviceDescription;
         this.serviceInterface = serviceInterface;
         this.serviceDependencies = serviceDependencies == null ? null : java.util.List.copyOf(serviceDependencies);
         this.serviceStatus = serviceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getServiceType() {
@@ -63,20 +53,15 @@ public final class StepServiceDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepServiceDefinition that = (StepServiceDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(serviceType, that.serviceType) && Objects.equals(serviceDescription, that.serviceDescription) && Objects.equals(serviceInterface, that.serviceInterface) && Objects.equals(serviceDependencies, that.serviceDependencies) && Objects.equals(serviceStatus, that.serviceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, serviceType, serviceDescription, serviceInterface, serviceDependencies, serviceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepServiceDefinition{" + "id=" + id + "name=" + name + "serviceType=" + serviceType + "serviceDescription=" + serviceDescription + "serviceInterface=" + serviceInterface + "serviceDependencies=" + serviceDependencies + "serviceStatus=" + serviceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("serviceType", serviceType);
+        state.put("serviceDescription", serviceDescription);
+        state.put("serviceInterface", serviceInterface);
+        state.put("serviceDependencies", serviceDependencies);
+        state.put("serviceStatus", serviceStatus);
+        return state;
     }
 }

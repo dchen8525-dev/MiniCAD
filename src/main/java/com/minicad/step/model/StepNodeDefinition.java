@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved NODE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param nodeConnections node variance connections
  * @param nodeStatus node variance status
  */
-public final class StepNodeDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepNodeDefinition extends AbstractStepEntity {
     private final String nodeType;
     private final StepEntity nodeLocation;
     private final List<String> nodeCapabilities;
@@ -25,21 +24,12 @@ public final class StepNodeDefinition implements StepEntity {
     private final String nodeStatus;
 
     public StepNodeDefinition(int id, String name, String nodeType, StepEntity nodeLocation, List<String> nodeCapabilities, List<StepEntity> nodeConnections, String nodeStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.nodeType = nodeType;
         this.nodeLocation = nodeLocation;
         this.nodeCapabilities = nodeCapabilities == null ? null : java.util.List.copyOf(nodeCapabilities);
         this.nodeConnections = nodeConnections == null ? null : java.util.List.copyOf(nodeConnections);
         this.nodeStatus = nodeStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getNodeType() {
@@ -63,20 +53,15 @@ public final class StepNodeDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNodeDefinition that = (StepNodeDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(nodeType, that.nodeType) && Objects.equals(nodeLocation, that.nodeLocation) && Objects.equals(nodeCapabilities, that.nodeCapabilities) && Objects.equals(nodeConnections, that.nodeConnections) && Objects.equals(nodeStatus, that.nodeStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, nodeType, nodeLocation, nodeCapabilities, nodeConnections, nodeStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNodeDefinition{" + "id=" + id + "name=" + name + "nodeType=" + nodeType + "nodeLocation=" + nodeLocation + "nodeCapabilities=" + nodeCapabilities + "nodeConnections=" + nodeConnections + "nodeStatus=" + nodeStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("nodeType", nodeType);
+        state.put("nodeLocation", nodeLocation);
+        state.put("nodeCapabilities", nodeCapabilities);
+        state.put("nodeConnections", nodeConnections);
+        state.put("nodeStatus", nodeStatus);
+        return state;
     }
 }

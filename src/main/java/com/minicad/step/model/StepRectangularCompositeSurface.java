@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved RECTANGULAR_COMPOSITE_SURFACE.
  * A composite surface formed by combining rectangular surface patches.
@@ -13,9 +15,7 @@ import java.util.Objects;
  * @param v1 first v parameter boundary
  * @param v2 second v parameter boundary
  */
-public final class StepRectangularCompositeSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRectangularCompositeSurface extends AbstractStepEntity {
     private final StepEntity parentSurface;
     private final double u1;
     private final double u2;
@@ -23,21 +23,12 @@ public final class StepRectangularCompositeSurface implements StepEntity {
     private final double v2;
 
     public StepRectangularCompositeSurface(int id, String name, StepEntity parentSurface, double u1, double u2, double v1, double v2) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.parentSurface = parentSurface;
         this.u1 = u1;
         this.u2 = u2;
         this.v1 = v1;
         this.v2 = v2;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getParentSurface() {
@@ -64,20 +55,15 @@ public final class StepRectangularCompositeSurface implements StepEntity {
     public StepEntity parentSurface() { return getParentSurface(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRectangularCompositeSurface that = (StepRectangularCompositeSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(parentSurface, that.parentSurface) && u1 == that.u1 && u2 == that.u2 && v1 == that.v1 && v2 == that.v2;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, parentSurface, u1, u2, v1, v2);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRectangularCompositeSurface{" + "id=" + id + "name=" + name + "parentSurface=" + parentSurface + "u1=" + u1 + "u2=" + u2 + "v1=" + v1 + "v2=" + v2 + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("parentSurface", parentSurface);
+        state.put("u1", u1);
+        state.put("u2", u2);
+        state.put("v1", v1);
+        state.put("v2", v2);
+        return state;
     }
 }

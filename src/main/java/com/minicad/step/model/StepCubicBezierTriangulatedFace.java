@@ -1,31 +1,21 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CUBIC_BEZIER_TRIANGULATED_FACE.
  * A triangulated face where edges are represented by cubic Bezier curves.
  */
-public final class StepCubicBezierTriangulatedFace implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCubicBezierTriangulatedFace extends AbstractStepEntity {
     private final List<StepEntity> controlPoints;
     private final List<Integer> indices;
 
     public StepCubicBezierTriangulatedFace(int id, String name, List<StepEntity> controlPoints, List<Integer> indices) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.controlPoints = controlPoints == null ? null : java.util.List.copyOf(controlPoints);
         this.indices = indices == null ? null : java.util.List.copyOf(indices);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getControlPoints() {
@@ -43,20 +33,12 @@ public final class StepCubicBezierTriangulatedFace implements StepEntity {
     public List<Integer> indices() { return getIndices(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCubicBezierTriangulatedFace that = (StepCubicBezierTriangulatedFace) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(controlPoints, that.controlPoints) && Objects.equals(indices, that.indices);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, controlPoints, indices);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCubicBezierTriangulatedFace{" + "id=" + id + "name=" + name + "controlPoints=" + controlPoints + "indices=" + indices + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("controlPoints", controlPoints);
+        state.put("indices", indices);
+        return state;
     }
 }

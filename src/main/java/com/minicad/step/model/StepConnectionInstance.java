@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CONNECTION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param connectionThroughput connection variance throughput
  * @param connectionStatus connection variance status
  */
-public final class StepConnectionInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConnectionInstance extends AbstractStepEntity {
     private final StepEntity connectionDefinition;
     private final String connectionState;
     private final double connectionLatency;
@@ -25,21 +24,12 @@ public final class StepConnectionInstance implements StepEntity {
     private final String connectionStatus;
 
     public StepConnectionInstance(int id, String name, StepEntity connectionDefinition, String connectionState, double connectionLatency, double connectionThroughput, String connectionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.connectionDefinition = connectionDefinition;
         this.connectionState = connectionState;
         this.connectionLatency = connectionLatency;
         this.connectionThroughput = connectionThroughput;
         this.connectionStatus = connectionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getConnectionDefinition() {
@@ -63,20 +53,15 @@ public final class StepConnectionInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConnectionInstance that = (StepConnectionInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(connectionDefinition, that.connectionDefinition) && Objects.equals(connectionState, that.connectionState) && connectionLatency == that.connectionLatency && connectionThroughput == that.connectionThroughput && Objects.equals(connectionStatus, that.connectionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, connectionDefinition, connectionState, connectionLatency, connectionThroughput, connectionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConnectionInstance{" + "id=" + id + "name=" + name + "connectionDefinition=" + connectionDefinition + "connectionState=" + connectionState + "connectionLatency=" + connectionLatency + "connectionThroughput=" + connectionThroughput + "connectionStatus=" + connectionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("connectionDefinition", connectionDefinition);
+        state.put("connectionState", connectionState);
+        state.put("connectionLatency", connectionLatency);
+        state.put("connectionThroughput", connectionThroughput);
+        state.put("connectionStatus", connectionStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved TOLERANCE_SET.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param toleranceContext tolerance context reference
  * @param appliedTo geometry the tolerances apply to
  */
-public final class StepToleranceSet implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepToleranceSet extends AbstractStepEntity {
     private final List<StepEntity> tolerances;
     private final StepEntity toleranceContext;
     private final StepEntity appliedTo;
 
     public StepToleranceSet(int id, String name, List<StepEntity> tolerances, StepEntity toleranceContext, StepEntity appliedTo) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.tolerances = tolerances == null ? null : java.util.List.copyOf(tolerances);
         this.toleranceContext = toleranceContext;
         this.appliedTo = appliedTo;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getTolerances() {
@@ -49,20 +39,13 @@ public final class StepToleranceSet implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepToleranceSet that = (StepToleranceSet) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(tolerances, that.tolerances) && Objects.equals(toleranceContext, that.toleranceContext) && Objects.equals(appliedTo, that.appliedTo);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, tolerances, toleranceContext, appliedTo);
-    }
-
-    @Override
-    public String toString() {
-        return "StepToleranceSet{" + "id=" + id + "name=" + name + "tolerances=" + tolerances + "toleranceContext=" + toleranceContext + "appliedTo=" + appliedTo + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("tolerances", tolerances);
+        state.put("toleranceContext", toleranceContext);
+        state.put("appliedTo", appliedTo);
+        return state;
     }
 }

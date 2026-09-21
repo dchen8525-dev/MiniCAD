@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal annotation text occurrence for presentation PMI.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param text annotation text
  * @param position anchor point
  */
-public final class StepAnnotationTextOccurrence implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnnotationTextOccurrence extends AbstractStepEntity {
     private final String text;
     private final StepEntity position;
 
     public StepAnnotationTextOccurrence(int id, String name, String text, StepEntity position) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.text = text;
         this.position = position;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getText() {
@@ -48,20 +39,12 @@ public final class StepAnnotationTextOccurrence implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnnotationTextOccurrence that = (StepAnnotationTextOccurrence) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(text, that.text) && Objects.equals(position, that.position);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, text, position);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnnotationTextOccurrence{" + "id=" + id + "name=" + name + "text=" + text + "position=" + position + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("text", text);
+        state.put("position", position);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PIPE_FEATURE.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param pipeBends pipe bend features for bent pipes
  * @param pipeMaterial pipe material specification
  */
-public final class StepPipeFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPipeFeature extends AbstractStepEntity {
     private final String pipeType;
     private final double outerDiameter;
     private final double innerDiameter;
@@ -29,8 +28,7 @@ public final class StepPipeFeature implements StepEntity {
     private final StepEntity pipeMaterial;
 
     public StepPipeFeature(int id, String name, String pipeType, double outerDiameter, double innerDiameter, double pipeLength, double wallThickness, List<StepEntity> pipeBends, StepEntity pipeMaterial) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.pipeType = pipeType;
         this.outerDiameter = outerDiameter;
         this.innerDiameter = innerDiameter;
@@ -38,14 +36,6 @@ public final class StepPipeFeature implements StepEntity {
         this.wallThickness = wallThickness;
         this.pipeBends = pipeBends == null ? null : java.util.List.copyOf(pipeBends);
         this.pipeMaterial = pipeMaterial;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPipeType() {
@@ -77,20 +67,17 @@ public final class StepPipeFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPipeFeature that = (StepPipeFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(pipeType, that.pipeType) && outerDiameter == that.outerDiameter && innerDiameter == that.innerDiameter && pipeLength == that.pipeLength && wallThickness == that.wallThickness && Objects.equals(pipeBends, that.pipeBends) && Objects.equals(pipeMaterial, that.pipeMaterial);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, pipeType, outerDiameter, innerDiameter, pipeLength, wallThickness, pipeBends, pipeMaterial);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPipeFeature{" + "id=" + id + "name=" + name + "pipeType=" + pipeType + "outerDiameter=" + outerDiameter + "innerDiameter=" + innerDiameter + "pipeLength=" + pipeLength + "wallThickness=" + wallThickness + "pipeBends=" + pipeBends + "pipeMaterial=" + pipeMaterial + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("pipeType", pipeType);
+        state.put("outerDiameter", outerDiameter);
+        state.put("innerDiameter", innerDiameter);
+        state.put("pipeLength", pipeLength);
+        state.put("wallThickness", wallThickness);
+        state.put("pipeBends", pipeBends);
+        state.put("pipeMaterial", pipeMaterial);
+        return state;
     }
 }

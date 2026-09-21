@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DISPOSAL_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceEnvironmental environmental variance compliance
  * @varianceStatus record variance status
  */
-public final class StepDisposalRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDisposalRecord extends AbstractStepEntity {
     private final StepEntity varianceItem;
     private final String varianceMethod;
     private final StepEntity varianceDate;
@@ -27,22 +26,13 @@ public final class StepDisposalRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepDisposalRecord(int id, String name, StepEntity varianceItem, String varianceMethod, StepEntity varianceDate, StepEntity varianceAuthorization, String varianceEnvironmental, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceItem = varianceItem;
         this.varianceMethod = varianceMethod;
         this.varianceDate = varianceDate;
         this.varianceAuthorization = varianceAuthorization;
         this.varianceEnvironmental = varianceEnvironmental;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceItem() {
@@ -70,20 +60,16 @@ public final class StepDisposalRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDisposalRecord that = (StepDisposalRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceItem, that.varianceItem) && Objects.equals(varianceMethod, that.varianceMethod) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceAuthorization, that.varianceAuthorization) && Objects.equals(varianceEnvironmental, that.varianceEnvironmental) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceItem, varianceMethod, varianceDate, varianceAuthorization, varianceEnvironmental, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDisposalRecord{" + "id=" + id + "name=" + name + "varianceItem=" + varianceItem + "varianceMethod=" + varianceMethod + "varianceDate=" + varianceDate + "varianceAuthorization=" + varianceAuthorization + "varianceEnvironmental=" + varianceEnvironmental + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceItem", varianceItem);
+        state.put("varianceMethod", varianceMethod);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceAuthorization", varianceAuthorization);
+        state.put("varianceEnvironmental", varianceEnvironmental);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

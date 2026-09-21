@@ -1,13 +1,13 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved GEOMETRIC_TOLERANCE_WITH_DEFINED_AREA_UNIT.
  * A geometric tolerance with a defined area unit for spatial application.
  */
-public final class StepGeometricToleranceWithDefinedAreaUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGeometricToleranceWithDefinedAreaUnit extends AbstractStepEntity {
     private final String toleranceType;
     private final Double magnitude;
     private final StepEntity magnitudeUnit;
@@ -15,21 +15,12 @@ public final class StepGeometricToleranceWithDefinedAreaUnit implements StepEnti
     private final StepEntity areaUnit;
 
     public StepGeometricToleranceWithDefinedAreaUnit(int id, String name, String toleranceType, Double magnitude, StepEntity magnitudeUnit, StepEntity tolerancedFeature, StepEntity areaUnit) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.toleranceType = toleranceType;
         this.magnitude = magnitude;
         this.magnitudeUnit = magnitudeUnit;
         this.tolerancedFeature = tolerancedFeature;
         this.areaUnit = areaUnit;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getToleranceType() {
@@ -66,20 +57,15 @@ public final class StepGeometricToleranceWithDefinedAreaUnit implements StepEnti
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGeometricToleranceWithDefinedAreaUnit that = (StepGeometricToleranceWithDefinedAreaUnit) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(toleranceType, that.toleranceType) && Objects.equals(magnitude, that.magnitude) && Objects.equals(magnitudeUnit, that.magnitudeUnit) && Objects.equals(tolerancedFeature, that.tolerancedFeature) && Objects.equals(areaUnit, that.areaUnit);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, toleranceType, magnitude, magnitudeUnit, tolerancedFeature, areaUnit);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGeometricToleranceWithDefinedAreaUnit{" + "id=" + id + "name=" + name + "toleranceType=" + toleranceType + "magnitude=" + magnitude + "magnitudeUnit=" + magnitudeUnit + "tolerancedFeature=" + tolerancedFeature + "areaUnit=" + areaUnit + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("toleranceType", toleranceType);
+        state.put("magnitude", magnitude);
+        state.put("magnitudeUnit", magnitudeUnit);
+        state.put("tolerancedFeature", tolerancedFeature);
+        state.put("areaUnit", areaUnit);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DIE_FEATURE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param dieClearance die clearance specification
  * @param dieMaterial die material specification
  */
-public final class StepDieFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDieFeature extends AbstractStepEntity {
     private final String dieType;
     private final StepEntity dieGeometry;
     private final StepEntity dieSurface;
@@ -25,21 +24,12 @@ public final class StepDieFeature implements StepEntity {
     private final StepEntity dieMaterial;
 
     public StepDieFeature(int id, String name, String dieType, StepEntity dieGeometry, StepEntity dieSurface, double dieClearance, StepEntity dieMaterial) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.dieType = dieType;
         this.dieGeometry = dieGeometry;
         this.dieSurface = dieSurface;
         this.dieClearance = dieClearance;
         this.dieMaterial = dieMaterial;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDieType() {
@@ -63,20 +53,15 @@ public final class StepDieFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDieFeature that = (StepDieFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(dieType, that.dieType) && Objects.equals(dieGeometry, that.dieGeometry) && Objects.equals(dieSurface, that.dieSurface) && dieClearance == that.dieClearance && Objects.equals(dieMaterial, that.dieMaterial);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, dieType, dieGeometry, dieSurface, dieClearance, dieMaterial);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDieFeature{" + "id=" + id + "name=" + name + "dieType=" + dieType + "dieGeometry=" + dieGeometry + "dieSurface=" + dieSurface + "dieClearance=" + dieClearance + "dieMaterial=" + dieMaterial + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("dieType", dieType);
+        state.put("dieGeometry", dieGeometry);
+        state.put("dieSurface", dieSurface);
+        state.put("dieClearance", dieClearance);
+        state.put("dieMaterial", dieMaterial);
+        return state;
     }
 }

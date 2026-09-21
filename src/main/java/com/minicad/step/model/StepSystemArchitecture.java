@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SYSTEM_ARCHITECTURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceType architecture variance type (functional, physical, logical)
  * @varianceStatus architecture variance status
  */
-public final class StepSystemArchitecture implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSystemArchitecture extends AbstractStepEntity {
     private final List<StepEntity> varianceComponents;
     private final List<StepEntity> varianceConnections;
     private final List<StepEntity> varianceInterfaces;
@@ -27,22 +26,13 @@ public final class StepSystemArchitecture implements StepEntity {
     private final String varianceStatus;
 
     public StepSystemArchitecture(int id, String name, List<StepEntity> varianceComponents, List<StepEntity> varianceConnections, List<StepEntity> varianceInterfaces, int varianceHierarchy, String varianceType, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceComponents = varianceComponents == null ? null : java.util.List.copyOf(varianceComponents);
         this.varianceConnections = varianceConnections == null ? null : java.util.List.copyOf(varianceConnections);
         this.varianceInterfaces = varianceInterfaces == null ? null : java.util.List.copyOf(varianceInterfaces);
         this.varianceHierarchy = varianceHierarchy;
         this.varianceType = varianceType;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getVarianceComponents() {
@@ -70,20 +60,16 @@ public final class StepSystemArchitecture implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSystemArchitecture that = (StepSystemArchitecture) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceComponents, that.varianceComponents) && Objects.equals(varianceConnections, that.varianceConnections) && Objects.equals(varianceInterfaces, that.varianceInterfaces) && varianceHierarchy == that.varianceHierarchy && Objects.equals(varianceType, that.varianceType) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceComponents, varianceConnections, varianceInterfaces, varianceHierarchy, varianceType, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSystemArchitecture{" + "id=" + id + "name=" + name + "varianceComponents=" + varianceComponents + "varianceConnections=" + varianceConnections + "varianceInterfaces=" + varianceInterfaces + "varianceHierarchy=" + varianceHierarchy + "varianceType=" + varianceType + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceComponents", varianceComponents);
+        state.put("varianceConnections", varianceConnections);
+        state.put("varianceInterfaces", varianceInterfaces);
+        state.put("varianceHierarchy", varianceHierarchy);
+        state.put("varianceType", varianceType);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

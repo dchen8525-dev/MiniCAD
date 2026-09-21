@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved ATTRIBUTE_CLASSIFICATION.
  * An attribute classification assignment.
  */
-public final class StepAttributeClassification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAttributeClassification extends AbstractStepEntity {
     private final StepEntity assignedClassification;
     private final StepEntity items;
 
     public StepAttributeClassification(int id, String name, StepEntity assignedClassification, StepEntity items) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.assignedClassification = assignedClassification;
         this.items = items;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getAssignedClassification() {
@@ -35,20 +26,12 @@ public final class StepAttributeClassification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAttributeClassification that = (StepAttributeClassification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(assignedClassification, that.assignedClassification) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, assignedClassification, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAttributeClassification{" + "id=" + id + "name=" + name + "assignedClassification=" + assignedClassification + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("assignedClassification", assignedClassification);
+        state.put("items", items);
+        return state;
     }
 }

@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved PARABOLOID_SURFACE.
  * A quadric surface defined by a paraboloid shape.
  */
-public final class StepParaboloidSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepParaboloidSurface extends AbstractStepEntity {
     private final StepEntity position;
     private final Double focalLength;
 
     public StepParaboloidSurface(int id, String name, StepEntity position, Double focalLength) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.focalLength = focalLength;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPosition() {
@@ -39,20 +30,12 @@ public final class StepParaboloidSurface implements StepEntity {
     public Double focalLength() { return getFocalLength(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepParaboloidSurface that = (StepParaboloidSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && Objects.equals(focalLength, that.focalLength);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, focalLength);
-    }
-
-    @Override
-    public String toString() {
-        return "StepParaboloidSurface{" + "id=" + id + "name=" + name + "position=" + position + "focalLength=" + focalLength + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("focalLength", focalLength);
+        return state;
     }
 }

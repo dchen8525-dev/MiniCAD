@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REPAIR_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceActions repair variance actions
  * @varianceStatus record variance status
  */
-public final class StepRepairRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRepairRecord extends AbstractStepEntity {
     private final StepEntity varianceEquipment;
     private final String varianceProblem;
     private final String varianceCause;
@@ -27,22 +26,13 @@ public final class StepRepairRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepRepairRecord(int id, String name, StepEntity varianceEquipment, String varianceProblem, String varianceCause, StepEntity varianceDate, List<String> varianceActions, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceEquipment = varianceEquipment;
         this.varianceProblem = varianceProblem;
         this.varianceCause = varianceCause;
         this.varianceDate = varianceDate;
         this.varianceActions = varianceActions == null ? null : java.util.List.copyOf(varianceActions);
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceEquipment() {
@@ -70,20 +60,16 @@ public final class StepRepairRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRepairRecord that = (StepRepairRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceEquipment, that.varianceEquipment) && Objects.equals(varianceProblem, that.varianceProblem) && Objects.equals(varianceCause, that.varianceCause) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceActions, that.varianceActions) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceEquipment, varianceProblem, varianceCause, varianceDate, varianceActions, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRepairRecord{" + "id=" + id + "name=" + name + "varianceEquipment=" + varianceEquipment + "varianceProblem=" + varianceProblem + "varianceCause=" + varianceCause + "varianceDate=" + varianceDate + "varianceActions=" + varianceActions + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceEquipment", varianceEquipment);
+        state.put("varianceProblem", varianceProblem);
+        state.put("varianceCause", varianceCause);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceActions", varianceActions);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

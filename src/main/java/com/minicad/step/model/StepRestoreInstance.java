@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RESTORE_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param restoreValid restore variance valid flag
  * @param restoreStatus restore variance status
  */
-public final class StepRestoreInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRestoreInstance extends AbstractStepEntity {
     private final StepEntity restoreDefinition;
     private final StepEntity restoreStartTime;
     private final StepEntity restoreEndTime;
@@ -27,22 +26,13 @@ public final class StepRestoreInstance implements StepEntity {
     private final String restoreStatus;
 
     public StepRestoreInstance(int id, String name, StepEntity restoreDefinition, StepEntity restoreStartTime, StepEntity restoreEndTime, String restoreResult, boolean restoreValid, String restoreStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.restoreDefinition = restoreDefinition;
         this.restoreStartTime = restoreStartTime;
         this.restoreEndTime = restoreEndTime;
         this.restoreResult = restoreResult;
         this.restoreValid = restoreValid;
         this.restoreStatus = restoreStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRestoreDefinition() {
@@ -70,20 +60,16 @@ public final class StepRestoreInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRestoreInstance that = (StepRestoreInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(restoreDefinition, that.restoreDefinition) && Objects.equals(restoreStartTime, that.restoreStartTime) && Objects.equals(restoreEndTime, that.restoreEndTime) && Objects.equals(restoreResult, that.restoreResult) && restoreValid == that.restoreValid && Objects.equals(restoreStatus, that.restoreStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, restoreDefinition, restoreStartTime, restoreEndTime, restoreResult, restoreValid, restoreStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRestoreInstance{" + "id=" + id + "name=" + name + "restoreDefinition=" + restoreDefinition + "restoreStartTime=" + restoreStartTime + "restoreEndTime=" + restoreEndTime + "restoreResult=" + restoreResult + "restoreValid=" + restoreValid + "restoreStatus=" + restoreStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("restoreDefinition", restoreDefinition);
+        state.put("restoreStartTime", restoreStartTime);
+        state.put("restoreEndTime", restoreEndTime);
+        state.put("restoreResult", restoreResult);
+        state.put("restoreValid", restoreValid);
+        state.put("restoreStatus", restoreStatus);
+        return state;
     }
 }

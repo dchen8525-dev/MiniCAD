@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CONTRACT metadata.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param purpose contract purpose
  * @param kind contract type
  */
-public final class StepContract implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepContract extends AbstractStepEntity {
     private final String purpose;
     private final StepContractType kind;
 
     public StepContract(int id, String name, String purpose, StepContractType kind) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.purpose = purpose;
         this.kind = kind;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPurpose() {
@@ -44,20 +35,12 @@ public final class StepContract implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepContract that = (StepContract) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(purpose, that.purpose) && Objects.equals(kind, that.kind);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, purpose, kind);
-    }
-
-    @Override
-    public String toString() {
-        return "StepContract{" + "id=" + id + "name=" + name + "purpose=" + purpose + "kind=" + kind + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("purpose", purpose);
+        state.put("kind", kind);
+        return state;
     }
 }

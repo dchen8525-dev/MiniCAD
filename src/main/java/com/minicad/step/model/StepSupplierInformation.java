@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SUPPLIER_INFORMATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceLeadTime typical variance lead time
  * @param supplierStatus supplier status (active, inactive)
  */
-public final class StepSupplierInformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSupplierInformation extends AbstractStepEntity {
     private final String supplierId;
     private final StepEntity varianceContact;
     private final List<StepEntity> suppliedItems;
@@ -27,22 +26,13 @@ public final class StepSupplierInformation implements StepEntity {
     private final String supplierStatus;
 
     public StepSupplierInformation(int id, String name, String supplierId, StepEntity varianceContact, List<StepEntity> suppliedItems, String supplierRating, double varianceLeadTime, String supplierStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.supplierId = supplierId;
         this.varianceContact = varianceContact;
         this.suppliedItems = suppliedItems == null ? null : java.util.List.copyOf(suppliedItems);
         this.supplierRating = supplierRating;
         this.varianceLeadTime = varianceLeadTime;
         this.supplierStatus = supplierStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSupplierId() {
@@ -70,20 +60,16 @@ public final class StepSupplierInformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSupplierInformation that = (StepSupplierInformation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(supplierId, that.supplierId) && Objects.equals(varianceContact, that.varianceContact) && Objects.equals(suppliedItems, that.suppliedItems) && Objects.equals(supplierRating, that.supplierRating) && varianceLeadTime == that.varianceLeadTime && Objects.equals(supplierStatus, that.supplierStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, supplierId, varianceContact, suppliedItems, supplierRating, varianceLeadTime, supplierStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSupplierInformation{" + "id=" + id + "name=" + name + "supplierId=" + supplierId + "varianceContact=" + varianceContact + "suppliedItems=" + suppliedItems + "supplierRating=" + supplierRating + "varianceLeadTime=" + varianceLeadTime + "supplierStatus=" + supplierStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("supplierId", supplierId);
+        state.put("varianceContact", varianceContact);
+        state.put("suppliedItems", suppliedItems);
+        state.put("supplierRating", supplierRating);
+        state.put("varianceLeadTime", varianceLeadTime);
+        state.put("supplierStatus", supplierStatus);
+        return state;
     }
 }

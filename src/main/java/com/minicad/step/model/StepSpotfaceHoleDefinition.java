@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SPOTFACE_HOLE_DEFINITION.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param spotfaceDiameter diameter of the spotface
  * @param spotfaceDepth depth of the spotface
  */
-public final class StepSpotfaceHoleDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSpotfaceHoleDefinition extends AbstractStepEntity {
     private final StepEntity throughHoleReference;
     private final Double spotfaceDiameter;
     private final Double spotfaceDepth;
 
     public StepSpotfaceHoleDefinition(int id, String name, StepEntity throughHoleReference, Double spotfaceDiameter, Double spotfaceDepth) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.throughHoleReference = throughHoleReference;
         this.spotfaceDiameter = spotfaceDiameter;
         this.spotfaceDepth = spotfaceDepth;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getThroughHoleReference() {
@@ -49,20 +39,13 @@ public final class StepSpotfaceHoleDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSpotfaceHoleDefinition that = (StepSpotfaceHoleDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(throughHoleReference, that.throughHoleReference) && Objects.equals(spotfaceDiameter, that.spotfaceDiameter) && Objects.equals(spotfaceDepth, that.spotfaceDepth);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, throughHoleReference, spotfaceDiameter, spotfaceDepth);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSpotfaceHoleDefinition{" + "id=" + id + "name=" + name + "throughHoleReference=" + throughHoleReference + "spotfaceDiameter=" + spotfaceDiameter + "spotfaceDepth=" + spotfaceDepth + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("throughHoleReference", throughHoleReference);
+        state.put("spotfaceDiameter", spotfaceDiameter);
+        state.put("spotfaceDepth", spotfaceDepth);
+        return state;
     }
 }

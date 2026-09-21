@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ELECTRICAL_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param wireGauge wire gauge specification
  * @variancePins variance pins count for connectors
  */
-public final class StepElectricalFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepElectricalFeature extends AbstractStepEntity {
     private final String electricalType;
     private final StepEntity electricalGeometry;
     private final double voltageRating;
@@ -27,22 +26,13 @@ public final class StepElectricalFeature implements StepEntity {
     private final int variancePins;
 
     public StepElectricalFeature(int id, String name, String electricalType, StepEntity electricalGeometry, double voltageRating, double currentRating, String wireGauge, int variancePins) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.electricalType = electricalType;
         this.electricalGeometry = electricalGeometry;
         this.voltageRating = voltageRating;
         this.currentRating = currentRating;
         this.wireGauge = wireGauge;
         this.variancePins = variancePins;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getElectricalType() {
@@ -70,20 +60,16 @@ public final class StepElectricalFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepElectricalFeature that = (StepElectricalFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(electricalType, that.electricalType) && Objects.equals(electricalGeometry, that.electricalGeometry) && voltageRating == that.voltageRating && currentRating == that.currentRating && Objects.equals(wireGauge, that.wireGauge) && variancePins == that.variancePins;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, electricalType, electricalGeometry, voltageRating, currentRating, wireGauge, variancePins);
-    }
-
-    @Override
-    public String toString() {
-        return "StepElectricalFeature{" + "id=" + id + "name=" + name + "electricalType=" + electricalType + "electricalGeometry=" + electricalGeometry + "voltageRating=" + voltageRating + "currentRating=" + currentRating + "wireGauge=" + wireGauge + "variancePins=" + variancePins + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("electricalType", electricalType);
+        state.put("electricalGeometry", electricalGeometry);
+        state.put("voltageRating", voltageRating);
+        state.put("currentRating", currentRating);
+        state.put("wireGauge", wireGauge);
+        state.put("variancePins", variancePins);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved JOINT_CONFIGURATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param jointLimits joint limit values
  * @param jointMotion joint motion direction
  */
-public final class StepJointConfiguration implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepJointConfiguration extends AbstractStepEntity {
     private final StepEntity joint;
     private final String jointType;
     private final double jointPosition;
@@ -27,22 +26,13 @@ public final class StepJointConfiguration implements StepEntity {
     private final String jointMotion;
 
     public StepJointConfiguration(int id, String name, StepEntity joint, String jointType, double jointPosition, double jointVelocity, List<Double> jointLimits, String jointMotion) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.joint = joint;
         this.jointType = jointType;
         this.jointPosition = jointPosition;
         this.jointVelocity = jointVelocity;
         this.jointLimits = jointLimits == null ? null : java.util.List.copyOf(jointLimits);
         this.jointMotion = jointMotion;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getJoint() {
@@ -70,20 +60,16 @@ public final class StepJointConfiguration implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepJointConfiguration that = (StepJointConfiguration) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(joint, that.joint) && Objects.equals(jointType, that.jointType) && jointPosition == that.jointPosition && jointVelocity == that.jointVelocity && Objects.equals(jointLimits, that.jointLimits) && Objects.equals(jointMotion, that.jointMotion);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, joint, jointType, jointPosition, jointVelocity, jointLimits, jointMotion);
-    }
-
-    @Override
-    public String toString() {
-        return "StepJointConfiguration{" + "id=" + id + "name=" + name + "joint=" + joint + "jointType=" + jointType + "jointPosition=" + jointPosition + "jointVelocity=" + jointVelocity + "jointLimits=" + jointLimits + "jointMotion=" + jointMotion + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("joint", joint);
+        state.put("jointType", jointType);
+        state.put("jointPosition", jointPosition);
+        state.put("jointVelocity", jointVelocity);
+        state.put("jointLimits", jointLimits);
+        state.put("jointMotion", jointMotion);
+        return state;
     }
 }

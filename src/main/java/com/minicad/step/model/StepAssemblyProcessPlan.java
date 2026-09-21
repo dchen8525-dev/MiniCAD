@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ASSEMBLY_PROCESS_PLAN.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param context representation context
  * @param assemblySequence assembly sequence operations
  */
-public final class StepAssemblyProcessPlan implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAssemblyProcessPlan extends AbstractStepEntity {
     private final List<StepEntity> items;
     private final StepEntity context;
     private final List<StepEntity> assemblySequence;
 
     public StepAssemblyProcessPlan(int id, String name, List<StepEntity> items, StepEntity context, List<StepEntity> assemblySequence) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.items = items == null ? null : java.util.List.copyOf(items);
         this.context = context;
         this.assemblySequence = assemblySequence == null ? null : java.util.List.copyOf(assemblySequence);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getItems() {
@@ -49,20 +39,13 @@ public final class StepAssemblyProcessPlan implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAssemblyProcessPlan that = (StepAssemblyProcessPlan) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(items, that.items) && Objects.equals(context, that.context) && Objects.equals(assemblySequence, that.assemblySequence);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, items, context, assemblySequence);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAssemblyProcessPlan{" + "id=" + id + "name=" + name + "items=" + items + "context=" + context + "assemblySequence=" + assemblySequence + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("items", items);
+        state.put("context", context);
+        state.put("assemblySequence", assemblySequence);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved RESPONSIBILITY_ASSIGNMENT.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceEnd assignment variance end date
  * @varianceStatus assignment variance status
  */
-public final class StepResponsibilityAssignment implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepResponsibilityAssignment extends AbstractStepEntity {
     private final StepEntity varianceTask;
     private final StepEntity variancePerson;
     private final StepEntity varianceRole;
@@ -29,8 +28,7 @@ public final class StepResponsibilityAssignment implements StepEntity {
     private final String varianceStatus;
 
     public StepResponsibilityAssignment(int id, String name, StepEntity varianceTask, StepEntity variancePerson, StepEntity varianceRole, int varianceAuthority, StepEntity varianceStart, StepEntity varianceEnd, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceTask = varianceTask;
         this.variancePerson = variancePerson;
         this.varianceRole = varianceRole;
@@ -38,14 +36,6 @@ public final class StepResponsibilityAssignment implements StepEntity {
         this.varianceStart = varianceStart;
         this.varianceEnd = varianceEnd;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceTask() {
@@ -77,20 +67,17 @@ public final class StepResponsibilityAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepResponsibilityAssignment that = (StepResponsibilityAssignment) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceTask, that.varianceTask) && Objects.equals(variancePerson, that.variancePerson) && Objects.equals(varianceRole, that.varianceRole) && varianceAuthority == that.varianceAuthority && Objects.equals(varianceStart, that.varianceStart) && Objects.equals(varianceEnd, that.varianceEnd) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceTask, variancePerson, varianceRole, varianceAuthority, varianceStart, varianceEnd, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepResponsibilityAssignment{" + "id=" + id + "name=" + name + "varianceTask=" + varianceTask + "variancePerson=" + variancePerson + "varianceRole=" + varianceRole + "varianceAuthority=" + varianceAuthority + "varianceStart=" + varianceStart + "varianceEnd=" + varianceEnd + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceTask", varianceTask);
+        state.put("variancePerson", variancePerson);
+        state.put("varianceRole", varianceRole);
+        state.put("varianceAuthority", varianceAuthority);
+        state.put("varianceStart", varianceStart);
+        state.put("varianceEnd", varianceEnd);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

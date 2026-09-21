@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_IDENTIFICATION_ASSIGNMENT metadata.
@@ -11,21 +12,16 @@ import java.util.Objects;
  * @param role assignment role
  * @param items assigned target items
  */
-public final class StepAppliedIdentificationAssignment implements StepEntity {
-    private final int id;
+public final class StepAppliedIdentificationAssignment extends AbstractStepEntity {
     private final String assignedId;
     private final StepIdentificationRole role;
     private final List<StepEntity> items;
 
     public StepAppliedIdentificationAssignment(int id, String assignedId, StepIdentificationRole role, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.assignedId = assignedId;
         this.role = role;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getAssignedId() {
@@ -59,20 +55,12 @@ public final class StepAppliedIdentificationAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedIdentificationAssignment that = (StepAppliedIdentificationAssignment) o;
-        return id == that.id && Objects.equals(assignedId, that.assignedId) && Objects.equals(role, that.role) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedId, role, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedIdentificationAssignment{" + "id=" + id + "assignedId=" + assignedId + "role=" + role + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedId", assignedId);
+        state.put("role", role);
+        state.put("items", items);
+        return state;
     }
 }

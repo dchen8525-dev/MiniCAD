@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved USAGE_OCCURRENCE.
  * A usage occurrence in assembly structure.
  */
-public final class StepUsageOccurrence implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepUsageOccurrence extends AbstractStepEntity {
     private final StepEntity parent;
     private final StepEntity child;
 
     public StepUsageOccurrence(int id, String name, StepEntity parent, StepEntity child) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.parent = parent;
         this.child = child;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getParent() {
@@ -35,20 +26,12 @@ public final class StepUsageOccurrence implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepUsageOccurrence that = (StepUsageOccurrence) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(parent, that.parent) && Objects.equals(child, that.child);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, parent, child);
-    }
-
-    @Override
-    public String toString() {
-        return "StepUsageOccurrence{" + "id=" + id + "name=" + name + "parent=" + parent + "child=" + child + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("parent", parent);
+        state.put("child", child);
+        return state;
     }
 }

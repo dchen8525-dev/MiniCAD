@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ENVIRONMENT_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param environmentConstraints environment variance constraints
  * @param environmentStatus environment variance status
  */
-public final class StepEnvironmentDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEnvironmentDefinition extends AbstractStepEntity {
     private final String environmentType;
     private final String environmentDescription;
     private final List<String> environmentParameters;
@@ -25,21 +24,12 @@ public final class StepEnvironmentDefinition implements StepEntity {
     private final String environmentStatus;
 
     public StepEnvironmentDefinition(int id, String name, String environmentType, String environmentDescription, List<String> environmentParameters, List<String> environmentConstraints, String environmentStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.environmentType = environmentType;
         this.environmentDescription = environmentDescription;
         this.environmentParameters = environmentParameters == null ? null : java.util.List.copyOf(environmentParameters);
         this.environmentConstraints = environmentConstraints == null ? null : java.util.List.copyOf(environmentConstraints);
         this.environmentStatus = environmentStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEnvironmentType() {
@@ -63,20 +53,15 @@ public final class StepEnvironmentDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEnvironmentDefinition that = (StepEnvironmentDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(environmentType, that.environmentType) && Objects.equals(environmentDescription, that.environmentDescription) && Objects.equals(environmentParameters, that.environmentParameters) && Objects.equals(environmentConstraints, that.environmentConstraints) && Objects.equals(environmentStatus, that.environmentStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, environmentType, environmentDescription, environmentParameters, environmentConstraints, environmentStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEnvironmentDefinition{" + "id=" + id + "name=" + name + "environmentType=" + environmentType + "environmentDescription=" + environmentDescription + "environmentParameters=" + environmentParameters + "environmentConstraints=" + environmentConstraints + "environmentStatus=" + environmentStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("environmentType", environmentType);
+        state.put("environmentDescription", environmentDescription);
+        state.put("environmentParameters", environmentParameters);
+        state.put("environmentConstraints", environmentConstraints);
+        state.put("environmentStatus", environmentStatus);
+        return state;
     }
 }

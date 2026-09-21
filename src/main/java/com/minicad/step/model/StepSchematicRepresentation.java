@@ -1,30 +1,20 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SCHEMATIC_REPRESENTATION.
  */
-public final class StepSchematicRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSchematicRepresentation extends AbstractStepEntity {
     private final StepEntity context;
     private final List<StepEntity> items;
 
     public StepSchematicRepresentation(int id, String name, StepEntity context, List<StepEntity> items) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.context = context;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getContext() {
@@ -36,20 +26,12 @@ public final class StepSchematicRepresentation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSchematicRepresentation that = (StepSchematicRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(context, that.context) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, context, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSchematicRepresentation{" + "id=" + id + "name=" + name + "context=" + context + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("context", context);
+        state.put("items", items);
+        return state;
     }
 }

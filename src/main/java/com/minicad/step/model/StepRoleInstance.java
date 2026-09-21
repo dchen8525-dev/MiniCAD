@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ROLE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param roleExpiration role variance expiration time
  * @param roleStatus role variance status
  */
-public final class StepRoleInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRoleInstance extends AbstractStepEntity {
     private final StepEntity roleDefinition;
     private final StepEntity roleHolder;
     private final StepEntity roleAssignedTime;
@@ -25,21 +24,12 @@ public final class StepRoleInstance implements StepEntity {
     private final String roleStatus;
 
     public StepRoleInstance(int id, String name, StepEntity roleDefinition, StepEntity roleHolder, StepEntity roleAssignedTime, StepEntity roleExpiration, String roleStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.roleDefinition = roleDefinition;
         this.roleHolder = roleHolder;
         this.roleAssignedTime = roleAssignedTime;
         this.roleExpiration = roleExpiration;
         this.roleStatus = roleStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getRoleDefinition() {
@@ -63,20 +53,15 @@ public final class StepRoleInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRoleInstance that = (StepRoleInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(roleDefinition, that.roleDefinition) && Objects.equals(roleHolder, that.roleHolder) && Objects.equals(roleAssignedTime, that.roleAssignedTime) && Objects.equals(roleExpiration, that.roleExpiration) && Objects.equals(roleStatus, that.roleStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, roleDefinition, roleHolder, roleAssignedTime, roleExpiration, roleStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRoleInstance{" + "id=" + id + "name=" + name + "roleDefinition=" + roleDefinition + "roleHolder=" + roleHolder + "roleAssignedTime=" + roleAssignedTime + "roleExpiration=" + roleExpiration + "roleStatus=" + roleStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("roleDefinition", roleDefinition);
+        state.put("roleHolder", roleHolder);
+        state.put("roleAssignedTime", roleAssignedTime);
+        state.put("roleExpiration", roleExpiration);
+        state.put("roleStatus", roleStatus);
+        return state;
     }
 }

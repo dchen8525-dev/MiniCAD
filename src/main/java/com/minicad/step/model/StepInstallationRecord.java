@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INSTALLATION_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceChecks installation variance verification checks
  * @varianceStatus record variance status
  */
-public final class StepInstallationRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInstallationRecord extends AbstractStepEntity {
     private final StepEntity varianceEquipment;
     private final String varianceLocation;
     private final StepEntity varianceDate;
@@ -27,22 +26,13 @@ public final class StepInstallationRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepInstallationRecord(int id, String name, StepEntity varianceEquipment, String varianceLocation, StepEntity varianceDate, StepEntity varianceInstaller, List<String> varianceChecks, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceEquipment = varianceEquipment;
         this.varianceLocation = varianceLocation;
         this.varianceDate = varianceDate;
         this.varianceInstaller = varianceInstaller;
         this.varianceChecks = varianceChecks == null ? null : java.util.List.copyOf(varianceChecks);
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceEquipment() {
@@ -70,20 +60,16 @@ public final class StepInstallationRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInstallationRecord that = (StepInstallationRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceEquipment, that.varianceEquipment) && Objects.equals(varianceLocation, that.varianceLocation) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceInstaller, that.varianceInstaller) && Objects.equals(varianceChecks, that.varianceChecks) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceEquipment, varianceLocation, varianceDate, varianceInstaller, varianceChecks, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInstallationRecord{" + "id=" + id + "name=" + name + "varianceEquipment=" + varianceEquipment + "varianceLocation=" + varianceLocation + "varianceDate=" + varianceDate + "varianceInstaller=" + varianceInstaller + "varianceChecks=" + varianceChecks + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceEquipment", varianceEquipment);
+        state.put("varianceLocation", varianceLocation);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceInstaller", varianceInstaller);
+        state.put("varianceChecks", varianceChecks);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

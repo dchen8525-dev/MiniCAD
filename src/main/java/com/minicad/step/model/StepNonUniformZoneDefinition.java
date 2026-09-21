@@ -1,31 +1,22 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved NON_UNIFORM_ZONE_DEFINITION.
  * A tolerance zone definition that varies non-uniformly across the feature.
  */
-public final class StepNonUniformZoneDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepNonUniformZoneDefinition extends AbstractStepEntity {
     private final String zoneType;
     private final StepEntity definingCurve;
     private final Double variationMagnitude;
 
     public StepNonUniformZoneDefinition(int id, String name, String zoneType, StepEntity definingCurve, Double variationMagnitude) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.zoneType = zoneType;
         this.definingCurve = definingCurve;
         this.variationMagnitude = variationMagnitude;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getZoneType() {
@@ -41,20 +32,13 @@ public final class StepNonUniformZoneDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNonUniformZoneDefinition that = (StepNonUniformZoneDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(zoneType, that.zoneType) && Objects.equals(definingCurve, that.definingCurve) && Objects.equals(variationMagnitude, that.variationMagnitude);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, zoneType, definingCurve, variationMagnitude);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNonUniformZoneDefinition{" + "id=" + id + "name=" + name + "zoneType=" + zoneType + "definingCurve=" + definingCurve + "variationMagnitude=" + variationMagnitude + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("zoneType", zoneType);
+        state.put("definingCurve", definingCurve);
+        state.put("variationMagnitude", variationMagnitude);
+        return state;
     }
 }

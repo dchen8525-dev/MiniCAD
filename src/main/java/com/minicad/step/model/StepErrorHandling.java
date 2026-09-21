@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ERROR_HANDLING.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceRecovery recovery variance procedure
  * @varianceStatus handling variance status
  */
-public final class StepErrorHandling implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepErrorHandling extends AbstractStepEntity {
     private final String varianceError;
     private final String varianceCause;
     private final String varianceHandling;
@@ -27,22 +26,13 @@ public final class StepErrorHandling implements StepEntity {
     private final String varianceStatus;
 
     public StepErrorHandling(int id, String name, String varianceError, String varianceCause, String varianceHandling, int varianceSeverity, String varianceRecovery, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceError = varianceError;
         this.varianceCause = varianceCause;
         this.varianceHandling = varianceHandling;
         this.varianceSeverity = varianceSeverity;
         this.varianceRecovery = varianceRecovery;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceError() {
@@ -70,20 +60,16 @@ public final class StepErrorHandling implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepErrorHandling that = (StepErrorHandling) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceError, that.varianceError) && Objects.equals(varianceCause, that.varianceCause) && Objects.equals(varianceHandling, that.varianceHandling) && varianceSeverity == that.varianceSeverity && Objects.equals(varianceRecovery, that.varianceRecovery) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceError, varianceCause, varianceHandling, varianceSeverity, varianceRecovery, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepErrorHandling{" + "id=" + id + "name=" + name + "varianceError=" + varianceError + "varianceCause=" + varianceCause + "varianceHandling=" + varianceHandling + "varianceSeverity=" + varianceSeverity + "varianceRecovery=" + varianceRecovery + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceError", varianceError);
+        state.put("varianceCause", varianceCause);
+        state.put("varianceHandling", varianceHandling);
+        state.put("varianceSeverity", varianceSeverity);
+        state.put("varianceRecovery", varianceRecovery);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

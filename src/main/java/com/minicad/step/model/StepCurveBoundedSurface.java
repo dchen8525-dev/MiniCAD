@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal CURVE_BOUNDED_SURFACE parse-only surface.
@@ -12,27 +13,16 @@ import java.util.Objects;
  * @param boundaries boundary curves
  * @param implicitOuter whether an implicit outer boundary is present
  */
-public final class StepCurveBoundedSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCurveBoundedSurface extends AbstractStepEntity {
     private final StepEntity basisSurface;
     private final List<StepEntity> boundaries;
     private final boolean implicitOuter;
 
     public StepCurveBoundedSurface(int id, String name, StepEntity basisSurface, List<StepEntity> boundaries, boolean implicitOuter) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.basisSurface = basisSurface;
         this.boundaries = boundaries == null ? null : java.util.List.copyOf(boundaries);
         this.implicitOuter = implicitOuter;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBasisSurface() {
@@ -55,20 +45,13 @@ public final class StepCurveBoundedSurface implements StepEntity {
     public boolean implicitOuter() { return isImplicitOuter(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCurveBoundedSurface that = (StepCurveBoundedSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(basisSurface, that.basisSurface) && Objects.equals(boundaries, that.boundaries) && implicitOuter == that.implicitOuter;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, basisSurface, boundaries, implicitOuter);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCurveBoundedSurface{" + "id=" + id + "name=" + name + "basisSurface=" + basisSurface + "boundaries=" + boundaries + "implicitOuter=" + implicitOuter + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("basisSurface", basisSurface);
+        state.put("boundaries", boundaries);
+        state.put("implicitOuter", implicitOuter);
+        return state;
     }
 }

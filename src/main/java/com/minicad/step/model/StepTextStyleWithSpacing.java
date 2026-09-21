@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal TEXT_STYLE_WITH_SPACING.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param characterAppearance character appearance definition
  * @param characterSpacing additional spacing between characters
  */
-public final class StepTextStyleWithSpacing implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTextStyleWithSpacing extends AbstractStepEntity {
     private final StepEntity characterAppearance;
     private final double characterSpacing;
 
     public StepTextStyleWithSpacing(int id, String name, StepEntity characterAppearance, double characterSpacing) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.characterAppearance = characterAppearance;
         this.characterSpacing = characterSpacing;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCharacterAppearance() {
@@ -48,20 +39,12 @@ public final class StepTextStyleWithSpacing implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTextStyleWithSpacing that = (StepTextStyleWithSpacing) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(characterAppearance, that.characterAppearance) && characterSpacing == that.characterSpacing;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, characterAppearance, characterSpacing);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTextStyleWithSpacing{" + "id=" + id + "name=" + name + "characterAppearance=" + characterAppearance + "characterSpacing=" + characterSpacing + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("characterAppearance", characterAppearance);
+        state.put("characterSpacing", characterSpacing);
+        return state;
     }
 }

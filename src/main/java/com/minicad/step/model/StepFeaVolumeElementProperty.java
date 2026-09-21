@@ -1,28 +1,17 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
-
-public final class StepFeaVolumeElementProperty implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaVolumeElementProperty extends AbstractStepEntity {
     private final List<StepEntity> properties;
     private final StepEntity material;
 
     public StepFeaVolumeElementProperty(int id, String name, List<StepEntity> properties, StepEntity material) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.properties = properties == null ? null : java.util.List.copyOf(properties);
         this.material = material;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getProperties() {
@@ -34,20 +23,12 @@ public final class StepFeaVolumeElementProperty implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaVolumeElementProperty that = (StepFeaVolumeElementProperty) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(properties, that.properties) && Objects.equals(material, that.material);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, properties, material);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaVolumeElementProperty{" + "id=" + id + "name=" + name + "properties=" + properties + "material=" + material + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("properties", properties);
+        state.put("material", material);
+        return state;
     }
 }

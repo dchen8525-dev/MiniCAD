@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MATERIAL_SPECIFICATION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param chemicalComposition chemical composition specifications
  * @param standards applicable material standards
  */
-public final class StepMaterialSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMaterialSpecification extends AbstractStepEntity {
     private final String materialType;
     private final String materialGrade;
     private final List<Double> mechanicalProperties;
@@ -25,21 +24,12 @@ public final class StepMaterialSpecification implements StepEntity {
     private final List<String> standards;
 
     public StepMaterialSpecification(int id, String name, String materialType, String materialGrade, List<Double> mechanicalProperties, List<String> chemicalComposition, List<String> standards) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.materialType = materialType;
         this.materialGrade = materialGrade;
         this.mechanicalProperties = mechanicalProperties == null ? null : java.util.List.copyOf(mechanicalProperties);
         this.chemicalComposition = chemicalComposition == null ? null : java.util.List.copyOf(chemicalComposition);
         this.standards = standards == null ? null : java.util.List.copyOf(standards);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMaterialType() {
@@ -63,20 +53,15 @@ public final class StepMaterialSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMaterialSpecification that = (StepMaterialSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(materialType, that.materialType) && Objects.equals(materialGrade, that.materialGrade) && Objects.equals(mechanicalProperties, that.mechanicalProperties) && Objects.equals(chemicalComposition, that.chemicalComposition) && Objects.equals(standards, that.standards);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, materialType, materialGrade, mechanicalProperties, chemicalComposition, standards);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMaterialSpecification{" + "id=" + id + "name=" + name + "materialType=" + materialType + "materialGrade=" + materialGrade + "mechanicalProperties=" + mechanicalProperties + "chemicalComposition=" + chemicalComposition + "standards=" + standards + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("materialType", materialType);
+        state.put("materialGrade", materialGrade);
+        state.put("mechanicalProperties", mechanicalProperties);
+        state.put("chemicalComposition", chemicalComposition);
+        state.put("standards", standards);
+        return state;
     }
 }

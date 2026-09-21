@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STANDARD_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param standardRequirements standard variance requirements
  * @param standardStatus standard variance status
  */
-public final class StepStandardDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStandardDefinition extends AbstractStepEntity {
     private final String standardType;
     private final String standardCode;
     private final String standardVersion;
@@ -25,21 +24,12 @@ public final class StepStandardDefinition implements StepEntity {
     private final String standardStatus;
 
     public StepStandardDefinition(int id, String name, String standardType, String standardCode, String standardVersion, List<String> standardRequirements, String standardStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.standardType = standardType;
         this.standardCode = standardCode;
         this.standardVersion = standardVersion;
         this.standardRequirements = standardRequirements == null ? null : java.util.List.copyOf(standardRequirements);
         this.standardStatus = standardStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getStandardType() {
@@ -63,20 +53,15 @@ public final class StepStandardDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStandardDefinition that = (StepStandardDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(standardType, that.standardType) && Objects.equals(standardCode, that.standardCode) && Objects.equals(standardVersion, that.standardVersion) && Objects.equals(standardRequirements, that.standardRequirements) && Objects.equals(standardStatus, that.standardStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, standardType, standardCode, standardVersion, standardRequirements, standardStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStandardDefinition{" + "id=" + id + "name=" + name + "standardType=" + standardType + "standardCode=" + standardCode + "standardVersion=" + standardVersion + "standardRequirements=" + standardRequirements + "standardStatus=" + standardStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("standardType", standardType);
+        state.put("standardCode", standardCode);
+        state.put("standardVersion", standardVersion);
+        state.put("standardRequirements", standardRequirements);
+        state.put("standardStatus", standardStatus);
+        return state;
     }
 }

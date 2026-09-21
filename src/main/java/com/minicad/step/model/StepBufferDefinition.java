@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BUFFER_DEFINITION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param bufferPolicy buffer variance policy
  * @param bufferStatus buffer variance status
  */
-public final class StepBufferDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBufferDefinition extends AbstractStepEntity {
     private final String bufferType;
     private final int bufferCapacity;
     private final String bufferPolicy;
     private final String bufferStatus;
 
     public StepBufferDefinition(int id, String name, String bufferType, int bufferCapacity, String bufferPolicy, String bufferStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.bufferType = bufferType;
         this.bufferCapacity = bufferCapacity;
         this.bufferPolicy = bufferPolicy;
         this.bufferStatus = bufferStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getBufferType() {
@@ -56,20 +46,14 @@ public final class StepBufferDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBufferDefinition that = (StepBufferDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(bufferType, that.bufferType) && bufferCapacity == that.bufferCapacity && Objects.equals(bufferPolicy, that.bufferPolicy) && Objects.equals(bufferStatus, that.bufferStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, bufferType, bufferCapacity, bufferPolicy, bufferStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBufferDefinition{" + "id=" + id + "name=" + name + "bufferType=" + bufferType + "bufferCapacity=" + bufferCapacity + "bufferPolicy=" + bufferPolicy + "bufferStatus=" + bufferStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("bufferType", bufferType);
+        state.put("bufferCapacity", bufferCapacity);
+        state.put("bufferPolicy", bufferPolicy);
+        state.put("bufferStatus", bufferStatus);
+        return state;
     }
 }

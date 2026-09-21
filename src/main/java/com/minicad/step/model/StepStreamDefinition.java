@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STREAM_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param streamBufferSize stream variance buffer size
  * @param streamStatus stream variance status
  */
-public final class StepStreamDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStreamDefinition extends AbstractStepEntity {
     private final String streamType;
     private final String streamDirection;
     private final String streamFormat;
@@ -25,21 +24,12 @@ public final class StepStreamDefinition implements StepEntity {
     private final String streamStatus;
 
     public StepStreamDefinition(int id, String name, String streamType, String streamDirection, String streamFormat, int streamBufferSize, String streamStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.streamType = streamType;
         this.streamDirection = streamDirection;
         this.streamFormat = streamFormat;
         this.streamBufferSize = streamBufferSize;
         this.streamStatus = streamStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getStreamType() {
@@ -63,20 +53,15 @@ public final class StepStreamDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStreamDefinition that = (StepStreamDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(streamType, that.streamType) && Objects.equals(streamDirection, that.streamDirection) && Objects.equals(streamFormat, that.streamFormat) && streamBufferSize == that.streamBufferSize && Objects.equals(streamStatus, that.streamStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, streamType, streamDirection, streamFormat, streamBufferSize, streamStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStreamDefinition{" + "id=" + id + "name=" + name + "streamType=" + streamType + "streamDirection=" + streamDirection + "streamFormat=" + streamFormat + "streamBufferSize=" + streamBufferSize + "streamStatus=" + streamStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("streamType", streamType);
+        state.put("streamDirection", streamDirection);
+        state.put("streamFormat", streamFormat);
+        state.put("streamBufferSize", streamBufferSize);
+        state.put("streamStatus", streamStatus);
+        return state;
     }
 }

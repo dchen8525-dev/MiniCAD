@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ACCESS_FEATURE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param accessLocation access location placement
  * @varianceFrequency access variance frequency (regular, emergency)
  */
-public final class StepAccessFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAccessFeature extends AbstractStepEntity {
     private final String accessType;
     private final StepEntity accessGeometry;
     private final List<Double> accessOpening;
@@ -25,21 +24,12 @@ public final class StepAccessFeature implements StepEntity {
     private final String varianceFrequency;
 
     public StepAccessFeature(int id, String name, String accessType, StepEntity accessGeometry, List<Double> accessOpening, StepEntity accessLocation, String varianceFrequency) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.accessType = accessType;
         this.accessGeometry = accessGeometry;
         this.accessOpening = accessOpening == null ? null : java.util.List.copyOf(accessOpening);
         this.accessLocation = accessLocation;
         this.varianceFrequency = varianceFrequency;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAccessType() {
@@ -63,20 +53,15 @@ public final class StepAccessFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAccessFeature that = (StepAccessFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(accessType, that.accessType) && Objects.equals(accessGeometry, that.accessGeometry) && Objects.equals(accessOpening, that.accessOpening) && Objects.equals(accessLocation, that.accessLocation) && Objects.equals(varianceFrequency, that.varianceFrequency);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, accessType, accessGeometry, accessOpening, accessLocation, varianceFrequency);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAccessFeature{" + "id=" + id + "name=" + name + "accessType=" + accessType + "accessGeometry=" + accessGeometry + "accessOpening=" + accessOpening + "accessLocation=" + accessLocation + "varianceFrequency=" + varianceFrequency + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("accessType", accessType);
+        state.put("accessGeometry", accessGeometry);
+        state.put("accessOpening", accessOpening);
+        state.put("accessLocation", accessLocation);
+        state.put("varianceFrequency", varianceFrequency);
+        return state;
     }
 }

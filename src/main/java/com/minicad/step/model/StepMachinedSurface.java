@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved MACHINED_SURFACE.
  * Represents a surface that has been machined.
@@ -9,23 +11,12 @@ import java.util.Objects;
  * @param name surface name
  * @param face the face that was machined
  */
-public final class StepMachinedSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMachinedSurface extends AbstractStepEntity {
     private final StepEntity face;
 
     public StepMachinedSurface(int id, String name, StepEntity face) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.face = face;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getFace() {
@@ -36,20 +27,11 @@ public final class StepMachinedSurface implements StepEntity {
     public StepEntity face() { return getFace(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMachinedSurface that = (StepMachinedSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(face, that.face);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, face);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMachinedSurface{" + "id=" + id + "name=" + name + "face=" + face + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("face", face);
+        return state;
     }
 }

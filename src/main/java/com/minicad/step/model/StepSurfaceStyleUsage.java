@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal surface style usage.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param side side enum
  * @param style referenced side style
  */
-public final class StepSurfaceStyleUsage implements StepEntity {
-    private final int id;
+public final class StepSurfaceStyleUsage extends AbstractStepEntity {
     private final String side;
     private final StepSurfaceSideStyle style;
 
     public StepSurfaceStyleUsage(int id, String side, StepSurfaceSideStyle style) {
-        this.id = id;
+        super(id, "");
         this.side = side;
         this.style = style;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public String getSide() {
@@ -42,20 +35,11 @@ public final class StepSurfaceStyleUsage implements StepEntity {
     public StepSurfaceSideStyle style() { return getStyle(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceStyleUsage that = (StepSurfaceStyleUsage) o;
-        return id == that.id && Objects.equals(side, that.side) && Objects.equals(style, that.style);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, side, style);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceStyleUsage{" + "id=" + id + "side=" + side + "style=" + style + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("side", side);
+        state.put("style", style);
+        return state;
     }
 }

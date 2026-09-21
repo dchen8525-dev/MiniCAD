@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved AXIS2_PLACEMENT_2D.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param location origin point
  * @param refDirection local x direction
  */
-public final class StepAxis2Placement2D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAxis2Placement2D extends AbstractStepEntity {
     private final StepCartesianPoint location;
     private final StepDirection refDirection;
 
     public StepAxis2Placement2D(int id, String name, StepCartesianPoint location, StepDirection refDirection) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.location = location;
         this.refDirection = refDirection;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepCartesianPoint getLocation() {
@@ -45,20 +36,12 @@ public final class StepAxis2Placement2D implements StepEntity {
     public StepDirection refDirection() { return getRefDirection(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAxis2Placement2D that = (StepAxis2Placement2D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(location, that.location) && Objects.equals(refDirection, that.refDirection);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, location, refDirection);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAxis2Placement2D{" + "id=" + id + "name=" + name + "location=" + location + "refDirection=" + refDirection + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("location", location);
+        state.put("refDirection", refDirection);
+        return state;
     }
 }

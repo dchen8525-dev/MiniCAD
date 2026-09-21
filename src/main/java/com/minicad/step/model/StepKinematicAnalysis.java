@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved KINEMATIC_ANALYSIS.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param motionRange motion range limits
  * @param kinematicConstraints kinematic constraints
  */
-public final class StepKinematicAnalysis implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepKinematicAnalysis extends AbstractStepEntity {
     private final StepEntity mechanism;
     private final List<StepEntity> inputMotion;
     private final List<StepEntity> outputMotion;
@@ -25,21 +24,12 @@ public final class StepKinematicAnalysis implements StepEntity {
     private final List<StepEntity> kinematicConstraints;
 
     public StepKinematicAnalysis(int id, String name, StepEntity mechanism, List<StepEntity> inputMotion, List<StepEntity> outputMotion, List<Double> motionRange, List<StepEntity> kinematicConstraints) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.mechanism = mechanism;
         this.inputMotion = inputMotion == null ? null : java.util.List.copyOf(inputMotion);
         this.outputMotion = outputMotion == null ? null : java.util.List.copyOf(outputMotion);
         this.motionRange = motionRange == null ? null : java.util.List.copyOf(motionRange);
         this.kinematicConstraints = kinematicConstraints == null ? null : java.util.List.copyOf(kinematicConstraints);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMechanism() {
@@ -63,20 +53,15 @@ public final class StepKinematicAnalysis implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepKinematicAnalysis that = (StepKinematicAnalysis) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(mechanism, that.mechanism) && Objects.equals(inputMotion, that.inputMotion) && Objects.equals(outputMotion, that.outputMotion) && Objects.equals(motionRange, that.motionRange) && Objects.equals(kinematicConstraints, that.kinematicConstraints);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, mechanism, inputMotion, outputMotion, motionRange, kinematicConstraints);
-    }
-
-    @Override
-    public String toString() {
-        return "StepKinematicAnalysis{" + "id=" + id + "name=" + name + "mechanism=" + mechanism + "inputMotion=" + inputMotion + "outputMotion=" + outputMotion + "motionRange=" + motionRange + "kinematicConstraints=" + kinematicConstraints + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("mechanism", mechanism);
+        state.put("inputMotion", inputMotion);
+        state.put("outputMotion", outputMotion);
+        state.put("motionRange", motionRange);
+        state.put("kinematicConstraints", kinematicConstraints);
+        return state;
     }
 }

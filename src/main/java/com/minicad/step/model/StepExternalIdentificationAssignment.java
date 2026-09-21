@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal EXTERNAL_IDENTIFICATION_ASSIGNMENT metadata.
  *
@@ -9,21 +11,16 @@ import java.util.Objects;
  * @param role identification role
  * @param source external source
  */
-public final class StepExternalIdentificationAssignment implements StepEntity {
-    private final int id;
+public final class StepExternalIdentificationAssignment extends AbstractStepEntity {
     private final String assignedId;
     private final StepIdentificationRole role;
     private final StepExternalSource source;
 
     public StepExternalIdentificationAssignment(int id, String assignedId, StepIdentificationRole role, StepExternalSource source) {
-        this.id = id;
+        super(id, "");
         this.assignedId = assignedId;
         this.role = role;
         this.source = source;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {
@@ -56,20 +53,12 @@ public final class StepExternalIdentificationAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepExternalIdentificationAssignment that = (StepExternalIdentificationAssignment) o;
-        return id == that.id && Objects.equals(assignedId, that.assignedId) && Objects.equals(role, that.role) && Objects.equals(source, that.source);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedId, role, source);
-    }
-
-    @Override
-    public String toString() {
-        return "StepExternalIdentificationAssignment{" + "id=" + id + "assignedId=" + assignedId + "role=" + role + "source=" + source + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedId", assignedId);
+        state.put("role", role);
+        state.put("source", source);
+        return state;
     }
 }

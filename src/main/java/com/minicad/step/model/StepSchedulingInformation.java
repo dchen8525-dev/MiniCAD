@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SCHEDULING_INFORMATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param schedulingStatus scheduling status (planned, started, completed)
  * @param schedulingDependencies scheduling dependencies
  */
-public final class StepSchedulingInformation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSchedulingInformation extends AbstractStepEntity {
     private final double plannedStart;
     private final double plannedEnd;
     private final double actualStart;
@@ -27,22 +26,13 @@ public final class StepSchedulingInformation implements StepEntity {
     private final List<StepEntity> schedulingDependencies;
 
     public StepSchedulingInformation(int id, String name, double plannedStart, double plannedEnd, double actualStart, double actualEnd, String schedulingStatus, List<StepEntity> schedulingDependencies) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.plannedStart = plannedStart;
         this.plannedEnd = plannedEnd;
         this.actualStart = actualStart;
         this.actualEnd = actualEnd;
         this.schedulingStatus = schedulingStatus;
         this.schedulingDependencies = schedulingDependencies == null ? null : java.util.List.copyOf(schedulingDependencies);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getPlannedStart() {
@@ -70,20 +60,16 @@ public final class StepSchedulingInformation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSchedulingInformation that = (StepSchedulingInformation) o;
-        return id == that.id && Objects.equals(name, that.name) && plannedStart == that.plannedStart && plannedEnd == that.plannedEnd && actualStart == that.actualStart && actualEnd == that.actualEnd && Objects.equals(schedulingStatus, that.schedulingStatus) && Objects.equals(schedulingDependencies, that.schedulingDependencies);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, plannedStart, plannedEnd, actualStart, actualEnd, schedulingStatus, schedulingDependencies);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSchedulingInformation{" + "id=" + id + "name=" + name + "plannedStart=" + plannedStart + "plannedEnd=" + plannedEnd + "actualStart=" + actualStart + "actualEnd=" + actualEnd + "schedulingStatus=" + schedulingStatus + "schedulingDependencies=" + schedulingDependencies + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("plannedStart", plannedStart);
+        state.put("plannedEnd", plannedEnd);
+        state.put("actualStart", actualStart);
+        state.put("actualEnd", actualEnd);
+        state.put("schedulingStatus", schedulingStatus);
+        state.put("schedulingDependencies", schedulingDependencies);
+        return state;
     }
 }

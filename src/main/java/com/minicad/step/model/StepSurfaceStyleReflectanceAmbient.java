@@ -1,31 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal SURFACE_STYLE_REFLECTANCE_AMBIENT.
  *
  * @param id STEP instance id
  * @param ambientReflectance ambient reflectance factor
  */
-public final class StepSurfaceStyleReflectanceAmbient implements StepEntity {
-    private final int id;
+public final class StepSurfaceStyleReflectanceAmbient extends AbstractStepEntity {
     private final double ambientReflectance;
 
     public StepSurfaceStyleReflectanceAmbient(int id, double ambientReflectance) {
-        this.id = id;
+        super(id, "");
         this.ambientReflectance = ambientReflectance;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public double getAmbientReflectance() {
         return ambientReflectance;
-    }
-
-    public String getName() {
-        return "";
     }
 
     // Record-style accessor
@@ -34,20 +27,10 @@ public final class StepSurfaceStyleReflectanceAmbient implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceStyleReflectanceAmbient that = (StepSurfaceStyleReflectanceAmbient) o;
-        return id == that.id && ambientReflectance == that.ambientReflectance;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, ambientReflectance);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceStyleReflectanceAmbient{" + "id=" + id + "ambientReflectance=" + ambientReflectance + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("ambientReflectance", ambientReflectance);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LINEAR_DIMENSION_REPRESENTATION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param lengthValue length value
  * @param lengthUnit length unit
  */
-public final class StepLinearDimensionRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLinearDimensionRepresentation extends AbstractStepEntity {
     private final List<StepEntity> items;
     private final StepEntity context;
     private final Double lengthValue;
     private final StepEntity lengthUnit;
 
     public StepLinearDimensionRepresentation(int id, String name, List<StepEntity> items, StepEntity context, Double lengthValue, StepEntity lengthUnit) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.items = items == null ? null : java.util.List.copyOf(items);
         this.context = context;
         this.lengthValue = lengthValue;
         this.lengthUnit = lengthUnit;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getItems() {
@@ -56,20 +46,14 @@ public final class StepLinearDimensionRepresentation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLinearDimensionRepresentation that = (StepLinearDimensionRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(items, that.items) && Objects.equals(context, that.context) && Objects.equals(lengthValue, that.lengthValue) && Objects.equals(lengthUnit, that.lengthUnit);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, items, context, lengthValue, lengthUnit);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLinearDimensionRepresentation{" + "id=" + id + "name=" + name + "items=" + items + "context=" + context + "lengthValue=" + lengthValue + "lengthUnit=" + lengthUnit + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("items", items);
+        state.put("context", context);
+        state.put("lengthValue", lengthValue);
+        state.put("lengthUnit", lengthUnit);
+        return state;
     }
 }

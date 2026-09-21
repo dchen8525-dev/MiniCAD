@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BILL_OF_MATERIALS.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceLevel BOM variance level in hierarchy
  * @param bomStatus BOM status (current, revision)
  */
-public final class StepBillOfMaterials implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBillOfMaterials extends AbstractStepEntity {
     private final String bomId;
     private final List<StepEntity> bomItems;
     private final List<Integer> bomQuantities;
@@ -27,22 +26,13 @@ public final class StepBillOfMaterials implements StepEntity {
     private final String bomStatus;
 
     public StepBillOfMaterials(int id, String name, String bomId, List<StepEntity> bomItems, List<Integer> bomQuantities, String bomStructure, int varianceLevel, String bomStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.bomId = bomId;
         this.bomItems = bomItems == null ? null : java.util.List.copyOf(bomItems);
         this.bomQuantities = bomQuantities == null ? null : java.util.List.copyOf(bomQuantities);
         this.bomStructure = bomStructure;
         this.varianceLevel = varianceLevel;
         this.bomStatus = bomStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getBomId() {
@@ -70,20 +60,16 @@ public final class StepBillOfMaterials implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBillOfMaterials that = (StepBillOfMaterials) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(bomId, that.bomId) && Objects.equals(bomItems, that.bomItems) && Objects.equals(bomQuantities, that.bomQuantities) && Objects.equals(bomStructure, that.bomStructure) && varianceLevel == that.varianceLevel && Objects.equals(bomStatus, that.bomStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, bomId, bomItems, bomQuantities, bomStructure, varianceLevel, bomStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBillOfMaterials{" + "id=" + id + "name=" + name + "bomId=" + bomId + "bomItems=" + bomItems + "bomQuantities=" + bomQuantities + "bomStructure=" + bomStructure + "varianceLevel=" + varianceLevel + "bomStatus=" + bomStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("bomId", bomId);
+        state.put("bomItems", bomItems);
+        state.put("bomQuantities", bomQuantities);
+        state.put("bomStructure", bomStructure);
+        state.put("varianceLevel", varianceLevel);
+        state.put("bomStatus", bomStatus);
+        return state;
     }
 }

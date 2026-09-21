@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COST_INSTANCE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param costBreakdown cost variance breakdown details
  * @param costStatus cost variance status
  */
-public final class StepCostInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCostInstance extends AbstractStepEntity {
     private final StepEntity costDefinition;
     private final double costPlanned;
     private final double costActual;
@@ -27,22 +26,13 @@ public final class StepCostInstance implements StepEntity {
     private final String costStatus;
 
     public StepCostInstance(int id, String name, StepEntity costDefinition, double costPlanned, double costActual, double costVariance, List<String> costBreakdown, String costStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.costDefinition = costDefinition;
         this.costPlanned = costPlanned;
         this.costActual = costActual;
         this.costVariance = costVariance;
         this.costBreakdown = costBreakdown == null ? null : java.util.List.copyOf(costBreakdown);
         this.costStatus = costStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getCostDefinition() {
@@ -70,20 +60,16 @@ public final class StepCostInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCostInstance that = (StepCostInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(costDefinition, that.costDefinition) && costPlanned == that.costPlanned && costActual == that.costActual && costVariance == that.costVariance && Objects.equals(costBreakdown, that.costBreakdown) && Objects.equals(costStatus, that.costStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, costDefinition, costPlanned, costActual, costVariance, costBreakdown, costStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCostInstance{" + "id=" + id + "name=" + name + "costDefinition=" + costDefinition + "costPlanned=" + costPlanned + "costActual=" + costActual + "costVariance=" + costVariance + "costBreakdown=" + costBreakdown + "costStatus=" + costStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("costDefinition", costDefinition);
+        state.put("costPlanned", costPlanned);
+        state.put("costActual", costActual);
+        state.put("costVariance", costVariance);
+        state.put("costBreakdown", costBreakdown);
+        state.put("costStatus", costStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INSPECTION_CRITERIA.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param toleranceLimits tolerance limits for each criterion
  * @param measurementMethod measurement method specifications
  */
-public final class StepInspectionCriteria implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInspectionCriteria extends AbstractStepEntity {
     private final List<StepEntity> criteriaItems;
     private final StepEntity criteriaContext;
     private final List<Double> toleranceLimits;
     private final List<String> measurementMethod;
 
     public StepInspectionCriteria(int id, String name, List<StepEntity> criteriaItems, StepEntity criteriaContext, List<Double> toleranceLimits, List<String> measurementMethod) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.criteriaItems = criteriaItems == null ? null : java.util.List.copyOf(criteriaItems);
         this.criteriaContext = criteriaContext;
         this.toleranceLimits = toleranceLimits == null ? null : java.util.List.copyOf(toleranceLimits);
         this.measurementMethod = measurementMethod == null ? null : java.util.List.copyOf(measurementMethod);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getCriteriaItems() {
@@ -56,20 +46,14 @@ public final class StepInspectionCriteria implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInspectionCriteria that = (StepInspectionCriteria) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(criteriaItems, that.criteriaItems) && Objects.equals(criteriaContext, that.criteriaContext) && Objects.equals(toleranceLimits, that.toleranceLimits) && Objects.equals(measurementMethod, that.measurementMethod);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, criteriaItems, criteriaContext, toleranceLimits, measurementMethod);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInspectionCriteria{" + "id=" + id + "name=" + name + "criteriaItems=" + criteriaItems + "criteriaContext=" + criteriaContext + "toleranceLimits=" + toleranceLimits + "measurementMethod=" + measurementMethod + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("criteriaItems", criteriaItems);
+        state.put("criteriaContext", criteriaContext);
+        state.put("toleranceLimits", toleranceLimits);
+        state.put("measurementMethod", measurementMethod);
+        return state;
     }
 }

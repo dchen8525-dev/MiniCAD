@@ -1,23 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal EFFECTIVITY metadata.
  *
  * @param id STEP instance id
  * @param effectivityId effectivity identifier
  */
-public final class StepEffectivity implements StepEntity {
-    private final int id;
+public final class StepEffectivity extends AbstractStepEntity {
     private final String effectivityId;
 
     public StepEffectivity(int id, String effectivityId) {
-        this.id = id;
+        super(id, "");
         this.effectivityId = effectivityId;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getEffectivityId() {
@@ -38,20 +35,10 @@ public final class StepEffectivity implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEffectivity that = (StepEffectivity) o;
-        return id == that.id && Objects.equals(effectivityId, that.effectivityId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, effectivityId);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEffectivity{" + "id=" + id + "effectivityId=" + effectivityId + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("effectivityId", effectivityId);
+        return state;
     }
 }

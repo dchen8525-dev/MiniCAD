@@ -1,29 +1,20 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved DATUM_REFERENCE_MODIFIER.
  * A modifier applied to a datum reference (e.g., MMB, LMB).
  */
-public final class StepDatumReferenceModifier implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDatumReferenceModifier extends AbstractStepEntity {
     private final String modifierType;
     private final StepEntity referencedDatum;
 
     public StepDatumReferenceModifier(int id, String name, String modifierType, StepEntity referencedDatum) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.modifierType = modifierType;
         this.referencedDatum = referencedDatum;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getModifierType() {
@@ -35,20 +26,12 @@ public final class StepDatumReferenceModifier implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDatumReferenceModifier that = (StepDatumReferenceModifier) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(modifierType, that.modifierType) && Objects.equals(referencedDatum, that.referencedDatum);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, modifierType, referencedDatum);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDatumReferenceModifier{" + "id=" + id + "name=" + name + "modifierType=" + modifierType + "referencedDatum=" + referencedDatum + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("modifierType", modifierType);
+        state.put("referencedDatum", referencedDatum);
+        return state;
     }
 }

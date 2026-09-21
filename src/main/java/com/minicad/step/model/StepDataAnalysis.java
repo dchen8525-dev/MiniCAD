@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DATA_ANALYSIS.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceDate analysis variance date
  * @varianceStatus analysis variance status
  */
-public final class StepDataAnalysis implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDataAnalysis extends AbstractStepEntity {
     private final StepEntity varianceData;
     private final String varianceMethod;
     private final List<Double> varianceResults;
@@ -27,22 +26,13 @@ public final class StepDataAnalysis implements StepEntity {
     private final String varianceStatus;
 
     public StepDataAnalysis(int id, String name, StepEntity varianceData, String varianceMethod, List<Double> varianceResults, String varianceConclusions, StepEntity varianceDate, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceData = varianceData;
         this.varianceMethod = varianceMethod;
         this.varianceResults = varianceResults == null ? null : java.util.List.copyOf(varianceResults);
         this.varianceConclusions = varianceConclusions;
         this.varianceDate = varianceDate;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceData() {
@@ -70,20 +60,16 @@ public final class StepDataAnalysis implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDataAnalysis that = (StepDataAnalysis) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceData, that.varianceData) && Objects.equals(varianceMethod, that.varianceMethod) && Objects.equals(varianceResults, that.varianceResults) && Objects.equals(varianceConclusions, that.varianceConclusions) && Objects.equals(varianceDate, that.varianceDate) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceData, varianceMethod, varianceResults, varianceConclusions, varianceDate, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDataAnalysis{" + "id=" + id + "name=" + name + "varianceData=" + varianceData + "varianceMethod=" + varianceMethod + "varianceResults=" + varianceResults + "varianceConclusions=" + varianceConclusions + "varianceDate=" + varianceDate + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceData", varianceData);
+        state.put("varianceMethod", varianceMethod);
+        state.put("varianceResults", varianceResults);
+        state.put("varianceConclusions", varianceConclusions);
+        state.put("varianceDate", varianceDate);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved EVENT_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param eventExecutedActions event variance executed actions
  * @param eventStatus event variance status
  */
-public final class StepEventInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEventInstance extends AbstractStepEntity {
     private final StepEntity eventDefinition;
     private final String eventState;
     private final StepEntity eventTriggerTime;
@@ -25,21 +24,12 @@ public final class StepEventInstance implements StepEntity {
     private final String eventStatus;
 
     public StepEventInstance(int id, String name, StepEntity eventDefinition, String eventState, StepEntity eventTriggerTime, List<String> eventExecutedActions, String eventStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.eventDefinition = eventDefinition;
         this.eventState = eventState;
         this.eventTriggerTime = eventTriggerTime;
         this.eventExecutedActions = eventExecutedActions == null ? null : java.util.List.copyOf(eventExecutedActions);
         this.eventStatus = eventStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getEventDefinition() {
@@ -63,20 +53,15 @@ public final class StepEventInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEventInstance that = (StepEventInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(eventDefinition, that.eventDefinition) && Objects.equals(eventState, that.eventState) && Objects.equals(eventTriggerTime, that.eventTriggerTime) && Objects.equals(eventExecutedActions, that.eventExecutedActions) && Objects.equals(eventStatus, that.eventStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, eventDefinition, eventState, eventTriggerTime, eventExecutedActions, eventStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEventInstance{" + "id=" + id + "name=" + name + "eventDefinition=" + eventDefinition + "eventState=" + eventState + "eventTriggerTime=" + eventTriggerTime + "eventExecutedActions=" + eventExecutedActions + "eventStatus=" + eventStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("eventDefinition", eventDefinition);
+        state.put("eventState", eventState);
+        state.put("eventTriggerTime", eventTriggerTime);
+        state.put("eventExecutedActions", eventExecutedActions);
+        state.put("eventStatus", eventStatus);
+        return state;
     }
 }

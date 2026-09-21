@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PACKET_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param packetChecksum packet variance checksum
  * @param packetStatus packet variance status
  */
-public final class StepPacketInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPacketInstance extends AbstractStepEntity {
     private final StepEntity packetDefinition;
     private final long packetSequence;
     private final String packetData;
@@ -25,21 +24,12 @@ public final class StepPacketInstance implements StepEntity {
     private final String packetStatus;
 
     public StepPacketInstance(int id, String name, StepEntity packetDefinition, long packetSequence, String packetData, String packetChecksum, String packetStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.packetDefinition = packetDefinition;
         this.packetSequence = packetSequence;
         this.packetData = packetData;
         this.packetChecksum = packetChecksum;
         this.packetStatus = packetStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPacketDefinition() {
@@ -63,20 +53,15 @@ public final class StepPacketInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPacketInstance that = (StepPacketInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(packetDefinition, that.packetDefinition) && packetSequence == that.packetSequence && Objects.equals(packetData, that.packetData) && Objects.equals(packetChecksum, that.packetChecksum) && Objects.equals(packetStatus, that.packetStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, packetDefinition, packetSequence, packetData, packetChecksum, packetStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPacketInstance{" + "id=" + id + "name=" + name + "packetDefinition=" + packetDefinition + "packetSequence=" + packetSequence + "packetData=" + packetData + "packetChecksum=" + packetChecksum + "packetStatus=" + packetStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("packetDefinition", packetDefinition);
+        state.put("packetSequence", packetSequence);
+        state.put("packetData", packetData);
+        state.put("packetChecksum", packetChecksum);
+        state.put("packetStatus", packetStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal ANNOTATION_SYMBOL.
  *
@@ -10,25 +11,14 @@ import java.util.Objects;
  * @param mappingSource symbol representation map
  * @param mappingTarget placement target
  */
-public final class StepAnnotationSymbol implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAnnotationSymbol extends AbstractStepEntity {
     private final StepSymbolRepresentationMap mappingSource;
     private final StepEntity mappingTarget;
 
     public StepAnnotationSymbol(int id, String name, StepSymbolRepresentationMap mappingSource, StepEntity mappingTarget) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.mappingSource = mappingSource;
         this.mappingTarget = mappingTarget;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepSymbolRepresentationMap getMappingSource() {
@@ -49,20 +39,12 @@ public final class StepAnnotationSymbol implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAnnotationSymbol that = (StepAnnotationSymbol) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(mappingSource, that.mappingSource) && Objects.equals(mappingTarget, that.mappingTarget);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, mappingSource, mappingTarget);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAnnotationSymbol{" + "id=" + id + "name=" + name + "mappingSource=" + mappingSource + "mappingTarget=" + mappingTarget + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("mappingSource", mappingSource);
+        state.put("mappingTarget", mappingTarget);
+        return state;
     }
 }

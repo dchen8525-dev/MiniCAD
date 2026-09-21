@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal PRODUCT_DEFINITION_EFFECTIVITY metadata.
  *
@@ -9,25 +11,16 @@ import java.util.Objects;
  * @param usage usage text
  * @param productDefinition affected product definition
  */
-public final class StepProductDefinitionEffectivity implements StepEntity {
-    private final int id;
+public final class StepProductDefinitionEffectivity extends AbstractStepEntity {
     private final String effectivityId;
     private final String usage;
     private final StepProductDefinition productDefinition;
 
     public StepProductDefinitionEffectivity(int id, String effectivityId, String usage, StepProductDefinition productDefinition) {
-        this.id = id;
+        super(id, "");
         this.effectivityId = effectivityId;
         this.usage = usage;
         this.productDefinition = productDefinition;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public String getEffectivityId() {
@@ -56,20 +49,12 @@ public final class StepProductDefinitionEffectivity implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductDefinitionEffectivity that = (StepProductDefinitionEffectivity) o;
-        return id == that.id && Objects.equals(effectivityId, that.effectivityId) && Objects.equals(usage, that.usage) && Objects.equals(productDefinition, that.productDefinition);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, effectivityId, usage, productDefinition);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductDefinitionEffectivity{" + "id=" + id + "effectivityId=" + effectivityId + "usage=" + usage + "productDefinition=" + productDefinition + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("effectivityId", effectivityId);
+        state.put("usage", usage);
+        state.put("productDefinition", productDefinition);
+        return state;
     }
 }

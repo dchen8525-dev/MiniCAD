@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FEATURE_PATTERN.
@@ -13,27 +14,16 @@ import java.util.Objects;
  * @param patternType pattern type (linear, circular, mirror, etc)
  * @param parameters pattern parameters (spacing, count, angle, etc)
  */
-public final class StepFeaturePattern implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFeaturePattern extends AbstractStepEntity {
     private final StepEntity baseFeature;
     private final String patternType;
     private final List<Double> parameters;
 
     public StepFeaturePattern(int id, String name, StepEntity baseFeature, String patternType, List<Double> parameters) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.baseFeature = baseFeature;
         this.patternType = patternType;
         this.parameters = parameters == null ? null : java.util.List.copyOf(parameters);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBaseFeature() {
@@ -49,20 +39,13 @@ public final class StepFeaturePattern implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFeaturePattern that = (StepFeaturePattern) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(baseFeature, that.baseFeature) && Objects.equals(patternType, that.patternType) && Objects.equals(parameters, that.parameters);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, baseFeature, patternType, parameters);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFeaturePattern{" + "id=" + id + "name=" + name + "baseFeature=" + baseFeature + "patternType=" + patternType + "parameters=" + parameters + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("baseFeature", baseFeature);
+        state.put("patternType", patternType);
+        state.put("parameters", parameters);
+        return state;
     }
 }

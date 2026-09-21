@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COST_ESTIMATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param estimationMethod estimation method used
  * @param estimationDate estimation date
  */
-public final class StepCostEstimation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCostEstimation extends AbstractStepEntity {
     private final String estimationType;
     private final double estimatedCost;
     private final String costCurrency;
@@ -27,22 +26,13 @@ public final class StepCostEstimation implements StepEntity {
     private final StepEntity estimationDate;
 
     public StepCostEstimation(int id, String name, String estimationType, double estimatedCost, String costCurrency, List<StepEntity> costBreakdown, String estimationMethod, StepEntity estimationDate) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.estimationType = estimationType;
         this.estimatedCost = estimatedCost;
         this.costCurrency = costCurrency;
         this.costBreakdown = costBreakdown == null ? null : java.util.List.copyOf(costBreakdown);
         this.estimationMethod = estimationMethod;
         this.estimationDate = estimationDate;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEstimationType() {
@@ -70,20 +60,16 @@ public final class StepCostEstimation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCostEstimation that = (StepCostEstimation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(estimationType, that.estimationType) && estimatedCost == that.estimatedCost && Objects.equals(costCurrency, that.costCurrency) && Objects.equals(costBreakdown, that.costBreakdown) && Objects.equals(estimationMethod, that.estimationMethod) && Objects.equals(estimationDate, that.estimationDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, estimationType, estimatedCost, costCurrency, costBreakdown, estimationMethod, estimationDate);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCostEstimation{" + "id=" + id + "name=" + name + "estimationType=" + estimationType + "estimatedCost=" + estimatedCost + "costCurrency=" + costCurrency + "costBreakdown=" + costBreakdown + "estimationMethod=" + estimationMethod + "estimationDate=" + estimationDate + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("estimationType", estimationType);
+        state.put("estimatedCost", estimatedCost);
+        state.put("costCurrency", costCurrency);
+        state.put("costBreakdown", costBreakdown);
+        state.put("estimationMethod", estimationMethod);
+        state.put("estimationDate", estimationDate);
+        return state;
     }
 }

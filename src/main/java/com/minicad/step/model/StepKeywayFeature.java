@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved KEYWAY_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param keywayPosition keyway position placement
  * @param shaftDiameter reference shaft diameter
  */
-public final class StepKeywayFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepKeywayFeature extends AbstractStepEntity {
     private final String keywayType;
     private final double keywayWidth;
     private final double keywayDepth;
@@ -27,22 +26,13 @@ public final class StepKeywayFeature implements StepEntity {
     private final double shaftDiameter;
 
     public StepKeywayFeature(int id, String name, String keywayType, double keywayWidth, double keywayDepth, double keywayLength, StepEntity keywayPosition, double shaftDiameter) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.keywayType = keywayType;
         this.keywayWidth = keywayWidth;
         this.keywayDepth = keywayDepth;
         this.keywayLength = keywayLength;
         this.keywayPosition = keywayPosition;
         this.shaftDiameter = shaftDiameter;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getKeywayType() {
@@ -70,20 +60,16 @@ public final class StepKeywayFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepKeywayFeature that = (StepKeywayFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(keywayType, that.keywayType) && keywayWidth == that.keywayWidth && keywayDepth == that.keywayDepth && keywayLength == that.keywayLength && Objects.equals(keywayPosition, that.keywayPosition) && shaftDiameter == that.shaftDiameter;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, keywayType, keywayWidth, keywayDepth, keywayLength, keywayPosition, shaftDiameter);
-    }
-
-    @Override
-    public String toString() {
-        return "StepKeywayFeature{" + "id=" + id + "name=" + name + "keywayType=" + keywayType + "keywayWidth=" + keywayWidth + "keywayDepth=" + keywayDepth + "keywayLength=" + keywayLength + "keywayPosition=" + keywayPosition + "shaftDiameter=" + shaftDiameter + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("keywayType", keywayType);
+        state.put("keywayWidth", keywayWidth);
+        state.put("keywayDepth", keywayDepth);
+        state.put("keywayLength", keywayLength);
+        state.put("keywayPosition", keywayPosition);
+        state.put("shaftDiameter", shaftDiameter);
+        return state;
     }
 }

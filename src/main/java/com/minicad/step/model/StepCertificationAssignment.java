@@ -1,31 +1,24 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CERTIFICATION_ASSIGNMENT metadata.
  *
  * @param id STEP instance id
  * @param assignedCertification assigned certification
  */
-public final class StepCertificationAssignment implements StepEntity {
-    private final int id;
+public final class StepCertificationAssignment extends AbstractStepEntity {
     private final StepCertification assignedCertification;
 
     public StepCertificationAssignment(int id, StepCertification assignedCertification) {
-        this.id = id;
+        super(id, "");
         this.assignedCertification = assignedCertification;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public StepCertification getAssignedCertification() {
         return assignedCertification;
-    }
-
-    public String getName() {
-        return "";
     }
 
     // Record-style accessor - no name field, return empty string
@@ -38,20 +31,10 @@ public final class StepCertificationAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCertificationAssignment that = (StepCertificationAssignment) o;
-        return id == that.id && Objects.equals(assignedCertification, that.assignedCertification);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedCertification);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCertificationAssignment{" + "id=" + id + "assignedCertification=" + assignedCertification + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedCertification", assignedCertification);
+        return state;
     }
 }

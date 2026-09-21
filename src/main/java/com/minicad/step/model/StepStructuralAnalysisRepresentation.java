@@ -1,30 +1,21 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+
 /**
  * Resolved STRUCTURAL_ANALYSIS_REPRESENTATION.
  * A structural analysis representation.
  */
-public final class StepStructuralAnalysisRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStructuralAnalysisRepresentation extends AbstractStepEntity {
     private final String analysisType;
     private final List<StepEntity> items;
 
     public StepStructuralAnalysisRepresentation(int id, String name, String analysisType, List<StepEntity> items) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.analysisType = analysisType;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAnalysisType() {
@@ -36,20 +27,12 @@ public final class StepStructuralAnalysisRepresentation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStructuralAnalysisRepresentation that = (StepStructuralAnalysisRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(analysisType, that.analysisType) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, analysisType, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStructuralAnalysisRepresentation{" + "id=" + id + "name=" + name + "analysisType=" + analysisType + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("analysisType", analysisType);
+        state.put("items", items);
+        return state;
     }
 }

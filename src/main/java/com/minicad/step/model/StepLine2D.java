@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved LINE_2D.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param point_2d point on the line
  * @param direction_2d direction of the line
  */
-public final class StepLine2D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLine2D extends AbstractStepEntity {
     private final StepCartesianPoint point2d;
     private final StepDirection direction2d;
 
     public StepLine2D(int id, String name, StepCartesianPoint point2d, StepDirection direction2d) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.point2d = point2d;
         this.direction2d = direction2d;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepCartesianPoint getPoint2d() {
@@ -45,20 +36,12 @@ public final class StepLine2D implements StepEntity {
     public StepDirection direction2d() { return getDirection2d(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLine2D that = (StepLine2D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(point2d, that.point2d) && Objects.equals(direction2d, that.direction2d);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, point2d, direction2d);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLine2D{" + "id=" + id + "name=" + name + "point2d=" + point2d + "direction2d=" + direction2d + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("point2d", point2d);
+        state.put("direction2d", direction2d);
+        return state;
     }
 }

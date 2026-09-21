@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved METRIC_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param metricHistory metric variance historical values
  * @param metricStatus metric variance status
  */
-public final class StepMetricInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMetricInstance extends AbstractStepEntity {
     private final StepEntity metricDefinition;
     private final double metricValue;
     private final String metricTrend;
@@ -25,21 +24,12 @@ public final class StepMetricInstance implements StepEntity {
     private final String metricStatus;
 
     public StepMetricInstance(int id, String name, StepEntity metricDefinition, double metricValue, String metricTrend, List<Double> metricHistory, String metricStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.metricDefinition = metricDefinition;
         this.metricValue = metricValue;
         this.metricTrend = metricTrend;
         this.metricHistory = metricHistory == null ? null : java.util.List.copyOf(metricHistory);
         this.metricStatus = metricStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMetricDefinition() {
@@ -63,20 +53,15 @@ public final class StepMetricInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMetricInstance that = (StepMetricInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(metricDefinition, that.metricDefinition) && metricValue == that.metricValue && Objects.equals(metricTrend, that.metricTrend) && Objects.equals(metricHistory, that.metricHistory) && Objects.equals(metricStatus, that.metricStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, metricDefinition, metricValue, metricTrend, metricHistory, metricStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMetricInstance{" + "id=" + id + "name=" + name + "metricDefinition=" + metricDefinition + "metricValue=" + metricValue + "metricTrend=" + metricTrend + "metricHistory=" + metricHistory + "metricStatus=" + metricStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("metricDefinition", metricDefinition);
+        state.put("metricValue", metricValue);
+        state.put("metricTrend", metricTrend);
+        state.put("metricHistory", metricHistory);
+        state.put("metricStatus", metricStatus);
+        return state;
     }
 }

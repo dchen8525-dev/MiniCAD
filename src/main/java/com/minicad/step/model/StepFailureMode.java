@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FAILURE_MODE.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceDetection detection variance rating
  * @varianceRisk risk variance priority number
  */
-public final class StepFailureMode implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFailureMode extends AbstractStepEntity {
     private final StepEntity varianceItem;
     private final String varianceType;
     private final List<String> varianceCause;
@@ -29,8 +28,7 @@ public final class StepFailureMode implements StepEntity {
     private final int varianceRisk;
 
     public StepFailureMode(int id, String name, StepEntity varianceItem, String varianceType, List<String> varianceCause, List<String> varianceEffect, int varianceSeverity, int varianceDetection, int varianceRisk) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceItem = varianceItem;
         this.varianceType = varianceType;
         this.varianceCause = varianceCause == null ? null : java.util.List.copyOf(varianceCause);
@@ -38,14 +36,6 @@ public final class StepFailureMode implements StepEntity {
         this.varianceSeverity = varianceSeverity;
         this.varianceDetection = varianceDetection;
         this.varianceRisk = varianceRisk;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceItem() {
@@ -77,20 +67,17 @@ public final class StepFailureMode implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFailureMode that = (StepFailureMode) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceItem, that.varianceItem) && Objects.equals(varianceType, that.varianceType) && Objects.equals(varianceCause, that.varianceCause) && Objects.equals(varianceEffect, that.varianceEffect) && varianceSeverity == that.varianceSeverity && varianceDetection == that.varianceDetection && varianceRisk == that.varianceRisk;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceItem, varianceType, varianceCause, varianceEffect, varianceSeverity, varianceDetection, varianceRisk);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFailureMode{" + "id=" + id + "name=" + name + "varianceItem=" + varianceItem + "varianceType=" + varianceType + "varianceCause=" + varianceCause + "varianceEffect=" + varianceEffect + "varianceSeverity=" + varianceSeverity + "varianceDetection=" + varianceDetection + "varianceRisk=" + varianceRisk + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceItem", varianceItem);
+        state.put("varianceType", varianceType);
+        state.put("varianceCause", varianceCause);
+        state.put("varianceEffect", varianceEffect);
+        state.put("varianceSeverity", varianceSeverity);
+        state.put("varianceDetection", varianceDetection);
+        state.put("varianceRisk", varianceRisk);
+        return state;
     }
 }

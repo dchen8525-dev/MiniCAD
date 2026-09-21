@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CAPABILITY_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param capabilityLevel capability variance level
  * @param capabilityStatus capability variance status
  */
-public final class StepCapabilityDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCapabilityDefinition extends AbstractStepEntity {
     private final String capabilityType;
     private final String capabilityDescription;
     private final List<String> capabilityParameters;
@@ -25,21 +24,12 @@ public final class StepCapabilityDefinition implements StepEntity {
     private final String capabilityStatus;
 
     public StepCapabilityDefinition(int id, String name, String capabilityType, String capabilityDescription, List<String> capabilityParameters, int capabilityLevel, String capabilityStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.capabilityType = capabilityType;
         this.capabilityDescription = capabilityDescription;
         this.capabilityParameters = capabilityParameters == null ? null : java.util.List.copyOf(capabilityParameters);
         this.capabilityLevel = capabilityLevel;
         this.capabilityStatus = capabilityStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCapabilityType() {
@@ -63,20 +53,15 @@ public final class StepCapabilityDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCapabilityDefinition that = (StepCapabilityDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(capabilityType, that.capabilityType) && Objects.equals(capabilityDescription, that.capabilityDescription) && Objects.equals(capabilityParameters, that.capabilityParameters) && capabilityLevel == that.capabilityLevel && Objects.equals(capabilityStatus, that.capabilityStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, capabilityType, capabilityDescription, capabilityParameters, capabilityLevel, capabilityStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCapabilityDefinition{" + "id=" + id + "name=" + name + "capabilityType=" + capabilityType + "capabilityDescription=" + capabilityDescription + "capabilityParameters=" + capabilityParameters + "capabilityLevel=" + capabilityLevel + "capabilityStatus=" + capabilityStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("capabilityType", capabilityType);
+        state.put("capabilityDescription", capabilityDescription);
+        state.put("capabilityParameters", capabilityParameters);
+        state.put("capabilityLevel", capabilityLevel);
+        state.put("capabilityStatus", capabilityStatus);
+        return state;
     }
 }

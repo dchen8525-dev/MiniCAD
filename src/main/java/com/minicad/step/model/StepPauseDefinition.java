@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PAUSE_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param pauseTimeout pause variance max pause time
  * @param pauseStatus pause variance status
  */
-public final class StepPauseDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPauseDefinition extends AbstractStepEntity {
     private final String pauseType;
     private final String pauseCondition;
     private final String pauseResumeCondition;
@@ -25,21 +24,12 @@ public final class StepPauseDefinition implements StepEntity {
     private final String pauseStatus;
 
     public StepPauseDefinition(int id, String name, String pauseType, String pauseCondition, String pauseResumeCondition, int pauseTimeout, String pauseStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.pauseType = pauseType;
         this.pauseCondition = pauseCondition;
         this.pauseResumeCondition = pauseResumeCondition;
         this.pauseTimeout = pauseTimeout;
         this.pauseStatus = pauseStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPauseType() {
@@ -63,20 +53,15 @@ public final class StepPauseDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPauseDefinition that = (StepPauseDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(pauseType, that.pauseType) && Objects.equals(pauseCondition, that.pauseCondition) && Objects.equals(pauseResumeCondition, that.pauseResumeCondition) && pauseTimeout == that.pauseTimeout && Objects.equals(pauseStatus, that.pauseStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, pauseType, pauseCondition, pauseResumeCondition, pauseTimeout, pauseStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPauseDefinition{" + "id=" + id + "name=" + name + "pauseType=" + pauseType + "pauseCondition=" + pauseCondition + "pauseResumeCondition=" + pauseResumeCondition + "pauseTimeout=" + pauseTimeout + "pauseStatus=" + pauseStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("pauseType", pauseType);
+        state.put("pauseCondition", pauseCondition);
+        state.put("pauseResumeCondition", pauseResumeCondition);
+        state.put("pauseTimeout", pauseTimeout);
+        state.put("pauseStatus", pauseStatus);
+        return state;
     }
 }

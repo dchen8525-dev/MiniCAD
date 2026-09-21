@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SEQUENCE_DEFINITION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param sequenceOrder sequence variance ordering policy
  * @param sequenceStatus sequence variance status
  */
-public final class StepSequenceDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSequenceDefinition extends AbstractStepEntity {
     private final String sequenceType;
     private final List<StepEntity> sequenceItems;
     private final String sequenceOrder;
     private final String sequenceStatus;
 
     public StepSequenceDefinition(int id, String name, String sequenceType, List<StepEntity> sequenceItems, String sequenceOrder, String sequenceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.sequenceType = sequenceType;
         this.sequenceItems = sequenceItems == null ? null : java.util.List.copyOf(sequenceItems);
         this.sequenceOrder = sequenceOrder;
         this.sequenceStatus = sequenceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSequenceType() {
@@ -56,20 +46,14 @@ public final class StepSequenceDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSequenceDefinition that = (StepSequenceDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(sequenceType, that.sequenceType) && Objects.equals(sequenceItems, that.sequenceItems) && Objects.equals(sequenceOrder, that.sequenceOrder) && Objects.equals(sequenceStatus, that.sequenceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, sequenceType, sequenceItems, sequenceOrder, sequenceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSequenceDefinition{" + "id=" + id + "name=" + name + "sequenceType=" + sequenceType + "sequenceItems=" + sequenceItems + "sequenceOrder=" + sequenceOrder + "sequenceStatus=" + sequenceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("sequenceType", sequenceType);
+        state.put("sequenceItems", sequenceItems);
+        state.put("sequenceOrder", sequenceOrder);
+        state.put("sequenceStatus", sequenceStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FACETTED_BREP.
@@ -11,23 +12,12 @@ import java.util.Objects;
  * @param name STEP label
  * @param outer the outer closed shell
  */
-public final class StepFacettedBrep implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFacettedBrep extends AbstractStepEntity {
     private final StepEntity outer;
 
     public StepFacettedBrep(int id, String name, StepEntity outer) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.outer = outer;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getOuter() {
@@ -45,20 +35,11 @@ public final class StepFacettedBrep implements StepEntity {
     public StepEntity outer() { return getOuter(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFacettedBrep that = (StepFacettedBrep) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(outer, that.outer);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, outer);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFacettedBrep{" + "id=" + id + "name=" + name + "outer=" + outer + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("outer", outer);
+        return state;
     }
 }

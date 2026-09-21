@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PREVENTIVE_ACTION.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceStatus action variance status
  * @varianceVerification verification variance method
  */
-public final class StepPreventiveAction implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPreventiveAction extends AbstractStepEntity {
     private final String variancePotential;
     private final String varianceCause;
     private final String varianceAction;
@@ -29,8 +28,7 @@ public final class StepPreventiveAction implements StepEntity {
     private final String varianceVerification;
 
     public StepPreventiveAction(int id, String name, String variancePotential, String varianceCause, String varianceAction, StepEntity varianceResponsible, StepEntity varianceTarget, String varianceStatus, String varianceVerification) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.variancePotential = variancePotential;
         this.varianceCause = varianceCause;
         this.varianceAction = varianceAction;
@@ -38,14 +36,6 @@ public final class StepPreventiveAction implements StepEntity {
         this.varianceTarget = varianceTarget;
         this.varianceStatus = varianceStatus;
         this.varianceVerification = varianceVerification;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVariancePotential() {
@@ -77,20 +67,17 @@ public final class StepPreventiveAction implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPreventiveAction that = (StepPreventiveAction) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(variancePotential, that.variancePotential) && Objects.equals(varianceCause, that.varianceCause) && Objects.equals(varianceAction, that.varianceAction) && Objects.equals(varianceResponsible, that.varianceResponsible) && Objects.equals(varianceTarget, that.varianceTarget) && Objects.equals(varianceStatus, that.varianceStatus) && Objects.equals(varianceVerification, that.varianceVerification);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, variancePotential, varianceCause, varianceAction, varianceResponsible, varianceTarget, varianceStatus, varianceVerification);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPreventiveAction{" + "id=" + id + "name=" + name + "variancePotential=" + variancePotential + "varianceCause=" + varianceCause + "varianceAction=" + varianceAction + "varianceResponsible=" + varianceResponsible + "varianceTarget=" + varianceTarget + "varianceStatus=" + varianceStatus + "varianceVerification=" + varianceVerification + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("variancePotential", variancePotential);
+        state.put("varianceCause", varianceCause);
+        state.put("varianceAction", varianceAction);
+        state.put("varianceResponsible", varianceResponsible);
+        state.put("varianceTarget", varianceTarget);
+        state.put("varianceStatus", varianceStatus);
+        state.put("varianceVerification", varianceVerification);
+        return state;
     }
 }

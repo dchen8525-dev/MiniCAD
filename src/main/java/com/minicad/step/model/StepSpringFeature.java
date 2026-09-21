@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SPRING_FEATURE.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param springRate spring rate/constant
  * @param springMaterial spring material specification
  */
-public final class StepSpringFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSpringFeature extends AbstractStepEntity {
     private final String springType;
     private final double wireDiameter;
     private final double coilDiameter;
@@ -29,8 +28,7 @@ public final class StepSpringFeature implements StepEntity {
     private final StepEntity springMaterial;
 
     public StepSpringFeature(int id, String name, String springType, double wireDiameter, double coilDiameter, int numberOfCoils, double freeLength, double springRate, StepEntity springMaterial) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.springType = springType;
         this.wireDiameter = wireDiameter;
         this.coilDiameter = coilDiameter;
@@ -38,14 +36,6 @@ public final class StepSpringFeature implements StepEntity {
         this.freeLength = freeLength;
         this.springRate = springRate;
         this.springMaterial = springMaterial;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getSpringType() {
@@ -77,20 +67,17 @@ public final class StepSpringFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSpringFeature that = (StepSpringFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(springType, that.springType) && wireDiameter == that.wireDiameter && coilDiameter == that.coilDiameter && numberOfCoils == that.numberOfCoils && freeLength == that.freeLength && springRate == that.springRate && Objects.equals(springMaterial, that.springMaterial);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, springType, wireDiameter, coilDiameter, numberOfCoils, freeLength, springRate, springMaterial);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSpringFeature{" + "id=" + id + "name=" + name + "springType=" + springType + "wireDiameter=" + wireDiameter + "coilDiameter=" + coilDiameter + "numberOfCoils=" + numberOfCoils + "freeLength=" + freeLength + "springRate=" + springRate + "springMaterial=" + springMaterial + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("springType", springType);
+        state.put("wireDiameter", wireDiameter);
+        state.put("coilDiameter", coilDiameter);
+        state.put("numberOfCoils", numberOfCoils);
+        state.put("freeLength", freeLength);
+        state.put("springRate", springRate);
+        state.put("springMaterial", springMaterial);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CARTESIAN_TRANSFORMATION_OPERATOR_2D/3D.
  *
@@ -13,9 +15,7 @@ import java.util.Objects;
  * @param axis3 optional third axis for 3D operators
  * @param entityName concrete STEP entity name
  */
-public final class StepCartesianTransformationOperator implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCartesianTransformationOperator extends AbstractStepEntity {
     private final StepDirection axis1;
     private final StepDirection axis2;
     private final StepCartesianPoint localOrigin;
@@ -24,22 +24,13 @@ public final class StepCartesianTransformationOperator implements StepEntity {
     private final String entityName;
 
     public StepCartesianTransformationOperator(int id, String name, StepDirection axis1, StepDirection axis2, StepCartesianPoint localOrigin, Double scale, StepDirection axis3, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.axis1 = axis1;
         this.axis2 = axis2;
         this.localOrigin = localOrigin;
         this.scale = scale;
         this.axis3 = axis3;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepDirection getAxis1() {
@@ -77,20 +68,16 @@ public final class StepCartesianTransformationOperator implements StepEntity {
     public String entityName() { return getEntityName(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCartesianTransformationOperator that = (StepCartesianTransformationOperator) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(axis1, that.axis1) && Objects.equals(axis2, that.axis2) && Objects.equals(localOrigin, that.localOrigin) && Objects.equals(scale, that.scale) && Objects.equals(axis3, that.axis3) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, axis1, axis2, localOrigin, scale, axis3, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCartesianTransformationOperator{" + "id=" + id + "name=" + name + "axis1=" + axis1 + "axis2=" + axis2 + "localOrigin=" + localOrigin + "scale=" + scale + "axis3=" + axis3 + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("axis1", axis1);
+        state.put("axis2", axis2);
+        state.put("localOrigin", localOrigin);
+        state.put("scale", scale);
+        state.put("axis3", axis3);
+        state.put("entityName", entityName);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MATERIAL_STOCK.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @varianceLeadTime procurement variance lead time
  * @varianceStatus stock variance status
  */
-public final class StepMaterialStock implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMaterialStock extends AbstractStepEntity {
     private final String materialType;
     private final int varianceQuantity;
     private final StepEntity varianceUnit;
@@ -29,8 +28,7 @@ public final class StepMaterialStock implements StepEntity {
     private final String varianceStatus;
 
     public StepMaterialStock(int id, String name, String materialType, int varianceQuantity, StepEntity varianceUnit, String varianceLocation, double varianceCost, double varianceLeadTime, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.materialType = materialType;
         this.varianceQuantity = varianceQuantity;
         this.varianceUnit = varianceUnit;
@@ -38,14 +36,6 @@ public final class StepMaterialStock implements StepEntity {
         this.varianceCost = varianceCost;
         this.varianceLeadTime = varianceLeadTime;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMaterialType() {
@@ -77,20 +67,17 @@ public final class StepMaterialStock implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMaterialStock that = (StepMaterialStock) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(materialType, that.materialType) && varianceQuantity == that.varianceQuantity && Objects.equals(varianceUnit, that.varianceUnit) && Objects.equals(varianceLocation, that.varianceLocation) && varianceCost == that.varianceCost && varianceLeadTime == that.varianceLeadTime && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, materialType, varianceQuantity, varianceUnit, varianceLocation, varianceCost, varianceLeadTime, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMaterialStock{" + "id=" + id + "name=" + name + "materialType=" + materialType + "varianceQuantity=" + varianceQuantity + "varianceUnit=" + varianceUnit + "varianceLocation=" + varianceLocation + "varianceCost=" + varianceCost + "varianceLeadTime=" + varianceLeadTime + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("materialType", materialType);
+        state.put("varianceQuantity", varianceQuantity);
+        state.put("varianceUnit", varianceUnit);
+        state.put("varianceLocation", varianceLocation);
+        state.put("varianceCost", varianceCost);
+        state.put("varianceLeadTime", varianceLeadTime);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

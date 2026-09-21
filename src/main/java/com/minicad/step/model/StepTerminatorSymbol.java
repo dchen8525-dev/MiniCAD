@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal TERMINATOR_SYMBOL.
@@ -12,27 +13,16 @@ import java.util.Objects;
  * @param item referenced supported annotation content or occurrence
  * @param annotatedCurve referenced annotation curve occurrence
  */
-public final class StepTerminatorSymbol implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTerminatorSymbol extends AbstractStepEntity {
     private final List<StepPresentationStyleAssignment> styles;
     private final StepEntity item;
     private final StepEntity annotatedCurve;
 
     public StepTerminatorSymbol(int id, String name, List<StepPresentationStyleAssignment> styles, StepEntity item, StepEntity annotatedCurve) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.styles = styles == null ? null : java.util.List.copyOf(styles);
         this.item = item;
         this.annotatedCurve = annotatedCurve;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepPresentationStyleAssignment> getStyles() {
@@ -49,7 +39,7 @@ public final class StepTerminatorSymbol implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public List<StepPresentationStyleAssignment> styles() {
@@ -65,20 +55,13 @@ public final class StepTerminatorSymbol implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTerminatorSymbol that = (StepTerminatorSymbol) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(styles, that.styles) && Objects.equals(item, that.item) && Objects.equals(annotatedCurve, that.annotatedCurve);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, styles, item, annotatedCurve);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTerminatorSymbol{" + "id=" + id + "name=" + name + "styles=" + styles + "item=" + item + "annotatedCurve=" + annotatedCurve + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("styles", styles);
+        state.put("item", item);
+        state.put("annotatedCurve", annotatedCurve);
+        return state;
     }
 }

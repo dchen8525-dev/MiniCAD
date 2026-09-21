@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMPOSITE_CURVE_ON_SURFACE.
@@ -11,25 +12,14 @@ import java.util.Objects;
  * @param segments ordered segments
  * @param selfIntersect self intersect flag
  */
-public final class StepCompositeCurveOnSurface implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCompositeCurveOnSurface extends AbstractStepEntity {
     private final List<StepCompositeCurveSegment> segments;
     private final boolean selfIntersect;
 
     public StepCompositeCurveOnSurface(int id, String name, List<StepCompositeCurveSegment> segments, boolean selfIntersect) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.segments = segments == null ? null : java.util.List.copyOf(segments);
         this.selfIntersect = selfIntersect;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepCompositeCurveSegment> getSegments() {
@@ -47,20 +37,12 @@ public final class StepCompositeCurveOnSurface implements StepEntity {
     public boolean selfIntersect() { return isSelfIntersect(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCompositeCurveOnSurface that = (StepCompositeCurveOnSurface) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(segments, that.segments) && selfIntersect == that.selfIntersect;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, segments, selfIntersect);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCompositeCurveOnSurface{" + "id=" + id + "name=" + name + "segments=" + segments + "selfIntersect=" + selfIntersect + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("segments", segments);
+        state.put("selfIntersect", selfIntersect);
+        return state;
     }
 }

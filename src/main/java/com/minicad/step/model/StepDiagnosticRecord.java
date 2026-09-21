@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved DIAGNOSTIC_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceRecommendation recommendation variance for fix
  * @varianceStatus record variance status
  */
-public final class StepDiagnosticRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDiagnosticRecord extends AbstractStepEntity {
     private final StepEntity varianceSystem;
     private final List<String> varianceTests;
     private final List<String> varianceResults;
@@ -27,22 +26,13 @@ public final class StepDiagnosticRecord implements StepEntity {
     private final String varianceStatus;
 
     public StepDiagnosticRecord(int id, String name, StepEntity varianceSystem, List<String> varianceTests, List<String> varianceResults, String varianceConclusion, String varianceRecommendation, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceSystem = varianceSystem;
         this.varianceTests = varianceTests == null ? null : java.util.List.copyOf(varianceTests);
         this.varianceResults = varianceResults == null ? null : java.util.List.copyOf(varianceResults);
         this.varianceConclusion = varianceConclusion;
         this.varianceRecommendation = varianceRecommendation;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceSystem() {
@@ -70,20 +60,16 @@ public final class StepDiagnosticRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDiagnosticRecord that = (StepDiagnosticRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceSystem, that.varianceSystem) && Objects.equals(varianceTests, that.varianceTests) && Objects.equals(varianceResults, that.varianceResults) && Objects.equals(varianceConclusion, that.varianceConclusion) && Objects.equals(varianceRecommendation, that.varianceRecommendation) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceSystem, varianceTests, varianceResults, varianceConclusion, varianceRecommendation, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDiagnosticRecord{" + "id=" + id + "name=" + name + "varianceSystem=" + varianceSystem + "varianceTests=" + varianceTests + "varianceResults=" + varianceResults + "varianceConclusion=" + varianceConclusion + "varianceRecommendation=" + varianceRecommendation + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceSystem", varianceSystem);
+        state.put("varianceTests", varianceTests);
+        state.put("varianceResults", varianceResults);
+        state.put("varianceConclusion", varianceConclusion);
+        state.put("varianceRecommendation", varianceRecommendation);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal typed measure-with-unit subtype.
  *
@@ -9,25 +11,16 @@ import java.util.Objects;
  * @param valueComponent numeric value
  * @param unitComponent referenced unit entity
  */
-public final class StepTypedMeasureWithUnit implements StepEntity {
-    private final int id;
+public final class StepTypedMeasureWithUnit extends AbstractStepEntity {
     private final String entityName;
     private final double valueComponent;
     private final StepEntity unitComponent;
 
     public StepTypedMeasureWithUnit(int id, String entityName, double valueComponent, StepEntity unitComponent) {
-        this.id = id;
+        super(id, "");
         this.entityName = entityName;
         this.valueComponent = valueComponent;
         this.unitComponent = unitComponent;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public String getEntityName() {
@@ -52,20 +45,12 @@ public final class StepTypedMeasureWithUnit implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTypedMeasureWithUnit that = (StepTypedMeasureWithUnit) o;
-        return id == that.id && Objects.equals(entityName, that.entityName) && valueComponent == that.valueComponent && Objects.equals(unitComponent, that.unitComponent);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, entityName, valueComponent, unitComponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTypedMeasureWithUnit{" + "id=" + id + "entityName=" + entityName + "valueComponent=" + valueComponent + "unitComponent=" + unitComponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("entityName", entityName);
+        state.put("valueComponent", valueComponent);
+        state.put("unitComponent", unitComponent);
+        return state;
     }
 }

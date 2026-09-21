@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ACTIVITY_RECORD.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param activityDetails activity variance details
  * @param activityStatus activity variance status
  */
-public final class StepActivityRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepActivityRecord extends AbstractStepEntity {
     private final String activityType;
     private final String activityAction;
     private final StepEntity activityActor;
@@ -29,8 +28,7 @@ public final class StepActivityRecord implements StepEntity {
     private final String activityStatus;
 
     public StepActivityRecord(int id, String name, String activityType, String activityAction, StepEntity activityActor, StepEntity activityTarget, StepEntity activityTimestamp, List<String> activityDetails, String activityStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.activityType = activityType;
         this.activityAction = activityAction;
         this.activityActor = activityActor;
@@ -38,14 +36,6 @@ public final class StepActivityRecord implements StepEntity {
         this.activityTimestamp = activityTimestamp;
         this.activityDetails = activityDetails == null ? null : java.util.List.copyOf(activityDetails);
         this.activityStatus = activityStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getActivityType() {
@@ -77,20 +67,17 @@ public final class StepActivityRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepActivityRecord that = (StepActivityRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(activityType, that.activityType) && Objects.equals(activityAction, that.activityAction) && Objects.equals(activityActor, that.activityActor) && Objects.equals(activityTarget, that.activityTarget) && Objects.equals(activityTimestamp, that.activityTimestamp) && Objects.equals(activityDetails, that.activityDetails) && Objects.equals(activityStatus, that.activityStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, activityType, activityAction, activityActor, activityTarget, activityTimestamp, activityDetails, activityStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepActivityRecord{" + "id=" + id + "name=" + name + "activityType=" + activityType + "activityAction=" + activityAction + "activityActor=" + activityActor + "activityTarget=" + activityTarget + "activityTimestamp=" + activityTimestamp + "activityDetails=" + activityDetails + "activityStatus=" + activityStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("activityType", activityType);
+        state.put("activityAction", activityAction);
+        state.put("activityActor", activityActor);
+        state.put("activityTarget", activityTarget);
+        state.put("activityTimestamp", activityTimestamp);
+        state.put("activityDetails", activityDetails);
+        state.put("activityStatus", activityStatus);
+        return state;
     }
 }

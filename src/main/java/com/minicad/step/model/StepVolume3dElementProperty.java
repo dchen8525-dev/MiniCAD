@@ -1,31 +1,22 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved VOLUME_3D_ELEMENT_PROPERTY.
  * Properties associated with 3D volume elements (material, thickness, etc.).
  */
-public final class StepVolume3dElementProperty implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepVolume3dElementProperty extends AbstractStepEntity {
     private final StepEntity element;
     private final StepEntity property;
     private final StepEntity material;
 
     public StepVolume3dElementProperty(int id, String name, StepEntity element, StepEntity property, StepEntity material) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.element = element;
         this.property = property;
         this.material = material;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getElement() {
@@ -41,20 +32,13 @@ public final class StepVolume3dElementProperty implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVolume3dElementProperty that = (StepVolume3dElementProperty) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(element, that.element) && Objects.equals(property, that.property) && Objects.equals(material, that.material);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, element, property, material);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVolume3dElementProperty{" + "id=" + id + "name=" + name + "element=" + element + "property=" + property + "material=" + material + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("element", element);
+        state.put("property", property);
+        state.put("material", material);
+        return state;
     }
 }

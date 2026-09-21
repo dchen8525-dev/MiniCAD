@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LOGGING_SPECIFICATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceRetention retention variance period
  * @varianceStatus specification variance status
  */
-public final class StepLoggingSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLoggingSpecification extends AbstractStepEntity {
     private final List<String> varianceEvents;
     private final String varianceFormat;
     private final String varianceLevel;
@@ -27,22 +26,13 @@ public final class StepLoggingSpecification implements StepEntity {
     private final String varianceStatus;
 
     public StepLoggingSpecification(int id, String name, List<String> varianceEvents, String varianceFormat, String varianceLevel, String varianceDestination, double varianceRetention, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceEvents = varianceEvents == null ? null : java.util.List.copyOf(varianceEvents);
         this.varianceFormat = varianceFormat;
         this.varianceLevel = varianceLevel;
         this.varianceDestination = varianceDestination;
         this.varianceRetention = varianceRetention;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<String> getVarianceEvents() {
@@ -70,20 +60,16 @@ public final class StepLoggingSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLoggingSpecification that = (StepLoggingSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceEvents, that.varianceEvents) && Objects.equals(varianceFormat, that.varianceFormat) && Objects.equals(varianceLevel, that.varianceLevel) && Objects.equals(varianceDestination, that.varianceDestination) && varianceRetention == that.varianceRetention && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceEvents, varianceFormat, varianceLevel, varianceDestination, varianceRetention, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLoggingSpecification{" + "id=" + id + "name=" + name + "varianceEvents=" + varianceEvents + "varianceFormat=" + varianceFormat + "varianceLevel=" + varianceLevel + "varianceDestination=" + varianceDestination + "varianceRetention=" + varianceRetention + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceEvents", varianceEvents);
+        state.put("varianceFormat", varianceFormat);
+        state.put("varianceLevel", varianceLevel);
+        state.put("varianceDestination", varianceDestination);
+        state.put("varianceRetention", varianceRetention);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

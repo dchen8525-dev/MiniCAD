@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved BEHAVIOR_SPECIFICATION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @variancePriority behavior variance priority
  * @varianceStatus specification variance status
  */
-public final class StepBehaviorSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBehaviorSpecification extends AbstractStepEntity {
     private final String varianceBehavior;
     private final List<String> varianceConditions;
     private final List<StepEntity> varianceActions;
@@ -27,22 +26,13 @@ public final class StepBehaviorSpecification implements StepEntity {
     private final String varianceStatus;
 
     public StepBehaviorSpecification(int id, String name, String varianceBehavior, List<String> varianceConditions, List<StepEntity> varianceActions, List<String> varianceEvents, int variancePriority, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceBehavior = varianceBehavior;
         this.varianceConditions = varianceConditions == null ? null : java.util.List.copyOf(varianceConditions);
         this.varianceActions = varianceActions == null ? null : java.util.List.copyOf(varianceActions);
         this.varianceEvents = varianceEvents == null ? null : java.util.List.copyOf(varianceEvents);
         this.variancePriority = variancePriority;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVarianceBehavior() {
@@ -70,20 +60,16 @@ public final class StepBehaviorSpecification implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBehaviorSpecification that = (StepBehaviorSpecification) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceBehavior, that.varianceBehavior) && Objects.equals(varianceConditions, that.varianceConditions) && Objects.equals(varianceActions, that.varianceActions) && Objects.equals(varianceEvents, that.varianceEvents) && variancePriority == that.variancePriority && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceBehavior, varianceConditions, varianceActions, varianceEvents, variancePriority, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBehaviorSpecification{" + "id=" + id + "name=" + name + "varianceBehavior=" + varianceBehavior + "varianceConditions=" + varianceConditions + "varianceActions=" + varianceActions + "varianceEvents=" + varianceEvents + "variancePriority=" + variancePriority + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceBehavior", varianceBehavior);
+        state.put("varianceConditions", varianceConditions);
+        state.put("varianceActions", varianceActions);
+        state.put("varianceEvents", varianceEvents);
+        state.put("variancePriority", variancePriority);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

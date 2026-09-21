@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LABEL_FEATURE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param labelContent label content text/data
  * @param labelStandard label standard reference
  */
-public final class StepLabelFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLabelFeature extends AbstractStepEntity {
     private final String labelType;
     private final StepEntity labelGeometry;
     private final StepEntity labelPosition;
@@ -25,21 +24,12 @@ public final class StepLabelFeature implements StepEntity {
     private final String labelStandard;
 
     public StepLabelFeature(int id, String name, String labelType, StepEntity labelGeometry, StepEntity labelPosition, String labelContent, String labelStandard) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.labelType = labelType;
         this.labelGeometry = labelGeometry;
         this.labelPosition = labelPosition;
         this.labelContent = labelContent;
         this.labelStandard = labelStandard;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLabelType() {
@@ -63,20 +53,15 @@ public final class StepLabelFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLabelFeature that = (StepLabelFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(labelType, that.labelType) && Objects.equals(labelGeometry, that.labelGeometry) && Objects.equals(labelPosition, that.labelPosition) && Objects.equals(labelContent, that.labelContent) && Objects.equals(labelStandard, that.labelStandard);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, labelType, labelGeometry, labelPosition, labelContent, labelStandard);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLabelFeature{" + "id=" + id + "name=" + name + "labelType=" + labelType + "labelGeometry=" + labelGeometry + "labelPosition=" + labelPosition + "labelContent=" + labelContent + "labelStandard=" + labelStandard + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("labelType", labelType);
+        state.put("labelGeometry", labelGeometry);
+        state.put("labelPosition", labelPosition);
+        state.put("labelContent", labelContent);
+        state.put("labelStandard", labelStandard);
+        return state;
     }
 }

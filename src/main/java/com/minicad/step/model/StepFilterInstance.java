@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved FILTER_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param filterRejectCount filter variance reject count
  * @param filterStatus filter variance status
  */
-public final class StepFilterInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepFilterInstance extends AbstractStepEntity {
     private final StepEntity filterDefinition;
     private final String filterState;
     private final int filterMatchCount;
@@ -25,21 +24,12 @@ public final class StepFilterInstance implements StepEntity {
     private final String filterStatus;
 
     public StepFilterInstance(int id, String name, StepEntity filterDefinition, String filterState, int filterMatchCount, int filterRejectCount, String filterStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.filterDefinition = filterDefinition;
         this.filterState = filterState;
         this.filterMatchCount = filterMatchCount;
         this.filterRejectCount = filterRejectCount;
         this.filterStatus = filterStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getFilterDefinition() {
@@ -63,20 +53,15 @@ public final class StepFilterInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepFilterInstance that = (StepFilterInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(filterDefinition, that.filterDefinition) && Objects.equals(filterState, that.filterState) && filterMatchCount == that.filterMatchCount && filterRejectCount == that.filterRejectCount && Objects.equals(filterStatus, that.filterStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, filterDefinition, filterState, filterMatchCount, filterRejectCount, filterStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepFilterInstance{" + "id=" + id + "name=" + name + "filterDefinition=" + filterDefinition + "filterState=" + filterState + "filterMatchCount=" + filterMatchCount + "filterRejectCount=" + filterRejectCount + "filterStatus=" + filterStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("filterDefinition", filterDefinition);
+        state.put("filterState", filterState);
+        state.put("filterMatchCount", filterMatchCount);
+        state.put("filterRejectCount", filterRejectCount);
+        state.put("filterStatus", filterStatus);
+        return state;
     }
 }

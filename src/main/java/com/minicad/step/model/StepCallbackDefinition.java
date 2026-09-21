@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CALLBACK_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param callbackAsync callback variance async flag
  * @param callbackStatus callback variance status
  */
-public final class StepCallbackDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCallbackDefinition extends AbstractStepEntity {
     private final String callbackType;
     private final StepEntity callbackFunction;
     private final List<String> callbackParameters;
@@ -25,21 +24,12 @@ public final class StepCallbackDefinition implements StepEntity {
     private final String callbackStatus;
 
     public StepCallbackDefinition(int id, String name, String callbackType, StepEntity callbackFunction, List<String> callbackParameters, boolean callbackAsync, String callbackStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.callbackType = callbackType;
         this.callbackFunction = callbackFunction;
         this.callbackParameters = callbackParameters == null ? null : java.util.List.copyOf(callbackParameters);
         this.callbackAsync = callbackAsync;
         this.callbackStatus = callbackStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCallbackType() {
@@ -63,20 +53,15 @@ public final class StepCallbackDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCallbackDefinition that = (StepCallbackDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(callbackType, that.callbackType) && Objects.equals(callbackFunction, that.callbackFunction) && Objects.equals(callbackParameters, that.callbackParameters) && callbackAsync == that.callbackAsync && Objects.equals(callbackStatus, that.callbackStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, callbackType, callbackFunction, callbackParameters, callbackAsync, callbackStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCallbackDefinition{" + "id=" + id + "name=" + name + "callbackType=" + callbackType + "callbackFunction=" + callbackFunction + "callbackParameters=" + callbackParameters + "callbackAsync=" + callbackAsync + "callbackStatus=" + callbackStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("callbackType", callbackType);
+        state.put("callbackFunction", callbackFunction);
+        state.put("callbackParameters", callbackParameters);
+        state.put("callbackAsync", callbackAsync);
+        state.put("callbackStatus", callbackStatus);
+        return state;
     }
 }

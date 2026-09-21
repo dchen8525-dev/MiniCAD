@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal PERSON_AND_ORGANIZATION metadata.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param person person
  * @param organization organization
  */
-public final class StepPersonAndOrganization implements StepEntity {
-    private final int id;
+public final class StepPersonAndOrganization extends AbstractStepEntity {
     private final StepPerson person;
     private final StepOrganization organization;
 
     public StepPersonAndOrganization(int id, StepPerson person, StepOrganization organization) {
-        this.id = id;
+        super(id, "");
         this.person = person;
         this.organization = organization;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepPerson getPerson() {
@@ -45,20 +38,11 @@ public final class StepPersonAndOrganization implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPersonAndOrganization that = (StepPersonAndOrganization) o;
-        return id == that.id && Objects.equals(person, that.person) && Objects.equals(organization, that.organization);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, person, organization);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPersonAndOrganization{" + "id=" + id + "person=" + person + "organization=" + organization + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("person", person);
+        state.put("organization", organization);
+        return state;
     }
 }

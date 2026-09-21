@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MESSAGE_DEFINITION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param messageFields message variance field definitions
  * @param messageStatus message variance status
  */
-public final class StepMessageDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMessageDefinition extends AbstractStepEntity {
     private final String messageType;
     private final String messageFormat;
     private final List<String> messageFields;
     private final String messageStatus;
 
     public StepMessageDefinition(int id, String name, String messageType, String messageFormat, List<String> messageFields, String messageStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.messageType = messageType;
         this.messageFormat = messageFormat;
         this.messageFields = messageFields == null ? null : java.util.List.copyOf(messageFields);
         this.messageStatus = messageStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMessageType() {
@@ -56,20 +46,14 @@ public final class StepMessageDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMessageDefinition that = (StepMessageDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(messageType, that.messageType) && Objects.equals(messageFormat, that.messageFormat) && Objects.equals(messageFields, that.messageFields) && Objects.equals(messageStatus, that.messageStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, messageType, messageFormat, messageFields, messageStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMessageDefinition{" + "id=" + id + "name=" + name + "messageType=" + messageType + "messageFormat=" + messageFormat + "messageFields=" + messageFields + "messageStatus=" + messageStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("messageType", messageType);
+        state.put("messageFormat", messageFormat);
+        state.put("messageFields", messageFields);
+        state.put("messageStatus", messageStatus);
+        return state;
     }
 }

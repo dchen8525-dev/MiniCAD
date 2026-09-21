@@ -1,31 +1,21 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PRODUCT_DEFINITION_WITH_ASSOCIATED_DOCUMENTS.
  * Product definition with linked documents.
  */
-public final class StepProductDefinitionWithAssociatedDocuments implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepProductDefinitionWithAssociatedDocuments extends AbstractStepEntity {
     private final String description;
     private final List<StepEntity> documents;
 
     public StepProductDefinitionWithAssociatedDocuments(int id, String name, String description, List<StepEntity> documents) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.documents = documents == null ? null : java.util.List.copyOf(documents);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -37,20 +27,12 @@ public final class StepProductDefinitionWithAssociatedDocuments implements StepE
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepProductDefinitionWithAssociatedDocuments that = (StepProductDefinitionWithAssociatedDocuments) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(documents, that.documents);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, documents);
-    }
-
-    @Override
-    public String toString() {
-        return "StepProductDefinitionWithAssociatedDocuments{" + "id=" + id + "name=" + name + "description=" + description + "documents=" + documents + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("documents", documents);
+        return state;
     }
 }

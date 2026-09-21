@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved INTERFACE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param interfaceConnections interface variance connections
  * @param interfaceStatus interface variance status
  */
-public final class StepInterfaceInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepInterfaceInstance extends AbstractStepEntity {
     private final StepEntity interfaceDefinition;
     private final StepEntity interfaceLocation;
     private final String interfaceState;
@@ -25,21 +24,12 @@ public final class StepInterfaceInstance implements StepEntity {
     private final String interfaceStatus;
 
     public StepInterfaceInstance(int id, String name, StepEntity interfaceDefinition, StepEntity interfaceLocation, String interfaceState, List<StepEntity> interfaceConnections, String interfaceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.interfaceDefinition = interfaceDefinition;
         this.interfaceLocation = interfaceLocation;
         this.interfaceState = interfaceState;
         this.interfaceConnections = interfaceConnections == null ? null : java.util.List.copyOf(interfaceConnections);
         this.interfaceStatus = interfaceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getInterfaceDefinition() {
@@ -63,20 +53,15 @@ public final class StepInterfaceInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepInterfaceInstance that = (StepInterfaceInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(interfaceDefinition, that.interfaceDefinition) && Objects.equals(interfaceLocation, that.interfaceLocation) && Objects.equals(interfaceState, that.interfaceState) && Objects.equals(interfaceConnections, that.interfaceConnections) && Objects.equals(interfaceStatus, that.interfaceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, interfaceDefinition, interfaceLocation, interfaceState, interfaceConnections, interfaceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepInterfaceInstance{" + "id=" + id + "name=" + name + "interfaceDefinition=" + interfaceDefinition + "interfaceLocation=" + interfaceLocation + "interfaceState=" + interfaceState + "interfaceConnections=" + interfaceConnections + "interfaceStatus=" + interfaceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("interfaceDefinition", interfaceDefinition);
+        state.put("interfaceLocation", interfaceLocation);
+        state.put("interfaceState", interfaceState);
+        state.put("interfaceConnections", interfaceConnections);
+        state.put("interfaceStatus", interfaceStatus);
+        return state;
     }
 }

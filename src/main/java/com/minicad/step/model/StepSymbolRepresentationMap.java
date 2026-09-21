@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal SYMBOL_REPRESENTATION_MAP.
  *
@@ -8,19 +10,14 @@ import java.util.Objects;
  * @param mappedOrigin mapped origin placement
  * @param mappedRepresentation mapped symbol representation
  */
-public final class StepSymbolRepresentationMap implements StepEntity {
-    private final int id;
+public final class StepSymbolRepresentationMap extends AbstractStepEntity {
     private final StepEntity mappedOrigin;
     private final StepRepresentation mappedRepresentation;
 
     public StepSymbolRepresentationMap(int id, StepEntity mappedOrigin, StepRepresentation mappedRepresentation) {
-        this.id = id;
+        super(id, "");
         this.mappedOrigin = mappedOrigin;
         this.mappedRepresentation = mappedRepresentation;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public StepEntity getMappedOrigin() {
@@ -29,10 +26,6 @@ public final class StepSymbolRepresentationMap implements StepEntity {
 
     public StepRepresentation getMappedRepresentation() {
         return mappedRepresentation;
-    }
-
-    public String getName() {
-        return "";
     }
 
     // Record-style accessors
@@ -45,20 +38,11 @@ public final class StepSymbolRepresentationMap implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSymbolRepresentationMap that = (StepSymbolRepresentationMap) o;
-        return id == that.id && Objects.equals(mappedOrigin, that.mappedOrigin) && Objects.equals(mappedRepresentation, that.mappedRepresentation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, mappedOrigin, mappedRepresentation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSymbolRepresentationMap{" + "id=" + id + "mappedOrigin=" + mappedOrigin + "mappedRepresentation=" + mappedRepresentation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("mappedOrigin", mappedOrigin);
+        state.put("mappedRepresentation", mappedRepresentation);
+        return state;
     }
 }

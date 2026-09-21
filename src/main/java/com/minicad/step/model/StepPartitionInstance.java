@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PARTITION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param partitionEntries partition variance entry count
  * @param partitionStatus partition variance status
  */
-public final class StepPartitionInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPartitionInstance extends AbstractStepEntity {
     private final StepEntity partitionDefinition;
     private final String partitionState;
     private final long partitionSize;
@@ -25,21 +24,12 @@ public final class StepPartitionInstance implements StepEntity {
     private final String partitionStatus;
 
     public StepPartitionInstance(int id, String name, StepEntity partitionDefinition, String partitionState, long partitionSize, long partitionEntries, String partitionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.partitionDefinition = partitionDefinition;
         this.partitionState = partitionState;
         this.partitionSize = partitionSize;
         this.partitionEntries = partitionEntries;
         this.partitionStatus = partitionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getPartitionDefinition() {
@@ -63,20 +53,15 @@ public final class StepPartitionInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPartitionInstance that = (StepPartitionInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(partitionDefinition, that.partitionDefinition) && Objects.equals(partitionState, that.partitionState) && partitionSize == that.partitionSize && partitionEntries == that.partitionEntries && Objects.equals(partitionStatus, that.partitionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, partitionDefinition, partitionState, partitionSize, partitionEntries, partitionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPartitionInstance{" + "id=" + id + "name=" + name + "partitionDefinition=" + partitionDefinition + "partitionState=" + partitionState + "partitionSize=" + partitionSize + "partitionEntries=" + partitionEntries + "partitionStatus=" + partitionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("partitionDefinition", partitionDefinition);
+        state.put("partitionState", partitionState);
+        state.put("partitionSize", partitionSize);
+        state.put("partitionEntries", partitionEntries);
+        state.put("partitionStatus", partitionStatus);
+        return state;
     }
 }

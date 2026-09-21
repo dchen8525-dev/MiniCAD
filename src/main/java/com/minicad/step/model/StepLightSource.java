@@ -1,26 +1,16 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public final class StepLightSource implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLightSource extends AbstractStepEntity {
     private final StepEntity color;
     private final double intensity;
 
     public StepLightSource(int id, String name, StepEntity color, double intensity) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.color = color;
         this.intensity = intensity;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getColor() {
@@ -32,20 +22,12 @@ public final class StepLightSource implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLightSource that = (StepLightSource) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(color, that.color) && intensity == that.intensity;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, color, intensity);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLightSource{" + "id=" + id + "name=" + name + "color=" + color + "intensity=" + intensity + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("color", color);
+        state.put("intensity", intensity);
+        return state;
     }
 }

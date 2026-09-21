@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved AUTHORIZATION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param authorizationConstraints authorization variance constraints
  * @param authorizationStatus authorization variance status
  */
-public final class StepAuthorizationDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepAuthorizationDefinition extends AbstractStepEntity {
     private final String authorizationType;
     private final List<String> authorizationPermissions;
     private final List<String> authorizationRoles;
@@ -25,21 +24,12 @@ public final class StepAuthorizationDefinition implements StepEntity {
     private final String authorizationStatus;
 
     public StepAuthorizationDefinition(int id, String name, String authorizationType, List<String> authorizationPermissions, List<String> authorizationRoles, List<String> authorizationConstraints, String authorizationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.authorizationType = authorizationType;
         this.authorizationPermissions = authorizationPermissions == null ? null : java.util.List.copyOf(authorizationPermissions);
         this.authorizationRoles = authorizationRoles == null ? null : java.util.List.copyOf(authorizationRoles);
         this.authorizationConstraints = authorizationConstraints == null ? null : java.util.List.copyOf(authorizationConstraints);
         this.authorizationStatus = authorizationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getAuthorizationType() {
@@ -63,20 +53,15 @@ public final class StepAuthorizationDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAuthorizationDefinition that = (StepAuthorizationDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(authorizationType, that.authorizationType) && Objects.equals(authorizationPermissions, that.authorizationPermissions) && Objects.equals(authorizationRoles, that.authorizationRoles) && Objects.equals(authorizationConstraints, that.authorizationConstraints) && Objects.equals(authorizationStatus, that.authorizationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, authorizationType, authorizationPermissions, authorizationRoles, authorizationConstraints, authorizationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAuthorizationDefinition{" + "id=" + id + "name=" + name + "authorizationType=" + authorizationType + "authorizationPermissions=" + authorizationPermissions + "authorizationRoles=" + authorizationRoles + "authorizationConstraints=" + authorizationConstraints + "authorizationStatus=" + authorizationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("authorizationType", authorizationType);
+        state.put("authorizationPermissions", authorizationPermissions);
+        state.put("authorizationRoles", authorizationRoles);
+        state.put("authorizationConstraints", authorizationConstraints);
+        state.put("authorizationStatus", authorizationStatus);
+        return state;
     }
 }

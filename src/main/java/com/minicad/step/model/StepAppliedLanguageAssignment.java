@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal APPLIED_LANGUAGE_ASSIGNMENT metadata.
@@ -10,19 +11,14 @@ import java.util.Objects;
  * @param assignedLanguage assigned language
  * @param items assigned target items
  */
-public final class StepAppliedLanguageAssignment implements StepEntity {
-    private final int id;
+public final class StepAppliedLanguageAssignment extends AbstractStepEntity {
     private final StepLanguage assignedLanguage;
     private final List<StepEntity> items;
 
     public StepAppliedLanguageAssignment(int id, StepLanguage assignedLanguage, List<StepEntity> items) {
-        this.id = id;
+        super(id, "");
         this.assignedLanguage = assignedLanguage;
         this.items = items == null ? null : java.util.List.copyOf(items);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public StepLanguage getAssignedLanguage() {
@@ -31,10 +27,6 @@ public final class StepAppliedLanguageAssignment implements StepEntity {
 
     public List<StepEntity> getItems() {
         return items;
-    }
-
-    public String getName() {
-        return "";
     }
 
     // Record-style accessors
@@ -47,20 +39,11 @@ public final class StepAppliedLanguageAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAppliedLanguageAssignment that = (StepAppliedLanguageAssignment) o;
-        return id == that.id && Objects.equals(assignedLanguage, that.assignedLanguage) && Objects.equals(items, that.items);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedLanguage, items);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAppliedLanguageAssignment{" + "id=" + id + "assignedLanguage=" + assignedLanguage + "items=" + items + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedLanguage", assignedLanguage);
+        state.put("items", items);
+        return state;
     }
 }

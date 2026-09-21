@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SURFACE_QUALITY.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param measurementMethod measurement method
  * @param direction measurement direction
  */
-public final class StepSurfaceQuality implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSurfaceQuality extends AbstractStepEntity {
     private final StepEntity surface;
     private final List<Double> roughnessValues;
     private final String qualityGrade;
@@ -25,21 +24,12 @@ public final class StepSurfaceQuality implements StepEntity {
     private final StepEntity direction;
 
     public StepSurfaceQuality(int id, String name, StepEntity surface, List<Double> roughnessValues, String qualityGrade, String measurementMethod, StepEntity direction) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.surface = surface;
         this.roughnessValues = roughnessValues == null ? null : java.util.List.copyOf(roughnessValues);
         this.qualityGrade = qualityGrade;
         this.measurementMethod = measurementMethod;
         this.direction = direction;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getSurface() {
@@ -63,20 +53,15 @@ public final class StepSurfaceQuality implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSurfaceQuality that = (StepSurfaceQuality) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(surface, that.surface) && Objects.equals(roughnessValues, that.roughnessValues) && Objects.equals(qualityGrade, that.qualityGrade) && Objects.equals(measurementMethod, that.measurementMethod) && Objects.equals(direction, that.direction);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, surface, roughnessValues, qualityGrade, measurementMethod, direction);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSurfaceQuality{" + "id=" + id + "name=" + name + "surface=" + surface + "roughnessValues=" + roughnessValues + "qualityGrade=" + qualityGrade + "measurementMethod=" + measurementMethod + "direction=" + direction + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("surface", surface);
+        state.put("roughnessValues", roughnessValues);
+        state.put("qualityGrade", qualityGrade);
+        state.put("measurementMethod", measurementMethod);
+        state.put("direction", direction);
+        return state;
     }
 }

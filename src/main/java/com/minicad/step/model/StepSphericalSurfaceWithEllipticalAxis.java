@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved SPHERICAL_SURFACE_WITH_ELLIPTICAL_AXIS.
  * A spherical surface with an elliptical axis definition.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param radius sphere radius
  * @param ellipticalRatio ratio defining the elliptical shape
  */
-public final class StepSphericalSurfaceWithEllipticalAxis implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSphericalSurfaceWithEllipticalAxis extends AbstractStepEntity {
     private final StepAxis2Placement3D position;
     private final double radius;
     private final double ellipticalRatio;
 
     public StepSphericalSurfaceWithEllipticalAxis(int id, String name, StepAxis2Placement3D position, double radius, double ellipticalRatio) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.position = position;
         this.radius = radius;
         this.ellipticalRatio = ellipticalRatio;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepAxis2Placement3D getPosition() {
@@ -51,20 +42,13 @@ public final class StepSphericalSurfaceWithEllipticalAxis implements StepEntity 
     public double radius() { return getRadius(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSphericalSurfaceWithEllipticalAxis that = (StepSphericalSurfaceWithEllipticalAxis) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(position, that.position) && radius == that.radius && ellipticalRatio == that.ellipticalRatio;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, position, radius, ellipticalRatio);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSphericalSurfaceWithEllipticalAxis{" + "id=" + id + "name=" + name + "position=" + position + "radius=" + radius + "ellipticalRatio=" + ellipticalRatio + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("position", position);
+        state.put("radius", radius);
+        state.put("ellipticalRatio", ellipticalRatio);
+        return state;
     }
 }

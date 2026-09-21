@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved TOLERANCE_VALUE.
  * A tolerance value specification.
@@ -10,25 +12,14 @@ import java.util.Objects;
  * @param lowerBound lower bound value
  * @param upperBound upper bound value
  */
-public final class StepToleranceValue implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepToleranceValue extends AbstractStepEntity {
     private final double lowerBound;
     private final double upperBound;
 
     public StepToleranceValue(int id, String name, double lowerBound, double upperBound) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public double getLowerBound() {
@@ -40,20 +31,12 @@ public final class StepToleranceValue implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepToleranceValue that = (StepToleranceValue) o;
-        return id == that.id && Objects.equals(name, that.name) && lowerBound == that.lowerBound && upperBound == that.upperBound;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, lowerBound, upperBound);
-    }
-
-    @Override
-    public String toString() {
-        return "StepToleranceValue{" + "id=" + id + "name=" + name + "lowerBound=" + lowerBound + "upperBound=" + upperBound + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("lowerBound", lowerBound);
+        state.put("upperBound", upperBound);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal CSG_SOLID parse-only solid model.
  *
@@ -8,23 +10,12 @@ import java.util.Objects;
  * @param name solid name
  * @param treeRootExpression CSG tree root expression
  */
-public final class StepCsgSolid implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCsgSolid extends AbstractStepEntity {
     private final StepEntity treeRootExpression;
 
     public StepCsgSolid(int id, String name, StepEntity treeRootExpression) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.treeRootExpression = treeRootExpression;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getTreeRootExpression() {
@@ -37,20 +28,11 @@ public final class StepCsgSolid implements StepEntity {
     public StepEntity treeRootExpression() { return getTreeRootExpression(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCsgSolid that = (StepCsgSolid) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(treeRootExpression, that.treeRootExpression);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, treeRootExpression);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCsgSolid{" + "id=" + id + "name=" + name + "treeRootExpression=" + treeRootExpression + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("treeRootExpression", treeRootExpression);
+        return state;
     }
 }

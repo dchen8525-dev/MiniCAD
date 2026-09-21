@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal BOOLEAN_RESULT.
  *
@@ -10,27 +12,16 @@ import java.util.Objects;
  * @param firstOperand first boolean operand
  * @param secondOperand second boolean operand
  */
-public final class StepBooleanResult implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBooleanResult extends AbstractStepEntity {
     private final String operator;
     private final StepEntity firstOperand;
     private final StepEntity secondOperand;
 
     public StepBooleanResult(int id, String name, String operator, StepEntity firstOperand, StepEntity secondOperand) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.operator = operator;
         this.firstOperand = firstOperand;
         this.secondOperand = secondOperand;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getOperator() {
@@ -53,20 +44,13 @@ public final class StepBooleanResult implements StepEntity {
     public StepEntity secondOperand() { return getSecondOperand(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBooleanResult that = (StepBooleanResult) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(operator, that.operator) && Objects.equals(firstOperand, that.firstOperand) && Objects.equals(secondOperand, that.secondOperand);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, operator, firstOperand, secondOperand);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBooleanResult{" + "id=" + id + "name=" + name + "operator=" + operator + "firstOperand=" + firstOperand + "secondOperand=" + secondOperand + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("operator", operator);
+        state.put("firstOperand", firstOperand);
+        state.put("secondOperand", secondOperand);
+        return state;
     }
 }

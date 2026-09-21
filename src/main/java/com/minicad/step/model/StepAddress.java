@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal ADDRESS metadata.
  *
@@ -18,8 +20,7 @@ import java.util.Objects;
  * @param electronicMailAddress email address
  * @param telexNumber telex number
  */
-public final class StepAddress implements StepEntity {
-    private final int id;
+public final class StepAddress extends AbstractStepEntity {
     private final String internalLocation;
     private final String streetNumber;
     private final String street;
@@ -34,7 +35,7 @@ public final class StepAddress implements StepEntity {
     private final String telexNumber;
 
     public StepAddress(int id, String internalLocation, String streetNumber, String street, String postalBox, String town, String region, String postalCode, String country, String facsimileNumber, String telephoneNumber, String electronicMailAddress, String telexNumber) {
-        this.id = id;
+        super(id, "");
         this.internalLocation = internalLocation;
         this.streetNumber = streetNumber;
         this.street = street;
@@ -47,10 +48,6 @@ public final class StepAddress implements StepEntity {
         this.telephoneNumber = telephoneNumber;
         this.electronicMailAddress = electronicMailAddress;
         this.telexNumber = telexNumber;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {
@@ -110,20 +107,21 @@ public final class StepAddress implements StepEntity {
     public String electronicMailAddress() { return getElectronicMailAddress(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepAddress that = (StepAddress) o;
-        return id == that.id && Objects.equals(internalLocation, that.internalLocation) && Objects.equals(streetNumber, that.streetNumber) && Objects.equals(street, that.street) && Objects.equals(postalBox, that.postalBox) && Objects.equals(town, that.town) && Objects.equals(region, that.region) && Objects.equals(postalCode, that.postalCode) && Objects.equals(country, that.country) && Objects.equals(facsimileNumber, that.facsimileNumber) && Objects.equals(telephoneNumber, that.telephoneNumber) && Objects.equals(electronicMailAddress, that.electronicMailAddress) && Objects.equals(telexNumber, that.telexNumber);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, internalLocation, streetNumber, street, postalBox, town, region, postalCode, country, facsimileNumber, telephoneNumber, electronicMailAddress, telexNumber);
-    }
-
-    @Override
-    public String toString() {
-        return "StepAddress{" + "id=" + id + "internalLocation=" + internalLocation + "streetNumber=" + streetNumber + "street=" + street + "postalBox=" + postalBox + "town=" + town + "region=" + region + "postalCode=" + postalCode + "country=" + country + "facsimileNumber=" + facsimileNumber + "telephoneNumber=" + telephoneNumber + "electronicMailAddress=" + electronicMailAddress + "telexNumber=" + telexNumber + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("internalLocation", internalLocation);
+        state.put("streetNumber", streetNumber);
+        state.put("street", street);
+        state.put("postalBox", postalBox);
+        state.put("town", town);
+        state.put("region", region);
+        state.put("postalCode", postalCode);
+        state.put("country", country);
+        state.put("facsimileNumber", facsimileNumber);
+        state.put("telephoneNumber", telephoneNumber);
+        state.put("electronicMailAddress", electronicMailAddress);
+        state.put("telexNumber", telexNumber);
+        return state;
     }
 }

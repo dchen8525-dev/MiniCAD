@@ -1,11 +1,12 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DIMENSIONAL_EXPONENTS unit-dimension metadata.
  */
-public final class StepDimensionalExponents implements StepEntity {
-    private final int id;
+public final class StepDimensionalExponents extends AbstractStepEntity {
     private final double lengthExponent;
     private final double massExponent;
     private final double timeExponent;
@@ -15,7 +16,7 @@ public final class StepDimensionalExponents implements StepEntity {
     private final double luminousIntensityExponent;
 
     public StepDimensionalExponents(int id, double lengthExponent, double massExponent, double timeExponent, double electricCurrentExponent, double thermodynamicTemperatureExponent, double amountOfSubstanceExponent, double luminousIntensityExponent) {
-        this.id = id;
+        super(id, "");
         this.lengthExponent = lengthExponent;
         this.massExponent = massExponent;
         this.timeExponent = timeExponent;
@@ -23,14 +24,6 @@ public final class StepDimensionalExponents implements StepEntity {
         this.thermodynamicTemperatureExponent = thermodynamicTemperatureExponent;
         this.amountOfSubstanceExponent = amountOfSubstanceExponent;
         this.luminousIntensityExponent = luminousIntensityExponent;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public double getLengthExponent() {
@@ -71,20 +64,16 @@ public final class StepDimensionalExponents implements StepEntity {
     public double luminousIntensityExponent() { return getLuminousIntensityExponent(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDimensionalExponents that = (StepDimensionalExponents) o;
-        return id == that.id && lengthExponent == that.lengthExponent && massExponent == that.massExponent && timeExponent == that.timeExponent && electricCurrentExponent == that.electricCurrentExponent && thermodynamicTemperatureExponent == that.thermodynamicTemperatureExponent && amountOfSubstanceExponent == that.amountOfSubstanceExponent && luminousIntensityExponent == that.luminousIntensityExponent;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, lengthExponent, massExponent, timeExponent, electricCurrentExponent, thermodynamicTemperatureExponent, amountOfSubstanceExponent, luminousIntensityExponent);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDimensionalExponents{" + "id=" + id + "lengthExponent=" + lengthExponent + "massExponent=" + massExponent + "timeExponent=" + timeExponent + "electricCurrentExponent=" + electricCurrentExponent + "thermodynamicTemperatureExponent=" + thermodynamicTemperatureExponent + "amountOfSubstanceExponent=" + amountOfSubstanceExponent + "luminousIntensityExponent=" + luminousIntensityExponent + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("lengthExponent", lengthExponent);
+        state.put("massExponent", massExponent);
+        state.put("timeExponent", timeExponent);
+        state.put("electricCurrentExponent", electricCurrentExponent);
+        state.put("thermodynamicTemperatureExponent", thermodynamicTemperatureExponent);
+        state.put("amountOfSubstanceExponent", amountOfSubstanceExponent);
+        state.put("luminousIntensityExponent", luminousIntensityExponent);
+        return state;
     }
 }

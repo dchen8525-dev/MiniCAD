@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved LINK_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param linkBandwidth link variance bandwidth
  * @param linkStatus link variance status
  */
-public final class StepLinkDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLinkDefinition extends AbstractStepEntity {
     private final String linkType;
     private final StepEntity linkSource;
     private final StepEntity linkTarget;
@@ -25,21 +24,12 @@ public final class StepLinkDefinition implements StepEntity {
     private final String linkStatus;
 
     public StepLinkDefinition(int id, String name, String linkType, StepEntity linkSource, StepEntity linkTarget, double linkBandwidth, String linkStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.linkType = linkType;
         this.linkSource = linkSource;
         this.linkTarget = linkTarget;
         this.linkBandwidth = linkBandwidth;
         this.linkStatus = linkStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getLinkType() {
@@ -63,20 +53,15 @@ public final class StepLinkDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLinkDefinition that = (StepLinkDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(linkType, that.linkType) && Objects.equals(linkSource, that.linkSource) && Objects.equals(linkTarget, that.linkTarget) && linkBandwidth == that.linkBandwidth && Objects.equals(linkStatus, that.linkStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, linkType, linkSource, linkTarget, linkBandwidth, linkStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLinkDefinition{" + "id=" + id + "name=" + name + "linkType=" + linkType + "linkSource=" + linkSource + "linkTarget=" + linkTarget + "linkBandwidth=" + linkBandwidth + "linkStatus=" + linkStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("linkType", linkType);
+        state.put("linkSource", linkSource);
+        state.put("linkTarget", linkTarget);
+        state.put("linkBandwidth", linkBandwidth);
+        state.put("linkStatus", linkStatus);
+        return state;
     }
 }

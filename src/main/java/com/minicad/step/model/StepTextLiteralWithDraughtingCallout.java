@@ -1,29 +1,19 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Resolved TEXT_LITERAL_WITH_DRAUGHTING_CALLOUT.
  */
-public final class StepTextLiteralWithDraughtingCallout implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTextLiteralWithDraughtingCallout extends AbstractStepEntity {
     private final String textLiteral;
     private final StepEntity callout;
 
     public StepTextLiteralWithDraughtingCallout(int id, String name, String textLiteral, StepEntity callout) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.textLiteral = textLiteral;
         this.callout = callout;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getTextLiteral() {
@@ -35,20 +25,12 @@ public final class StepTextLiteralWithDraughtingCallout implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTextLiteralWithDraughtingCallout that = (StepTextLiteralWithDraughtingCallout) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(textLiteral, that.textLiteral) && Objects.equals(callout, that.callout);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, textLiteral, callout);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTextLiteralWithDraughtingCallout{" + "id=" + id + "name=" + name + "textLiteral=" + textLiteral + "callout=" + callout + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("textLiteral", textLiteral);
+        state.put("callout", callout);
+        return state;
     }
 }

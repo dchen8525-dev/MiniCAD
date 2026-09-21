@@ -1,28 +1,19 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+
 /**
  * Resolved NODE_REPRESENTATION.
  * Graphical representation of a finite element node.
  */
-public final class StepNodeRepresentation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepNodeRepresentation extends AbstractStepEntity {
     private final List<StepEntity> representedNodes;
 
     public StepNodeRepresentation(int id, String name, List<StepEntity> representedNodes) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.representedNodes = representedNodes == null ? null : java.util.List.copyOf(representedNodes);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getRepresentedNodes() {
@@ -30,20 +21,11 @@ public final class StepNodeRepresentation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNodeRepresentation that = (StepNodeRepresentation) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(representedNodes, that.representedNodes);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, representedNodes);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNodeRepresentation{" + "id=" + id + "name=" + name + "representedNodes=" + representedNodes + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("representedNodes", representedNodes);
+        return state;
     }
 }

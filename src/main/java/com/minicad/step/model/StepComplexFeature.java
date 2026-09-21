@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved COMPLEX_FEATURE.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param position feature position placement
  * @param orientation feature orientation
  */
-public final class StepComplexFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepComplexFeature extends AbstractStepEntity {
     private final List<StepEntity> componentFeatures;
     private final String featureType;
     private final StepEntity position;
     private final StepEntity orientation;
 
     public StepComplexFeature(int id, String name, List<StepEntity> componentFeatures, String featureType, StepEntity position, StepEntity orientation) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.componentFeatures = componentFeatures == null ? null : java.util.List.copyOf(componentFeatures);
         this.featureType = featureType;
         this.position = position;
         this.orientation = orientation;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getComponentFeatures() {
@@ -56,20 +46,14 @@ public final class StepComplexFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepComplexFeature that = (StepComplexFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(componentFeatures, that.componentFeatures) && Objects.equals(featureType, that.featureType) && Objects.equals(position, that.position) && Objects.equals(orientation, that.orientation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, componentFeatures, featureType, position, orientation);
-    }
-
-    @Override
-    public String toString() {
-        return "StepComplexFeature{" + "id=" + id + "name=" + name + "componentFeatures=" + componentFeatures + "featureType=" + featureType + "position=" + position + "orientation=" + orientation + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("componentFeatures", componentFeatures);
+        state.put("featureType", featureType);
+        state.put("position", position);
+        state.put("orientation", orientation);
+        return state;
     }
 }

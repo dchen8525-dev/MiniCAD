@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved BLOCK_INSTANCE.
  * A block instance entity.
@@ -12,29 +14,18 @@ import java.util.Objects;
  * @param blockUsed block variance used size
  * @param blockStatus block variance status
  */
-public final class StepBlockInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepBlockInstance extends AbstractStepEntity {
     private final StepEntity blockDefinition;
     private final long blockAddress;
     private final int blockUsed;
     private final String blockStatus;
 
     public StepBlockInstance(int id, String name, StepEntity blockDefinition, long blockAddress, int blockUsed, String blockStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.blockDefinition = blockDefinition;
         this.blockAddress = blockAddress;
         this.blockUsed = blockUsed;
         this.blockStatus = blockStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBlockDefinition() {
@@ -54,20 +45,14 @@ public final class StepBlockInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepBlockInstance that = (StepBlockInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(blockDefinition, that.blockDefinition) && blockAddress == that.blockAddress && blockUsed == that.blockUsed && Objects.equals(blockStatus, that.blockStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, blockDefinition, blockAddress, blockUsed, blockStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepBlockInstance{" + "id=" + id + "name=" + name + "blockDefinition=" + blockDefinition + "blockAddress=" + blockAddress + "blockUsed=" + blockUsed + "blockStatus=" + blockStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("blockDefinition", blockDefinition);
+        state.put("blockAddress", blockAddress);
+        state.put("blockUsed", blockUsed);
+        state.put("blockStatus", blockStatus);
+        return state;
     }
 }

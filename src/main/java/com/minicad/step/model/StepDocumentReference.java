@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal DOCUMENT_REFERENCE metadata.
  *
@@ -8,19 +10,14 @@ import java.util.Objects;
  * @param assignedDocument assigned document
  * @param source document source label
  */
-public final class StepDocumentReference implements StepEntity {
-    private final int id;
+public final class StepDocumentReference extends AbstractStepEntity {
     private final StepDocument assignedDocument;
     private final String source;
 
     public StepDocumentReference(int id, StepDocument assignedDocument, String source) {
-        this.id = id;
+        super(id, "");
         this.assignedDocument = assignedDocument;
         this.source = source;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getName() {
@@ -41,20 +38,11 @@ public final class StepDocumentReference implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDocumentReference that = (StepDocumentReference) o;
-        return id == that.id && Objects.equals(assignedDocument, that.assignedDocument) && Objects.equals(source, that.source);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedDocument, source);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDocumentReference{" + "id=" + id + "assignedDocument=" + assignedDocument + "source=" + source + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedDocument", assignedDocument);
+        state.put("source", source);
+        return state;
     }
 }

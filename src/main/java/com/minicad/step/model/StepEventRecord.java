@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved EVENT_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param eventProcessed event variance processed flag
  * @param eventStatus event variance status
  */
-public final class StepEventRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEventRecord extends AbstractStepEntity {
     private final String eventType;
     private final StepEntity eventSource;
     private final StepEntity eventTime;
@@ -27,22 +26,13 @@ public final class StepEventRecord implements StepEntity {
     private final String eventStatus;
 
     public StepEventRecord(int id, String name, String eventType, StepEntity eventSource, StepEntity eventTime, List<String> eventDetails, boolean eventProcessed, String eventStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.eventType = eventType;
         this.eventSource = eventSource;
         this.eventTime = eventTime;
         this.eventDetails = eventDetails == null ? null : java.util.List.copyOf(eventDetails);
         this.eventProcessed = eventProcessed;
         this.eventStatus = eventStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEventType() {
@@ -70,20 +60,16 @@ public final class StepEventRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEventRecord that = (StepEventRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(eventType, that.eventType) && Objects.equals(eventSource, that.eventSource) && Objects.equals(eventTime, that.eventTime) && Objects.equals(eventDetails, that.eventDetails) && eventProcessed == that.eventProcessed && Objects.equals(eventStatus, that.eventStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, eventType, eventSource, eventTime, eventDetails, eventProcessed, eventStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEventRecord{" + "id=" + id + "name=" + name + "eventType=" + eventType + "eventSource=" + eventSource + "eventTime=" + eventTime + "eventDetails=" + eventDetails + "eventProcessed=" + eventProcessed + "eventStatus=" + eventStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("eventType", eventType);
+        state.put("eventSource", eventSource);
+        state.put("eventTime", eventTime);
+        state.put("eventDetails", eventDetails);
+        state.put("eventProcessed", eventProcessed);
+        state.put("eventStatus", eventStatus);
+        return state;
     }
 }

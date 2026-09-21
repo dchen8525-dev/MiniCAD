@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved RADIAL_TOLERANCE_ZONE.
  * A radial tolerance zone definition.
@@ -11,27 +13,16 @@ import java.util.Objects;
  * @param zoneForm the form of the tolerance zone
  * @param zoneRadius radius of the tolerance zone
  */
-public final class StepRadialToleranceZone implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRadialToleranceZone extends AbstractStepEntity {
     private final StepEntity definingTolerance;
     private final StepEntity zoneForm;
     private final Double zoneRadius;
 
     public StepRadialToleranceZone(int id, String name, StepEntity definingTolerance, StepEntity zoneForm, Double zoneRadius) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.definingTolerance = definingTolerance;
         this.zoneForm = zoneForm;
         this.zoneRadius = zoneRadius;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getDefiningTolerance() {
@@ -47,20 +38,13 @@ public final class StepRadialToleranceZone implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRadialToleranceZone that = (StepRadialToleranceZone) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(definingTolerance, that.definingTolerance) && Objects.equals(zoneForm, that.zoneForm) && Objects.equals(zoneRadius, that.zoneRadius);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, definingTolerance, zoneForm, zoneRadius);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRadialToleranceZone{" + "id=" + id + "name=" + name + "definingTolerance=" + definingTolerance + "zoneForm=" + zoneForm + "zoneRadius=" + zoneRadius + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("definingTolerance", definingTolerance);
+        state.put("zoneForm", zoneForm);
+        state.put("zoneRadius", zoneRadius);
+        return state;
     }
 }

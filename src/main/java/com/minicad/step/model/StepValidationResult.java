@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved VALIDATION_RESULT.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceDeficiencies deficiencies variance identified
  * @varianceStatus result variance status
  */
-public final class StepValidationResult implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepValidationResult extends AbstractStepEntity {
     private final StepEntity varianceItem;
     private final String varianceMethod;
     private final String varianceEnvironment;
@@ -27,22 +26,13 @@ public final class StepValidationResult implements StepEntity {
     private final String varianceStatus;
 
     public StepValidationResult(int id, String name, StepEntity varianceItem, String varianceMethod, String varianceEnvironment, String varianceOutcome, List<String> varianceDeficiencies, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceItem = varianceItem;
         this.varianceMethod = varianceMethod;
         this.varianceEnvironment = varianceEnvironment;
         this.varianceOutcome = varianceOutcome;
         this.varianceDeficiencies = varianceDeficiencies == null ? null : java.util.List.copyOf(varianceDeficiencies);
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceItem() {
@@ -70,20 +60,16 @@ public final class StepValidationResult implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepValidationResult that = (StepValidationResult) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceItem, that.varianceItem) && Objects.equals(varianceMethod, that.varianceMethod) && Objects.equals(varianceEnvironment, that.varianceEnvironment) && Objects.equals(varianceOutcome, that.varianceOutcome) && Objects.equals(varianceDeficiencies, that.varianceDeficiencies) && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceItem, varianceMethod, varianceEnvironment, varianceOutcome, varianceDeficiencies, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepValidationResult{" + "id=" + id + "name=" + name + "varianceItem=" + varianceItem + "varianceMethod=" + varianceMethod + "varianceEnvironment=" + varianceEnvironment + "varianceOutcome=" + varianceOutcome + "varianceDeficiencies=" + varianceDeficiencies + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceItem", varianceItem);
+        state.put("varianceMethod", varianceMethod);
+        state.put("varianceEnvironment", varianceEnvironment);
+        state.put("varianceOutcome", varianceOutcome);
+        state.put("varianceDeficiencies", varianceDeficiencies);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

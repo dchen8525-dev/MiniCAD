@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal TESSELLATED_FACE.
@@ -11,23 +12,12 @@ import java.util.Objects;
  * @param name STEP label
  * @param triangles list of triangle entities or vertex references
  */
-public final class StepTessellatedFace implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepTessellatedFace extends AbstractStepEntity {
     private final List<StepEntity> triangles;
 
     public StepTessellatedFace(int id, String name, List<StepEntity> triangles) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.triangles = triangles == null ? null : java.util.List.copyOf(triangles);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepEntity> getTriangles() {
@@ -40,20 +30,11 @@ public final class StepTessellatedFace implements StepEntity {
     public List<StepEntity> triangles() { return getTriangles(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepTessellatedFace that = (StepTessellatedFace) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(triangles, that.triangles);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, triangles);
-    }
-
-    @Override
-    public String toString() {
-        return "StepTessellatedFace{" + "id=" + id + "name=" + name + "triangles=" + triangles + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("triangles", triangles);
+        return state;
     }
 }

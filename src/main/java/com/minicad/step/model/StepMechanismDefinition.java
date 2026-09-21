@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MECHANISM_DEFINITION.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param baseLink base/grounded link
  * @param actuatedJoints actuated joints list
  */
-public final class StepMechanismDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMechanismDefinition extends AbstractStepEntity {
     private final String mechanismType;
     private final List<StepEntity> links;
     private final List<StepEntity> joints;
@@ -27,22 +26,13 @@ public final class StepMechanismDefinition implements StepEntity {
     private final List<StepEntity> actuatedJoints;
 
     public StepMechanismDefinition(int id, String name, String mechanismType, List<StepEntity> links, List<StepEntity> joints, int degreesOfFreedom, StepEntity baseLink, List<StepEntity> actuatedJoints) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.mechanismType = mechanismType;
         this.links = links == null ? null : java.util.List.copyOf(links);
         this.joints = joints == null ? null : java.util.List.copyOf(joints);
         this.degreesOfFreedom = degreesOfFreedom;
         this.baseLink = baseLink;
         this.actuatedJoints = actuatedJoints == null ? null : java.util.List.copyOf(actuatedJoints);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMechanismType() {
@@ -70,20 +60,16 @@ public final class StepMechanismDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMechanismDefinition that = (StepMechanismDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(mechanismType, that.mechanismType) && Objects.equals(links, that.links) && Objects.equals(joints, that.joints) && degreesOfFreedom == that.degreesOfFreedom && Objects.equals(baseLink, that.baseLink) && Objects.equals(actuatedJoints, that.actuatedJoints);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, mechanismType, links, joints, degreesOfFreedom, baseLink, actuatedJoints);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMechanismDefinition{" + "id=" + id + "name=" + name + "mechanismType=" + mechanismType + "links=" + links + "joints=" + joints + "degreesOfFreedom=" + degreesOfFreedom + "baseLink=" + baseLink + "actuatedJoints=" + actuatedJoints + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("mechanismType", mechanismType);
+        state.put("links", links);
+        state.put("joints", joints);
+        state.put("degreesOfFreedom", degreesOfFreedom);
+        state.put("baseLink", baseLink);
+        state.put("actuatedJoints", actuatedJoints);
+        return state;
     }
 }

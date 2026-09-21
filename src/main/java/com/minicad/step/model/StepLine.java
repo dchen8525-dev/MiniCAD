@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved LINE.
  *
@@ -9,25 +11,14 @@ import java.util.Objects;
  * @param point line origin
  * @param vector line direction vector
  */
-public final class StepLine implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepLine extends AbstractStepEntity {
     private final StepCartesianPoint point;
     private final StepVector vector;
 
     public StepLine(int id, String name, StepCartesianPoint point, StepVector vector) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.point = point;
         this.vector = vector;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepCartesianPoint getPoint() {
@@ -45,20 +36,12 @@ public final class StepLine implements StepEntity {
     public StepVector vector() { return getVector(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepLine that = (StepLine) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(point, that.point) && Objects.equals(vector, that.vector);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, point, vector);
-    }
-
-    @Override
-    public String toString() {
-        return "StepLine{" + "id=" + id + "name=" + name + "point=" + point + "vector=" + vector + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("point", point);
+        state.put("vector", vector);
+        return state;
     }
 }

@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved OFFSET_CURVE_3D.
  *
@@ -11,29 +13,18 @@ import java.util.Objects;
  * @param selfIntersect self-intersection flag
  * @param refDirection reference direction
  */
-public final class StepOffsetCurve3D implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOffsetCurve3D extends AbstractStepEntity {
     private final StepEntity basisCurve;
     private final double distance;
     private final boolean selfIntersect;
     private final StepDirection refDirection;
 
     public StepOffsetCurve3D(int id, String name, StepEntity basisCurve, double distance, boolean selfIntersect, StepDirection refDirection) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.basisCurve = basisCurve;
         this.distance = distance;
         this.selfIntersect = selfIntersect;
         this.refDirection = refDirection;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getBasisCurve() {
@@ -61,20 +52,14 @@ public final class StepOffsetCurve3D implements StepEntity {
     public StepDirection refDirection() { return getRefDirection(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOffsetCurve3D that = (StepOffsetCurve3D) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(basisCurve, that.basisCurve) && distance == that.distance && selfIntersect == that.selfIntersect && Objects.equals(refDirection, that.refDirection);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, basisCurve, distance, selfIntersect, refDirection);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOffsetCurve3D{" + "id=" + id + "name=" + name + "basisCurve=" + basisCurve + "distance=" + distance + "selfIntersect=" + selfIntersect + "refDirection=" + refDirection + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("basisCurve", basisCurve);
+        state.put("distance", distance);
+        state.put("selfIntersect", selfIntersect);
+        state.put("refDirection", refDirection);
+        return state;
     }
 }

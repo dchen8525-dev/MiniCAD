@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import java.util.Objects;
 /**
  * Minimal SHAPE_ASPECT_OCCURRENCE metadata.
  *
@@ -13,9 +14,7 @@ import java.util.Objects;
  * @param definition occurrence definition
  * @param entityName concrete STEP entity name
  */
-public final class StepShapeAspectOccurrence implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepShapeAspectOccurrence extends AbstractStepEntity {
     private final String description;
     private final StepProductDefinitionShape ofShape;
     private final String productDefinitional;
@@ -23,21 +22,12 @@ public final class StepShapeAspectOccurrence implements StepEntity {
     private final String entityName;
 
     public StepShapeAspectOccurrence(int id, String name, String description, StepProductDefinitionShape ofShape, String productDefinitional, StepEntity definition, String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.ofShape = ofShape;
         this.productDefinitional = productDefinitional;
         this.definition = definition;
         this.entityName = entityName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -62,7 +52,7 @@ public final class StepShapeAspectOccurrence implements StepEntity {
 
     // Record-style accessors
     public String name() {
-        return name;
+        return getName();
     }
 
     public String description() {
@@ -86,20 +76,15 @@ public final class StepShapeAspectOccurrence implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepShapeAspectOccurrence that = (StepShapeAspectOccurrence) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(ofShape, that.ofShape) && Objects.equals(productDefinitional, that.productDefinitional) && Objects.equals(definition, that.definition) && Objects.equals(entityName, that.entityName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, ofShape, productDefinitional, definition, entityName);
-    }
-
-    @Override
-    public String toString() {
-        return "StepShapeAspectOccurrence{" + "id=" + id + "name=" + name + "description=" + description + "ofShape=" + ofShape + "productDefinitional=" + productDefinitional + "definition=" + definition + "entityName=" + entityName + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("ofShape", ofShape);
+        state.put("productDefinitional", productDefinitional);
+        state.put("definition", definition);
+        state.put("entityName", entityName);
+        return state;
     }
 }

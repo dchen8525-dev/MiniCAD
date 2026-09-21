@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal ORGANIZATION_ASSIGNMENT metadata.
  *
@@ -8,23 +10,14 @@ import java.util.Objects;
  * @param assignedOrganization assigned organization
  * @param role assignment role
  */
-public final class StepOrganizationAssignment implements StepEntity {
-    private final int id;
+public final class StepOrganizationAssignment extends AbstractStepEntity {
     private final StepOrganization assignedOrganization;
     private final StepOrganizationRole role;
 
     public StepOrganizationAssignment(int id, StepOrganization assignedOrganization, StepOrganizationRole role) {
-        this.id = id;
+        super(id, "");
         this.assignedOrganization = assignedOrganization;
         this.role = role;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return "";
     }
 
     public StepOrganization getAssignedOrganization() {
@@ -45,20 +38,11 @@ public final class StepOrganizationAssignment implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOrganizationAssignment that = (StepOrganizationAssignment) o;
-        return id == that.id && Objects.equals(assignedOrganization, that.assignedOrganization) && Objects.equals(role, that.role);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, assignedOrganization, role);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOrganizationAssignment{" + "id=" + id + "assignedOrganization=" + assignedOrganization + "role=" + role + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("assignedOrganization", assignedOrganization);
+        state.put("role", role);
+        return state;
     }
 }

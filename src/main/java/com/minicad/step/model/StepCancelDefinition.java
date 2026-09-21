@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CANCEL_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param cancelCleanup cancel variance cleanup action
  * @param cancelStatus cancel variance status
  */
-public final class StepCancelDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepCancelDefinition extends AbstractStepEntity {
     private final String cancelType;
     private final String cancelCondition;
     private final int cancelGracePeriod;
@@ -25,21 +24,12 @@ public final class StepCancelDefinition implements StepEntity {
     private final String cancelStatus;
 
     public StepCancelDefinition(int id, String name, String cancelType, String cancelCondition, int cancelGracePeriod, StepEntity cancelCleanup, String cancelStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.cancelType = cancelType;
         this.cancelCondition = cancelCondition;
         this.cancelGracePeriod = cancelGracePeriod;
         this.cancelCleanup = cancelCleanup;
         this.cancelStatus = cancelStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getCancelType() {
@@ -63,20 +53,15 @@ public final class StepCancelDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepCancelDefinition that = (StepCancelDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(cancelType, that.cancelType) && Objects.equals(cancelCondition, that.cancelCondition) && cancelGracePeriod == that.cancelGracePeriod && Objects.equals(cancelCleanup, that.cancelCleanup) && Objects.equals(cancelStatus, that.cancelStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, cancelType, cancelCondition, cancelGracePeriod, cancelCleanup, cancelStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepCancelDefinition{" + "id=" + id + "name=" + name + "cancelType=" + cancelType + "cancelCondition=" + cancelCondition + "cancelGracePeriod=" + cancelGracePeriod + "cancelCleanup=" + cancelCleanup + "cancelStatus=" + cancelStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("cancelType", cancelType);
+        state.put("cancelCondition", cancelCondition);
+        state.put("cancelGracePeriod", cancelGracePeriod);
+        state.put("cancelCleanup", cancelCleanup);
+        state.put("cancelStatus", cancelStatus);
+        return state;
     }
 }

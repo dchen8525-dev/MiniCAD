@@ -1,6 +1,8 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved EDGE_CURVE.
  *
@@ -11,29 +13,18 @@ import java.util.Objects;
  * @param edgeGeometry referenced edge geometry
  * @param sameSense orientation flag
  */
-public final class StepEdgeCurve implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepEdgeCurve extends AbstractStepEntity {
     private final StepVertexPoint start;
     private final StepVertexPoint end;
     private final StepEntity edgeGeometry;
     private final boolean sameSense;
 
     public StepEdgeCurve(int id, String name, StepVertexPoint start, StepVertexPoint end, StepEntity edgeGeometry, boolean sameSense) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.start = start;
         this.end = end;
         this.edgeGeometry = edgeGeometry;
         this.sameSense = sameSense;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepVertexPoint getStart() {
@@ -61,20 +52,14 @@ public final class StepEdgeCurve implements StepEntity {
     public boolean sameSense() { return isSameSense(); }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepEdgeCurve that = (StepEdgeCurve) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(start, that.start) && Objects.equals(end, that.end) && Objects.equals(edgeGeometry, that.edgeGeometry) && sameSense == that.sameSense;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, start, end, edgeGeometry, sameSense);
-    }
-
-    @Override
-    public String toString() {
-        return "StepEdgeCurve{" + "id=" + id + "name=" + name + "start=" + start + "end=" + end + "edgeGeometry=" + edgeGeometry + "sameSense=" + sameSense + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("start", start);
+        state.put("end", end);
+        state.put("edgeGeometry", edgeGeometry);
+        state.put("sameSense", sameSense);
+        return state;
     }
 }

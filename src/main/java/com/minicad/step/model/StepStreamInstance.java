@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STREAM_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param streamRate stream variance rate
  * @param streamStatus stream variance status
  */
-public final class StepStreamInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStreamInstance extends AbstractStepEntity {
     private final StepEntity streamDefinition;
     private final String streamState;
     private final long streamPosition;
@@ -25,21 +24,12 @@ public final class StepStreamInstance implements StepEntity {
     private final String streamStatus;
 
     public StepStreamInstance(int id, String name, StepEntity streamDefinition, String streamState, long streamPosition, double streamRate, String streamStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.streamDefinition = streamDefinition;
         this.streamState = streamState;
         this.streamPosition = streamPosition;
         this.streamRate = streamRate;
         this.streamStatus = streamStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getStreamDefinition() {
@@ -63,20 +53,15 @@ public final class StepStreamInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStreamInstance that = (StepStreamInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(streamDefinition, that.streamDefinition) && Objects.equals(streamState, that.streamState) && streamPosition == that.streamPosition && streamRate == that.streamRate && Objects.equals(streamStatus, that.streamStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, streamDefinition, streamState, streamPosition, streamRate, streamStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStreamInstance{" + "id=" + id + "name=" + name + "streamDefinition=" + streamDefinition + "streamState=" + streamState + "streamPosition=" + streamPosition + "streamRate=" + streamRate + "streamStatus=" + streamStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("streamDefinition", streamDefinition);
+        state.put("streamState", streamState);
+        state.put("streamPosition", streamPosition);
+        state.put("streamRate", streamRate);
+        state.put("streamStatus", streamStatus);
+        return state;
     }
 }

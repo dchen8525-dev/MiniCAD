@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal global unit assigned context.
@@ -9,25 +10,16 @@ import java.util.Objects;
  * @param id STEP instance id
  * @param units referenced unit entities
  */
-public final class StepGlobalUnitAssignedContext implements StepEntity {
-    private final int id;
+public final class StepGlobalUnitAssignedContext extends AbstractStepEntity {
     private final List<StepEntity> units;
 
     public StepGlobalUnitAssignedContext(int id, List<StepEntity> units) {
-        this.id = id;
+        super(id, "");
         this.units = units == null ? null : java.util.List.copyOf(units);
-    }
-
-    public int getId() {
-        return id;
     }
 
     public List<StepEntity> getUnits() {
         return units;
-    }
-
-    public String getName() {
-        return "";
     }
 
     // Record-style accessor
@@ -36,20 +28,10 @@ public final class StepGlobalUnitAssignedContext implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGlobalUnitAssignedContext that = (StepGlobalUnitAssignedContext) o;
-        return id == that.id && Objects.equals(units, that.units);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, units);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGlobalUnitAssignedContext{" + "id=" + id + "units=" + units + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("units", units);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STATE_MACHINE_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param machineTransitionCount machine variance transition count
  * @param machineStatus machine variance status
  */
-public final class StepStateMachineInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStateMachineInstance extends AbstractStepEntity {
     private final StepEntity machineDefinition;
     private final StepEntity machineState;
     private final StepEntity machinePreviousState;
@@ -25,21 +24,12 @@ public final class StepStateMachineInstance implements StepEntity {
     private final String machineStatus;
 
     public StepStateMachineInstance(int id, String name, StepEntity machineDefinition, StepEntity machineState, StepEntity machinePreviousState, int machineTransitionCount, String machineStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.machineDefinition = machineDefinition;
         this.machineState = machineState;
         this.machinePreviousState = machinePreviousState;
         this.machineTransitionCount = machineTransitionCount;
         this.machineStatus = machineStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getMachineDefinition() {
@@ -63,20 +53,15 @@ public final class StepStateMachineInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStateMachineInstance that = (StepStateMachineInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(machineDefinition, that.machineDefinition) && Objects.equals(machineState, that.machineState) && Objects.equals(machinePreviousState, that.machinePreviousState) && machineTransitionCount == that.machineTransitionCount && Objects.equals(machineStatus, that.machineStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, machineDefinition, machineState, machinePreviousState, machineTransitionCount, machineStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStateMachineInstance{" + "id=" + id + "name=" + name + "machineDefinition=" + machineDefinition + "machineState=" + machineState + "machinePreviousState=" + machinePreviousState + "machineTransitionCount=" + machineTransitionCount + "machineStatus=" + machineStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("machineDefinition", machineDefinition);
+        state.put("machineState", machineState);
+        state.put("machinePreviousState", machinePreviousState);
+        state.put("machineTransitionCount", machineTransitionCount);
+        state.put("machineStatus", machineStatus);
+        return state;
     }
 }

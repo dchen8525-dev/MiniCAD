@@ -1,31 +1,22 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Resolved THERMAL_BOUNDARY_CONDITION.
  * Thermal boundary condition for FEA.
  */
-public final class StepThermalBoundaryCondition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepThermalBoundaryCondition extends AbstractStepEntity {
     private final StepEntity appliedTo;
     private final double temperature;
     private final double heatFlux;
 
     public StepThermalBoundaryCondition(int id, String name, StepEntity appliedTo, double temperature, double heatFlux) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.appliedTo = appliedTo;
         this.temperature = temperature;
         this.heatFlux = heatFlux;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getAppliedTo() {
@@ -41,20 +32,13 @@ public final class StepThermalBoundaryCondition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepThermalBoundaryCondition that = (StepThermalBoundaryCondition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(appliedTo, that.appliedTo) && temperature == that.temperature && heatFlux == that.heatFlux;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, appliedTo, temperature, heatFlux);
-    }
-
-    @Override
-    public String toString() {
-        return "StepThermalBoundaryCondition{" + "id=" + id + "name=" + name + "appliedTo=" + appliedTo + "temperature=" + temperature + "heatFlux=" + heatFlux + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("appliedTo", appliedTo);
+        state.put("temperature", temperature);
+        state.put("heatFlux", heatFlux);
+        return state;
     }
 }

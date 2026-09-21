@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ZONE_DEFINITION.
@@ -14,29 +15,18 @@ import java.util.Objects;
  * @param zoneBoundary zone variance boundary definition
  * @param zoneStatus zone variance status
  */
-public final class StepZoneDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepZoneDefinition extends AbstractStepEntity {
     private final String zoneType;
     private final StepEntity zoneLocation;
     private final String zoneBoundary;
     private final String zoneStatus;
 
     public StepZoneDefinition(int id, String name, String zoneType, StepEntity zoneLocation, String zoneBoundary, String zoneStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.zoneType = zoneType;
         this.zoneLocation = zoneLocation;
         this.zoneBoundary = zoneBoundary;
         this.zoneStatus = zoneStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getZoneType() {
@@ -56,20 +46,14 @@ public final class StepZoneDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepZoneDefinition that = (StepZoneDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(zoneType, that.zoneType) && Objects.equals(zoneLocation, that.zoneLocation) && Objects.equals(zoneBoundary, that.zoneBoundary) && Objects.equals(zoneStatus, that.zoneStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, zoneType, zoneLocation, zoneBoundary, zoneStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepZoneDefinition{" + "id=" + id + "name=" + name + "zoneType=" + zoneType + "zoneLocation=" + zoneLocation + "zoneBoundary=" + zoneBoundary + "zoneStatus=" + zoneStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("zoneType", zoneType);
+        state.put("zoneLocation", zoneLocation);
+        state.put("zoneBoundary", zoneBoundary);
+        state.put("zoneStatus", zoneStatus);
+        return state;
     }
 }

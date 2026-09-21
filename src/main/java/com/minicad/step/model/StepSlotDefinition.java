@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SLOT_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param length slot length
  * @param bottomType bottom type
  */
-public final class StepSlotDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSlotDefinition extends AbstractStepEntity {
     private final StepEntity profile;
     private final Double depth;
     private final StepEntity direction;
@@ -25,21 +24,12 @@ public final class StepSlotDefinition implements StepEntity {
     private final String bottomType;
 
     public StepSlotDefinition(int id, String name, StepEntity profile, Double depth, StepEntity direction, Double length, String bottomType) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.profile = profile;
         this.depth = depth;
         this.direction = direction;
         this.length = length;
         this.bottomType = bottomType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getProfile() {
@@ -63,20 +53,15 @@ public final class StepSlotDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSlotDefinition that = (StepSlotDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(profile, that.profile) && Objects.equals(depth, that.depth) && Objects.equals(direction, that.direction) && Objects.equals(length, that.length) && Objects.equals(bottomType, that.bottomType);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, profile, depth, direction, length, bottomType);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSlotDefinition{" + "id=" + id + "name=" + name + "profile=" + profile + "depth=" + depth + "direction=" + direction + "length=" + length + "bottomType=" + bottomType + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("profile", profile);
+        state.put("depth", depth);
+        state.put("direction", direction);
+        state.put("length", length);
+        state.put("bottomType", bottomType);
+        return state;
     }
 }

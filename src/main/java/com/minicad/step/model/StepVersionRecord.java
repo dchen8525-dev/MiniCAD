@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved VERSION_RECORD.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param versionTimestamp version variance timestamp
  * @param versionStatus version variance status
  */
-public final class StepVersionRecord implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepVersionRecord extends AbstractStepEntity {
     private final String versionNumber;
     private final String versionLabel;
     private final StepEntity versionTarget;
@@ -27,22 +26,13 @@ public final class StepVersionRecord implements StepEntity {
     private final String versionStatus;
 
     public StepVersionRecord(int id, String name, String versionNumber, String versionLabel, StepEntity versionTarget, StepEntity versionAuthor, StepEntity versionTimestamp, String versionStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.versionNumber = versionNumber;
         this.versionLabel = versionLabel;
         this.versionTarget = versionTarget;
         this.versionAuthor = versionAuthor;
         this.versionTimestamp = versionTimestamp;
         this.versionStatus = versionStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getVersionNumber() {
@@ -70,20 +60,16 @@ public final class StepVersionRecord implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepVersionRecord that = (StepVersionRecord) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(versionNumber, that.versionNumber) && Objects.equals(versionLabel, that.versionLabel) && Objects.equals(versionTarget, that.versionTarget) && Objects.equals(versionAuthor, that.versionAuthor) && Objects.equals(versionTimestamp, that.versionTimestamp) && Objects.equals(versionStatus, that.versionStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, versionNumber, versionLabel, versionTarget, versionAuthor, versionTimestamp, versionStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepVersionRecord{" + "id=" + id + "name=" + name + "versionNumber=" + versionNumber + "versionLabel=" + versionLabel + "versionTarget=" + versionTarget + "versionAuthor=" + versionAuthor + "versionTimestamp=" + versionTimestamp + "versionStatus=" + versionStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("versionNumber", versionNumber);
+        state.put("versionLabel", versionLabel);
+        state.put("versionTarget", versionTarget);
+        state.put("versionAuthor", versionAuthor);
+        state.put("versionTimestamp", versionTimestamp);
+        state.put("versionStatus", versionStatus);
+        return state;
     }
 }

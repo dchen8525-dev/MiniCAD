@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved CONFIGURATION_INSTANCE.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param configurationApplied configuration variance applied flag
  * @param configurationStatus configuration variance status
  */
-public final class StepConfigurationInstance implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepConfigurationInstance extends AbstractStepEntity {
     private final StepEntity configurationDefinition;
     private final String configurationState;
     private final List<String> configurationValues;
@@ -25,21 +24,12 @@ public final class StepConfigurationInstance implements StepEntity {
     private final String configurationStatus;
 
     public StepConfigurationInstance(int id, String name, StepEntity configurationDefinition, String configurationState, List<String> configurationValues, boolean configurationApplied, String configurationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.configurationDefinition = configurationDefinition;
         this.configurationState = configurationState;
         this.configurationValues = configurationValues == null ? null : java.util.List.copyOf(configurationValues);
         this.configurationApplied = configurationApplied;
         this.configurationStatus = configurationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getConfigurationDefinition() {
@@ -63,20 +53,15 @@ public final class StepConfigurationInstance implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepConfigurationInstance that = (StepConfigurationInstance) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(configurationDefinition, that.configurationDefinition) && Objects.equals(configurationState, that.configurationState) && Objects.equals(configurationValues, that.configurationValues) && configurationApplied == that.configurationApplied && Objects.equals(configurationStatus, that.configurationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, configurationDefinition, configurationState, configurationValues, configurationApplied, configurationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepConfigurationInstance{" + "id=" + id + "name=" + name + "configurationDefinition=" + configurationDefinition + "configurationState=" + configurationState + "configurationValues=" + configurationValues + "configurationApplied=" + configurationApplied + "configurationStatus=" + configurationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("configurationDefinition", configurationDefinition);
+        state.put("configurationState", configurationState);
+        state.put("configurationValues", configurationValues);
+        state.put("configurationApplied", configurationApplied);
+        state.put("configurationStatus", configurationStatus);
+        return state;
     }
 }

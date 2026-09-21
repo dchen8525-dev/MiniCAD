@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved ERROR_ENTRY.
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @param entryContext entry variance context reference
  * @param entryStatus entry variance status
  */
-public final class StepErrorEntry implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepErrorEntry extends AbstractStepEntity {
     private final String entryType;
     private final String entryCode;
     private final String entryMessage;
@@ -29,8 +28,7 @@ public final class StepErrorEntry implements StepEntity {
     private final String entryStatus;
 
     public StepErrorEntry(int id, String name, String entryType, String entryCode, String entryMessage, int entrySeverity, StepEntity entryTimestamp, StepEntity entryContext, String entryStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.entryType = entryType;
         this.entryCode = entryCode;
         this.entryMessage = entryMessage;
@@ -38,14 +36,6 @@ public final class StepErrorEntry implements StepEntity {
         this.entryTimestamp = entryTimestamp;
         this.entryContext = entryContext;
         this.entryStatus = entryStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getEntryType() {
@@ -77,20 +67,17 @@ public final class StepErrorEntry implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepErrorEntry that = (StepErrorEntry) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(entryType, that.entryType) && Objects.equals(entryCode, that.entryCode) && Objects.equals(entryMessage, that.entryMessage) && entrySeverity == that.entrySeverity && Objects.equals(entryTimestamp, that.entryTimestamp) && Objects.equals(entryContext, that.entryContext) && Objects.equals(entryStatus, that.entryStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, entryType, entryCode, entryMessage, entrySeverity, entryTimestamp, entryContext, entryStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepErrorEntry{" + "id=" + id + "name=" + name + "entryType=" + entryType + "entryCode=" + entryCode + "entryMessage=" + entryMessage + "entrySeverity=" + entrySeverity + "entryTimestamp=" + entryTimestamp + "entryContext=" + entryContext + "entryStatus=" + entryStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("entryType", entryType);
+        state.put("entryCode", entryCode);
+        state.put("entryMessage", entryMessage);
+        state.put("entrySeverity", entrySeverity);
+        state.put("entryTimestamp", entryTimestamp);
+        state.put("entryContext", entryContext);
+        state.put("entryStatus", entryStatus);
+        return state;
     }
 }

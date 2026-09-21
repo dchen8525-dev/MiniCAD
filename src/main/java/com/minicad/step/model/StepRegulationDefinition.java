@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved REGULATION_DEFINITION.
@@ -15,9 +16,7 @@ import java.util.Objects;
  * @param regulationPenalties regulation variance penalties
  * @param regulationStatus regulation variance status
  */
-public final class StepRegulationDefinition implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRegulationDefinition extends AbstractStepEntity {
     private final String regulationType;
     private final String regulationAuthority;
     private final List<String> regulationRequirements;
@@ -25,21 +24,12 @@ public final class StepRegulationDefinition implements StepEntity {
     private final String regulationStatus;
 
     public StepRegulationDefinition(int id, String name, String regulationType, String regulationAuthority, List<String> regulationRequirements, String regulationPenalties, String regulationStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.regulationType = regulationType;
         this.regulationAuthority = regulationAuthority;
         this.regulationRequirements = regulationRequirements == null ? null : java.util.List.copyOf(regulationRequirements);
         this.regulationPenalties = regulationPenalties;
         this.regulationStatus = regulationStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getRegulationType() {
@@ -63,20 +53,15 @@ public final class StepRegulationDefinition implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRegulationDefinition that = (StepRegulationDefinition) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(regulationType, that.regulationType) && Objects.equals(regulationAuthority, that.regulationAuthority) && Objects.equals(regulationRequirements, that.regulationRequirements) && Objects.equals(regulationPenalties, that.regulationPenalties) && Objects.equals(regulationStatus, that.regulationStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, regulationType, regulationAuthority, regulationRequirements, regulationPenalties, regulationStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRegulationDefinition{" + "id=" + id + "name=" + name + "regulationType=" + regulationType + "regulationAuthority=" + regulationAuthority + "regulationRequirements=" + regulationRequirements + "regulationPenalties=" + regulationPenalties + "regulationStatus=" + regulationStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("regulationType", regulationType);
+        state.put("regulationAuthority", regulationAuthority);
+        state.put("regulationRequirements", regulationRequirements);
+        state.put("regulationPenalties", regulationPenalties);
+        state.put("regulationStatus", regulationStatus);
+        return state;
     }
 }

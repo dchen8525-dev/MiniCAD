@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved SIMULATION_RESULT.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @varianceConvergence convergence variance status
  * @varianceStatus result variance status
  */
-public final class StepSimulationResult implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepSimulationResult extends AbstractStepEntity {
     private final StepEntity varianceModel;
     private final StepEntity varianceScenario;
     private final List<Double> varianceOutputs;
@@ -27,22 +26,13 @@ public final class StepSimulationResult implements StepEntity {
     private final String varianceStatus;
 
     public StepSimulationResult(int id, String name, StepEntity varianceModel, StepEntity varianceScenario, List<Double> varianceOutputs, List<Double> varianceTime, boolean varianceConvergence, String varianceStatus) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.varianceModel = varianceModel;
         this.varianceScenario = varianceScenario;
         this.varianceOutputs = varianceOutputs == null ? null : java.util.List.copyOf(varianceOutputs);
         this.varianceTime = varianceTime == null ? null : java.util.List.copyOf(varianceTime);
         this.varianceConvergence = varianceConvergence;
         this.varianceStatus = varianceStatus;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public StepEntity getVarianceModel() {
@@ -70,20 +60,16 @@ public final class StepSimulationResult implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepSimulationResult that = (StepSimulationResult) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(varianceModel, that.varianceModel) && Objects.equals(varianceScenario, that.varianceScenario) && Objects.equals(varianceOutputs, that.varianceOutputs) && Objects.equals(varianceTime, that.varianceTime) && varianceConvergence == that.varianceConvergence && Objects.equals(varianceStatus, that.varianceStatus);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, varianceModel, varianceScenario, varianceOutputs, varianceTime, varianceConvergence, varianceStatus);
-    }
-
-    @Override
-    public String toString() {
-        return "StepSimulationResult{" + "id=" + id + "name=" + name + "varianceModel=" + varianceModel + "varianceScenario=" + varianceScenario + "varianceOutputs=" + varianceOutputs + "varianceTime=" + varianceTime + "varianceConvergence=" + varianceConvergence + "varianceStatus=" + varianceStatus + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("varianceModel", varianceModel);
+        state.put("varianceScenario", varianceScenario);
+        state.put("varianceOutputs", varianceOutputs);
+        state.put("varianceTime", varianceTime);
+        state.put("varianceConvergence", varianceConvergence);
+        state.put("varianceStatus", varianceStatus);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Minimal OVER_RIDING_STYLED_ITEM.
@@ -12,27 +13,16 @@ import java.util.Objects;
  * @param item styled target
  * @param overRiddenStyle referenced base styled item
  */
-public final class StepOverRidingStyledItem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepOverRidingStyledItem extends AbstractStepEntity {
     private final List<StepPresentationStyleAssignment> styles;
     private final StepEntity item;
     private final StepStyledItem overRiddenStyle;
 
     public StepOverRidingStyledItem(int id, String name, List<StepPresentationStyleAssignment> styles, StepEntity item, StepStyledItem overRiddenStyle) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.styles = styles == null ? null : java.util.List.copyOf(styles);
         this.item = item;
         this.overRiddenStyle = overRiddenStyle;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public List<StepPresentationStyleAssignment> getStyles() {
@@ -48,27 +38,20 @@ public final class StepOverRidingStyledItem implements StepEntity {
     }
 
     // Record-style accessors
-    public int id() { return id; }
-    public String name() { return name; }
+    public int id() { return getId(); }
+    public String name() { return getName(); }
     public List<StepPresentationStyleAssignment> styles() { return styles; }
     public StepEntity item() { return item; }
     public StepStyledItem overRiddenStyle() { return overRiddenStyle; }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepOverRidingStyledItem that = (StepOverRidingStyledItem) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(styles, that.styles) && Objects.equals(item, that.item) && Objects.equals(overRiddenStyle, that.overRiddenStyle);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, styles, item, overRiddenStyle);
-    }
-
-    @Override
-    public String toString() {
-        return "StepOverRidingStyledItem{" + "id=" + id + "name=" + name + "styles=" + styles + "item=" + item + "overRiddenStyle=" + overRiddenStyle + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("styles", styles);
+        state.put("item", item);
+        state.put("overRiddenStyle", overRiddenStyle);
+        return state;
     }
 }

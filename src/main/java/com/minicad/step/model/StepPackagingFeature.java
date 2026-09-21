@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved PACKAGING_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param packagingDimensions packaging dimensions (L, W, H)
  * @param packagingStandard packaging standard reference
  */
-public final class StepPackagingFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepPackagingFeature extends AbstractStepEntity {
     private final String packagingType;
     private final StepEntity packagingGeometry;
     private final StepEntity packagingMaterial;
@@ -27,22 +26,13 @@ public final class StepPackagingFeature implements StepEntity {
     private final String packagingStandard;
 
     public StepPackagingFeature(int id, String name, String packagingType, StepEntity packagingGeometry, StepEntity packagingMaterial, double packagingWeight, List<Double> packagingDimensions, String packagingStandard) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.packagingType = packagingType;
         this.packagingGeometry = packagingGeometry;
         this.packagingMaterial = packagingMaterial;
         this.packagingWeight = packagingWeight;
         this.packagingDimensions = packagingDimensions == null ? null : java.util.List.copyOf(packagingDimensions);
         this.packagingStandard = packagingStandard;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getPackagingType() {
@@ -70,20 +60,16 @@ public final class StepPackagingFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepPackagingFeature that = (StepPackagingFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(packagingType, that.packagingType) && Objects.equals(packagingGeometry, that.packagingGeometry) && Objects.equals(packagingMaterial, that.packagingMaterial) && packagingWeight == that.packagingWeight && Objects.equals(packagingDimensions, that.packagingDimensions) && Objects.equals(packagingStandard, that.packagingStandard);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, packagingType, packagingGeometry, packagingMaterial, packagingWeight, packagingDimensions, packagingStandard);
-    }
-
-    @Override
-    public String toString() {
-        return "StepPackagingFeature{" + "id=" + id + "name=" + name + "packagingType=" + packagingType + "packagingGeometry=" + packagingGeometry + "packagingMaterial=" + packagingMaterial + "packagingWeight=" + packagingWeight + "packagingDimensions=" + packagingDimensions + "packagingStandard=" + packagingStandard + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("packagingType", packagingType);
+        state.put("packagingGeometry", packagingGeometry);
+        state.put("packagingMaterial", packagingMaterial);
+        state.put("packagingWeight", packagingWeight);
+        state.put("packagingDimensions", packagingDimensions);
+        state.put("packagingStandard", packagingStandard);
+        return state;
     }
 }

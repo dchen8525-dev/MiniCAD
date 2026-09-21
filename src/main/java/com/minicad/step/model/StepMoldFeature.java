@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved MOLD_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param gatingSystem gating system features
  * @param coolingChannels cooling channel features
  */
-public final class StepMoldFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMoldFeature extends AbstractStepEntity {
     private final String moldType;
     private final StepEntity cavityGeometry;
     private final StepEntity coreGeometry;
@@ -27,22 +26,13 @@ public final class StepMoldFeature implements StepEntity {
     private final List<StepEntity> coolingChannels;
 
     public StepMoldFeature(int id, String name, String moldType, StepEntity cavityGeometry, StepEntity coreGeometry, StepEntity partingLine, List<StepEntity> gatingSystem, List<StepEntity> coolingChannels) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.moldType = moldType;
         this.cavityGeometry = cavityGeometry;
         this.coreGeometry = coreGeometry;
         this.partingLine = partingLine;
         this.gatingSystem = gatingSystem == null ? null : java.util.List.copyOf(gatingSystem);
         this.coolingChannels = coolingChannels == null ? null : java.util.List.copyOf(coolingChannels);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getMoldType() {
@@ -70,20 +60,16 @@ public final class StepMoldFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMoldFeature that = (StepMoldFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(moldType, that.moldType) && Objects.equals(cavityGeometry, that.cavityGeometry) && Objects.equals(coreGeometry, that.coreGeometry) && Objects.equals(partingLine, that.partingLine) && Objects.equals(gatingSystem, that.gatingSystem) && Objects.equals(coolingChannels, that.coolingChannels);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, moldType, cavityGeometry, coreGeometry, partingLine, gatingSystem, coolingChannels);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMoldFeature{" + "id=" + id + "name=" + name + "moldType=" + moldType + "cavityGeometry=" + cavityGeometry + "coreGeometry=" + coreGeometry + "partingLine=" + partingLine + "gatingSystem=" + gatingSystem + "coolingChannels=" + coolingChannels + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("moldType", moldType);
+        state.put("cavityGeometry", cavityGeometry);
+        state.put("coreGeometry", coreGeometry);
+        state.put("partingLine", partingLine);
+        state.put("gatingSystem", gatingSystem);
+        state.put("coolingChannels", coolingChannels);
+        return state;
     }
 }

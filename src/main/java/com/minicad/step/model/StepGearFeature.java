@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved GEAR_FEATURE.
@@ -18,9 +19,7 @@ import java.util.Objects;
  * @param rootDiameter root diameter
  * @param tipDiameter tip diameter
  */
-public final class StepGearFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepGearFeature extends AbstractStepEntity {
     private final String gearType;
     private final int numberOfTeeth;
     private final double module;
@@ -31,8 +30,7 @@ public final class StepGearFeature implements StepEntity {
     private final double tipDiameter;
 
     public StepGearFeature(int id, String name, String gearType, int numberOfTeeth, double module, double pressureAngle, double helixAngle, double pitchDiameter, double rootDiameter, double tipDiameter) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.gearType = gearType;
         this.numberOfTeeth = numberOfTeeth;
         this.module = module;
@@ -41,14 +39,6 @@ public final class StepGearFeature implements StepEntity {
         this.pitchDiameter = pitchDiameter;
         this.rootDiameter = rootDiameter;
         this.tipDiameter = tipDiameter;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getGearType() {
@@ -84,20 +74,18 @@ public final class StepGearFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepGearFeature that = (StepGearFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(gearType, that.gearType) && numberOfTeeth == that.numberOfTeeth && module == that.module && pressureAngle == that.pressureAngle && helixAngle == that.helixAngle && pitchDiameter == that.pitchDiameter && rootDiameter == that.rootDiameter && tipDiameter == that.tipDiameter;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, gearType, numberOfTeeth, module, pressureAngle, helixAngle, pitchDiameter, rootDiameter, tipDiameter);
-    }
-
-    @Override
-    public String toString() {
-        return "StepGearFeature{" + "id=" + id + "name=" + name + "gearType=" + gearType + "numberOfTeeth=" + numberOfTeeth + "module=" + module + "pressureAngle=" + pressureAngle + "helixAngle=" + helixAngle + "pitchDiameter=" + pitchDiameter + "rootDiameter=" + rootDiameter + "tipDiameter=" + tipDiameter + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("gearType", gearType);
+        state.put("numberOfTeeth", numberOfTeeth);
+        state.put("module", module);
+        state.put("pressureAngle", pressureAngle);
+        state.put("helixAngle", helixAngle);
+        state.put("pitchDiameter", pitchDiameter);
+        state.put("rootDiameter", rootDiameter);
+        state.put("tipDiameter", tipDiameter);
+        return state;
     }
 }

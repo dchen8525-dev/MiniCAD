@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * Resolved STRUCTURAL_FEATURE.
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param endConditions end condition features
  * @param loadPoints load application points
  */
-public final class StepStructuralFeature implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepStructuralFeature extends AbstractStepEntity {
     private final String structuralType;
     private final StepEntity crossSection;
     private final double structuralLength;
@@ -27,22 +26,13 @@ public final class StepStructuralFeature implements StepEntity {
     private final List<StepEntity> loadPoints;
 
     public StepStructuralFeature(int id, String name, String structuralType, StepEntity crossSection, double structuralLength, StepEntity structuralMaterial, List<StepEntity> endConditions, List<StepEntity> loadPoints) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.structuralType = structuralType;
         this.crossSection = crossSection;
         this.structuralLength = structuralLength;
         this.structuralMaterial = structuralMaterial;
         this.endConditions = endConditions == null ? null : java.util.List.copyOf(endConditions);
         this.loadPoints = loadPoints == null ? null : java.util.List.copyOf(loadPoints);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getStructuralType() {
@@ -70,20 +60,16 @@ public final class StepStructuralFeature implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepStructuralFeature that = (StepStructuralFeature) o;
-        return id == that.id && Objects.equals(name, that.name) && Objects.equals(structuralType, that.structuralType) && Objects.equals(crossSection, that.crossSection) && structuralLength == that.structuralLength && Objects.equals(structuralMaterial, that.structuralMaterial) && Objects.equals(endConditions, that.endConditions) && Objects.equals(loadPoints, that.loadPoints);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, structuralType, crossSection, structuralLength, structuralMaterial, endConditions, loadPoints);
-    }
-
-    @Override
-    public String toString() {
-        return "StepStructuralFeature{" + "id=" + id + "name=" + name + "structuralType=" + structuralType + "crossSection=" + crossSection + "structuralLength=" + structuralLength + "structuralMaterial=" + structuralMaterial + "endConditions=" + endConditions + "loadPoints=" + loadPoints + "}";
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("structuralType", structuralType);
+        state.put("crossSection", crossSection);
+        state.put("structuralLength", structuralLength);
+        state.put("structuralMaterial", structuralMaterial);
+        state.put("endConditions", endConditions);
+        state.put("loadPoints", loadPoints);
+        return state;
     }
 }
