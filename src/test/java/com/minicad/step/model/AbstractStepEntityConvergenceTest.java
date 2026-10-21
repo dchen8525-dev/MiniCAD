@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * Pins the extraction of the value contract into {@link AbstractStepEntity}.
  *
  * <p>Every concrete entity in this package used to hand-write {@code id}/{@code name} plus the same
- * three value algorithms. 1241 of them now inherit those from the base and declare only their
+ * three value algorithms. 1242 of them now inherit those from the base and declare only their
  * {@code components()} list. This test holds the extraction in place from four directions.
  *
  * <ul>
@@ -36,16 +36,15 @@ import org.junit.jupiter.api.Test;
  *       {@code getId}, {@code getName}, {@code equals}, {@code hashCode} or {@code toString}, must
  *       still declare exactly one {@code components()}, and must not still declare the two moved
  *       fields. The count of such entities is asserted exactly, so a new entity cannot quietly opt
- *       out - and any entity outside the base that still writes {@code equals} has to be on the
- *       documented legacy list, which is itself asserted to be exactly the single expected type. The
- *       same claim is then made about the package as a whole rather than about a list of entities:
- *       the algorithms and their component cache appear in exactly one file, which is what catches a
- *       copy in a file that is neither a {@code Step*} entity nor on the legacy list.</li>
+ *       out - and no entity outside the base may write {@code equals} at all. The same claim is
+ *       then made about the package as a whole rather than about a list of entities: the algorithms
+ *       and their component cache appear in exactly one file, which catches a copy in any file,
+ *       including one that is not a {@code Step*} entity.</li>
  *   <li><b>The retired order is preserved.</b> The single most dangerous part of the fold was
  *       reordering a component: the order is what {@code toString} prints and what {@code hashCode}
- *       folds. The digest below was computed from the retired bodies themselves, read out of the
- *       tree before the adoption of the id-only entities ran, and is re-derived here from the folded
- *       {@code components()} maps - so a reordering anywhere in the package changes it.</li>
+ *       folds. The digest below was computed from the retired bodies themselves, and is re-derived
+ *       here from the folded {@code components()} maps - so a reordering anywhere in the package
+ *       changes it.</li>
  *   <li><b>No field was left out.</b> For every entity, the labels of {@code components()} are the
  *       entity's declared fields, in declaration order. That is the one mistake the fold could
  *       still make (a field added to a constructor but not to the list), and the classes are read
@@ -61,22 +60,19 @@ class AbstractStepEntityConvergenceTest {
     private static final String PKG = "com.minicad.step.model";
 
     /**
-     * The one entity that still writes its own {@code toString}: it is already on the value
-     * contract (its {@code equals}/{@code hashCode} fold every field), but it prints its components
-     * comma separated instead of the base's unseparated form. Folding it would change debug output
-     * only, so it keeps its body rather than making the base grow a separator knob.
+     * The eighteen entities that keyed equality on the instance id alone were migrated onto the base
+     * deliberately. They ignored their own fields, formed no coherent family (two of the
+     * twenty-two {@code *Relationship} entities, two of the twenty-unit family, and the whole small
+     * A3m/DataEquivalence/GenericExpression groups) and matched what the retired generator used to
+     * emit. {@code StepGenericEntity}, the only one holding an array, hands its {@code Object[]}
+     * attributes to {@code components()} as a list, so equality sees their content rather than the
+     * array identity.
      *
-     * <p>The eighteen entities that keyed equality on the instance id alone are gone: they were
-     * migrated onto the base deliberately. They ignored their own fields, formed no coherent family
-     * (two of the twenty-two {@code *Relationship} entities, two of the twenty-unit family, and the
-     * whole small A3m/DataEquivalence/GenericExpression groups) and matched what the retired
-     * generator used to emit. {@code StepGenericEntity}, the only one holding an array, hands its
-     * {@code Object[]} attributes to {@code components()} as a list, so equality sees their content
-     * rather than the array identity.
+     * <p>{@code StepFacetedBrepAndBrepWithVoids} was the last exception: it printed its components
+     * comma separated while the base prints them unseparated. It now extends the base too, so no
+     * entity in the package writes its own value contract and the legacy list is empty.
      */
-    private static final Set<String> LEGACY_CONTRACT = Set.of("StepFacetedBrepAndBrepWithVoids");
-
-    private static final int FOLDED_ENTITIES = 1241;
+    private static final int FOLDED_ENTITIES = 1242;
 
     /**
      * How many folded entities derive their label instead of storing one - a date and a time rendered
@@ -86,15 +82,28 @@ class AbstractStepEntityConvergenceTest {
      */
     private static final int DERIVED_LABEL_ENTITIES = 30;
 
-    /** sha256 over "Entity:label,label,..." for the 1241 entities, taken before the adoption ran. */
+    /** sha256 over "Entity:label,label,..." for the 1242 entities, taken from the retired bodies. */
     private static final String RETIRED_ORDER_DIGEST =
-            "86284902e779434aa42c4626f0fb1060fb8042dd1faadd91e823cba396109eaa";
+            "7ddeaaa33e50ba1a1e60f0f0b933bcf7421a7d345f045f16ff16d7b215a2112e";
 
     private static final Pattern COMPONENT = Pattern.compile("state\\.put\\(\"([A-Za-z0-9_]+)\",");
     private static final Pattern COMPONENTS_DECL =
             Pattern.compile("protected Map<String, Object> components\\(\\) \\{");
     private static final Pattern FIELD =
             Pattern.compile("^    private final [A-Za-z0-9_<>,.\\[\\] ]+? ([A-Za-z0-9_]+);", Pattern.MULTILINE);
+
+    /** The base is reached directly or through either control-point core, never by a lookalike name. */
+    private static final Pattern EXTENDS_BASE = Pattern.compile("\\bextends\\s+AbstractStepEntity\\b");
+    private static final Pattern EXTENDS_CONTROL_POINT =
+            Pattern.compile("\\bextends\\s+AbstractStepControlPoint\\w*\\b");
+
+    /**
+     * An implementation of the value equality, whatever its modifier order or parameter name. Matching
+     * the body rather than one remembered spelling is what stops a new entity from slipping an
+     * id-only contract past the legacy list by writing {@code equals(final Object obj)}.
+     */
+    private static final Pattern EQUALS_DECL =
+            Pattern.compile("\\bboolean\\s+equals\\s*\\(\\s*(?:final\\s+)?Object\\s+\\w+\\s*\\)\\s*\\{");
 
     // ------------------------------------------------------------------ the triple lives once
 
@@ -108,7 +117,7 @@ class AbstractStepEntityConvergenceTest {
                 continue;
             }
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));
-            if (!code.contains("extends AbstractStepEntity")) {
+            if (!EXTENDS_BASE.matcher(code).find()) {
                 continue;
             }
             folded.add(name);
@@ -148,17 +157,25 @@ class AbstractStepEntityConvergenceTest {
                 continue;
             }
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));
-            if (!code.contains("public boolean equals(Object o)")) {
+            if (!EQUALS_DECL.matcher(code).find()) {
                 continue;
             }
-            if (code.contains("extends AbstractStepEntity") || code.contains("extends AbstractStepControlPoint")) {
+            if (EXTENDS_BASE.matcher(code).find() || EXTENDS_CONTROL_POINT.matcher(code).find()) {
                 continue;
             }
             legacy.add(name);
         }
-        assertEquals(LEGACY_CONTRACT, legacy,
-                "the entities that keep their own equals changed - an entity opted out of the base, "
-                        + "or one of the legacy contracts was folded or removed");
+        assertTrue(legacy.isEmpty(), "an entity opted out of the base: " + legacy);
+    }
+
+    @Test
+    void theLegacyScanSeesAnEqualsWhateverItsSpelling() {
+        assertTrue(EQUALS_DECL.matcher("public boolean equals(final Object obj) {").find(),
+                "a final parameter must not hide an implementation");
+        assertTrue(EQUALS_DECL.matcher("public final boolean equals(Object other) {").find(),
+                "a renamed parameter must not hide an implementation");
+        assertFalse(EQUALS_DECL.matcher("boolean equals(Object other);").find(),
+                "an interface declaration is not an implementation");
     }
 
     /**
@@ -166,8 +183,7 @@ class AbstractStepEntityConvergenceTest {
      * The two control-point cores used to carry a byte-identical copy each; every file that still
      * writes a body the base owns - or keeps a second component cache - is a regression, whether or
      * not it happens to be one of the entities the tests above walk. Reading the whole package is
-     * what lets this catch a copy in a file that is neither a {@code Step*} entity nor on the legacy
-     * list.
+     * what lets this catch a copy in any file, including one that is not a {@code Step*} entity.
      */
     @Test
     void thePackageWritesTheAlgorithmInExactlyOnePlace() throws IOException {
@@ -175,7 +191,7 @@ class AbstractStepEntityConvergenceTest {
         List<String> caches = new ArrayList<>();
         for (Path source : sources()) {
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));
-            if (code.contains("public final boolean equals(Object o)")) {
+            if (EQUALS_DECL.matcher(code).find()) {
                 declarations.add(fileName(source));
             }
             if (code.contains("componentCache")) {
@@ -198,11 +214,11 @@ class AbstractStepEntityConvergenceTest {
             // The subject is the concrete entities the base absorbed. The base itself and the two
             // control-point cores extend it too, but they are abstract and declare no components of
             // their own; those two are pinned by ControlPointEntityCoreConvergenceTest.
-            if (LEGACY_CONTRACT.contains(name) || !name.startsWith("Step")) {
+            if (!name.startsWith("Step")) {
                 continue;
             }
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));
-            if (!code.contains("extends AbstractStepEntity")) {
+            if (!EXTENDS_BASE.matcher(code).find()) {
                 continue;
             }
             lines.add(name + ":" + String.join(",", components(code, name)));
@@ -224,11 +240,11 @@ class AbstractStepEntityConvergenceTest {
         int checked = 0;
         for (Path source : sources()) {
             String name = fileName(source);
-            if (LEGACY_CONTRACT.contains(name) || !name.startsWith("Step")) {
+            if (!name.startsWith("Step")) {
                 continue;
             }
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));
-            if (!code.contains("extends AbstractStepEntity")) {
+            if (!EXTENDS_BASE.matcher(code).find()) {
                 continue;
             }
             List<String> declared = new ArrayList<>();
@@ -259,11 +275,11 @@ class AbstractStepEntityConvergenceTest {
         int arrayBacked = 0;
         for (Path source : sources()) {
             String name = fileName(source);
-            if (LEGACY_CONTRACT.contains(name) || !name.startsWith("Step")) {
+            if (!name.startsWith("Step")) {
                 continue;
             }
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));
-            if (!code.contains("extends AbstractStepEntity")) {
+            if (!EXTENDS_BASE.matcher(code).find()) {
                 continue;
             }
             Class<?> type = Class.forName(PKG + "." + name);

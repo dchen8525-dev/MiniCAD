@@ -32,9 +32,12 @@ import java.util.Objects;
  * the component cache, one per core - so they now carry only their geometry and inherit the rest
  * from here.
  *
- * <p>Not every entity in the package extends this type yet. The classes that key equality on the
- * instance id alone, and the one whose {@code toString} uses a different separator, still carry
- * their own bodies; they are listed, with the reason, in the convergence test.
+ * <p>Every entity in the package now inherits this contract, either directly or through the two
+ * control-point cores; none writes its own triple. The entities that used to key equality on the
+ * instance id alone were adopted once the tree was checked for a caller that relied on that
+ * identity - none did, so the id-only contract was never observable. The one that printed its
+ * components comma separated was adopted too: its debug output now matches the unseparated form
+ * every other entity uses, which is the only thing that fold changed.
  */
 public abstract class AbstractStepEntity implements StepEntity {
     private final int id;
