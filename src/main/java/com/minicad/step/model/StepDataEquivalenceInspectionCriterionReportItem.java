@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * DATA_EQUIVALENCE_INSPECTION_CRITERION_REPORT_ITEM entity model (ABSTRACT SUPERTYPE).
@@ -11,9 +12,7 @@ import java.util.Objects;
  * @param measuredValue reference to measured value (for subtype A3M_EQUIVALENCE_CRITERION_REPORT_ITEM_WITH_MEASURED_VALUE)
  * @param entityName actual entity type name (for subtype handling)
  */
-public final class StepDataEquivalenceInspectionCriterionReportItem implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDataEquivalenceInspectionCriterionReportItem extends AbstractStepEntity {
     private final Object measuredValue; // equivalence_measured_value_select reference
     private final String entityName;
 
@@ -22,20 +21,9 @@ public final class StepDataEquivalenceInspectionCriterionReportItem implements S
         String name,
         Object measuredValue,
         String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.measuredValue = measuredValue;
         this.entityName = entityName;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public Object getMeasuredValue() {
@@ -51,25 +39,12 @@ public final class StepDataEquivalenceInspectionCriterionReportItem implements S
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDataEquivalenceInspectionCriterionReportItem that = (StepDataEquivalenceInspectionCriterionReportItem) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDataEquivalenceInspectionCriterionReportItem{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", measuredValue=" + measuredValue +
-            ", entityName='" + entityName + '\'' +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("measuredValue", measuredValue);
+        state.put("entityName", entityName);
+        return state;
     }
 }

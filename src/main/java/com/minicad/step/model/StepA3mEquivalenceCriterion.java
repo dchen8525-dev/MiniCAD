@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * A3M_EQUIVALENCE_CRITERION entity model (ABSTRACT SUPERTYPE).
@@ -16,9 +17,7 @@ import java.util.Objects;
  * @param detectedDifferenceTypes list of detected difference type names (optional, can be empty)
  * @param accuracyTypes list of accuracy type names (optional, can be empty)
  */
-public final class StepA3mEquivalenceCriterion implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepA3mEquivalenceCriterion extends AbstractStepEntity {
     private final Object assessmentSpecification; // a3m_equivalence_assessment_specification_select reference
     private final List<String> comparingElementTypes; // LIST [1:?] OF a3m_element_type_name
     private final List<String> comparedElementTypes; // LIST [1:?] OF a3m_element_type_name
@@ -35,24 +34,13 @@ public final class StepA3mEquivalenceCriterion implements StepEntity {
         Object measuredDataType,
         List<String> detectedDifferenceTypes,
         List<String> accuracyTypes) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.assessmentSpecification = assessmentSpecification;
         this.comparingElementTypes = comparingElementTypes;
         this.comparedElementTypes = comparedElementTypes;
         this.measuredDataType = measuredDataType;
         this.detectedDifferenceTypes = detectedDifferenceTypes;
         this.accuracyTypes = accuracyTypes;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public Object getAssessmentSpecification() {
@@ -80,29 +68,16 @@ public final class StepA3mEquivalenceCriterion implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepA3mEquivalenceCriterion that = (StepA3mEquivalenceCriterion) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepA3mEquivalenceCriterion{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", assessmentSpecification=" + assessmentSpecification +
-            ", comparingElementTypes=" + comparingElementTypes +
-            ", comparedElementTypes=" + comparedElementTypes +
-            ", measuredDataType=" + measuredDataType +
-            ", detectedDifferenceTypes=" + detectedDifferenceTypes +
-            ", accuracyTypes=" + accuracyTypes +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("assessmentSpecification", assessmentSpecification);
+        state.put("comparingElementTypes", comparingElementTypes);
+        state.put("comparedElementTypes", comparedElementTypes);
+        state.put("measuredDataType", measuredDataType);
+        state.put("detectedDifferenceTypes", detectedDifferenceTypes);
+        state.put("accuracyTypes", accuracyTypes);
+        return state;
     }
 }

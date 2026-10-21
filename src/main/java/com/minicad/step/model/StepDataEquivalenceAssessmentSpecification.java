@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * DATA_EQUIVALENCE_ASSESSMENT_SPECIFICATION entity model.
@@ -11,9 +12,7 @@ import java.util.Objects;
  * @param description optional description text
  * @param entityName actual entity type name (for subtype handling)
  */
-public final class StepDataEquivalenceAssessmentSpecification implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDataEquivalenceAssessmentSpecification extends AbstractStepEntity {
     private final String description; // OPTIONAL
     private final String entityName;
 
@@ -22,20 +21,9 @@ public final class StepDataEquivalenceAssessmentSpecification implements StepEnt
         String name,
         String description,
         String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.entityName = entityName;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -51,25 +39,12 @@ public final class StepDataEquivalenceAssessmentSpecification implements StepEnt
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDataEquivalenceAssessmentSpecification that = (StepDataEquivalenceAssessmentSpecification) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDataEquivalenceAssessmentSpecification{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", description='" + description + '\'' +
-            ", entityName='" + entityName + '\'' +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("entityName", entityName);
+        return state;
     }
 }

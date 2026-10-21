@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * Pins the extraction of the value contract into {@link AbstractStepEntity}.
  *
  * <p>Every concrete entity in this package used to hand-write {@code id}/{@code name} plus the same
- * three value algorithms. 1223 of them now inherit those from the base and declare only their
+ * three value algorithms. 1241 of them now inherit those from the base and declare only their
  * {@code components()} list. This test holds the extraction in place from four directions.
  *
  * <ul>
@@ -37,14 +37,14 @@ import org.junit.jupiter.api.Test;
  *       still declare exactly one {@code components()}, and must not still declare the two moved
  *       fields. The count of such entities is asserted exactly, so a new entity cannot quietly opt
  *       out - and any entity outside the base that still writes {@code equals} has to be on the
- *       documented legacy list, which is itself asserted to be exactly the nineteen expected. The
+ *       documented legacy list, which is itself asserted to be exactly the single expected type. The
  *       same claim is then made about the package as a whole rather than about a list of entities:
  *       the algorithms and their component cache appear in exactly one file, which is what catches a
  *       copy in a file that is neither a {@code Step*} entity nor on the legacy list.</li>
  *   <li><b>The retired order is preserved.</b> The single most dangerous part of the fold was
  *       reordering a component: the order is what {@code toString} prints and what {@code hashCode}
- *       folds. The digest below was computed from the retired bodies themselves, read out of
- *       {@code HEAD} before the fold ran, and is re-derived here from the folded
+ *       folds. The digest below was computed from the retired bodies themselves, read out of the
+ *       tree before the adoption of the id-only entities ran, and is re-derived here from the folded
  *       {@code components()} maps - so a reordering anywhere in the package changes it.</li>
  *   <li><b>No field was left out.</b> For every entity, the labels of {@code components()} are the
  *       entity's declared fields, in declaration order. That is the one mistake the fold could
@@ -61,39 +61,22 @@ class AbstractStepEntityConvergenceTest {
     private static final String PKG = "com.minicad.step.model";
 
     /**
-     * Entities that keep their own value bodies for now. Eighteen key {@code equals}/{@code hashCode}
-     * on the instance id alone and ignore their other fields - a contract they have had since the
-     * initial import, shared by no coherent group (two of the twenty-two {@code *Relationship}
-     * entities, two of the twenty-unit family, and the whole small A3m/DataEquivalence and
-     * GenericExpression groups), which is why they read as residue of an older generator pass rather
-     * than a decision. The nineteenth, {@code StepFacetedBrepAndBrepWithVoids}, is a value entity but
-     * prints its components with a comma separator. Neither contract can be folded into the base
-     * without either changing behaviour or adding a branch to it, and changing what {@code equals}
-     * means for eighteen public types is a decision to be taken deliberately, not as a side effect of
-     * a deduplication pass.
+     * The one entity that still writes its own {@code toString}: it is already on the value
+     * contract (its {@code equals}/{@code hashCode} fold every field), but it prints its components
+     * comma separated instead of the base's unseparated form. Folding it would change debug output
+     * only, so it keeps its body rather than making the base grow a separator knob.
+     *
+     * <p>The eighteen entities that keyed equality on the instance id alone are gone: they were
+     * migrated onto the base deliberately. They ignored their own fields, formed no coherent family
+     * (two of the twenty-two {@code *Relationship} entities, two of the twenty-unit family, and the
+     * whole small A3m/DataEquivalence/GenericExpression groups) and matched what the retired
+     * generator used to emit. {@code StepGenericEntity}, the only one holding an array, hands its
+     * {@code Object[]} attributes to {@code components()} as a list, so equality sees their content
+     * rather than the array identity.
      */
-    private static final Set<String> LEGACY_CONTRACT = Set.of(
-            "StepA3mEquivalenceAccuracyAssociation",
-            "StepA3mEquivalenceCriterion",
-            "StepA3mInspectedModelAndInspectionResultRelationship",
-            "StepA3maEquivalenceInspectionResult",
-            "StepA3msEquivalenceInspectionResult",
-            "StepBinaryGenericExpression",
-            "StepDataEquivalenceAssessmentSpecification",
-            "StepDataEquivalenceInspectionCriterionReportItem",
-            "StepDataEquivalenceInspectionInstanceReportItem",
-            "StepDataEquivalenceInspectionRequirement",
-            "StepDataEquivalenceReportRequest",
-            "StepExternallyDefinedConversionBasedUnit",
-            "StepFacetedBrepAndBrepWithVoids",
-            "StepGenericEntity",
-            "StepMultipleArityGenericExpression",
-            "StepNonAgreedUnitUsage",
-            "StepRepresentationItemRelationship",
-            "StepSimpleGenericExpression",
-            "StepUnaryGenericExpression");
+    private static final Set<String> LEGACY_CONTRACT = Set.of("StepFacetedBrepAndBrepWithVoids");
 
-    private static final int FOLDED_ENTITIES = 1223;
+    private static final int FOLDED_ENTITIES = 1241;
 
     /**
      * How many folded entities derive their label instead of storing one - a date and a time rendered
@@ -103,9 +86,9 @@ class AbstractStepEntityConvergenceTest {
      */
     private static final int DERIVED_LABEL_ENTITIES = 30;
 
-    /** sha256 over "Entity:label,label,..." for the 1223 entities, taken from HEAD before the fold. */
+    /** sha256 over "Entity:label,label,..." for the 1241 entities, taken before the adoption ran. */
     private static final String RETIRED_ORDER_DIGEST =
-            "0f394c9006b001dd8bc9e2fbe2355ba3048352464b1f46bce69b81de020e42bb";
+            "86284902e779434aa42c4626f0fb1060fb8042dd1faadd91e823cba396109eaa";
 
     private static final Pattern COMPONENT = Pattern.compile("state\\.put\\(\"([A-Za-z0-9_]+)\",");
     private static final Pattern COMPONENTS_DECL =

@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A3M_EQUIVALENCE_ACCURACY_ASSOCIATION entity model.
@@ -12,9 +13,7 @@ import java.util.Objects;
  * @param specificAccuracy reference to shape measurement accuracy
  * @param equivalenceTarget reference to accuracy associated target select
  */
-public final class StepA3mEquivalenceAccuracyAssociation implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepA3mEquivalenceAccuracyAssociation extends AbstractStepEntity {
     private final String description; // OPTIONAL
     private final Object specificAccuracy; // shape_measurement_accuracy reference
     private final Object equivalenceTarget; // accuracy_associated_target_select reference
@@ -25,21 +24,10 @@ public final class StepA3mEquivalenceAccuracyAssociation implements StepEntity {
         String description,
         Object specificAccuracy,
         Object equivalenceTarget) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.specificAccuracy = specificAccuracy;
         this.equivalenceTarget = equivalenceTarget;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -55,26 +43,13 @@ public final class StepA3mEquivalenceAccuracyAssociation implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepA3mEquivalenceAccuracyAssociation that = (StepA3mEquivalenceAccuracyAssociation) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepA3mEquivalenceAccuracyAssociation{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", description='" + description + '\'' +
-            ", specificAccuracy=" + specificAccuracy +
-            ", equivalenceTarget=" + equivalenceTarget +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("specificAccuracy", specificAccuracy);
+        state.put("equivalenceTarget", equivalenceTarget);
+        return state;
     }
 }

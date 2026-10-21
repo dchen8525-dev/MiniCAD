@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * UNARY_GENERIC_EXPRESSION entity model (ABSTRACT SUPERTYPE).
@@ -11,9 +12,7 @@ import java.util.Objects;
  * @param operand reference to generic_expression
  * @param entityName actual entity type name (for subtype handling)
  */
-public final class StepUnaryGenericExpression implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepUnaryGenericExpression extends AbstractStepEntity {
     private final Object operand; // generic_expression reference
     private final String entityName;
 
@@ -22,20 +21,9 @@ public final class StepUnaryGenericExpression implements StepEntity {
         String name,
         Object operand,
         String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.operand = operand;
         this.entityName = entityName;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public Object getOperand() {
@@ -51,25 +39,12 @@ public final class StepUnaryGenericExpression implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepUnaryGenericExpression that = (StepUnaryGenericExpression) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepUnaryGenericExpression{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", operand=" + operand +
-            ", entityName='" + entityName + '\'' +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("operand", operand);
+        state.put("entityName", entityName);
+        return state;
     }
 }

@@ -1,7 +1,8 @@
 package com.minicad.step.model;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * MULTIPLE_ARITY_GENERIC_EXPRESSION entity model (ABSTRACT SUPERTYPE).
@@ -12,9 +13,7 @@ import java.util.Objects;
  * @param operands LIST [1:?] OF generic_expression references
  * @param entityName actual entity type name (for subtype handling)
  */
-public final class StepMultipleArityGenericExpression implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepMultipleArityGenericExpression extends AbstractStepEntity {
     private final List<String> operands; // LIST [1:?] OF generic_expression literal names
     private final String entityName;
 
@@ -23,20 +22,9 @@ public final class StepMultipleArityGenericExpression implements StepEntity {
         String name,
         List<String> operands,
         String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.operands = operands;
         this.entityName = entityName;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public List<String> getOperands() {
@@ -52,25 +40,12 @@ public final class StepMultipleArityGenericExpression implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepMultipleArityGenericExpression that = (StepMultipleArityGenericExpression) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepMultipleArityGenericExpression{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", operands=" + operands +
-            ", entityName='" + entityName + '\'' +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("operands", operands);
+        state.put("entityName", entityName);
+        return state;
     }
 }

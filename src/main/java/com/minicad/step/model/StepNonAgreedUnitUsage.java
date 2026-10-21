@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * NON_AGREED_UNIT_USAGE entity model.
@@ -10,25 +11,12 @@ import java.util.Objects;
  * @param name unit label
  * @param unit reference to the unit being used
  */
-public final class StepNonAgreedUnitUsage implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepNonAgreedUnitUsage extends AbstractStepEntity {
     private final Object unit; // Can be any unit type
 
     public StepNonAgreedUnitUsage(int id, String name, Object unit) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.unit = unit;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public Object getUnit() {
@@ -36,24 +24,11 @@ public final class StepNonAgreedUnitUsage implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepNonAgreedUnitUsage that = (StepNonAgreedUnitUsage) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepNonAgreedUnitUsage{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", unit=" + unit +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("unit", unit);
+        return state;
     }
 }

@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * DATA_EQUIVALENCE_REPORT_REQUEST entity model.
@@ -11,9 +12,7 @@ import java.util.Objects;
  * @param reportRequestType type of report request (for A3M_EQUIVALENCE_SUMMARY_REPORT_REQUEST_WITH_REPRESENTATIVE_VALUE)
  * @param entityName actual entity type name (for subtype handling)
  */
-public final class StepDataEquivalenceReportRequest implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepDataEquivalenceReportRequest extends AbstractStepEntity {
     private final Object reportRequestType; // representative_value_type reference
     private final String entityName;
 
@@ -22,20 +21,9 @@ public final class StepDataEquivalenceReportRequest implements StepEntity {
         String name,
         Object reportRequestType,
         String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.reportRequestType = reportRequestType;
         this.entityName = entityName;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public Object getReportRequestType() {
@@ -51,25 +39,12 @@ public final class StepDataEquivalenceReportRequest implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepDataEquivalenceReportRequest that = (StepDataEquivalenceReportRequest) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepDataEquivalenceReportRequest{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", reportRequestType=" + reportRequestType +
-            ", entityName='" + entityName + '\'' +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("reportRequestType", reportRequestType);
+        state.put("entityName", entityName);
+        return state;
     }
 }

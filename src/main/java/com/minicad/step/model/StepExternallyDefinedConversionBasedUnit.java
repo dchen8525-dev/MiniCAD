@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * EXTERNALLY_DEFINED_CONVERSION_BASED_UNIT entity model.
@@ -11,9 +12,7 @@ import java.util.Objects;
  * @param unitKind derived unit kind such as LENGTH_UNIT
  * @param externallyDefinedItem reference to external definition
  */
-public final class StepExternallyDefinedConversionBasedUnit implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepExternallyDefinedConversionBasedUnit extends AbstractStepEntity {
     private final String unitKind;
     private final StepExternallyDefinedItem externallyDefinedItem;
 
@@ -22,20 +21,9 @@ public final class StepExternallyDefinedConversionBasedUnit implements StepEntit
         String name,
         String unitKind,
         StepExternallyDefinedItem externallyDefinedItem) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.unitKind = unitKind;
         this.externallyDefinedItem = externallyDefinedItem;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public String getUnitKind() {
@@ -47,25 +35,12 @@ public final class StepExternallyDefinedConversionBasedUnit implements StepEntit
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepExternallyDefinedConversionBasedUnit that = (StepExternallyDefinedConversionBasedUnit) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepExternallyDefinedConversionBasedUnit{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", unitKind='" + unitKind + '\'' +
-            ", externallyDefinedItem=" + externallyDefinedItem +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("unitKind", unitKind);
+        state.put("externallyDefinedItem", externallyDefinedItem);
+        return state;
     }
 }

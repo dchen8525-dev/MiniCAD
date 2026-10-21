@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
-import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * REPRESENTATION_ITEM_RELATIONSHIP entity model.
@@ -13,9 +14,7 @@ import java.util.Objects;
  * @param relatedRepresentationItem reference to related representation item
  * @param entityName actual entity type name (for subtype handling)
  */
-public final class StepRepresentationItemRelationship implements StepEntity {
-    private final int id;
-    private final String name;
+public final class StepRepresentationItemRelationship extends AbstractStepEntity {
     private final String description; // OPTIONAL
     private final Object relatingRepresentationItem; // representation_item reference
     private final Object relatedRepresentationItem; // representation_item reference
@@ -28,22 +27,11 @@ public final class StepRepresentationItemRelationship implements StepEntity {
         Object relatingRepresentationItem,
         Object relatedRepresentationItem,
         String entityName) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.description = description;
         this.relatingRepresentationItem = relatingRepresentationItem;
         this.relatedRepresentationItem = relatedRepresentationItem;
         this.entityName = entityName;
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     public String getDescription() {
@@ -67,27 +55,14 @@ public final class StepRepresentationItemRelationship implements StepEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StepRepresentationItemRelationship that = (StepRepresentationItemRelationship) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Integer.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "StepRepresentationItemRelationship{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", description='" + description + '\'' +
-            ", relatingRepresentationItem=" + relatingRepresentationItem +
-            ", relatedRepresentationItem=" + relatedRepresentationItem +
-            ", entityName='" + entityName + '\'' +
-            '}';
+    protected Map<String, Object> components() {
+        Map<String, Object> state = new LinkedHashMap<>();
+        state.put("id", getId());
+        state.put("name", getName());
+        state.put("description", description);
+        state.put("relatingRepresentationItem", relatingRepresentationItem);
+        state.put("relatedRepresentationItem", relatedRepresentationItem);
+        state.put("entityName", entityName);
+        return state;
     }
 }
