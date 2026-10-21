@@ -3,7 +3,6 @@ package com.minicad.geometry2d;
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,12 +80,7 @@ public final class Circle2 implements Curve2 {
 
     @Override
     public List<Point2> sample(int segments) {
-        List<Point2> points = new ArrayList<>();
-        for (int i = 0; i <= segments; i++) {
-            double angle = 2 * Math.PI * i / segments;
-            points.add(pointAt(angle));
-        }
-        return List.copyOf(points);
+        return sample(segments, 0.0, 2 * Math.PI);
     }
 
     /**
@@ -98,13 +92,7 @@ public final class Circle2 implements Curve2 {
      * @return list of sampled points
      */
     public List<Point2> sample(int segments, double startAngle, double endAngle) {
-        List<Point2> points = new ArrayList<>();
-        double delta = endAngle - startAngle;
-        for (int i = 0; i <= segments; i++) {
-            double angle = startAngle + delta * i / segments;
-            points.add(pointAt(angle));
-        }
-        return List.copyOf(points);
+        return CurveSampling2.between(segments, startAngle, endAngle, this::pointAt);
     }
 
     /**

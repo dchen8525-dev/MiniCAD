@@ -328,11 +328,6 @@ public final class Line2 implements Curve2 {
     public List<Point2> sample(int segments, double startParam, double endParam) {
         Preconditions.requireFinite(startParam, "startParam");
         Preconditions.requireFinite(endParam, "endParam");
-        List<Point2> points = new ArrayList<>();
-        for (int i = 0; i <= segments; i++) {
-            double t = startParam + (endParam - startParam) * i / segments;
-            points.add(pointAt(t));
-        }
-        return List.copyOf(points);
+        return CurveSampling2.between(segments, startParam, endParam, this::pointAt);
     }
 }

@@ -3,8 +3,6 @@ package com.minicad.geometry2d;
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -109,12 +107,7 @@ public final class Parabola2 implements Curve2 {
 
     @Override
     public List<Point2> sample(int segments) {
-        List<Point2> points = new ArrayList<>();
-        for (int i = 0; i <= segments; i++) {
-            double t = -1.0 + 2.0 * i / segments;
-            points.add(pointAt(t));
-        }
-        return List.copyOf(points);
+        return CurveSampling2.between(segments, -1.0, 1.0, this::pointAt);
     }
 
     /**
@@ -128,12 +121,7 @@ public final class Parabola2 implements Curve2 {
     public List<Point2> sample(int segments, double startParam, double endParam) {
         Preconditions.requireFinite(startParam, "startParam");
         Preconditions.requireFinite(endParam, "endParam");
-        List<Point2> points = new ArrayList<>();
-        for (int i = 0; i <= segments; i++) {
-            double t = startParam + (endParam - startParam) * i / segments;
-            points.add(pointAt(t));
-        }
-        return List.copyOf(points);
+        return CurveSampling2.between(segments, startParam, endParam, this::pointAt);
     }
 
     /**
