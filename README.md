@@ -114,5 +114,5 @@ mvn -q exec:java -Dexec.mainClass=com.minicad.tool.ExpressSchemaParser \
 
 ## Repository hygiene
 
-- `.workbuddy/`, `target/` are developer-local and ignored.
+- `.claude/`, `.commandcode/`, `.workbuddy/`, `target/` are developer-local and ignored.
 - Reports from earlier refactoring sessions are archived under `docs/archive/`.

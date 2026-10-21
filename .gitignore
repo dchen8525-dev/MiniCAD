@@ -3,6 +3,7 @@ target/
 .minicad-cache/
 .idea/
 .claude/
+.commandcode/
 .workbuddy/
 tools/cp.txt
 __pycache__/
