@@ -39,14 +39,14 @@ public final class FaceBound {
     public boolean outer() { return isOuter(); }
 
     /**
-     * Creates a FaceBound with a given loop and outer flag, with default orientation true.
+     * Creates an outer FaceBound with a given loop and orientation.
      *
      * @param loop the loop
-     * @param outer whether this is an outer boundary
-     * @return new FaceBound
+     * @param orientation orientation relative to the face
+     * @return new FaceBound marked as outer
      */
-    public static FaceBound outer(Loop loop, boolean outer) {
-        return new FaceBound(loop, true, outer);
+    public static FaceBound outer(Loop loop, boolean orientation) {
+        return new FaceBound(loop, orientation, true);
     }
 
     /**

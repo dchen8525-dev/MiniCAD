@@ -45,6 +45,7 @@ import com.minicad.step.model.StepCsgPrimitive;
 import com.minicad.step.syntax.StepParser;
 import com.minicad.topology.Edge;
 import com.minicad.topology.Face;
+import com.minicad.topology.FaceBound;
 import com.minicad.topology.Shell;
 import com.minicad.topology.Solid;
 import com.minicad.topology.Vertex;
@@ -53,6 +54,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -151,6 +153,20 @@ class StepCadBuilderTest {
         assertEquals(false, openShell.closed());
         assertEquals(true, closedShell.closed());
         assertEquals(true, solid.outerShell().closed());
+    }
+
+    @Test
+    void shouldPromoteAReversedFaceBoundToOuterWithoutLosingItsOrientation() {
+        Face face = builder(faceWithReversedBound("FACE_BOUND")).buildFace(11);
+
+        assertReversedOuterBound(face);
+    }
+
+    @Test
+    void shouldKeepOrientationOnAnExplicitlyOuterReversedFaceBound() {
+        Face face = builder(faceWithReversedBound("FACE_OUTER_BOUND")).buildFace(11);
+
+        assertReversedOuterBound(face);
     }
 
     @Test
@@ -3684,6 +3700,30 @@ class StepCadBuilderTest {
 
     private static Plane planeSurface(Face face) {
         return assertInstanceOf(Plane.class, face.surface());
+    }
+
+    private static String faceWithReversedBound(String boundType) {
+        return "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(1.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(1.0,1.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,1.0,0.0));\n"
+        + "#5=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#6=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#7=AXIS2_PLACEMENT_3D('AX',#1,#5,#6);\n"
+        + "#8=PLANE('PL',#7);\n"
+        + "#9=POLY_LOOP('PL',(#1,#2,#3,#4));\n"
+        + "#10=" + boundType + "('FB',#9,.F.);\n"
+        + "#11=ADVANCED_FACE('AF',(#10),#8,.T.);\n"
+        + "ENDSEC;";
+    }
+
+    private static void assertReversedOuterBound(Face face) {
+        FaceBound bound = face.bounds().get(0);
+        assertTrue(bound.isOuter());
+        assertFalse(bound.isOrientation());
+        assertSame(bound, face.outerBound());
+        assertEquals(1.0, face.area(), 1.0e-12);
     }
 
     private static StepCadBuilder builder(String step) {

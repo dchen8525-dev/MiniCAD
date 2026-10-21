@@ -78,7 +78,7 @@ public final class Face {
             return null;
         }
         for (FaceBound bound : bounds) {
-            if (bound.isOrientation()) {
+            if (bound.isOuter()) {
                 return bound;
             }
         }

@@ -14,7 +14,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FaceTest {
 
@@ -27,6 +30,29 @@ class FaceTest {
         );
 
         assertEquals(1, face.getBounds().size());
+    }
+
+    @Test
+    void shouldPreserveOrientationOnAnOuterBound() {
+        FaceBound bound = FaceBound.outer(squareLoop(), false);
+
+        assertTrue(bound.isOuter());
+        assertFalse(bound.isOrientation());
+    }
+
+    @Test
+    void shouldFindTheOuterBoundByItsOuterFlagRatherThanItsOrientation() {
+        FaceBound inner = FaceBound.inner(squareLoop(), true);
+        FaceBound outer = FaceBound.outer(squareLoop(), false);
+
+        Face face = new Face(
+                new Plane(new CartesianPoint(0.0, 0.0, 0.0), Direction3.from(new Vector3(0.0, 0.0, 1.0))),
+                List.of(inner, outer),
+                true
+        );
+
+        assertSame(outer, face.outerBound());
+        assertEquals(List.of(inner), face.innerBounds());
     }
 
     @Test
