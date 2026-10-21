@@ -20,8 +20,9 @@ mesh usable by the bundled browser viewer.
   JSON (fastjson2) for rendering.
 - **Browser viewer** — embedded Jetty web app serving a Three.js viewer
   (`src/main/resources/static`).
-- **EXPRESS code generation** — `tools` package generates Java model classes and
-  resolver methods from an EXPRESS schema, plus a capability scanner/report.
+- **EXPRESS tooling** — the `tool` package parses EXPRESS schema catalogs and
+  inventories entity/capability coverage; the 1,265 generated STEP model
+  classes are checked in under `step.model`.
 - **Samples** — real-world `.step` files under `samples/` used as regression
   fixtures.
 
@@ -78,24 +79,32 @@ src/main/java/com/minicad/
   helper/       unit extraction, math utilities
   preview/      tessellation and UV mapping for preview mesh
   step/         STEP syntax (ANTLR) and semantic resolution
-  tool/         EXPRESS schema → Java code generation (see below)
+  tool/         EXPRESS schema parsing and entity-coverage tooling (see below)
   topology/     solids, faces, loops, edges, validation
 ```
 
-### The `tool` code-generation package
+### The `tool` package
 
 `com.minicad.tool` is a development-time CLI, not part of the runtime
-pipeline: `ExpressSchemaParser` reads an EXPRESS schema catalog,
-`CapabilityScanner`/`EntityPrioritizer` inventory entity coverage, and
-`ModelClassGenerator`/`ResolverMethodGenerator` emit the 1265 generated
-classes in `com.minicad.step.model` plus their resolver dispatch table.
-The generated sources are checked in and excluded from coverage and
-formatting gates; the generator itself has no unit tests (it is exercised
-by regenerating and diffing). Entry points expose `main` methods and are
-run ad hoc, e.g.:
+pipeline: `ExpressSchemaParser` reads an EXPRESS schema catalog and
+`CapabilityScanner`/`EntityPrioritizer` inventory entity coverage.
+
+The 1,265 classes in `com.minicad.step.model` and their resolver dispatch
+table were generated once from a STEP AP242 catalog and are checked in;
+those sources are excluded from the coverage and formatting gates. The two
+emitters that produced them, `ModelClassGenerator` and
+`ResolverMethodGenerator`, have been retired together with their shared
+naming helper: their `generated/` catalog inputs were never checked in, and
+their output targeted a per-domain package layout and an id-only value
+contract that the flat `step.model` package has since replaced with
+`AbstractStepEntity`. Both remain available in git history should the
+pipeline ever be revived.
+
+Entry points expose `main` methods and are run ad hoc, e.g.:
 
 ```sh
-mvn -q exec:java -Dexec.mainClass=com.minicad.tool.ModelClassGenerator
+mvn -q exec:java -Dexec.mainClass=com.minicad.tool.ExpressSchemaParser \
+    -Dexec.args="ap242.exp catalog.json"
 ```
 
 ## Documentation
