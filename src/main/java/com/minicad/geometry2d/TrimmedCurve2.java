@@ -101,7 +101,10 @@ public final class TrimmedCurve2 implements Curve2 {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TrimmedCurve2 that = (TrimmedCurve2) o;
-        return Objects.equals(basisCurve, that.basisCurve) && trimParamStart() == that.trimParamStart() && trimParamEnd() == that.trimParamEnd() && senseAgreement() == that.senseAgreement();
+        return Objects.equals(basisCurve, that.basisCurve)
+                && Double.compare(trimParamStart(), that.trimParamStart()) == 0
+                && Double.compare(trimParamEnd(), that.trimParamEnd()) == 0
+                && senseAgreement() == that.senseAgreement();
     }
 
     @Override
@@ -136,17 +139,9 @@ public final class TrimmedCurve2 implements Curve2 {
         // First find the parameter on the trimmed curve
         // Then map to the basis curve parameter
         List<Point2> samples = sample(256);
-        int closestIdx = 0;
-        double minDist = point.distanceTo(samples.get(0));
-        for (int i = 1; i < samples.size(); i++) {
-            double dist = point.distanceTo(samples.get(i));
-            if (dist < minDist) {
-                minDist = dist;
-                closestIdx = i;
-            }
-        }
+        int closestIndex = TrimmedWindowWalk.nearestIndex(samples, point, POINT_DISTANCE);
         // Convert to basis curve parameter
-        double trimmedParam = (double) closestIdx / (samples.size() - 1);
+        double trimmedParam = (double) closestIndex / (samples.size() - 1);
         double basisParameter = window.basisParameter(trimmedParam);
         if (basisCurve instanceof TrimmedCurve2) {
             TrimmedCurve2 trimmedBasis = (TrimmedCurve2) basisCurve;

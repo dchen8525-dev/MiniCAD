@@ -102,7 +102,10 @@ public final class TrimmedCurve3 implements Curve3 {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TrimmedCurve3 that = (TrimmedCurve3) o;
-        return Objects.equals(basisCurve, that.basisCurve) && trimParamStart() == that.trimParamStart() && trimParamEnd() == that.trimParamEnd() && senseAgreement() == that.senseAgreement();
+        return Objects.equals(basisCurve, that.basisCurve)
+                && Double.compare(trimParamStart(), that.trimParamStart()) == 0
+                && Double.compare(trimParamEnd(), that.trimParamEnd()) == 0
+                && senseAgreement() == that.senseAgreement();
     }
 
     @Override

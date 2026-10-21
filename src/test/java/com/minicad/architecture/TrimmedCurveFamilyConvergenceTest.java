@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -67,6 +68,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li>the two behaviours 2D was missing are enforced by both, so a later edit
  *       cannot quietly restore the delegation;</li>
  *   <li>the retired 2D spellings stay retired;</li>
+ *   <li>2D's parameter-onto-the-basis search asks the walk for the nearest
+ *       sample, with its retired inline scan as the bit-for-bit oracle;</li>
+ *   <li>both wrappers' {@code equals} draws the same signed-zero line as their
+ *       {@code hashCode}, so equal wrappers cannot hash apart;</li>
  *   <li>the window names no geometry type, so {@code common} stays a leaf.</li>
  * </ul>
  */
@@ -240,6 +245,67 @@ class TrimmedCurveFamilyConvergenceTest {
     }
 
     @Test
+    @DisplayName("2D's parameter-onto-the-basis search asks the walk for the nearest sample")
+    void theParameterSearchUsesTheSharedWalk() throws IOException {
+        String body = bodyOf(commentless(read(Paths.get(TWO_D))), "parameterOnUnderlyingCurve");
+        assertTrue(
+                body.contains("TrimmedWindowWalk.nearestIndex("),
+                "TrimmedCurve2 re-implemented the nearest-sample scan. The walk already owns that rule, "
+                        + "and 3D never had a second copy of it.");
+        assertFalse(
+                body.contains("Double.POSITIVE_INFINITY"),
+                "TrimmedCurve2 resurrected its inline scan, which seeded the minimum by hand.");
+    }
+
+    @Test
+    @DisplayName("the 2D parameter onto the basis still matches the retired scan, bit for bit")
+    void theParameterOntoTheBasisMatchesTheRetiredScan() {
+        double[][] windows = {{0.0, 10.0}, {2.0, 8.0}, {-3.0, 4.5}};
+        for (double[] window : windows) {
+            for (boolean sense : new boolean[] {true, false}) {
+                Line2 basis = line2();
+                TrimmedCurve2 two = new TrimmedCurve2(basis, window[0], window[1], sense);
+                for (int step = 0; step <= 8; step++) {
+                    Point2 point = two.pointAt(step / 8.0);
+                    assertEquals(
+                            retiredParameterOnUnderlyingCurve(basis, window, sense, point),
+                            two.parameterOnUnderlyingCurve(point),
+                            0.0,
+                            "the shared nearest-index walk changed the basis parameter: " + describe(window, sense));
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("both dimensions keep equals and hashCode consistent on a signed-zero trim")
+    void bothDimensionsKeepEqualsAndHashConsistentOnSignedZero() {
+        Line2 basis2 = line2();
+        Line3 basis3 = line3();
+        TrimmedCurve2 zero2 = new TrimmedCurve2(basis2, 0.0, 10.0, true);
+        TrimmedCurve2 negativeZero2 = new TrimmedCurve2(basis2, -0.0, 10.0, true);
+        TrimmedCurve3 zero3 = new TrimmedCurve3(basis3, 0.0, 10.0, true);
+        TrimmedCurve3 negativeZero3 = new TrimmedCurve3(basis3, -0.0, 10.0, true);
+
+        // `-0.0 == 0.0` used to make equals true while Double.hashCode saw two
+        // different bit patterns, so an equal pair could hash apart. Double.compare
+        // draws the same line as the hash.
+        assertNotEquals(zero2, negativeZero2, "2D: -0.0 and 0.0 are different trim bits");
+        assertNotEquals(negativeZero2, zero2, "2D equality must stay symmetric");
+        assertNotEquals(zero3, negativeZero3, "3D: -0.0 and 0.0 are different trim bits");
+        assertNotEquals(negativeZero3, zero3, "3D equality must stay symmetric");
+
+        assertEquals(zero2, new TrimmedCurve2(basis2, 0.0, 10.0, true));
+        assertEquals(negativeZero2, new TrimmedCurve2(basis2, -0.0, 10.0, true));
+        assertEquals(zero3, new TrimmedCurve3(basis3, 0.0, 10.0, true));
+        assertEquals(negativeZero3, new TrimmedCurve3(basis3, -0.0, 10.0, true));
+        assertEquals(zero2.hashCode(), new TrimmedCurve2(basis2, 0.0, 10.0, true).hashCode());
+        assertEquals(negativeZero2.hashCode(), new TrimmedCurve2(basis2, -0.0, 10.0, true).hashCode());
+        assertEquals(zero3.hashCode(), new TrimmedCurve3(basis3, 0.0, 10.0, true).hashCode());
+        assertEquals(negativeZero3.hashCode(), new TrimmedCurve3(basis3, -0.0, 10.0, true).hashCode());
+    }
+
+    @Test
     @DisplayName("the window names no geometry type, so common stays a leaf")
     void theWindowNamesNoGeometryType() throws IOException {
         String text = read(Paths.get(HOME));
@@ -302,6 +368,31 @@ class TrimmedCurveFamilyConvergenceTest {
 
     private static boolean retiredReversesTangents(double start, double end, boolean senseAgreement) {
         return (end < start) ^ !senseAgreement;
+    }
+
+    /**
+     * The retired 2D body: sample the trimmed curve at 256 segments, take the
+     * nearest sample by a hand-seeded scan, then map that index back through the
+     * window. Kept inline so a change to the shared walk's tie rule or segment
+     * count shows up as a bit difference here.
+     */
+    private static double retiredParameterOnUnderlyingCurve(
+            Line2 basis, double[] window, boolean senseAgreement, Point2 point) {
+        List<Point2> samples = new ArrayList<>(257);
+        for (int index = 0; index <= 256; index++) {
+            samples.add(basis.pointAt(
+                    retiredBasisParameter(window[0], window[1], senseAgreement, (double) index / 256)));
+        }
+        int closestIndex = 0;
+        double minDistance = point.distanceTo(samples.get(0));
+        for (int index = 1; index < samples.size(); index++) {
+            double distance = point.distanceTo(samples.get(index));
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = index;
+            }
+        }
+        return retiredBasisParameter(window[0], window[1], senseAgreement, (double) closestIndex / (samples.size() - 1));
     }
 
     private static String describe(double[] window, boolean sense) {
