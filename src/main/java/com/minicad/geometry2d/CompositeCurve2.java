@@ -35,7 +35,7 @@ public final class CompositeCurve2 implements Curve2 {
      * @return segment count
      */
     public int segmentCount() {
-        return segments == null ? 0 : segments.size();
+        return segments.size();
     }
 
     /**
@@ -46,26 +46,33 @@ public final class CompositeCurve2 implements Curve2 {
      */
     public double parameterOf(Point2 point) {
         Preconditions.requireNonNull(point, "point");
-        if (segments == null || segments.isEmpty()) {
-            return 0.0;
-        }
-        // Find which segment contains the point and return parameter
-        double accumulatedLength = 0.0;
+        // A trimmed segment can answer with the fraction along itself directly, so
+        // keep that path for the accuracy it already has. It must not be derived
+        // from parameterOnUnderlyingCurve: that one descends through a nested trim
+        // to the innermost basis, whose parameter is not a parameter of this
+        // segment and would land far outside the segment's window.
         for (int i = 0; i < segments.size(); i++) {
-            Curve2 seg = segments.get(i);
-            if (seg.contains(point)) {
-                double local = 0.0;
-                if (seg instanceof TrimmedCurve2) {
-                    TrimmedCurve2 trimmed = (TrimmedCurve2) seg;
-                    double underlying = trimmed.parameterOnUnderlyingCurve(point);
-                    double span = trimmed.getTrimParamEnd() - trimmed.getTrimParamStart();
-                    local = (underlying - trimmed.getTrimParamStart()) / span;
-                    if (!trimmed.isSenseAgreement()) local = 1.0 - local;
-                }
-                return (i + local) / segments.size();
+            Curve2 segment = segments.get(i);
+            if (segment instanceof TrimmedCurve2 && segment.contains(point)) {
+                TrimmedCurve2 trimmed = (TrimmedCurve2) segment;
+                return (i + trimmed.trimmedParameterOf(point)) / segments.size();
             }
         }
-        return 1.0;
+        // Every other segment only exposes the curve's own [0, 1] parameter, which
+        // is shared across the whole composite. Mirror CompositeCurve3.parameterAt:
+        // take the nearest sample instead of assuming the point sits at the start
+        // of whichever segment reports containment (unbounded lines all do).
+        int sampleCount = 1024;
+        int bestIndex = 0;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i <= sampleCount; i++) {
+            double distance = point.distanceTo(pointAt((double) i / sampleCount));
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = i;
+            }
+        }
+        return (double) bestIndex / sampleCount;
     }
 
     @Override
@@ -89,24 +96,29 @@ public final class CompositeCurve2 implements Curve2 {
     @Override
     public Point2 pointAt(double parameter) {
         Preconditions.requireFinite(parameter, "parameter");
-        if (segments == null || segments.isEmpty()) {
-            return new Point2(0, 0);
-        }
         // Map parameter to segment
         int n = segments.size();
         double segmentParam = parameter * n;
         int segmentIndex = (int) segmentParam;
         segmentIndex = Math.max(0, Math.min(segmentIndex, n - 1));
         double localParam = segmentParam - segmentIndex;
-        return segments.get(segmentIndex).pointAt(localParam);
+        Curve2 segment = segments.get(segmentIndex);
+        // A B-spline's natural domain is its knot range, not [0, 1]; mirror
+        // CompositeCurve3.pointAt before handing the local parameter over. The
+        // rational twin carries the same domain, so it needs the same remap.
+        if (segment instanceof BSplineCurve2) {
+            BSplineCurve2 spline = (BSplineCurve2) segment;
+            localParam = spline.startParameter() + localParam * (spline.endParameter() - spline.startParameter());
+        } else if (segment instanceof RationalBSplineCurve2) {
+            RationalBSplineCurve2 spline = (RationalBSplineCurve2) segment;
+            localParam = spline.startParameter() + localParam * (spline.endParameter() - spline.startParameter());
+        }
+        return segment.pointAt(localParam);
     }
 
     @Override
     public boolean contains(Point2 point) {
         Preconditions.requireNonNull(point, "point");
-        if (segments == null || segments.isEmpty()) {
-            return false;
-        }
         for (Curve2 segment : segments) {
             if (segment.contains(point)) {
                 return true;
@@ -118,9 +130,6 @@ public final class CompositeCurve2 implements Curve2 {
     @Override
     public List<Point2> sample(int segments) {
         List<Point2> points = new ArrayList<>();
-        if (this.segments == null || this.segments.isEmpty()) {
-            return List.copyOf(points);
-        }
         for (Curve2 seg : this.segments) {
             points.addAll(seg.sample(segments / this.segments.size() + 1));
         }

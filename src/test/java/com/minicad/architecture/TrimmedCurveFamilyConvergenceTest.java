@@ -3,10 +3,12 @@ package com.minicad.architecture;
 import com.minicad.common.GeometryException;
 import com.minicad.common.TrimmedParamRange;
 import com.minicad.geometry.CartesianPoint;
+import com.minicad.geometry.CompositeCurve3;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Line3;
 import com.minicad.geometry.TrimmedCurve3;
 import com.minicad.geometry.Vector3;
+import com.minicad.geometry2d.CompositeCurve2;
 import com.minicad.geometry2d.Direction2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
@@ -72,6 +74,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *       sample, with its retired inline scan as the bit-for-bit oracle;</li>
  *   <li>both wrappers' {@code equals} draws the same signed-zero line as their
  *       {@code hashCode}, so equal wrappers cannot hash apart;</li>
+ *   <li>the boilerplate the two wrappers still share - accessors, the value
+ *       contract and the segment-fraction search - stays a mirror image. It is
+ *       deliberately not pulled into a base type: a generic base would cost more
+ *       lines than it removes and add an indirection, so the copies are pinned
+ *       instead of folded. The one asymmetry, 2D's parameter-onto-the-basis
+ *       entry point, is named here so a later edit cannot mistake it for
+ *       drift;</li>
  *   <li>the window names no geometry type, so {@code common} stays a leaf.</li>
  * </ul>
  */
@@ -85,6 +94,17 @@ class TrimmedCurveFamilyConvergenceTest {
     private static final double[][] WINDOWS = {
         {0.0, 10.0}, {2.0, 8.0}, {8.0, 2.0}, {-3.0, 4.5}, {2.0, 2.0},
     };
+
+    /**
+     * The members the two wrappers still spell identically once their dimension
+     * tokens are neutralised. They are kept as parallel copies rather than folded
+     * into a base type, so the guard holds them together instead.
+     */
+    private static final List<String> MIRRORED_MEMBERS = List.of(
+            "getBasisCurve", "getTrimParamStart", "getTrimParamEnd", "isSenseAgreement",
+            "basisCurve", "trimParamStart", "trimParamEnd", "senseAgreement",
+            "trimStart", "trimEnd", "pointAt", "tangentAt", "contains",
+            "equals", "hashCode", "toString", "closestPointTo", "sample", "trimmedParameterOf");
 
     @Test
     @DisplayName("both dimensions map the window onto the basis parameter identically")
@@ -247,14 +267,23 @@ class TrimmedCurveFamilyConvergenceTest {
     @Test
     @DisplayName("2D's parameter-onto-the-basis search asks the walk for the nearest sample")
     void theParameterSearchUsesTheSharedWalk() throws IOException {
-        String body = bodyOf(commentless(read(Paths.get(TWO_D))), "parameterOnUnderlyingCurve");
+        String code = commentless(read(Paths.get(TWO_D)));
+        String body = bodyOf(code, "parameterOnUnderlyingCurve");
         assertTrue(
-                body.contains("TrimmedWindowWalk.nearestIndex("),
+                body.contains("trimmedParameterOf("),
+                "TrimmedCurve2.parameterOnUnderlyingCurve must take the fraction along the trimmed curve "
+                        + "from trimmedParameterOf. Re-deriving it from the innermost basis parameter is what "
+                        + "made a nested trim land outside the segment window.");
+        String search = bodyOf(code, "trimmedParameterOf");
+        assertTrue(
+                search.contains("TrimmedWindowWalk.nearestIndex("),
                 "TrimmedCurve2 re-implemented the nearest-sample scan. The walk already owns that rule, "
                         + "and 3D never had a second copy of it.");
-        assertFalse(
-                body.contains("Double.POSITIVE_INFINITY"),
-                "TrimmedCurve2 resurrected its inline scan, which seeded the minimum by hand.");
+        for (String bodyUnderTest : List.of(body, search)) {
+            assertFalse(
+                    bodyUnderTest.contains("Double.POSITIVE_INFINITY"),
+                    "TrimmedCurve2 resurrected its inline scan, which seeded the minimum by hand.");
+        }
     }
 
     @Test
@@ -272,6 +301,64 @@ class TrimmedCurveFamilyConvergenceTest {
                             two.parameterOnUnderlyingCurve(point),
                             0.0,
                             "the shared nearest-index walk changed the basis parameter: " + describe(window, sense));
+                }
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("the remaining boilerplate stays a mirror image across the two dimensions")
+    void theRemainingBoilerplateStaysMirrored() throws IOException {
+        String twoDimensional = commentless(read(Paths.get(TWO_D)));
+        String threeDimensional = commentless(read(Paths.get(THREE_D)));
+        for (String member : MIRRORED_MEMBERS) {
+            assertEquals(
+                    dimensionFree(bodyOf(twoDimensional, member)),
+                    dimensionFree(bodyOf(threeDimensional, member)),
+                    "the two wrappers no longer agree on " + member + ". These bodies are deliberate "
+                            + "parallel copies: a generic base would cost more lines than it removes, so a "
+                            + "change on one side has to be made on the other. If the change is the fold "
+                            + "itself, remove the member from MIRRORED_MEMBERS and update the class javadoc.");
+        }
+    }
+
+    @Test
+    @DisplayName("the innermost-basis parameter entry point stays 2D-only")
+    void theInnermostBasisEntryPointStaysTwoDimensionalOnly() throws IOException {
+        assertTrue(
+                declares(read(Paths.get(TWO_D)), "parameterOnUnderlyingCurve"),
+                "StepTrimResolver needs the parameter on the innermost basis, which only 2D offers");
+        assertFalse(
+                declares(read(Paths.get(THREE_D)), "parameterOnUnderlyingCurve"),
+                "3D never had this entry point. Adding it here without a caller would be a new API, not "
+                        + "convergence; a composite segment needs trimmedParameterOf instead.");
+        for (String path : List.of(TWO_D, THREE_D)) {
+            assertTrue(
+                    declares(read(Paths.get(path)), "trimmedParameterOf"),
+                    path + " lost the fraction along a trimmed segment, which its composite needs. The two "
+                            + "wrappers answer this question the same way; neither may fall back to a "
+                            + "basis parameter or to sampling the whole composite.");
+        }
+    }
+
+    @Test
+    @DisplayName("both dimensions round-trip a composite parameter through a trimmed segment")
+    void bothDimensionsRoundTripACompositeParameter() {
+        double[][] windows = {{0.0, 10.0}, {2.0, 8.0}, {-3.0, 4.5}};
+        for (double[] window : windows) {
+            for (boolean sense : new boolean[] {true, false}) {
+                CompositeCurve2 two = new CompositeCurve2(List.of(
+                        new TrimmedCurve2(line2(), window[0], window[1], sense),
+                        new Line2(p2(100.0, 0.0), new Direction2(1.0, 0.0))));
+                CompositeCurve3 three = new CompositeCurve3(List.of(
+                        new TrimmedCurve3(line3(), window[0], window[1], sense),
+                        new Line3(p3(100.0, 0.0, 0.0), new Direction3(1.0, 0.0, 0.0))));
+                for (int step = 0; step < 8; step++) {
+                    double parameter = (step + 0.5) / 16.0;
+                    String reason = "a composite parameter no longer round-trips through the trimmed "
+                            + "segment: " + describe(window, sense);
+                    assertEquals(parameter, two.parameterOf(two.pointAt(parameter)), 0.0, reason);
+                    assertEquals(parameter, three.parameterAt(three.pointAt(parameter)), 0.0, reason);
                 }
             }
         }
@@ -303,6 +390,60 @@ class TrimmedCurveFamilyConvergenceTest {
         assertEquals(negativeZero2.hashCode(), new TrimmedCurve2(basis2, -0.0, 10.0, true).hashCode());
         assertEquals(zero3.hashCode(), new TrimmedCurve3(basis3, 0.0, 10.0, true).hashCode());
         assertEquals(negativeZero3.hashCode(), new TrimmedCurve3(basis3, -0.0, 10.0, true).hashCode());
+    }
+
+    @Test
+    @DisplayName("both dimensions answer the whole value contract, including toString")
+    void bothDimensionsAnswerTheWholeValueContract() {
+        Line2 basis2 = line2();
+        Line3 basis3 = line3();
+        TrimmedCurve2 two = new TrimmedCurve2(basis2, 2.0, 8.0, true);
+        TrimmedCurve3 three = new TrimmedCurve3(basis3, 2.0, 8.0, true);
+
+        // The self, null and wrong-class branches are the ones a caller reaches
+        // through a collection; the mirror guard only compares the bodies.
+        assertTrue(two.equals(two), "2D must recognise itself");
+        assertTrue(three.equals(three), "3D must recognise itself");
+        assertFalse(two.equals(null), "2D must reject null");
+        assertFalse(three.equals(null), "3D must reject null");
+        assertFalse(two.equals("not a trimmed curve"), "2D must reject another class");
+        assertFalse(three.equals("not a trimmed curve"), "3D must reject another class");
+        assertFalse(two.equals(three), "a 2D wrapper must not equal its 3D twin");
+        assertFalse(three.equals(two), "a 3D wrapper must not equal its 2D twin");
+
+        assertEquals(two, new TrimmedCurve2(basis2, 2.0, 8.0, true));
+        assertEquals(three, new TrimmedCurve3(basis3, 2.0, 8.0, true));
+        assertNotEquals(two, new TrimmedCurve2(new Line2(p2(0.0, 1.0), new Direction2(1.0, 0.0)), 2.0, 8.0, true),
+                "2D: a different basis is a different value");
+        assertNotEquals(three, new TrimmedCurve3(new Line3(p3(0.0, 1.0, 0.0), new Direction3(1.0, 0.0, 0.0)),
+                2.0, 8.0, true), "3D: a different basis is a different value");
+        assertNotEquals(two, new TrimmedCurve2(basis2, 2.0, 9.0, true), "2D: a different end is a different value");
+        assertNotEquals(three, new TrimmedCurve3(basis3, 2.0, 9.0, true), "3D: a different end is a different value");
+        assertNotEquals(two, new TrimmedCurve2(basis2, 2.0, 8.0, false), "2D: a different sense is a different value");
+        assertNotEquals(three, new TrimmedCurve3(basis3, 2.0, 8.0, false), "3D: a different sense is a different value");
+
+        assertTrue(two.toString().startsWith("TrimmedCurve2{"), "2D toString must name its wrapper: " + two);
+        assertTrue(three.toString().startsWith("TrimmedCurve3{"), "3D toString must name its wrapper: " + three);
+        for (String rendered : List.of(two.toString(), three.toString())) {
+            for (String key : List.of("basisCurve=", "trimParamStart=", "trimParamEnd=", "senseAgreement=")) {
+                assertTrue(rendered.contains(key), "toString lost " + key + ": " + rendered);
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("2D's parameter search descends into a trimmed basis")
+    void theParameterSearchDescendsIntoATrimmedBasis() {
+        TrimmedCurve2 inner = new TrimmedCurve2(line2(), 2.0, 8.0, true);
+        TrimmedCurve2 outer = new TrimmedCurve2(inner, 0.25, 0.75, true);
+
+        Point2 midpoint = outer.pointAt(0.5);
+        assertEquals(5.0, midpoint.x(), 1e-12, "the nested windows must compose to the line's midpoint");
+        assertEquals(
+                5.0,
+                outer.parameterOnUnderlyingCurve(midpoint),
+                1e-9,
+                "the search must return the innermost basis parameter, not the intermediate trimmed one");
     }
 
     @Test
@@ -475,6 +616,23 @@ class TrimmedCurveFamilyConvergenceTest {
 
     private static String commentless(String text) {
         return text.replaceAll("(?s)/\\*.*?\\*/", "").replaceAll("//[^\n]*", "");
+    }
+
+    /**
+     * Neutralises the four dimension-specific type names and removes whitespace,
+     * so the two wrappers' bodies can be compared token for token. The type names
+     * are the only difference the copies are allowed to have.
+     */
+    private static String dimensionFree(String body) {
+        return body.replace("CartesianPoint", "POINT")
+                .replace("Point2", "POINT")
+                .replace("Vector3", "VECTOR")
+                .replace("Vector2", "VECTOR")
+                .replace("TrimmedCurve3", "TRIMMED")
+                .replace("TrimmedCurve2", "TRIMMED")
+                .replace("Curve3", "CURVE")
+                .replace("Curve2", "CURVE")
+                .replaceAll("\\s+", "");
     }
 
     private static String read(Path path) throws IOException {

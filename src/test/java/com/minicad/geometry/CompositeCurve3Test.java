@@ -221,6 +221,42 @@ class CompositeCurve3Test {
     }
 
     @Test
+    void compositeCurveMapsNormalizedParameterIntoRationalBsplineDomain() {
+        RationalBSplineCurve3 rational = new RationalBSplineCurve3(
+            1,
+            List.of(
+                new CartesianPoint(0, 0, 0),
+                new CartesianPoint(1, 0, 0),
+                new CartesianPoint(2, 0, 0)
+            ),
+            List.of(1.0, 1.0, 1.0),
+            List.of(2, 1, 2),
+            List.of(0.0, 1.0, 2.0)
+        );
+
+        CompositeCurve3 composite = new CompositeCurve3(List.of(rational));
+
+        // The rational twin has the same [0, 2] knot domain as the plain spline.
+        assertEquals(1.0, composite.pointAt(0.5).x(), 1e-10);
+        assertEquals(0.5, composite.parameterAt(new CartesianPoint(1.0, 0.0, 0.0)), 1e-3);
+    }
+
+    @Test
+    void compositeCurveKeepsANestedTrimInsideItsSegment() {
+        TrimmedCurve3 inner =
+                new TrimmedCurve3(new Line3(new CartesianPoint(0, 0, 0), new Direction3(1, 0, 0)), 2.0, 8.0, true);
+        TrimmedCurve3 outer = new TrimmedCurve3(inner, 0.25, 0.75, true);
+
+        CompositeCurve3 composite = new CompositeCurve3(List.of(outer));
+
+        assertEquals(5.0, composite.pointAt(0.5).x(), 1e-12);
+        // The point sits half way along the outer segment, whose window is a
+        // fraction of the inner curve. The innermost basis parameter is 5.0, so
+        // a composite that reported that value would be far outside its segment.
+        assertEquals(0.5, composite.parameterAt(new CartesianPoint(5.0, 0.0, 0.0)), 1e-9);
+    }
+
+    @Test
     void compositeCurveLengthRespectsLineScale() {
         Line3 scaledLine = new Line3(
             new CartesianPoint(0, 0, 0),

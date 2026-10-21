@@ -17,6 +17,10 @@ import java.util.Objects;
  * lives in {@link TrimmedParamRange}, shared with {@code geometry2d.TrimmedCurve2}.
  * This class is the 3D half of a pair that is the same object up to the point
  * type; the dimension enters only as {@link #POINT_DISTANCE} and {@code this::pointAt}.
+ * The accessors, the value contract and the segment-fraction search below stay a
+ * mirror image of the 2D wrapper on purpose: a generic base would add an
+ * indirection and cost more lines than the copies it removes, so a guard keeps
+ * the two bodies in step instead.
  * </p>
  *
  * @param basisCurve supported basis curve
@@ -127,5 +131,24 @@ public final class TrimmedCurve3 implements Curve3 {
     @Override
     public List<CartesianPoint> sample(int segments) {
         return window.sample(segments, this::pointAt);
+    }
+
+    /**
+     * Parameter of this trimmed curve itself, in {@code [0, 1]}, nearest to the
+     * given point.
+     *
+     * <p>The 2D wrapper carries the same method for the same caller: a composite
+     * needs the fraction along this segment, not a parameter on the innermost
+     * basis, or a nested trim would map a point far outside the segment's
+     * window.</p>
+     *
+     * @param point point on or near the trimmed curve
+     * @return parameter in the trimmed curve's own {@code [0, 1]} range
+     */
+    double trimmedParameterOf(CartesianPoint point) {
+        Preconditions.requireNonNull(point, "point");
+        List<CartesianPoint> samples = sample(256);
+        int closestIndex = TrimmedWindowWalk.nearestIndex(samples, point, POINT_DISTANCE);
+        return (double) closestIndex / (samples.size() - 1);
     }
 }

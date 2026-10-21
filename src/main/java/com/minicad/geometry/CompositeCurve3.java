@@ -65,6 +65,9 @@ public final class CompositeCurve3 implements Curve3 {
         if (segment instanceof BSplineCurve3) {
             BSplineCurve3 spline = (BSplineCurve3) segment;
             localParam = spline.startParameter() + localParam * (spline.endParameter() - spline.startParameter());
+        } else if (segment instanceof RationalBSplineCurve3) {
+            RationalBSplineCurve3 spline = (RationalBSplineCurve3) segment;
+            localParam = spline.startParameter() + localParam * (spline.endParameter() - spline.startParameter());
         }
         return segment.pointAt(localParam);
     }
@@ -105,6 +108,16 @@ public final class CompositeCurve3 implements Curve3 {
     @Override
     public double parameterAt(CartesianPoint point) {
         Preconditions.requireNonNull(point, "point");
+        // CompositeCurve2.parameterOf takes the same path for the same reason:
+        // the fraction along the segment is a parameter of the composite, while
+        // the innermost basis parameter is not.
+        for (int i = 0; i < segments.size(); i++) {
+            Curve3 segment = segments.get(i);
+            if (segment instanceof TrimmedCurve3 && segment.contains(point)) {
+                TrimmedCurve3 trimmed = (TrimmedCurve3) segment;
+                return (i + trimmed.trimmedParameterOf(point)) / segments.size();
+            }
+        }
         if (segments.size() == 1 && segments.get(0) instanceof BSplineCurve3) {
             BSplineCurve3 spline = (BSplineCurve3) segments.get(0);
             double basisParameter = spline.parameterAt(point);

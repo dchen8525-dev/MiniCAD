@@ -17,6 +17,10 @@ import java.util.Objects;
  * lives in {@link TrimmedParamRange}, shared with {@code geometry.TrimmedCurve3}.
  * This class is the 2D half of a pair that is the same object up to the point
  * type; the dimension enters only as {@link #POINT_DISTANCE} and {@code this::pointAt}.
+ * The accessors, the value contract and the segment-fraction search below stay a
+ * mirror image of the 3D wrapper on purpose: a generic base would add an
+ * indirection and cost more lines than the copies it removes, so a guard keeps
+ * the two bodies in step instead.
  * </p>
  *
  * @param basisCurve underlying supported 2D curve
@@ -136,17 +140,42 @@ public final class TrimmedCurve2 implements Curve2 {
      */
     public double parameterOnUnderlyingCurve(Point2 point) {
         Preconditions.requireNonNull(point, "point");
-        // First find the parameter on the trimmed curve
-        // Then map to the basis curve parameter
-        List<Point2> samples = sample(256);
-        int closestIndex = TrimmedWindowWalk.nearestIndex(samples, point, POINT_DISTANCE);
-        // Convert to basis curve parameter
-        double trimmedParam = (double) closestIndex / (samples.size() - 1);
-        double basisParameter = window.basisParameter(trimmedParam);
+        return parameterOnBasisOf(trimmedParameterOf(point));
+    }
+
+    /**
+     * Maps a parameter of this trimmed curve onto the innermost basis curve,
+     * descending through a trimmed basis if there is one.
+     *
+     * @param trimmedParameter parameter in this curve's own {@code [0, 1]} range
+     * @return parameter on the innermost basis curve
+     */
+    private double parameterOnBasisOf(double trimmedParameter) {
+        double basisParameter = window.basisParameter(trimmedParameter);
         if (basisCurve instanceof TrimmedCurve2) {
             TrimmedCurve2 trimmedBasis = (TrimmedCurve2) basisCurve;
             return trimmedBasis.parameterOnUnderlyingCurve(trimmedBasis.pointAt(basisParameter));
         }
         return basisParameter;
+    }
+
+    /**
+     * Parameter of this trimmed curve itself, in {@code [0, 1]}, nearest to the
+     * given point.
+     *
+     * <p>Deliberately separate from {@link #parameterOnUnderlyingCurve(Point2)}:
+     * that one descends through a trimmed basis to the innermost parameter, which
+     * is what a caller looking at the geometry wants but not a parameter of this
+     * segment. A composite needs the fraction along this segment, or a nested trim
+     * would map a point to a basis parameter far outside the segment's window.</p>
+     *
+     * @param point point on or near the trimmed curve
+     * @return parameter in the trimmed curve's own {@code [0, 1]} range
+     */
+    double trimmedParameterOf(Point2 point) {
+        Preconditions.requireNonNull(point, "point");
+        List<Point2> samples = sample(256);
+        int closestIndex = TrimmedWindowWalk.nearestIndex(samples, point, POINT_DISTANCE);
+        return (double) closestIndex / (samples.size() - 1);
     }
 }
