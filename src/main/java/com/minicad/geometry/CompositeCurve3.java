@@ -118,10 +118,20 @@ public final class CompositeCurve3 implements Curve3 {
                 return (i + trimmed.trimmedParameterOf(point)) / segments.size();
             }
         }
-        if (segments.size() == 1 && segments.get(0) instanceof BSplineCurve3) {
-            BSplineCurve3 spline = (BSplineCurve3) segments.get(0);
-            double basisParameter = spline.parameterAt(point);
-            return (basisParameter - spline.startParameter()) / (spline.endParameter() - spline.startParameter());
+        if (segments.size() == 1) {
+            Curve3 only = segments.get(0);
+            if (only instanceof BSplineCurve3) {
+                BSplineCurve3 spline = (BSplineCurve3) only;
+                double basisParameter = spline.parameterAt(point);
+                return (basisParameter - spline.startParameter())
+                        / (spline.endParameter() - spline.startParameter());
+            }
+            if (only instanceof RationalBSplineCurve3) {
+                RationalBSplineCurve3 spline = (RationalBSplineCurve3) only;
+                double basisParameter = spline.parameterAt(point);
+                return (basisParameter - spline.startParameter())
+                        / (spline.endParameter() - spline.startParameter());
+            }
         }
         int sampleCount = 1024;
         int bestIndex = 0;
@@ -142,7 +152,17 @@ public final class CompositeCurve3 implements Curve3 {
         double scaled = Math.max(0.0, Math.min(1.0, parameter)) * count;
         int index = Math.min((int) scaled, count - 1);
         double local = scaled - index;
-        return segments.get(index).tangentAt(local);
+        Curve3 segment = segments.get(index);
+        // The same domain remap pointAt applies: a spline segment is indexed by
+        // its own knot values, not by the composite's [0, 1].
+        if (segment instanceof BSplineCurve3) {
+            BSplineCurve3 spline = (BSplineCurve3) segment;
+            local = spline.startParameter() + local * (spline.endParameter() - spline.startParameter());
+        } else if (segment instanceof RationalBSplineCurve3) {
+            RationalBSplineCurve3 spline = (RationalBSplineCurve3) segment;
+            local = spline.startParameter() + local * (spline.endParameter() - spline.startParameter());
+        }
+        return segment.tangentAt(local);
     }
 
     @Override

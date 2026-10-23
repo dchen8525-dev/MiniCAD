@@ -236,9 +236,40 @@ class CompositeCurve3Test {
 
         CompositeCurve3 composite = new CompositeCurve3(List.of(rational));
 
-        // The rational twin has the same [0, 2] knot domain as the plain spline.
+        // The rational twin has the same [0, 2] knot domain as the plain spline,
+        // and gets the same exact basis-to-normalised inverse instead of sampling.
         assertEquals(1.0, composite.pointAt(0.5).x(), 1e-10);
-        assertEquals(0.5, composite.parameterAt(new CartesianPoint(1.0, 0.0, 0.0)), 1e-3);
+        assertEquals(0.5, composite.parameterAt(new CartesianPoint(1.0, 0.0, 0.0)), 1e-10);
+    }
+
+    @Test
+    void compositeCurveMapsNormalizedParameterIntoBsplineTangent() {
+        List<CartesianPoint> controlPoints = List.of(
+                new CartesianPoint(0, 0, 0), new CartesianPoint(1, 1, 0), new CartesianPoint(2, 0, 0));
+        List<Curve3> splines = List.of(
+                new BSplineCurve3(1, controlPoints, List.of(2, 1, 2), List.of(0.0, 1.0, 2.0)),
+                new RationalBSplineCurve3(
+                        1, controlPoints, List.of(1.0, 1.0, 1.0), List.of(2, 1, 2), List.of(0.0, 1.0, 2.0)));
+
+        for (Curve3 spline : splines) {
+            CompositeCurve3 composite = new CompositeCurve3(List.of(spline));
+            for (double parameter : new double[] {0.25, 0.5, 0.75}) {
+                // The geometric tangent of the composite, taken from its own pointAt,
+                // is the oracle: tangentAt must not fall back to the spline's raw
+                // parameter (0.5) when the composite parameter is halfway.
+                Vector3 expected = expectedTangent(composite, parameter);
+                Vector3 actual = composite.tangentAt(parameter);
+                assertEquals(expected.x(), actual.x(), 1e-4, "x at " + parameter);
+                assertEquals(expected.y(), actual.y(), 1e-4, "y at " + parameter);
+                assertEquals(expected.z(), actual.z(), 1e-4, "z at " + parameter);
+            }
+        }
+    }
+
+    private static Vector3 expectedTangent(CompositeCurve3 composite, double parameter) {
+        double eps = 1.0e-6;
+        Vector3 tangent = composite.pointAt(parameter + eps).subtract(composite.pointAt(parameter - eps));
+        return tangent.scale(1.0 / tangent.norm());
     }
 
     @Test
