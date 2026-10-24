@@ -611,6 +611,52 @@ class StepMeshExporterTest {
     }
 
     @Test
+    void shouldPlaceAssemblyInstancesOfCsgParts() {
+        // A BLOCK has no STEP faces, so the face pass never sees it: the solid
+        // pass drew it once from the part representation and ignored the
+        // instance placement, leaving every CSG instance stacked at the origin.
+        String step =
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=APPLICATION_CONTEXT('mechanical design');\n"
+        + "#2=PRODUCT_CONTEXT('part definition','mechanical',#1);\n"
+        + "#3=PRODUCT('ASM-ROOT','Root','Root assembly',(#2));\n"
+        + "#5=PRODUCT('PRT-CSG','Block','CSG part',(#2));\n"
+        + "#6=PRODUCT_DEFINITION_FORMATION('root-v1','first',#3);\n"
+        + "#8=PRODUCT_DEFINITION_FORMATION('part-v1','first',#5);\n"
+        + "#9=PRODUCT_DEFINITION_CONTEXT('design','released',#1);\n"
+        + "#10=PRODUCT_DEFINITION('root-def','root definition',#6,#9);\n"
+        + "#12=PRODUCT_DEFINITION('part-def','part definition',#8,#9);\n"
+        + "#13=PRODUCT_DEFINITION_SHAPE('root-shape','root shape',#10);\n"
+        + "#15=PRODUCT_DEFINITION_SHAPE('part-shape','part shape',#12);\n"
+        + "#16=CARTESIAN_POINT('O',(0.0,0.0,0.0));\n"
+        + "#17=CARTESIAN_POINT('TX',(5.0,0.0,0.0));\n"
+        + "#19=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#20=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#21=AXIS2_PLACEMENT_3D('AX0',#16,#19,#20);\n"
+        + "#22=AXIS2_PLACEMENT_3D('AX1',#17,#19,#20);\n"
+        + "#24=ITEM_DEFINED_TRANSFORMATION('move-root-part','translate x',#21,#22);\n"
+        + "#26=(GEOMETRIC_REPRESENTATION_CONTEXT(3) REPRESENTATION_CONTEXT('ID','MODEL'));\n"
+        + "#27=BLOCK('B',#21,1.0,2.0,3.0);\n"
+        + "#61=SHAPE_REPRESENTATION('ROOT_REP',(),#26);\n"
+        + "#63=SHAPE_REPRESENTATION('PART_REP',(#27),#26);\n"
+        + "#64=SHAPE_DEFINITION_REPRESENTATION(#13,#61);\n"
+        + "#66=SHAPE_DEFINITION_REPRESENTATION(#15,#63);\n"
+        + "#67=(REPRESENTATION_RELATIONSHIP('rr-root-part','root to part',#61,#63)\n"
+        + "     REPRESENTATION_RELATIONSHIP_WITH_TRANSFORMATION(#24));\n"
+        + "#69=NEXT_ASSEMBLY_USAGE_OCCURRENCE('root-part','part instance','mounted',#10,#12);\n"
+        + "#71=CONTEXT_DEPENDENT_SHAPE_REPRESENTATION(#67,#69);\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;";
+
+        String obj = StepMeshExporter.exportObj(step);
+        assertBounds(obj, 5.0, 6.0, 0.0, 2.0);
+        assertEquals(12, triangleCount(obj));
+    }
+
+    @Test
     void shouldPlaceAssemblyInstancesAtTheirWorldTransforms() throws IOException {
         // Each sample used to export the part once at its local origin: the mesh
         // pass never read NEXT_ASSEMBLY_USAGE_OCCURRENCE or the placement

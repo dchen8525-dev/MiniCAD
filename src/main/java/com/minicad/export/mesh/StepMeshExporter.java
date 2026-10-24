@@ -572,10 +572,10 @@ public final class StepMeshExporter {
         Map<Integer, StepEntity> resolved = compiled.resolved();
         StepCadBuilder builder = compiled.builder();
 
-        // Faces drawn by an assembly instance are emitted once per instance at
+        // Geometry drawn by an assembly instance is emitted once per instance at
         // that instance's world placement; everything else keeps the single
         // local copy this exporter has always written.
-        Map<Integer, List<double[]>> placementsByFace = assemblyPlacementsByFace(resolved);
+        AssemblyPlacements placements = assemblyPlacements(resolved, builder);
 
         // Collect face entities for deterministic triangulation.
         List<com.minicad.step.model.StepFaceEntity> faceEntities = resolved.values().stream()
@@ -586,11 +586,9 @@ public final class StepMeshExporter {
         int faceFailures = 0;
         String firstFaceFailure = null;
         for (com.minicad.step.model.StepFaceEntity faceEntity : faceEntities) {
-            List<double[]> placements = placementsByFace.get(faceEntity.id());
-            int copies = placements == null ? 1 : placements.size();
-            for (int copy = 0; copy < copies; copy++) {
+            for (double[] placement : placementsOrLocal(placements.byFace().get(faceEntity.id()))) {
                 try {
-                    t.setTransform(placements == null ? null : placements.get(copy));
+                    t.setTransform(placement);
                     t.triangulateSemanticFace(faceEntity, builder);
                 } catch (Exception e) {
                     faceFailures++;
@@ -615,28 +613,36 @@ public final class StepMeshExporter {
             if (isSemanticFaceBackedEntity(entity)) {
                 continue;
             }
+            List<double[]> entityPlacements = placements.bySolid().get(id);
             if (builder.canBuildAsSolid(entity)) {
-                try {
-                    Solid solid = builder.buildSolid(id);
-                    t.triangulateSolid(solid);
-                } catch (Exception e) {
-                    solidFailures++;
-                    if (firstSolidFailure == null) {
-                        firstSolidFailure = "#" + id + ": " + e.getMessage();
+                for (double[] placement : placementsOrLocal(entityPlacements)) {
+                    try {
+                        t.setTransform(placement);
+                        Solid solid = builder.buildSolid(id);
+                        t.triangulateSolid(solid);
+                    } catch (Exception e) {
+                        solidFailures++;
+                        if (firstSolidFailure == null) {
+                            firstSolidFailure = "#" + id + ": " + e.getMessage();
+                        }
                     }
                 }
             } else if (ShellHelper.isShellCandidate(entity)) {
-                try {
-                    Shell shell = builder.buildShell(id);
-                    t.triangulateShell(shell);
-                } catch (Exception e) {
-                    shellFailures++;
-                    if (firstShellFailure == null) {
-                        firstShellFailure = "#" + id + ": " + e.getMessage();
+                for (double[] placement : placementsOrLocal(entityPlacements)) {
+                    try {
+                        t.setTransform(placement);
+                        Shell shell = builder.buildShell(id);
+                        t.triangulateShell(shell);
+                    } catch (Exception e) {
+                        shellFailures++;
+                        if (firstShellFailure == null) {
+                            firstShellFailure = "#" + id + ": " + e.getMessage();
+                        }
                     }
                 }
             }
         }
+        t.setTransform(null);
         if (solidFailures > 0) {
             LOG.warn("Skipped {} solid(s) during mesh export; first failure: {}", solidFailures, firstSolidFailure);
         }
@@ -665,16 +671,21 @@ public final class StepMeshExporter {
     }
 
     /**
-     * Maps each face to the world placements of the product-structure instances
-     * that draw it. A lone root product is a plain part, not an assembly: its
-     * representation holds the same geometry the local face pass already writes,
-     * so no placements are returned and the output stays byte-identical.
+     * World placements of the assembly instances that draw each piece of
+     * geometry. Faces are keyed by face id because the semantic face pass owns
+     * them; everything else the solid pass builds (CSG, swept, tessellated) is
+     * keyed by the representation item id.
      *
-     * <p>Faces reachable from more than one node are emitted once per distinct
-     * placement. Faces no representation covers are absent and keep the single
+     * <p>A lone root product is a plain part, not an assembly: its representation
+     * holds the same geometry the local passes already write, so no placements
+     * are returned and the output stays byte-identical.
+     *
+     * <p>Geometry reachable from more than one node is emitted once per distinct
+     * placement. Geometry no representation covers is absent and keeps the single
      * local copy.
      */
-    private static Map<Integer, List<double[]>> assemblyPlacementsByFace(Map<Integer, StepEntity> resolved) {
+    private static AssemblyPlacements assemblyPlacements(
+            Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
         StepAssemblyGraphBuilder.AssemblyGraph graph;
         try {
             graph = StepAssemblyGraphBuilder.build(resolved, 1.0);
@@ -682,24 +693,34 @@ public final class StepMeshExporter {
             // A degenerate placement should not cost the whole export: without a
             // graph the local geometry is still written, exactly as before.
             LOG.warn("Assembly placements unavailable, exporting local geometry only: {}", e.getMessage());
-            return Map.of();
+            return AssemblyPlacements.NONE;
         }
         if (graph.nodes().size() < 2) {
-            return Map.of();
+            return AssemblyPlacements.NONE;
         }
         Map<Integer, List<double[]>> placementsByFace = new LinkedHashMap<>();
+        Map<Integer, List<double[]>> placementsBySolid = new LinkedHashMap<>();
         for (StepAssemblyGraphBuilder.AssemblyNode node : graph.nodes()) {
             for (Integer representationId : node.representationIds()) {
                 StepEntity representationEntity = resolved.get(representationId);
                 if (!(representationEntity instanceof StepRepresentation)) {
                     continue;
                 }
-                for (Integer faceId : representationFaceIds((StepRepresentation) representationEntity, resolved)) {
+                RepresentationGeometry geometry =
+                        representationGeometry((StepRepresentation) representationEntity, resolved, builder);
+                for (Integer faceId : geometry.faceIds()) {
                     addPlacement(placementsByFace, faceId, node.worldMatrix());
+                }
+                for (Integer solidId : geometry.solidIds()) {
+                    addPlacement(placementsBySolid, solidId, node.worldMatrix());
                 }
             }
         }
-        return placementsByFace;
+        return new AssemblyPlacements(placementsByFace, placementsBySolid);
+    }
+
+    private static List<double[]> placementsOrLocal(List<double[]> placements) {
+        return placements == null ? Collections.singletonList(null) : placements;
     }
 
     private static void addPlacement(
@@ -713,26 +734,28 @@ public final class StepMeshExporter {
         placements.add(placement);
     }
 
-    private static Set<Integer> representationFaceIds(
-            StepRepresentation representation, Map<Integer, StepEntity> resolved) {
+    private static RepresentationGeometry representationGeometry(
+            StepRepresentation representation, Map<Integer, StepEntity> resolved, StepCadBuilder builder) {
         Set<Integer> faceIds = new LinkedHashSet<>();
+        Set<Integer> solidIds = new LinkedHashSet<>();
         Set<Integer> visited = new LinkedHashSet<>();
         for (StepRepresentation linked : ShapeRepresentationHelper.linkedRepresentations(representation, resolved)) {
             for (StepEntity item : linked.items()) {
-                collectRepresentationFaceIds(item, faceIds, visited);
+                collectRepresentationIds(item, faceIds, solidIds, visited, builder);
             }
         }
-        return faceIds;
+        return new RepresentationGeometry(faceIds, solidIds);
     }
 
     /**
-     * Collects the faces an assembly representation item draws, descending
+     * Collects the geometry an assembly representation item draws, descending
      * through styled wrappers, solids, surface models and nested representations.
-     * Items with no face-based geometry (placements, mapped items, CSG) fall
-     * through, leaving their faces on the local pass.
+     * Faces are recorded by id for the face pass; geometry the solid pass builds
+     * without faces (CSG, swept, tessellated) is recorded by item id.
      */
-    private static void collectRepresentationFaceIds(
-            StepEntity entity, Set<Integer> faceIds, Set<Integer> visited) {
+    private static void collectRepresentationIds(
+            StepEntity entity, Set<Integer> faceIds, Set<Integer> solidIds,
+            Set<Integer> visited, StepCadBuilder builder) {
         StepEntity item = entity;
         while (item instanceof StepStyledItem || item instanceof StepOverRidingStyledItem) {
             item = item instanceof StepStyledItem
@@ -746,69 +769,75 @@ public final class StepMeshExporter {
             faceIds.add(item.id());
             return;
         }
+        if (!isSemanticFaceBackedEntity(item)
+                && !(item instanceof StepRepresentation)
+                && !(item instanceof StepCompoundRepresentationItem)
+                && (builder.canBuildAsSolid(item) || ShellHelper.isShellCandidate(item))) {
+            solidIds.add(item.id());
+            return;
+        }
         if (item instanceof StepManifoldSolidBrep) {
-            collectShellFaceIds(((StepManifoldSolidBrep) item).outer(), faceIds, visited);
+            collectShellFaceIds(((StepManifoldSolidBrep) item).outer(), faceIds);
             return;
         }
         if (item instanceof StepBrepWithVoids) {
             StepBrepWithVoids brep = (StepBrepWithVoids) item;
-            collectShellFaceIds(brep.outer(), faceIds, visited);
+            collectShellFaceIds(brep.outer(), faceIds);
             for (StepEntity voidShell : brep.voids()) {
-                collectShellFaceIds(voidShell, faceIds, visited);
+                collectShellFaceIds(voidShell, faceIds);
             }
             return;
         }
         if (item instanceof StepAdvancedBrep) {
             StepAdvancedBrep brep = (StepAdvancedBrep) item;
-            collectShellFaceIds(brep.outer(), faceIds, visited);
+            collectShellFaceIds(brep.outer(), faceIds);
             for (StepEntity voidShell : brep.voids()) {
-                collectShellFaceIds(voidShell, faceIds, visited);
+                collectShellFaceIds(voidShell, faceIds);
             }
             return;
         }
         if (item instanceof StepFacettedBrep) {
-            collectShellFaceIds(((StepFacettedBrep) item).outer(), faceIds, visited);
+            collectShellFaceIds(((StepFacettedBrep) item).outer(), faceIds);
             return;
         }
         if (item instanceof StepNonManifoldSolidBrep) {
-            collectShellFaceIds(((StepNonManifoldSolidBrep) item).outer(), faceIds, visited);
+            collectShellFaceIds(((StepNonManifoldSolidBrep) item).outer(), faceIds);
             return;
         }
         if (item instanceof StepShellBasedSurfaceModel) {
             for (StepEntity shell : ((StepShellBasedSurfaceModel) item).shells()) {
-                collectShellFaceIds(shell, faceIds, visited);
+                collectShellFaceIds(shell, faceIds);
             }
             return;
         }
         if (item instanceof StepManifoldSurfaceModel) {
             for (StepEntity shell : ((StepManifoldSurfaceModel) item).shells()) {
-                collectShellFaceIds(shell, faceIds, visited);
+                collectShellFaceIds(shell, faceIds);
             }
             return;
         }
         if (item instanceof StepFaceBasedSurfaceModel) {
             for (StepEntity faceSet : ((StepFaceBasedSurfaceModel) item).faceSets()) {
-                collectShellFaceIds(faceSet, faceIds, visited);
+                collectShellFaceIds(faceSet, faceIds);
             }
             return;
         }
         if (item instanceof StepRepresentation) {
             for (StepEntity nestedItem : ((StepRepresentation) item).items()) {
-                collectRepresentationFaceIds(nestedItem, faceIds, visited);
+                collectRepresentationIds(nestedItem, faceIds, solidIds, visited, builder);
             }
             return;
         }
         if (item instanceof StepCompoundRepresentationItem) {
             for (StepEntity nestedItem : ((StepCompoundRepresentationItem) item).items()) {
-                collectRepresentationFaceIds(nestedItem, faceIds, visited);
+                collectRepresentationIds(nestedItem, faceIds, solidIds, visited, builder);
             }
             return;
         }
-        collectShellFaceIds(item, faceIds, visited);
+        collectShellFaceIds(item, faceIds);
     }
 
-    private static void collectShellFaceIds(
-            StepEntity shellEntity, Set<Integer> faceIds, Set<Integer> visited) {
+    private static void collectShellFaceIds(StepEntity shellEntity, Set<Integer> faceIds) {
         if (shellEntity == null) {
             return;
         }
@@ -819,8 +848,16 @@ public final class StepMeshExporter {
             return;
         }
         for (StepFaceEntity face : ShellHelper.shellFaces(shellEntity)) {
-            collectRepresentationFaceIds(face, faceIds, visited);
+            faceIds.add(face.id());
         }
+    }
+
+    private record AssemblyPlacements(
+            Map<Integer, List<double[]>> byFace, Map<Integer, List<double[]>> bySolid) {
+        private static final AssemblyPlacements NONE = new AssemblyPlacements(Map.of(), Map.of());
+    }
+
+    private record RepresentationGeometry(Set<Integer> faceIds, Set<Integer> solidIds) {
     }
     private static class Triangulator {
         private final Map<MeshVertex, Integer> vertexIndex = new LinkedHashMap<>();
