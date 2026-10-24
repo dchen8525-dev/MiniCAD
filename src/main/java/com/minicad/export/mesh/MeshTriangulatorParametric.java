@@ -36,6 +36,16 @@ final class MeshTriangulatorParametric {
     private static final double PLANAR_EPS = 1e-9;
     private static final int DEFAULT_CURVE_SEGMENTS = 32;
 
+    /**
+     * Grid resolution for parametric faces. Loop edges are sampled at a fixed 32
+     * points, so the former {@code max(16, min(64, sampleCount * 2))} rule always
+     * saturated and every face was emitted at 64 x 48 regardless of its size or
+     * curvature. These values match the base density the preview tessellator uses
+     * for the same face, which keeps the mesh aligned with the viewer.
+     */
+    private static final int PARAMETRIC_U_SEGMENTS = 32;
+    private static final int PARAMETRIC_V_SEGMENTS = 24;
+
     private MeshTriangulatorParametric() {
     }
 
@@ -81,10 +91,9 @@ final class MeshTriangulatorParametric {
         if (bounds == null || bounds.uSpan() <= PLANAR_EPS || bounds.vSpan() <= PLANAR_EPS) {
             return false;
         }
-        int sampleCount = normalizedLoops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
-        int uSegments = Math.max(16, Math.min(64, sampleCount * 2));
-        int vSegments = Math.max(12, Math.min(48, sampleCount * 2));
-        return triangulateGrid(mapper, normalizedLoops, bounds, uSegments, vSegments, flipped, triangleCountSupplier, addVertex, addTriangle);
+        return triangulateGrid(mapper, normalizedLoops, bounds,
+                PARAMETRIC_U_SEGMENTS, PARAMETRIC_V_SEGMENTS,
+                flipped, triangleCountSupplier, addVertex, addTriangle);
     }
 
     /**
@@ -124,10 +133,9 @@ final class MeshTriangulatorParametric {
         if (bounds == null || bounds.uSpan() <= PLANAR_EPS || bounds.vSpan() <= PLANAR_EPS) {
             return false;
         }
-        int sampleCount = normalizedLoops.stream().mapToInt(loop -> loop.points().size()).max().orElse(0);
-        int uSegments = Math.max(16, Math.min(64, sampleCount * 2));
-        int vSegments = Math.max(12, Math.min(48, sampleCount * 2));
-        return triangulateGrid(mapper, normalizedLoops, bounds, uSegments, vSegments, flipped, triangleCountSupplier, addVertex, addTriangle);
+        return triangulateGrid(mapper, normalizedLoops, bounds,
+                PARAMETRIC_U_SEGMENTS, PARAMETRIC_V_SEGMENTS,
+                flipped, triangleCountSupplier, addVertex, addTriangle);
     }
 
     // --- ParametricSurfaceMapper factory ---

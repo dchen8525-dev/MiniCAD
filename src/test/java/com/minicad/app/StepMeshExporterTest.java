@@ -302,8 +302,10 @@ class StepMeshExporterTest {
         long triangles = obj.lines().filter(line -> line.startsWith("f ")).count();
         // 120 of the 194 faces are B-spline patches. With no mapper for those the
         // exporter fell back to gridding each whole surface, including the area the
-        // face is trimmed away from (~995k triangles for the sample).
-        assertEquals(800_799, triangles);
+        // face is trimmed away from (~995k triangles for the sample). The parametric
+        // grid is capped at the preview's base density, which keeps this at a quarter
+        // of the count produced when every face was refined to 64x48.
+        assertEquals(200_691, triangles);
     }
 
     @Test
