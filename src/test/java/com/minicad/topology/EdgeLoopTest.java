@@ -108,6 +108,17 @@ class EdgeLoopTest {
     }
 
     @Test
+    void shouldAllowShortDistinctVerticesOnOpenCurve() {
+        Vertex v0 = new Vertex(new CartesianPoint(0.0, 0.0, 0.0));
+        Vertex v1 = new Vertex(new CartesianPoint(0.00945, 0.0, 0.0));
+        Line3 line = new Line3(v0.getPoint(), Direction3.from(new Vector3(1.0, 0.0, 0.0)));
+
+        Edge edge = new Edge(v0, v1, line, true);
+
+        assertEquals(v1, edge.getEnd());
+    }
+
+    @Test
     void shouldAllowVerticesWithinImportToleranceOfCurve() {
         Vertex v0 = new Vertex(new CartesianPoint(0.0, 0.0, 0.0));
         Vertex v1 = new Vertex(new CartesianPoint(1.0, 0.0, 0.00005));

@@ -175,23 +175,13 @@ public final class StepLegacyGeometryBuilder {
                 String baseName = entity == null ? null : entity.name();
                 int faceIndex = 0;
                 for (Face face : solid.outerShell().faces()) {
-                    faces.add(PreviewMeshExporter.facePayloadFromTopologyFace(
-                            solidId * 1000 + faceIndex++,
-                            face,
-                            baseName,
-                            itemMetadata
-                    ));
-                    StepPayloadBuilder.collectTopologyEdges(face, uniqueEdges);
+                    collectFace(solidId * 1000 + faceIndex++, face, baseName, itemMetadata,
+                            faces, uniqueEdges, unsupportedFaces);
                 }
                 for (var voidShell : solid.voidShells()) {
                     for (Face face : voidShell.faces()) {
-                        faces.add(PreviewMeshExporter.facePayloadFromTopologyFace(
-                                solidId * 1000 + faceIndex++,
-                                face,
-                                baseName,
-                                itemMetadata
-                        ));
-                        StepPayloadBuilder.collectTopologyEdges(face, uniqueEdges);
+                        collectFace(solidId * 1000 + faceIndex++, face, baseName, itemMetadata,
+                                faces, uniqueEdges, unsupportedFaces);
                     }
                 }
             } catch (UnsupportedGeometryException | StepResolutionException | TopologyException ex) {
@@ -210,6 +200,28 @@ public final class StepLegacyGeometryBuilder {
             edgeIndex++;
         }
         return new GeometryCollection(List.copyOf(edges), List.copyOf(faces), List.copyOf(unsupportedFaces));
+    }
+
+    /**
+     * Adds a solid face to the payload, or records it as unsupported when the
+     * face has no triangulable preview (for example a sliver whose sampled grid
+     * collapses).
+     */
+    private static void collectFace(int stepId, Face face, String baseName,
+                                    StepMetadataExtractor.DisplayMetadata metadata,
+                                    List<FacePayload> faces, Set<Edge> uniqueEdges,
+                                    List<UnsupportedFacePayload> unsupportedFaces) {
+        FacePayload payload = PreviewMeshExporter.facePayloadFromTopologyFace(
+                stepId, face, baseName, metadata);
+        if (payload == null) {
+            unsupportedFaces.add(new UnsupportedFacePayload(
+                    stepId, baseName,
+                    face.surface().getClass().getSimpleName().toUpperCase(Locale.ROOT),
+                    "face preview could not be triangulated"));
+            return;
+        }
+        faces.add(payload);
+        StepPayloadBuilder.collectTopologyEdges(face, uniqueEdges);
     }
 
 

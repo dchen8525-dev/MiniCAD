@@ -41,9 +41,12 @@ public final class Edge {
         if (start == null || end == null || curve == null) {
             throw new TopologyException("edge vertices and curve are required");
         }
-        // Check if this is a degenerate edge (start == end within tolerance)
+        // A degenerate edge is one whose vertices are the same point. The import
+        // topology tolerance is a connectivity tolerance, not a minimum edge
+        // length: real models contain legitimately short edges (well under 1e-2)
+        // that must still build.
         double vertexDistance = start.point().distanceTo(end.point());
-        boolean isDegenerateEdge = vertexDistance <= Epsilon.IMPORT_TOPOLOGY_TOLERANCE;
+        boolean isDegenerateEdge = vertexDistance <= Epsilon.EPS;
 
         if (isDegenerateEdge && !isClosedCurve(curve)) {
             // Degenerate edges are only allowed on closed curves (circle, ellipse, closed B-spline)

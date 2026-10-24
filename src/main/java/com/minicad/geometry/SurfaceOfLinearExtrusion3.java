@@ -49,13 +49,25 @@ public final class SurfaceOfLinearExtrusion3 implements SurfaceGeometry {
     /**
      * {@inheritDoc}
      *
-     * <p>U follows the swept curve and V the extrusion vector, both normalized to
-     * {@code [0, 1]}.</p>
+     * <p>U follows the swept curve over its own parameter domain - a B-spline
+     * directrix is not necessarily parameterized on {@code [0, 1]} - and V sweeps
+     * the extrusion vector over {@code [0, 1]}.</p>
      */
     @Override
     public java.util.List<java.util.List<CartesianPoint>> sampleGrid(int uSegments, int vSegments) {
+        double uStart = 0.0;
+        double uEnd = 1.0;
+        if (sweptCurve instanceof BSplineCurve3) {
+            BSplineCurve3 spline = (BSplineCurve3) sweptCurve;
+            uStart = spline.startParameter();
+            uEnd = spline.endParameter();
+        } else if (sweptCurve instanceof RationalBSplineCurve3) {
+            RationalBSplineCurve3 spline = (RationalBSplineCurve3) sweptCurve;
+            uStart = spline.startParameter();
+            uEnd = spline.endParameter();
+        }
         return SurfaceGridSampling.sampleGrid(
-                uSegments, vSegments, 0.0, 1.0, 0.0, 1.0, this::pointAt);
+                uSegments, vSegments, uStart, uEnd, 0.0, 1.0, this::pointAt);
     }
 
     @Override
@@ -78,7 +90,6 @@ public final class SurfaceOfLinearExtrusion3 implements SurfaceGeometry {
 
     @Override
     public Vector3 normalAt(double u, double v) {
-        Vector3 tangent = sweptCurve.tangentAt(u);
-        return tangent.cross(extrusionVector).normalize();
+        return SurfaceGeometry.normalFromTangents(sweptCurve.tangentAt(u), extrusionVector);
     }
 }

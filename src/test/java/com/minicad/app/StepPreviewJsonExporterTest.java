@@ -10664,18 +10664,20 @@ class StepPreviewJsonExporterTest {
         String stepText = new String(raw, java.nio.charset.StandardCharsets.ISO_8859_1);
         byte[] binary = StepPreviewJsonExporter.exportGlb(stepText);
         String metadata = metadataFromGlb(binary);
-        // engine.stp: 93K entities, 31 solids, small number of unsupported faces relative to total
+        // engine.stp: 93K entities, 31 solids, every face previews successfully
         assertTrue(metadata.contains("\"entityCount\":93829"), "engine.stp should have 93829 entities");
         assertTrue(metadata.contains("\"solidCount\":31"), "engine.stp should have 31 solids");
+        assertTrue(metadata.contains("\"unsupportedFaceCount\":0"), metadata);
     }
 
     @Test
     void shouldExportGlbForFanStp() throws Exception {
         byte[] binary = StepPreviewJsonExporter.exportGlb(Files.readString(Path.of("samples/fan.stp")));
         String metadata = metadataFromGlb(binary);
-        // fan.stp: 42K entities, 1 solid, 1 unsupported face from assembly representation
+        // fan.stp: 42K entities, 1 solid, every face previews successfully
         assertTrue(metadata.contains("\"entityCount\":41905"), "fan.stp should have 41905 entities");
         assertTrue(metadata.contains("\"solidCount\":1"), "fan.stp should have 1 solid");
+        assertTrue(metadata.contains("\"unsupportedFaceCount\":0"), metadata);
     }
 
     @Test

@@ -284,10 +284,8 @@ class TopologyValidatorTest {
 
     @Test
     void shouldDetectZeroLengthEdgeInEdgeLoop() {
-        // Note: Edge constructor uses IMPORT_TOPOLOGY_TOLERANCE (1e-2) to check distinct vertices.
+        // Note: Edge rejects only coincident vertices (EPS), so short-but-distinct edges are legal.
         // Our TopologyValidator uses EPS (1e-9) to check zero-length edges.
-        // Edge class already prevents very short edges (< 1e-2).
-        // TopologyValidator's zero-length check (< EPS=1e-9) won't catch anything below Edge's threshold.
         //
         // Test that TopologyValidator accepts valid edges (all vertices on the same plane).
         Vertex v0 = new Vertex(new CartesianPoint(0, 0, 0));

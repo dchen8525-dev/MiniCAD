@@ -211,11 +211,12 @@ class CategoryDGeometryValidationTest {
     }
 
     @Test
-    void shouldRejectNearZeroLengthEdge() {
+    void shouldAcceptShortEdgeWithDistinctVertices() {
         Vertex v1 = new Vertex(new CartesianPoint(0.0, 0.0, 0.0));
         Vertex v2 = new Vertex(new CartesianPoint(0.001, 0.0, 0.0));
         BSplineCurve3 curve = makeLinearBSpline();
-        assertThrows(TopologyException.class, () -> new Edge(v1, v2, curve, true));
+        Edge edge = new Edge(v1, v2, curve, true);
+        assertEquals(0.001, edge.length(), 1e-6);
     }
 
     @Test

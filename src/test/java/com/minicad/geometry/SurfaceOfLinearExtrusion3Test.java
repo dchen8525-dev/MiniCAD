@@ -31,6 +31,27 @@ class SurfaceOfLinearExtrusion3Test {
     }
 
     @Test
+    void shouldSampleSweptCurveOverItsOwnParameterDomain() {
+        BSplineCurve3 generatrix = new BSplineCurve3(
+                1,
+                List.of(new CartesianPoint(0.0, 0.0, 0.0), new CartesianPoint(0.0, 10.0, 0.0)),
+                List.of(2, 2),
+                List.of(10.0, 20.0)
+        );
+        SurfaceOfLinearExtrusion3 surface = new SurfaceOfLinearExtrusion3(
+                generatrix,
+                new Vector3(0.0, 0.0, 5.0)
+        );
+
+        List<List<CartesianPoint>> grid = surface.sampleGrid(2, 1);
+
+        assertEquals(3, grid.size());
+        assertEquals(new CartesianPoint(0.0, 0.0, 0.0), grid.get(0).get(0));
+        assertEquals(new CartesianPoint(0.0, 10.0, 0.0), grid.get(2).get(0));
+        assertEquals(new CartesianPoint(0.0, 10.0, 5.0), grid.get(2).get(1));
+    }
+
+    @Test
     void shouldEvaluateTrimmedSurfaceCompositeGeneratrixUsingNormalizedParameter() {
         TrimmedCurve3 generatrix = new TrimmedCurve3(
                 new SurfaceCurve3(new CompositeCurve3(List.of(
