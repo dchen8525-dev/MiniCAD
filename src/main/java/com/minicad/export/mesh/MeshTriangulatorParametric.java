@@ -10,6 +10,7 @@ import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
 import com.minicad.preview.mapper.ParametricSurfaceMapper;
+import com.minicad.preview.mapper.SurfaceNearestUvSearch;
 import com.minicad.preview.payload.ParametricLoopPayload;
 import com.minicad.preview.payload.UvBounds;
 import com.minicad.preview.payload.UvPoint;
@@ -326,6 +327,40 @@ final class MeshTriangulatorParametric {
                     @Override
                     public Double uPeriod() {
                         return Math.PI * 2.0;
+                    }
+                };
+            }),
+            parametricMapperRule(BSplineSurface3.class, (surface) -> {
+                BSplineSurface3 spline = (BSplineSurface3) surface;
+                return new ParametricSurfaceMapper() {
+                    @Override
+                    public CartesianPoint pointAt(double u, double v) {
+                        return spline.pointAt(u, v);
+                    }
+                    @Override
+                    public Vector3 normalAt(double u, double v) {
+                        return spline.normalAt(u, v);
+                    }
+                    @Override
+                    public UvPoint project(CartesianPoint point, UvPoint previous) {
+                        return SurfaceNearestUvSearch.nearestUvOnBSplineSurface(spline, point, previous);
+                    }
+                };
+            }),
+            parametricMapperRule(RationalBSplineSurface3.class, (surface) -> {
+                RationalBSplineSurface3 spline = (RationalBSplineSurface3) surface;
+                return new ParametricSurfaceMapper() {
+                    @Override
+                    public CartesianPoint pointAt(double u, double v) {
+                        return spline.pointAt(u, v);
+                    }
+                    @Override
+                    public Vector3 normalAt(double u, double v) {
+                        return spline.normalAt(u, v);
+                    }
+                    @Override
+                    public UvPoint project(CartesianPoint point, UvPoint previous) {
+                        return SurfaceNearestUvSearch.nearestUvOnRationalBSplineSurface(spline, point, previous);
                     }
                 };
             }),

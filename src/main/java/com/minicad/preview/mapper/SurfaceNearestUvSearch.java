@@ -8,14 +8,15 @@ import com.minicad.preview.payload.UvPoint;
 
 /**
  * Coarse-to-refined nearest-UV search over B-spline surfaces, extracted from
- * SurfaceMapperHelper to keep that class under the 1000-line budget.
+ * SurfaceMapperHelper to keep that class under the 1000-line budget and shared
+ * with the mesh exporter, which projects loop points through the same search.
  */
-final class SurfaceNearestUvSearch {
+public final class SurfaceNearestUvSearch {
 
     private SurfaceNearestUvSearch() {
     }
 
-    static UvPoint nearestUvOnBSplineSurface(BSplineSurface3 surface, CartesianPoint point, UvPoint previous) {
+    public static UvPoint nearestUvOnBSplineSurface(BSplineSurface3 surface, CartesianPoint point, UvPoint previous) {
         double uStart = surface.uStart();
         double uEnd = surface.uEnd();
         double vStart = surface.vStart();
@@ -78,7 +79,7 @@ final class SurfaceNearestUvSearch {
         return new UvPoint(bestU, bestV);
     }
 
-    static UvPoint nearestUvOnRationalBSplineSurface(
+    public static UvPoint nearestUvOnRationalBSplineSurface(
             RationalBSplineSurface3 surface,
             CartesianPoint point,
             UvPoint previous

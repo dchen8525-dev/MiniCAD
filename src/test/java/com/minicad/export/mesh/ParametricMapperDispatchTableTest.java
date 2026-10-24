@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Guards the table-driven dispatch introduced for
- * MeshTriangulatorParametric.mapperFor, and exercises the four quadric rules
- * that had no direct coverage before.
+ * MeshTriangulatorParametric.mapperFor, and exercises the quadric rules that
+ * had no direct coverage before.
  *
- * mapperFor built a {@link ParametricSurfaceMapper} for one of six concrete surface
+ * mapperFor built a {@link ParametricSurfaceMapper} for a handful of concrete surface
  * types via a sequential if/else-if chain of anonymous classes, with a trailing
  * `return null` for everything else. It is now an ordered list of (type,
  * handler) rules walked by a first-match loop. Two things can go wrong in that
@@ -45,11 +45,11 @@ import static org.junit.jupiter.api.Assertions.fail;
  *
  *   1. a branch dropped, duplicated or reordered -- ordering is load-bearing
  *      because instanceof also matches subtypes and the first match wins. The
- *      6 types are unrelated today (each is a final direct SurfaceGeometry
+ *      types are unrelated today (each is a final direct SurfaceGeometry
  *      implementation), so the order happens not to matter, but the frozen file
  *      turns any future reordering into a test failure rather than a silent
  *      behaviour change;
- *   2. a type wired to the wrong handler -- the six handler bodies are
+ *   2. a type wired to the wrong handler -- the handler bodies are
  *      look-alike anonymous mappers that differ only in the surface they close
  *      over and which normalAt/project they delegate to, so a copy/paste slip
  *      between them would compile cleanly and only surface as subtly wrong

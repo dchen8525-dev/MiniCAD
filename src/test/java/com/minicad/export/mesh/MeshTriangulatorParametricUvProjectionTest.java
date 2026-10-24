@@ -1,9 +1,11 @@
 package com.minicad.export.mesh;
 
 import com.minicad.geometry.BSplineCurve3;
+import com.minicad.geometry.BSplineSurface3;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.geometry.Direction3;
 import com.minicad.geometry.Line3;
+import com.minicad.geometry.RationalBSplineSurface3;
 import com.minicad.geometry.SurfaceGeometry;
 import com.minicad.geometry.SurfaceOfLinearExtrusion3;
 import com.minicad.geometry.SurfaceOfRevolution3;
@@ -189,6 +191,41 @@ class MeshTriangulatorParametricUvProjectionTest {
         assertRoundTrip(mapper, point, uv);
         assertEquals(15.7, uv.u(), 1e-3);
         assertEquals(0.6, uv.v(), UV_TOLERANCE);
+    }
+
+    @Test
+    void projectsBSplineSurfaceWithoutFallingBackToTheWholeSurface() {
+        BSplineSurface3 surface = new BSplineSurface3(
+                1, 1,
+                List.of(List.of(new CartesianPoint(0, 0, 0), new CartesianPoint(0, 0.5, 0)),
+                        List.of(new CartesianPoint(10, 0, 0), new CartesianPoint(10, 0.5, 0))),
+                List.of(2, 2), List.of(2, 2),
+                List.of(0.0, 1.0), List.of(0.0, 1.0));
+        ParametricSurfaceMapper mapper = mapperFor(surface);
+
+        CartesianPoint point = surface.pointAt(0.3, 0.7);
+        UvPoint uv = mapper.project(point, null);
+        assertRoundTrip(mapper, point, uv);
+        assertEquals(0.3, uv.u(), 1e-2);
+        assertEquals(0.7, uv.v(), 1e-2);
+    }
+
+    @Test
+    void projectsRationalBSplineSurfaceWithoutFallingBackToTheWholeSurface() {
+        RationalBSplineSurface3 surface = new RationalBSplineSurface3(
+                1, 1,
+                List.of(List.of(new CartesianPoint(0, 0, 0), new CartesianPoint(0, 0.5, 0)),
+                        List.of(new CartesianPoint(10, 0, 0), new CartesianPoint(10, 0.5, 0))),
+                List.of(List.of(1.0, 1.0), List.of(1.0, 1.0)),
+                List.of(2, 2), List.of(2, 2),
+                List.of(0.0, 1.0), List.of(0.0, 1.0));
+        ParametricSurfaceMapper mapper = mapperFor(surface);
+
+        CartesianPoint point = surface.pointAt(0.6, 0.2);
+        UvPoint uv = mapper.project(point, null);
+        assertRoundTrip(mapper, point, uv);
+        assertEquals(0.6, uv.u(), 1e-2);
+        assertEquals(0.2, uv.v(), 1e-2);
     }
 
     private static double wrap(double angle) {

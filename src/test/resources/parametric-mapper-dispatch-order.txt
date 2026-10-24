@@ -2,9 +2,15 @@
 # original sequential ifs (MAPPER_RULES). The table is ordered data, not
 # control flow: instanceof matches subtypes and the first match wins, so any
 # reordering must be an explicit, reviewed change.
+#
+# BSplineSurface3/RationalBSplineSurface3 were added after the quadric rules:
+# without them mapperFor returned null for spline faces and the mesh exporter
+# silently emitted each face's whole (untrimmed) surface.
 CylindricalSurface
 ConicalSurface
 ToroidalSurface
 SphericalSurface
+BSplineSurface3
+RationalBSplineSurface3
 SurfaceOfRevolution3
 SurfaceOfLinearExtrusion3

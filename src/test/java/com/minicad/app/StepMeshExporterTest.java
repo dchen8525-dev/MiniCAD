@@ -282,6 +282,17 @@ class StepMeshExporterTest {
     }
 
     @Test
+    void shouldTrimBSplineFacesInFanSampleToTheirOwnBounds() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/fan.stp")));
+
+        long triangles = obj.lines().filter(line -> line.startsWith("f ")).count();
+        // 120 of the 194 faces are B-spline patches. With no mapper for those the
+        // exporter fell back to gridding each whole surface, including the area the
+        // face is trimmed away from (~995k triangles for the sample).
+        assertEquals(800_799, triangles);
+    }
+
+    @Test
     void shouldTrimCylindricalFaceToFaceBounds() throws IOException {
         String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/cylindrical-band.step")));
         assertTrue(obj.contains("f "));
