@@ -737,9 +737,17 @@ public final class StepMeshExporter {
             StepEntity faceGeometry = semanticFaceGeometry(stepFace);
             boolean flipped = !semanticFaceSameSense(stepFace);
             SurfaceGeometry surface = buildSemanticSurfaceGeometry(faceGeometry, builder);
-            if (!(surface instanceof Plane) && surface != null
-                    && triangulateSemanticParametricFace(stepFace, faceGeometry, surface, builder, flipped)) {
-                return;
+            // The semantic surface is the one the STEP face was resolved against,
+            // so try the parametric walk on it first. When buildSemanticSurfaceGeometry
+            // returned nothing, the walk below runs once on the topology face's
+            // surface instead; it must not be repeated on a surface it already
+            // rejected, because the walk is expensive and deterministic.
+            boolean parametricAttempted = false;
+            if (surface != null && !(surface instanceof Plane)) {
+                if (triangulateSemanticParametricFace(stepFace, faceGeometry, surface, builder, flipped)) {
+                    return;
+                }
+                parametricAttempted = true;
             }
             Face builtFace = builder.buildFace(stepFace.id());
             if (surface == null) {
@@ -748,8 +756,13 @@ public final class StepMeshExporter {
             if (surface instanceof Plane) {
             Plane plane = (Plane) surface;
                 triangulatePlanarFace(builtFace, plane, flipped);
-            } else if (!triangulateSemanticParametricFace(stepFace, faceGeometry, surface, builder, flipped)
-                    && (MeshTriangulatorParametric.mapperFor(surface) == null || builtFace.bounds().isEmpty())) {
+                return;
+            }
+            if (!parametricAttempted
+                    && triangulateSemanticParametricFace(stepFace, faceGeometry, surface, builder, flipped)) {
+                return;
+            }
+            if (MeshTriangulatorParametric.mapperFor(surface) == null || builtFace.bounds().isEmpty()) {
                 // A face with trim bounds and a mapper was trimmed: if the walk
                 // found no cells, the loops enclose no area (dead seam loops), and
                 // gridding the whole surface would add the geometry the bounds
