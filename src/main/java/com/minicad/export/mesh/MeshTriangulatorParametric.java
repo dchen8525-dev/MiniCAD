@@ -387,6 +387,32 @@ final class MeshTriangulatorParametric {
     private static final double TWO_PI = Math.PI * 2.0;
 
     /**
+     * Start of the generatrix's own parameter domain. B-splines carry a knot
+     * vector whose domain is not necessarily [-4, 4]; scanning a fixed window
+     * misses the whole curve for such generatrices.
+     */
+    private static double generatrixStart(Curve3 generatrix) {
+        if (generatrix instanceof BSplineCurve3) {
+            return ((BSplineCurve3) generatrix).startParameter();
+        }
+        if (generatrix instanceof RationalBSplineCurve3) {
+            return ((RationalBSplineCurve3) generatrix).startParameter();
+        }
+        return GENERATRIX_MIN;
+    }
+
+    /** End of the generatrix's own parameter domain, see {@link #generatrixStart(Curve3)}. */
+    private static double generatrixEnd(Curve3 generatrix) {
+        if (generatrix instanceof BSplineCurve3) {
+            return ((BSplineCurve3) generatrix).endParameter();
+        }
+        if (generatrix instanceof RationalBSplineCurve3) {
+            return ((RationalBSplineCurve3) generatrix).endParameter();
+        }
+        return GENERATRIX_MAX;
+    }
+
+    /**
      * Projects a point onto a surface of revolution without a 2D grid scan.
      *
      * <p>For a generatrix point C(s), the revolving circle is centered on the
@@ -399,11 +425,14 @@ final class MeshTriangulatorParametric {
      */
     private static UvPoint projectRevolutionUv(
             SurfaceOfRevolution3 revolution, CartesianPoint point, UvPoint previous) {
+        Curve3 generatrix = revolution.sweptCurve();
+        double sMin = generatrixStart(generatrix);
+        double sMax = generatrixEnd(generatrix);
         Vector3 axis = revolution.axisDirection().asVector();
         double axisNorm = axis.norm();
         if (axisNorm < 1e-12) {
             return approximateUv(point, previous, 96, 64,
-                    0.0, TWO_PI, GENERATRIX_MIN, GENERATRIX_MAX, true,
+                    0.0, TWO_PI, sMin, sMax, true,
                     (u, v) -> revolution.pointAt(v, u));
         }
         axis = axis.scale(1.0 / axisNorm);
@@ -413,21 +442,20 @@ final class MeshTriangulatorParametric {
         Vector3 radialP = offset.subtract(axis.scale(axialP));
         double radiusP = radialP.norm();
 
-        Curve3 generatrix = revolution.sweptCurve();
-        double bestS = GENERATRIX_MIN;
+        double bestS = sMin;
         double bestDistanceSq = Double.POSITIVE_INFINITY;
         for (int i = 0; i <= GENERATRIX_STEPS; i++) {
-            double s = GENERATRIX_MIN + (GENERATRIX_MAX - GENERATRIX_MIN) * i / GENERATRIX_STEPS;
+            double s = sMin + (sMax - sMin) * i / GENERATRIX_STEPS;
             double distanceSq = revolutionCircleDistanceSq(generatrix, origin, axis, s, axialP, radiusP);
             if (distanceSq < bestDistanceSq) {
                 bestDistanceSq = distanceSq;
                 bestS = s;
             }
         }
-        double radius = (GENERATRIX_MAX - GENERATRIX_MIN) / GENERATRIX_STEPS;
+        double radius = (sMax - sMin) / GENERATRIX_STEPS;
         for (int pass = 0; pass < 3; pass++) {
             for (int k = -4; k <= 4; k++) {
-                double s = clamp(bestS + radius * k / 4.0, GENERATRIX_MIN, GENERATRIX_MAX);
+                double s = clamp(bestS + radius * k / 4.0, sMin, sMax);
                 double distanceSq = revolutionCircleDistanceSq(generatrix, origin, axis, s, axialP, radiusP);
                 if (distanceSq < bestDistanceSq) {
                     bestDistanceSq = distanceSq;
@@ -446,7 +474,7 @@ final class MeshTriangulatorParametric {
         double actual = revolution.pointAt(bestS, u).distanceTo(point);
         if (actual > Math.sqrt(bestDistanceSq) + 1e-6 * (1.0 + Math.sqrt(bestDistanceSq))) {
             return approximateUv(point, previous, 96, 64,
-                    0.0, TWO_PI, GENERATRIX_MIN, GENERATRIX_MAX, true,
+                    0.0, TWO_PI, sMin, sMax, true,
                     (a, b) -> revolution.pointAt(b, a));
         }
         return candidate;
@@ -495,17 +523,19 @@ final class MeshTriangulatorParametric {
     private static UvPoint projectExtrusionUv(
             SurfaceOfLinearExtrusion3 extrusion, CartesianPoint point, UvPoint previous) {
         Vector3 direction = extrusion.extrusionVector();
+        Curve3 generatrix = extrusion.sweptCurve();
+        double sMin = generatrixStart(generatrix);
+        double sMax = generatrixEnd(generatrix);
         double directionSq = direction.dot(direction);
         if (directionSq < 1e-24) {
             return approximateUv(point, previous, 64, 48,
-                    GENERATRIX_MIN, GENERATRIX_MAX, 0.0, 1.0, false, extrusion::pointAt);
+                    sMin, sMax, 0.0, 1.0, false, extrusion::pointAt);
         }
-        Curve3 generatrix = extrusion.sweptCurve();
-        double bestS = GENERATRIX_MIN;
+        double bestS = sMin;
         double bestT = 0.0;
         double bestDistanceSq = Double.POSITIVE_INFINITY;
         for (int i = 0; i <= GENERATRIX_STEPS; i++) {
-            double s = GENERATRIX_MIN + (GENERATRIX_MAX - GENERATRIX_MIN) * i / GENERATRIX_STEPS;
+            double s = sMin + (sMax - sMin) * i / GENERATRIX_STEPS;
             double[] closest = extrusionSegmentClosest(generatrix, direction, directionSq, s, point);
             if (closest[1] < bestDistanceSq) {
                 bestDistanceSq = closest[1];
@@ -513,10 +543,10 @@ final class MeshTriangulatorParametric {
                 bestT = closest[0];
             }
         }
-        double radius = (GENERATRIX_MAX - GENERATRIX_MIN) / GENERATRIX_STEPS;
+        double radius = (sMax - sMin) / GENERATRIX_STEPS;
         for (int pass = 0; pass < 3; pass++) {
             for (int k = -4; k <= 4; k++) {
-                double s = clamp(bestS + radius * k / 4.0, GENERATRIX_MIN, GENERATRIX_MAX);
+                double s = clamp(bestS + radius * k / 4.0, sMin, sMax);
                 double[] closest = extrusionSegmentClosest(generatrix, direction, directionSq, s, point);
                 if (closest[1] < bestDistanceSq) {
                     bestDistanceSq = closest[1];
@@ -530,7 +560,7 @@ final class MeshTriangulatorParametric {
         double actual = extrusion.pointAt(bestS, bestT).distanceTo(point);
         if (actual > Math.sqrt(bestDistanceSq) + 1e-6 * (1.0 + Math.sqrt(bestDistanceSq))) {
             return approximateUv(point, previous, 64, 48,
-                    GENERATRIX_MIN, GENERATRIX_MAX, 0.0, 1.0, false, extrusion::pointAt);
+                    sMin, sMax, 0.0, 1.0, false, extrusion::pointAt);
         }
         return candidate;
     }
