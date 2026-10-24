@@ -10668,6 +10668,7 @@ class StepPreviewJsonExporterTest {
         assertTrue(metadata.contains("\"entityCount\":93829"), "engine.stp should have 93829 entities");
         assertTrue(metadata.contains("\"solidCount\":31"), "engine.stp should have 31 solids");
         assertTrue(metadata.contains("\"unsupportedFaceCount\":0"), metadata);
+        assertTrue(metadata.contains("\"faceCount\":2756"), metadata);
     }
 
     @Test
@@ -10678,6 +10679,7 @@ class StepPreviewJsonExporterTest {
         assertTrue(metadata.contains("\"entityCount\":41905"), "fan.stp should have 41905 entities");
         assertTrue(metadata.contains("\"solidCount\":1"), "fan.stp should have 1 solid");
         assertTrue(metadata.contains("\"unsupportedFaceCount\":0"), metadata);
+        assertTrue(metadata.contains("\"faceCount\":194"), metadata);
     }
 
     @Test

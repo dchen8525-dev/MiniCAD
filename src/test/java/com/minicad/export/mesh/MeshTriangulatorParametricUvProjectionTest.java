@@ -101,6 +101,27 @@ class MeshTriangulatorParametricUvProjectionTest {
     }
 
     @Test
+    void projectsRevolutionOfBSplineGeneratrixWithNonUnitDomain() {
+        BSplineCurve3 generatrix = new BSplineCurve3(
+                3,
+                List.of(new CartesianPoint(2, 0, 0), new CartesianPoint(1, 0, 1),
+                        new CartesianPoint(2, 0, 2), new CartesianPoint(3, 0, 3)),
+                List.of(4, 4),
+                List.of(10.0, 20.0));
+        SurfaceOfRevolution3 surface = new SurfaceOfRevolution3(
+                generatrix, CartesianPoint.origin(), new Direction3(0, 0, 1));
+        ParametricSurfaceMapper mapper = mapperFor(surface);
+
+        for (double s : new double[] {11.3, 15.0, 18.7}) {
+            CartesianPoint point = surface.pointAt(s, 2.0);
+            UvPoint uv = mapper.project(point, null);
+            assertRoundTrip(mapper, point, uv);
+            assertEquals(s, uv.v(), 1e-3);
+            assertEquals(wrap(2.0), uv.u(), UV_TOLERANCE);
+        }
+    }
+
+    @Test
     void staysContinuousAcrossSeam() {
         SurfaceOfRevolution3 cylinder = new SurfaceOfRevolution3(
                 new Line3(new CartesianPoint(1, 0, 0), new Direction3(0, 0, 1)),
@@ -148,6 +169,25 @@ class MeshTriangulatorParametricUvProjectionTest {
         UvPoint uv = mapper.project(point, null);
         assertRoundTrip(mapper, point, uv);
         assertEquals(0.4, uv.u(), UV_TOLERANCE);
+        assertEquals(0.6, uv.v(), UV_TOLERANCE);
+    }
+
+    @Test
+    void projectsLinearExtrusionOfBSplineWithNonUnitDomain() {
+        BSplineCurve3 generatrix = new BSplineCurve3(
+                3,
+                List.of(new CartesianPoint(1, 0, 0), new CartesianPoint(2, 1, 0),
+                        new CartesianPoint(3, -1, 0), new CartesianPoint(4, 0, 0)),
+                List.of(4, 4),
+                List.of(10.0, 20.0));
+        SurfaceOfLinearExtrusion3 extrusion = new SurfaceOfLinearExtrusion3(
+                generatrix, new Vector3(0, 0, 3));
+        ParametricSurfaceMapper mapper = mapperFor(extrusion);
+
+        CartesianPoint point = extrusion.pointAt(15.7, 0.6);
+        UvPoint uv = mapper.project(point, null);
+        assertRoundTrip(mapper, point, uv);
+        assertEquals(15.7, uv.u(), 1e-3);
         assertEquals(0.6, uv.v(), UV_TOLERANCE);
     }
 
