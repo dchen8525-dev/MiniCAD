@@ -81,6 +81,45 @@ final class MeshTriangulatorParametric {
         if (mapper == null) {
             return false;
         }
+        return triangulateWithMapper(face, mapper, surface, flipped,
+                triangleCountSupplier, addVertex, addTriangle);
+    }
+
+    /**
+     * Grid-walks a planar face in the plane's own frame.
+     *
+     * <p>The planar ear clipper owns planes and is the only path that can honour
+     * their exact outlines, but it drops the whole face when an inner loop is not
+     * fully nested inside the outer loop: no visible bridge exists, so
+     * {@code buildSimplePolygon} returns empty. Such faces are exactly the ones
+     * the grid walk handles, because it clips by containment ("inside the outer
+     * loop and outside every hole") instead of by bridging. Planes stay out of
+     * {@link #MAPPER_RULES} so that {@code mapperFor} keeps its contract that
+     * planes are not parametrically triangulable; this method builds the frame
+     * mapper it needs and shares the walk, density and emission with the
+     * parametric path.</p>
+     */
+    static boolean triangulatePlanarGridFallback(
+            Face face,
+            Plane plane,
+            boolean flipped,
+            Supplier<Integer> triangleCountSupplier,
+            BiFunction<CartesianPoint, Vector3, Integer> addVertex,
+            Consumer<int[]> addTriangle
+    ) {
+        return triangulateWithMapper(face, planeMapper(plane), plane, flipped,
+                triangleCountSupplier, addVertex, addTriangle);
+    }
+
+    private static boolean triangulateWithMapper(
+            Face face,
+            ParametricSurfaceMapper mapper,
+            SurfaceGeometry surface,
+            boolean flipped,
+            Supplier<Integer> triangleCountSupplier,
+            BiFunction<CartesianPoint, Vector3, Integer> addVertex,
+            Consumer<int[]> addTriangle
+    ) {
         List<ParametricLoopPayload> loops = buildParametricLoops(face, mapper, surface);
         if (loops.isEmpty() || loops.stream().noneMatch(ParametricLoopPayload::outer)) {
             return false;
@@ -94,6 +133,34 @@ final class MeshTriangulatorParametric {
         return triangulateGrid(mapper, normalizedLoops, bounds,
                 PARAMETRIC_U_SEGMENTS, PARAMETRIC_V_SEGMENTS,
                 flipped, triangleCountSupplier, addVertex, addTriangle);
+    }
+
+    /**
+     * Maps a plane onto the same orthonormal frame {@code PlanarFrame} uses, so
+     * the fallback walk covers the same u/v rectangle the ear clipper would have
+     * projected onto.
+     */
+    private static ParametricSurfaceMapper planeMapper(Plane plane) {
+        Vector3 normal = plane.normal().asVector();
+        Vector3 xSeed = Math.abs(normal.x()) < 0.9 ? new Vector3(1, 0, 0) : new Vector3(0, 1, 0);
+        Vector3 xAxis = normal.cross(xSeed).normalize().asVector();
+        Vector3 yAxis = normal.cross(xAxis).normalize().asVector();
+        CartesianPoint origin = plane.origin();
+        return new ParametricSurfaceMapper() {
+            @Override
+            public CartesianPoint pointAt(double u, double v) {
+                return origin.add(xAxis.scale(u)).add(yAxis.scale(v));
+            }
+            @Override
+            public Vector3 normalAt(double u, double v) {
+                return normal;
+            }
+            @Override
+            public UvPoint project(CartesianPoint point, UvPoint previous) {
+                Vector3 offset = point.subtract(origin);
+                return new UvPoint(offset.dot(xAxis), offset.dot(yAxis));
+            }
+        };
     }
 
     /**

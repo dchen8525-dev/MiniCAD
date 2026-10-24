@@ -272,6 +272,44 @@ class StepMeshExporterTest {
     }
 
     @Test
+    void shouldCoverPlanarFaceWhoseHoleIsNotFullyNested() {
+        // The inner loop pokes out of the outer square, so no bridge between the
+        // two loops is visible and ear clipping used to drop the whole face. The
+        // containment walk still covers the region the loops delimit: the outer
+        // square (64) minus the part of the hole that lies inside it (8).
+        String stepText =
+        "ISO-10303-21;\n"
+        + "HEADER;\n"
+        + "ENDSEC;\n"
+        + "DATA;\n"
+        + "#1=CARTESIAN_POINT('P0',(0.0,0.0,0.0));\n"
+        + "#2=CARTESIAN_POINT('P1',(8.0,0.0,0.0));\n"
+        + "#3=CARTESIAN_POINT('P2',(8.0,8.0,0.0));\n"
+        + "#4=CARTESIAN_POINT('P3',(0.0,8.0,0.0));\n"
+        + "#5=CARTESIAN_POINT('H0',(6.0,2.0,0.0));\n"
+        + "#6=CARTESIAN_POINT('H1',(10.0,2.0,0.0));\n"
+        + "#7=CARTESIAN_POINT('H2',(10.0,6.0,0.0));\n"
+        + "#8=CARTESIAN_POINT('H3',(6.0,6.0,0.0));\n"
+        + "#10=DIRECTION('DZ',(0.0,0.0,1.0));\n"
+        + "#11=DIRECTION('DX',(1.0,0.0,0.0));\n"
+        + "#12=AXIS2_PLACEMENT_3D('AXIS',#1,#10,#11);\n"
+        + "#13=PLANE('PL0',#12);\n"
+        + "#20=POLY_LOOP('OUT',(#1,#2,#3,#4));\n"
+        + "#21=POLY_LOOP('IN',(#5,#6,#7,#8));\n"
+        + "#30=FACE_OUTER_BOUND('FOB',#20,.T.);\n"
+        + "#31=FACE_BOUND('FB',#21,.T.);\n"
+        + "#40=ADVANCED_FACE('F',(#30,#31),#13,.T.);\n"
+        + "#50=OPEN_SHELL('OS',(#40));\n"
+        + "ENDSEC;\n"
+        + "END-ISO-10303-21;";
+
+        String obj = StepMeshExporter.exportObj(stepText);
+
+        // Whole cells on the walk's 32 x 24 window leave a sub-cell error.
+        assertEquals(56.0, planarAreaFromObj(obj), 1.5);
+    }
+
+    @Test
     void shouldTriangulateEllipseFaceWhoseTrimWrapsTheSeam() throws IOException {
         String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/ellipse-face.step")));
 

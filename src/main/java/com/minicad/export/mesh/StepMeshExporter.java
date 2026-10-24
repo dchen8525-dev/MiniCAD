@@ -772,7 +772,18 @@ public final class StepMeshExporter {
             }
         }
         private void triangulatePlanarFace(Face face, Plane plane, boolean flipped) {
+            int before = faceIndices.size();
             MeshTriangulatorPlanar.triangulatePlanarFace(face, plane, flipped,
+                    this::addVertex, tri -> addTriangle(tri[0], tri[1], tri[2]));
+            if (faceIndices.size() > before) {
+                return;
+            }
+            // Ear clipping drops the whole face when no hole bridge is visible,
+            // which happens whenever an inner loop is not fully nested inside the
+            // outer loop. Cover those faces with the same containment walk the
+            // parametric faces use instead of losing their area.
+            MeshTriangulatorParametric.triangulatePlanarGridFallback(face, plane, flipped,
+                    () -> faceIndices.size(),
                     this::addVertex, tri -> addTriangle(tri[0], tri[1], tri[2]));
         }
         private void triangulateCurvedFace(Face face, SurfaceGeometry surface, boolean flipped) {
