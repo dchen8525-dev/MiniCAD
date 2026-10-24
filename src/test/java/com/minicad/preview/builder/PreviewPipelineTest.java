@@ -7,6 +7,9 @@ import com.minicad.helper.StepMetadataExtractor;
 import com.minicad.geometry.CartesianPoint;
 import com.minicad.helper.StepTextReader;
 import com.minicad.preview.payload.FacePayload;
+import com.minicad.preview.payload.GeometryCollection;
+import com.minicad.preview.payload.LoopPayload;
+import com.minicad.preview.payload.PointPayload;
 import com.minicad.preview.sampling.CurveEvaluator;
 import com.minicad.preview.sampling.PreviewCurveEvaluator;
 import com.minicad.step.semantic.StepCadBuilder;
@@ -93,6 +96,71 @@ class PreviewPipelineTest {
             assertNotNull(evaluator.pointAt(evaluator.start()));
             assertNotNull(evaluator.pointAt(evaluator.end()));
         }
+    }
+
+    @Test
+    void solidFacesAreTrimmedToTheirOwnBounds() throws Exception {
+        // test.step wraps its geometry in a MANIFOLD_SOLID_BREP, so every face
+        // reaches the exporter through the solid bucket rather than through a
+        // shell. That bucket used to grid each carrier surface over its whole
+        // parameter domain, which drew each of the nine cylindrical bands as a
+        // full-height cylinder instead of the sliver the trim loops enclose.
+        String text = StepTextReader.readDecoded(
+                Files.readAllBytes(Path.of("samples", "test.step"))).text();
+        Map<Integer, StepEntity> sampleResolved = StepEntityResolver.resolveAll(StepParser.parse(text));
+        StepCadBuilder sampleBuilder = StepCadBuilder.fromResolved(sampleResolved);
+        GeometryCollection geometry =
+                StepLegacyGeometryBuilder.buildLegacyGeometry(
+                        sampleResolved, sampleBuilder, StepMetadataExtractor.fromResolved(sampleResolved));
+
+        assertEquals(15, geometry.faces().size(), "test.step has 9 cylindrical faces and 6 planes");
+        int cylindricalTriangles = 0;
+        for (FacePayload face : geometry.faces()) {
+            if (!"CYLINDRICAL_SURFACE".equals(face.surfaceType())) {
+                continue;
+            }
+            cylindricalTriangles += face.triangles().size() / 3;
+            double triangleDiagonal = diagonal(triangleBounds(face));
+            double loopDiagonal = diagonal(loopBounds(face));
+            assertTrue(triangleDiagonal <= loopDiagonal * 1.05,
+                    () -> "face " + face.stepId() + " draws triangles past its trim loops: "
+                            + triangleDiagonal + " vs " + loopDiagonal);
+        }
+        assertEquals(1_952, cylindricalTriangles,
+                "the cylindrical bands must be tessellated in their own parametric window");
+    }
+
+    private static double[] triangleBounds(FacePayload face) {
+        return pointBounds(face.triangles());
+    }
+
+    private static double[] loopBounds(FacePayload face) {
+        List<PointPayload> points = new ArrayList<>();
+        for (LoopPayload loop : face.loops()) {
+            points.addAll(loop.points());
+        }
+        return pointBounds(points);
+    }
+
+    private static double[] pointBounds(List<PointPayload> points) {
+        double[] bounds = {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
+                Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY};
+        for (PointPayload point : points) {
+            bounds[0] = Math.min(bounds[0], point.x());
+            bounds[1] = Math.min(bounds[1], point.y());
+            bounds[2] = Math.min(bounds[2], point.z());
+            bounds[3] = Math.max(bounds[3], point.x());
+            bounds[4] = Math.max(bounds[4], point.y());
+            bounds[5] = Math.max(bounds[5], point.z());
+        }
+        return bounds;
+    }
+
+    private static double diagonal(double[] bounds) {
+        double dx = bounds[3] - bounds[0];
+        double dy = bounds[4] - bounds[1];
+        double dz = bounds[5] - bounds[2];
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
     @Test

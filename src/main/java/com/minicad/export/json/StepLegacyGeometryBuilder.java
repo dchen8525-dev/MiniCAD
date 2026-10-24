@@ -173,6 +173,20 @@ public final class StepLegacyGeometryBuilder {
             try {
                 Solid solid = builder.buildSolid(solidId);
                 String baseName = entity == null ? null : entity.name();
+                List<StepEntity> shellEntities = solidShellEntities(entity);
+                if (!shellEntities.isEmpty()) {
+                    // A B-rep solid owns its shells' faces, and each of those was
+                    // resolved against the STEP surface it names. Preview them
+                    // through the semantic path the shell bucket uses, which
+                    // tessellates the face's trim loops; the topology grid path
+                    // below can only sample the whole carrier surface, so a
+                    // trimmed cylinder or torus came out as the full patch.
+                    // Edges stay on the built topology faces so this pass keeps
+                    // emitting the same edge ids it always has.
+                    collectSemanticFaces(shellEntities, itemMetadata, builder, faces, unsupportedFaces);
+                    collectSolidTopologyEdges(solid, uniqueEdges);
+                    continue;
+                }
                 int faceIndex = 0;
                 for (Face face : solid.outerShell().faces()) {
                     collectFace(solidId * 1000 + faceIndex++, face, baseName, itemMetadata,
@@ -200,6 +214,62 @@ public final class StepLegacyGeometryBuilder {
             edgeIndex++;
         }
         return new GeometryCollection(List.copyOf(edges), List.copyOf(faces), List.copyOf(unsupportedFaces));
+    }
+
+    /**
+     * Adds the faces of the given shells through the semantic preview path, the
+     * same one the shell bucket uses. A face that fails to build is recorded as
+     * unsupported instead of taking the rest of the solid down with it.
+     *
+     * <p>Planar faces keep the payload the solid bucket has always emitted for
+     * them: trim loops plus the {@code plane_face} surface, no triangles. The
+     * viewer tessellates those from {@code surfaceLoops}, so adding a mesh here
+     * would both double the payload and draw the face twice.</p>
+     */
+    private static void collectSemanticFaces(
+            List<StepEntity> shellEntities,
+            StepMetadataExtractor.DisplayMetadata metadata,
+            StepCadBuilder builder,
+            List<FacePayload> faces,
+            List<UnsupportedFacePayload> unsupportedFaces) {
+        for (StepEntity shell : shellEntities) {
+            for (StepFaceEntity stepFace : ShellHelper.shellFaces(shell)) {
+                try {
+                    if (StepGeometryHelper.faceGeometry(stepFace) instanceof StepPlane) {
+                        FacePayload planePayload = PreviewMeshExporter.facePayloadFromTopologyFace(
+                                stepFace.id(), builder.buildFace(stepFace.id()),
+                                StepMetadataHelper.faceDisplayName(stepFace), metadata);
+                        if (planePayload == null) {
+                            unsupportedFaces.add(StepFacePayloadBuilder.toUnsupportedFacePayload(
+                                    stepFace, "planar face preview returned no payload"));
+                        } else {
+                            faces.add(planePayload);
+                        }
+                        continue;
+                    }
+                    PreviewFaceResult previewFace =
+                            StepFacePayloadBuilder.buildPreviewFaceResult(stepFace, builder, metadata);
+                    if (previewFace.face() == null) {
+                        unsupportedFaces.add(previewFace.unsupportedFace());
+                        continue;
+                    }
+                    faces.add(previewFace.face());
+                } catch (RuntimeException ex) {
+                    unsupportedFaces.add(StepFacePayloadBuilder.toUnsupportedFacePayload(stepFace, ex.getMessage()));
+                }
+            }
+        }
+    }
+
+    private static void collectSolidTopologyEdges(Solid solid, Set<Edge> uniqueEdges) {
+        for (Face face : solid.outerShell().faces()) {
+            StepPayloadBuilder.collectTopologyEdges(face, uniqueEdges);
+        }
+        for (Shell shell : solid.voidShells()) {
+            for (Face face : shell.faces()) {
+                StepPayloadBuilder.collectTopologyEdges(face, uniqueEdges);
+            }
+        }
     }
 
     /**
@@ -323,47 +393,44 @@ public final class StepLegacyGeometryBuilder {
     // buildLegacyGeometry B-rep-solid shell-removal rules.
     // Clean first-match else-if chain: the six B-rep types are mutually exclusive (no subtype
     // relationship), so order is not load-bearing, but the table preserves the original order.
-    private record LegacySolidShellRule(Class<? extends StepEntity> type, LegacySolidShellHandler handler) {}
+    private record LegacySolidShellRule(Class<? extends StepEntity> type, LegacySolidShellProvider provider) {}
 
-    private interface LegacySolidShellHandler {
-        void removeShells(Set<Integer> shellIds, StepEntity solidEntity);
+    private interface LegacySolidShellProvider {
+        List<StepEntity> shells(StepEntity solidEntity);
     }
 
     private static LegacySolidShellRule legacySolidShellRule(
-            Class<? extends StepEntity> type, LegacySolidShellHandler handler) {
-        return new LegacySolidShellRule(type, handler);
+            Class<? extends StepEntity> type, LegacySolidShellProvider provider) {
+        return new LegacySolidShellRule(type, provider);
     }
 
     private static final List<LegacySolidShellRule> LEGACY_SOLID_SHELL_RULES = List.of(
-        legacySolidShellRule(StepManifoldSolidBrep.class, (shellIds, solidEntity) -> {
-            shellIds.remove(((StepManifoldSolidBrep) solidEntity).outer().id());
-        }),
-        legacySolidShellRule(StepFacettedBrep.class, (shellIds, solidEntity) -> {
-            shellIds.remove(((StepFacettedBrep) solidEntity).outer().id());
-        }),
-        legacySolidShellRule(StepNonManifoldSolidBrep.class, (shellIds, solidEntity) -> {
-            shellIds.remove(((StepNonManifoldSolidBrep) solidEntity).outer().id());
-        }),
-        legacySolidShellRule(StepAdvancedBrep.class, (shellIds, solidEntity) -> {
+        legacySolidShellRule(StepManifoldSolidBrep.class, solidEntity ->
+                List.of(((StepManifoldSolidBrep) solidEntity).outer())),
+        legacySolidShellRule(StepFacettedBrep.class, solidEntity ->
+                List.of(((StepFacettedBrep) solidEntity).outer())),
+        legacySolidShellRule(StepNonManifoldSolidBrep.class, solidEntity ->
+                List.of(((StepNonManifoldSolidBrep) solidEntity).outer())),
+        legacySolidShellRule(StepAdvancedBrep.class, solidEntity -> {
             StepAdvancedBrep brep = (StepAdvancedBrep) solidEntity;
-            shellIds.remove(brep.outer().id());
-            for (StepEntity voidShell : brep.voids()) {
-                shellIds.remove(voidShell.id());
-            }
+            List<StepEntity> shells = new ArrayList<>(brep.voids().size() + 1);
+            shells.add(brep.outer());
+            shells.addAll(brep.voids());
+            return List.copyOf(shells);
         }),
-        legacySolidShellRule(StepBrepWithVoids.class, (shellIds, solidEntity) -> {
+        legacySolidShellRule(StepBrepWithVoids.class, solidEntity -> {
             StepBrepWithVoids brep = (StepBrepWithVoids) solidEntity;
-            shellIds.remove(brep.outer().id());
-            for (StepEntity voidShell : brep.voids()) {
-                shellIds.remove(voidShell.id());
-            }
+            List<StepEntity> shells = new ArrayList<>(brep.voids().size() + 1);
+            shells.add(brep.outer());
+            shells.addAll(brep.voids());
+            return List.copyOf(shells);
         }),
-        legacySolidShellRule(StepFacetedBrepAndBrepWithVoids.class, (shellIds, solidEntity) -> {
+        legacySolidShellRule(StepFacetedBrepAndBrepWithVoids.class, solidEntity -> {
             StepFacetedBrepAndBrepWithVoids brep = (StepFacetedBrepAndBrepWithVoids) solidEntity;
-            shellIds.remove(brep.outer().id());
-            for (StepEntity voidShell : brep.voids()) {
-                shellIds.remove(voidShell.id());
-            }
+            List<StepEntity> shells = new ArrayList<>(brep.voids().size() + 1);
+            shells.add(brep.outer());
+            shells.addAll(brep.voids());
+            return List.copyOf(shells);
         })
     );
 
@@ -442,15 +509,26 @@ public final class StepLegacyGeometryBuilder {
     }
 
     private static void removeShellsReferencedBySolids(StepEntity solidEntity, Set<Integer> shellIds) {
+        for (StepEntity shell : solidShellEntities(solidEntity)) {
+            shellIds.remove(shell.id());
+        }
+    }
+
+    /**
+     * Returns the shells a B-rep solid is made of (outer shell first, then any
+     * void shells), or an empty list for the solid types that are not shell-backed
+     * (sweeps, CSG, volumes, tessellated bodies). Those keep the topology path.
+     */
+    private static List<StepEntity> solidShellEntities(StepEntity solidEntity) {
         if (solidEntity == null) {
-            return;
+            return List.of();
         }
         for (LegacySolidShellRule rule : LEGACY_SOLID_SHELL_RULES) {
             if (rule.type().isInstance(solidEntity)) {
-                rule.handler().removeShells(shellIds, solidEntity);
-                return;
+                return rule.provider().shells(solidEntity);
             }
         }
+        return List.of();
     }
 
     private static final int FACE_PROGRESS_INTERVAL = 25;
