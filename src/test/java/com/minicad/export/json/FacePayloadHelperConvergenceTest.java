@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -52,6 +53,9 @@ class FacePayloadHelperConvergenceTest {
 
     private static final String GLB_HOST =
             "src/main/java/com/minicad/export/glb/PreviewMeshExporter.java";
+
+    private static final String MESH_HOST =
+            "src/main/java/com/minicad/export/mesh/MeshTriangulatorParametric.java";
 
     /** The helpers made shared by c4e6e895 (all static, all now public). */
     private static final List<String> SHARED_HELPERS = List.of(
@@ -133,6 +137,19 @@ class FacePayloadHelperConvergenceTest {
                 "StepFacePayloadBuilder must call these helpers through the "
                         + "PreviewMeshExporter qualifier; a bare call means a local copy "
                         + "or a static import re-entered the file.");
+    }
+
+    @Test
+    @DisplayName("MeshTriangulatorParametric closes loops through the shared periodic normalizer")
+    void meshSideShouldNotRedeclareNormalizePeriodicLoop() throws IOException {
+        String text = read(Paths.get(MESH_HOST));
+        assertFalse(declaresMethod(text, "normalizePeriodicLoop"),
+                "MeshTriangulatorParametric must not fork normalizePeriodicLoop: its local "
+                        + "copy skipped the closing-step unwrap, leaving the last sample one "
+                        + "period away from the first point.");
+        assertTrue(text.contains("PreviewMeshExporter.normalizePeriodicLoop("),
+                "MeshTriangulatorParametric must normalize periodic loops through the "
+                        + "PreviewMeshExporter qualifier.");
     }
 
     @Test

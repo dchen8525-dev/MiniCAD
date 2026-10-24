@@ -9,6 +9,7 @@ import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
+import com.minicad.helper.MathUtilityHelper;
 import com.minicad.preview.mapper.ParametricSurfaceMapper;
 import com.minicad.preview.mapper.SurfaceNearestUvSearch;
 import com.minicad.preview.payload.ParametricLoopPayload;
@@ -747,6 +748,32 @@ final class MeshTriangulatorParametric {
         return Math.max(min, Math.min(max, value));
     }
 
+    /**
+     * Unwraps the samples of one open edge. This deliberately skips the
+     * loop-closing step in {@link PreviewMeshExporter#normalizePeriodicLoop}:
+     * the samples are not a loop, and collapsing the last sample onto the first
+     * branch would distort an arc wider than half a period.
+     */
+    private static List<UvPoint> normalizeEdgeSamples(List<UvPoint> points, ParametricSurfaceMapper mapper) {
+        Double uPeriod = mapper.uPeriod();
+        Double vPeriod = mapper.vPeriod();
+        List<UvPoint> normalized = new ArrayList<>(points.size());
+        UvPoint previous = null;
+        for (UvPoint point : points) {
+            UvPoint next = point;
+            if (previous != null) {
+                double u = uPeriod == null
+                        ? point.u() : MathUtilityHelper.unwrapPeriodic(point.u(), previous.u(), uPeriod);
+                double v = vPeriod == null
+                        ? point.v() : MathUtilityHelper.unwrapPeriodic(point.v(), previous.v(), vPeriod);
+                next = new UvPoint(u, v);
+            }
+            normalized.add(next);
+            previous = next;
+        }
+        return normalized;
+    }
+
     private static double wrapPeriodic(double value, double period) {
         double wrapped = value % period;
         return wrapped < 0.0 ? wrapped + period : wrapped;
@@ -772,7 +799,7 @@ final class MeshTriangulatorParametric {
             if (!bound.orientation()) {
                 uvPoints = reverseLoop(uvPoints);
             }
-            uvPoints = normalizePeriodicLoop(uvPoints, mapper);
+            uvPoints = PreviewMeshExporter.normalizePeriodicLoop(uvPoints, mapper);
             if (uvPoints.size() < 3) {
                 continue;
             }
@@ -825,7 +852,7 @@ final class MeshTriangulatorParametric {
             if (!bound.orientation()) {
                 loopPoints = reverseLoop(loopPoints);
             }
-            loopPoints = normalizePeriodicLoop(loopPoints, mapper);
+            loopPoints = PreviewMeshExporter.normalizePeriodicLoop(loopPoints, mapper);
             if (loopPoints.size() < 3) {
                 return List.of();
             }
@@ -1131,7 +1158,7 @@ final class MeshTriangulatorParametric {
             if (sampled.isEmpty()) {
                 continue;
             }
-            List<UvPoint> uvPoints = normalizePeriodicLoop(sampled, mapper);
+            List<UvPoint> uvPoints = normalizeEdgeSamples(sampled, mapper);
             List<UvPoint> oriented = orientUvSamples(orientedEdge, uvPoints, mapper);
             if (oriented.size() < 2) {
                 continue;
@@ -1324,42 +1351,6 @@ final class MeshTriangulatorParametric {
         double du = a.u() - b.u();
         double dv = a.v() - b.v();
         return du * du + dv * dv;
-    }
-
-    private static List<UvPoint> normalizePeriodicLoop(List<UvPoint> points, ParametricSurfaceMapper mapper) {
-        if (points.size() < 2) {
-            return points;
-        }
-        Double uPeriod = mapper.uPeriod();
-        Double vPeriod = mapper.vPeriod();
-        List<UvPoint> normalized = new ArrayList<>(points.size());
-        UvPoint previous = null;
-        for (UvPoint point : points) {
-            double u = point.u();
-            double v = point.v();
-            if (previous != null) {
-                if (uPeriod != null) {
-                    while (u - previous.u() > uPeriod * 0.5) {
-                        u -= uPeriod;
-                    }
-                    while (u - previous.u() < -uPeriod * 0.5) {
-                        u += uPeriod;
-                    }
-                }
-                if (vPeriod != null) {
-                    while (v - previous.v() > vPeriod * 0.5) {
-                        v -= vPeriod;
-                    }
-                    while (v - previous.v() < -vPeriod * 0.5) {
-                        v += vPeriod;
-                    }
-                }
-            }
-            UvPoint normalizedPoint = new UvPoint(u, v);
-            normalized.add(normalizedPoint);
-            previous = normalizedPoint;
-        }
-        return normalized;
     }
 
     static List<ParametricLoopPayload> normalizeLoopPeriods(List<ParametricLoopPayload> loops, ParametricSurfaceMapper mapper) {

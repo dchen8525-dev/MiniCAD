@@ -342,8 +342,12 @@ class StepMeshExporterTest {
         // exporter fell back to gridding each whole surface, including the area the
         // face is trimmed away from (~995k triangles for the sample). The parametric
         // grid is capped at the preview's base density, which keeps this at a quarter
-        // of the count produced when every face was refined to 64x48.
-        assertEquals(200_691, triangles);
+        // of the count produced when every face was refined to 64x48. Seam loops now
+        // close through the preview's periodic normalizer: the mesh-local copy left
+        // the closing sample on the previous sample's branch, one period away from
+        // the first point, which inflated the loop bounds and covered the cells the
+        // preview does not (22 triangles here).
+        assertEquals(200_669, triangles);
     }
 
     @Test
