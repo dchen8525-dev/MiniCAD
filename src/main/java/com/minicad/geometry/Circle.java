@@ -3,7 +3,6 @@ package com.minicad.geometry;
 import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -99,12 +98,7 @@ public final class Circle implements Curve3 {
 
     @Override
     public java.util.List<CartesianPoint> sample(int segments) {
-        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
-        for (int i = 0; i <= segments; i++) {
-            double angle = 2 * Math.PI * i / segments;
-            points.add(pointAt(angle));
-        }
-        return java.util.List.copyOf(points);
+        return CurveSampling3.between(segments, 0.0, 2 * Math.PI, this::pointAt);
     }
 
     /**

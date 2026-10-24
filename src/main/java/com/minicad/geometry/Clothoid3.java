@@ -4,7 +4,6 @@ import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -89,12 +88,6 @@ public final class Clothoid3 implements Curve3 {
 
     @Override
     public java.util.List<CartesianPoint> sample(int segments) {
-        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
-        // Sample a range of parameter values
-        for (int i = 0; i <= segments; i++) {
-            double t = (double) i / segments;
-            points.add(pointAt(t));
-        }
-        return java.util.List.copyOf(points);
+        return CurveSampling3.between(segments, 0.0, 1.0, this::pointAt);
     }
 }

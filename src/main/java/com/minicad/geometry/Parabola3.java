@@ -4,7 +4,6 @@ import com.minicad.common.Epsilon;
 import com.minicad.common.GeometryException;
 import com.minicad.common.Preconditions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -76,13 +75,7 @@ public final class Parabola3 implements Curve3 {
 
     @Override
     public java.util.List<CartesianPoint> sample(int segments) {
-        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
-        // Sample a range of parameter values
-        for (int i = 0; i <= segments; i++) {
-            double t = -1.0 + 2.0 * i / segments;
-            points.add(pointAt(t));
-        }
-        return java.util.List.copyOf(points);
+        return CurveSampling3.between(segments, -1.0, 1.0, this::pointAt);
     }
 
     /**
@@ -96,12 +89,7 @@ public final class Parabola3 implements Curve3 {
     public java.util.List<CartesianPoint> sample(int segments, double tMin, double tMax) {
         Preconditions.requireFinite(tMin, "tMin");
         Preconditions.requireFinite(tMax, "tMax");
-        java.util.List<CartesianPoint> points = new java.util.ArrayList<>();
-        for (int i = 0; i <= segments; i++) {
-            double t = tMin + (tMax - tMin) * i / segments;
-            points.add(pointAt(t));
-        }
-        return java.util.List.copyOf(points);
+        return CurveSampling3.between(segments, tMin, tMax, this::pointAt);
     }
 
     /**
