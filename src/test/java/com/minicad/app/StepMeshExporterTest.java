@@ -282,6 +282,20 @@ class StepMeshExporterTest {
     }
 
     @Test
+    void shouldNotEmitWholeSurfaceForFacesWhoseTrimLoopsEncloseNoArea() throws IOException {
+        for (String sample : new String[] {
+                "samples/conical-seam-vertex-loop.step",
+                "samples/toroidal-seam-vertex-loop.step"}) {
+            String obj = StepMeshExporter.exportObj(Files.readString(Path.of(sample)));
+
+            // The preview reports these faces unsupported: their bounds are dead
+            // seam loops. The mesh exporter used to fall back to gridding the whole
+            // cone/torus, emitting the geometry the trim excludes.
+            assertEquals(0, obj.lines().filter(line -> line.startsWith("f ")).count(), sample);
+        }
+    }
+
+    @Test
     void shouldTrimBSplineFacesInFanSampleToTheirOwnBounds() throws IOException {
         String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/fan.stp")));
 

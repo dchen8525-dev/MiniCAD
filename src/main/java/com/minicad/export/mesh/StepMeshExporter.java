@@ -748,8 +748,14 @@ public final class StepMeshExporter {
             if (surface instanceof Plane) {
             Plane plane = (Plane) surface;
                 triangulatePlanarFace(builtFace, plane, flipped);
-            } else if (!triangulateSemanticParametricFace(stepFace, faceGeometry, surface, builder, flipped)) {
-                triangulateFace(builtFace);
+            } else if (!triangulateSemanticParametricFace(stepFace, faceGeometry, surface, builder, flipped)
+                    && (MeshTriangulatorParametric.mapperFor(surface) == null || builtFace.bounds().isEmpty())) {
+                // A face with trim bounds and a mapper was trimmed: if the walk
+                // found no cells, the loops enclose no area (dead seam loops), and
+                // gridding the whole surface would add the geometry the bounds
+                // exclude. Without a mapper, or without bounds, the whole-surface
+                // grid is the only representation the exporter has.
+                triangulateCurvedFace(builtFace, surface, flipped);
             }
         }
         private void triangulatePlanarFace(Face face, Plane plane, boolean flipped) {
