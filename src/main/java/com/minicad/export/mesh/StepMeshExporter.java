@@ -910,27 +910,6 @@ public final class StepMeshExporter {
         void addTriangle(int v0, int v1, int v2) {
             faceIndices.add(new int[]{v0, v1, v2});
         }
-        void merge(Triangulator other) {
-            for (Map.Entry<MeshVertex, Integer> entry : other.vertexIndex.entrySet()) {
-                MeshVertex key = entry.getKey();
-                if (!vertexIndex.containsKey(key)) {
-                    int idx = vertexIndex.size();
-                    vertexIndex.put(key, idx);
-                }
-            }
-            // Re-index triangles: build a remap for other's local indices
-            List<Integer> otherToLocal = new ArrayList<>(other.vertexIndex.size());
-            for (Map.Entry<MeshVertex, Integer> entry : other.vertexIndex.entrySet()) {
-                otherToLocal.add(vertexIndex.get(entry.getKey()));
-            }
-            for (int[] tri : other.faceIndices) {
-                faceIndices.add(new int[]{
-                        otherToLocal.get(tri[0]),
-                        otherToLocal.get(tri[1]),
-                        otherToLocal.get(tri[2])
-                });
-            }
-        }
         void triangulateSolid(Solid solid) {
             triangulateShell(solid.outerShell());
             for (Shell shell : solid.voidShells()) {
