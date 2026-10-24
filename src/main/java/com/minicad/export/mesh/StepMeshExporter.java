@@ -658,6 +658,9 @@ public final class StepMeshExporter {
                 || entity instanceof com.minicad.step.model.StepManifoldSurfaceModel
                 || entity instanceof com.minicad.step.model.StepShellBasedSurfaceModel
                 || entity instanceof com.minicad.step.model.StepManifoldSolidBrep
+                || entity instanceof com.minicad.step.model.StepAdvancedBrep
+                || entity instanceof com.minicad.step.model.StepFacettedBrep
+                || entity instanceof com.minicad.step.model.StepNonManifoldSolidBrep
                 || entity instanceof com.minicad.step.model.StepBrepWithVoids;
     }
 

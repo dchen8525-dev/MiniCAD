@@ -591,6 +591,26 @@ class StepMeshExporterTest {
     }
 
     @Test
+    void shouldNotDrawBrepVariantsTwice() {
+        // The semantic face pass already triangulates every ADVANCED_FACE these
+        // breps own, so the solid pass used to rebuild the same shell and emit
+        // every triangle a second time. MANIFOLD_SOLID_BREP was the only kind
+        // the solid pass skipped, which kept the duplicate invisible.
+        String brep = MINIMAL_SQUARE.replace("#100=MANIFOLD_SOLID_BREP('S0',#90);",
+                "#100=%s;");
+        String[] variants = {
+                "MANIFOLD_SOLID_BREP('S0',#90)",
+                "ADVANCED_BREP('S0',#90,())",
+                "FACETTED_BREP('S0',#90)",
+                "NON_MANIFOLD_SOLID_BREP('S0',#90)"
+        };
+        for (String variant : variants) {
+            String obj = StepMeshExporter.exportObj(String.format(brep, variant));
+            assertEquals(2, triangleCount(obj), variant + " should emit each face once");
+        }
+    }
+
+    @Test
     void shouldPlaceAssemblyInstancesAtTheirWorldTransforms() throws IOException {
         // Each sample used to export the part once at its local origin: the mesh
         // pass never read NEXT_ASSEMBLY_USAGE_OCCURRENCE or the placement
