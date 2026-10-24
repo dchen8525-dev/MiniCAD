@@ -111,12 +111,25 @@ final class StepCadShellGeometry {
     }
 
     static Direction3 quadNormal(CartesianPoint a, CartesianPoint b, CartesianPoint c, CartesianPoint d) {
+        return quadNormal(a, b, c, d, "revolved side face is degenerate");
+    }
+
+    /**
+     * The quad normal with the caller's own wording for the degenerate case.
+     *
+     * <p>The four callers shared the arithmetic but not the message: the revolved and swept shells
+     * say "revolved side face is degenerate", while the truncated-cone and wedge quads in
+     * {@code StepCadBuilder} said "quad face is degenerate". That wording is observable, so it is
+     * the one thing the caller keeps rather than an implementation detail the helper may unify.
+     */
+    static Direction3 quadNormal(CartesianPoint a, CartesianPoint b, CartesianPoint c, CartesianPoint d,
+            String degenerateMessage) {
         Vector3 normal = b.subtract(a).cross(c.subtract(a));
         if (normal.isZero()) {
             normal = c.subtract(a).cross(d.subtract(a));
         }
         if (normal.isZero()) {
-            throw new UnsupportedGeometryException("revolved side face is degenerate");
+            throw new UnsupportedGeometryException(degenerateMessage);
         }
         return Direction3.from(normal.normalize());
     }

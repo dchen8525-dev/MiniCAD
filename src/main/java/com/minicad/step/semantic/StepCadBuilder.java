@@ -1168,26 +1168,6 @@ public final class StepCadBuilder {
     }
 
     /**
-     * Builds a parabola geometry object.
-     *
-     * @param id STEP entity id
-     * @return built parabola
-     */
-    public Parabola3 buildParabola(int id) {
-        return curveBuilder.buildParabola3(id);
-    }
-
-    /**
-     * Builds a hyperbola geometry object.
-     *
-     * @param id STEP entity id
-     * @return built hyperbola
-     */
-    public Hyperbola3 buildHyperbola(int id) {
-        return curveBuilder.buildHyperbola3(id);
-    }
-
-    /**
      * Builds a clothoid geometry object.
      *
      * @param id STEP entity id
@@ -2044,14 +2024,8 @@ public final class StepCadBuilder {
     }
 
     private Direction3 quadNormal(CartesianPoint a, CartesianPoint b, CartesianPoint c, CartesianPoint d) {
-        Vector3 normal = b.subtract(a).cross(c.subtract(a));
-        if (normal.isZero()) {
-            normal = c.subtract(a).cross(d.subtract(a));
-        }
-        if (normal.isZero()) {
-            throw new UnsupportedGeometryException("quad face is degenerate");
-        }
-        return Direction3.from(normal.normalize());
+        // Only the wording was this copy's own: a wedge or truncated-cone quad is not a revolved side.
+        return StepCadShellGeometry.quadNormal(a, b, c, d, "quad face is degenerate");
     }
 
     Solid buildBooleanResult(String operator, StepEntity first, StepEntity second) {

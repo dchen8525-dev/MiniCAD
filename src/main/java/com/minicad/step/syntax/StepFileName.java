@@ -99,10 +99,6 @@ public final class StepFileName {
         return originatingSystem;
     }
 
-    public String getAuthorization() {
-        return authorization;
-    }
-
     // Record-style accessors
     public String name() { return name; }
     public String timeStamp() { return timeStamp; }

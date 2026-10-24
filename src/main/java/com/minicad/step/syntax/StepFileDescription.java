@@ -19,10 +19,6 @@ public final class StepFileDescription {
         return description;
     }
 
-    public String getImplementationLevel() {
-        return implementationLevel;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

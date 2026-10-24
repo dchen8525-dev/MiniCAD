@@ -96,38 +96,6 @@ final class StepTrimResolver {
     }
 
     /**
-     * Resolves the first trim value to a CartesianPoint on the basis curve.
-     */
-    CartesianPoint resolveTrimPoint3(List<StepValue> trims, Curve3 basis, String slot) {
-        if (trims.isEmpty()) {
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " must have at least one trim value");
-        }
-        StepValue trim = unwrapTyped(trims.get(0));
-        if (trim instanceof StepValue.ListValue) {
-            StepValue.ListValue innerList = (StepValue.ListValue) trim;
-            return resolveTrimPoint3(innerList.elements(), basis, slot);
-        }
-        if (trim instanceof StepValue.ReferenceValue) {
-            StepValue.ReferenceValue ref = (StepValue.ReferenceValue) trim;
-            StepEntity entity = entitiesById.get(ref.id());
-            if (entity instanceof StepCartesianPoint) {
-            StepCartesianPoint point = (StepCartesianPoint) entity;
-                if (point.coordinates().size() < 2) {
-                    throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " point must have at least 2 coordinates");
-                }
-                return buildPoint.apply(point.id());
-            }
-            throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " reference #" + ref.id() + " is not a CARTESIAN_POINT");
-        }
-        if (trim instanceof StepValue.NumberValue) {
-            StepValue.NumberValue num = (StepValue.NumberValue) trim;
-            return basis.pointAt(num.value());
-        }
-        throw new UnsupportedGeometryException("TRIMMED_CURVE " + slot + " only supports entity reference or numeric parameter trims");
-    }
-
-
-    /**
      * Resolves a 2D trim value to a Point2.
      */
     Point2 resolveTrimPoint2(List<StepValue> trims, Curve2 basisCurve, String slot) {

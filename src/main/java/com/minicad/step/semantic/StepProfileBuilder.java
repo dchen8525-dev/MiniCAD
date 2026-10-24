@@ -38,7 +38,6 @@ final class StepProfileBuilder {
         public List<Point2> outer() { return outer; }
         public List<List<Point2>> inner() { return inner; }
         public List<Point2> getOuter() { return outer; }
-        public List<List<Point2>> getInner() { return inner; }
         public boolean isOuter() { return !outer.isEmpty(); }
 
         @Override

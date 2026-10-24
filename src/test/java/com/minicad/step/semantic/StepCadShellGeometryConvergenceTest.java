@@ -35,7 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li>StepCadBuilder's copy of the cluster was <em>dead</em>, not duplicated.
  *       It is gone, and the guard pins that it stays gone -- folding it would
  *       have been the wrong repair, so a later pass must not "restore" it to
- *       converge it.</li>
+ *       converge it. Its {@code quadNormal} is the exception: that one has a
+ *       live caller, so it survived, but only as a delegation that keeps the
+ *       wording a wedge or truncated-cone quad needs.</li>
  *   <li>The runtime agreement. A reflection call through each builder's private
  *       wrapper must return what the helper returns for the same inputs, which
  *       is what turns "the source looks like a delegation" into "it is one".</li>
@@ -93,6 +95,10 @@ class StepCadShellGeometryConvergenceTest {
             assertTrue(text.contains("StepCadShellGeometry.quadNormal(a, b, c, d)"),
                     builder + " must delegate quadNormal");
         }
+        assertTrue(source("StepCadBuilder").contains(
+                        "StepCadShellGeometry.quadNormal(a, b, c, d, \"quad face is degenerate\")"),
+                "StepCadBuilder's quadNormal keeps its own wording, so it delegates through the "
+                        + "message-carrying overload instead of the revolved-shell default");
     }
 
     @Test
@@ -138,9 +144,11 @@ class StepCadShellGeometryConvergenceTest {
                     "StepCadBuilder." + name + " had no callers and must stay deleted; "
                             + "re-adding it to converge it would be the wrong repair");
         }
-        // quadNormal is the one that survived: it has a live caller.
+        // quadNormal is the one that survived: it has a live caller, and only its wording differs.
         assertTrue(text.contains("private Direction3 quadNormal("),
-                "StepCadBuilder.quadNormal is still reached, so it stays");
+                "StepCadBuilder.quadNormal is still reached, so the wrapper stays");
+        assertTrue(!text.contains("normal = c.subtract(a).cross(d.subtract(a))"),
+                "the wrapper must not grow the body back; it is a delegation now");
         assertTrue(text.contains("quadNormal(bottomRing.get("),
                 "and its call site must still be there -- otherwise it is dead too");
     }
@@ -205,6 +213,10 @@ class StepCadShellGeometryConvergenceTest {
             assertEquals(expected.getX(), atPoint.getX(),
                     owner.getClass().getSimpleName() + ".circularFrameAtPoint drifted");
         }
+        assertEquals(StepCadShellGeometry.quadNormal(a, b, c, d),
+                call(builder, "quadNormal", new Class<?>[]{CartesianPoint.class, CartesianPoint.class,
+                        CartesianPoint.class, CartesianPoint.class}, a, b, c, d),
+                "StepCadBuilder.quadNormal drifted");
     }
 
     private static Object call(Object owner, String name, Class<?>[] types, Object... args)
@@ -255,6 +267,12 @@ class StepCadShellGeometryConvergenceTest {
                 UnsupportedGeometryException.class,
                 () -> StepCadShellGeometry.quadNormal(a, a, a, a));
         assertEquals("revolved side face is degenerate", degenerate.getMessage());
+
+        UnsupportedGeometryException wedge = assertThrows(
+                UnsupportedGeometryException.class,
+                () -> StepCadShellGeometry.quadNormal(a, a, a, a, "quad face is degenerate"));
+        assertEquals("quad face is degenerate", wedge.getMessage(),
+                "the caller's wording is carried through rather than replaced");
     }
 
     @Test
