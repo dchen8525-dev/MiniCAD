@@ -346,8 +346,23 @@ class StepMeshExporterTest {
         // close through the preview's periodic normalizer: the mesh-local copy left
         // the closing sample on the previous sample's branch, one period away from
         // the first point, which inflated the loop bounds and covered the cells the
-        // preview does not (22 triangles here).
-        assertEquals(200_669, triangles);
+        // preview does not (22 triangles here). Planar trims bounded by CIRCLE arcs
+        // now sample each arc over its own edge window instead of the whole circle,
+        // which adds the 70 triangles the repeated samples had collapsed.
+        assertEquals(200_739, triangles);
+    }
+
+    @Test
+    void shouldTrimPeriodicCircleSamplesToEachHoleEdge() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/plate-with-round-hole.step")));
+
+        // The hole is four edge curves sharing one CIRCLE. Each edge covers a
+        // quarter of the circle, but a periodic curve samples its whole period,
+        // so the loop used to collect 64 points at only 31 distinct positions.
+        // Ear clipping then answered with 16 duplicate triangles: 49 faces
+        // instead of the 36 the 4 + 32 vertex loop yields.
+        assertEquals(36, triangleCount(obj));
+        assertEquals(16.0 - Math.PI, planarAreaFromObj(obj), 0.05);
     }
 
     @Test

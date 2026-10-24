@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 final class MeshTriangulatorPlanar {
 
     private static final double PLANAR_EPS = 1e-9;
+    private static final double CLOSED_CURVE_EPS = 1e-6;
     private static final int DEFAULT_CURVE_SEGMENTS = 32;
 
     private MeshTriangulatorPlanar() {
@@ -89,7 +90,7 @@ final class MeshTriangulatorPlanar {
             List<CartesianPoint> points = new ArrayList<>();
             for (OrientedEdge oe : edgeLoop.edges()) {
                 List<CartesianPoint> edgePoints = MeshSampleOrientationHelper.orientSamples(
-                        oe, oe.edge().curve().sample(DEFAULT_CURVE_SEGMENTS));
+                        oe, trimClosedCurve(oe, oe.edge().curve().sample(DEFAULT_CURVE_SEGMENTS)));
                 int startIndex = points.isEmpty() ? 0 : 1;
                 for (int i = startIndex; i < edgePoints.size(); i++) {
                     points.add(edgePoints.get(i));
@@ -101,6 +102,53 @@ final class MeshTriangulatorPlanar {
             return points;
         }
         return List.of();
+    }
+
+    /**
+     * A periodic curve (a full CIRCLE, a closed spline) samples its whole period,
+     * so an edge covering a quarter of it carried the other three quarters too.
+     * Those repeated points reached ear clipping as a self-overlapping loop and
+     * it answered with duplicate triangles. Trim the closed sample loop to the
+     * window between the edge's own vertices, walked in the direction the edge
+     * traverses the curve.
+     */
+    private static List<CartesianPoint> trimClosedCurve(
+            OrientedEdge orientedEdge, List<CartesianPoint> samples) {
+        if (samples.size() < 3
+                || samples.get(0).distanceTo(samples.get(samples.size() - 1)) > CLOSED_CURVE_EPS) {
+            return samples;
+        }
+        int startIndex = nearestSampleIndex(samples, orientedEdge.startVertex().point());
+        int endIndex = nearestSampleIndex(samples, orientedEdge.endVertex().point());
+        if (startIndex == endIndex) {
+            return samples;
+        }
+        boolean followsCurve = orientedEdge.edge().sameSense() == orientedEdge.orientation();
+        List<CartesianPoint> window = new ArrayList<>();
+        int index = startIndex;
+        for (int step = 0; step < samples.size(); step++) {
+            window.add(samples.get(index));
+            if (index == endIndex) {
+                break;
+            }
+            index = followsCurve
+                    ? (index + 1) % samples.size()
+                    : (index - 1 + samples.size()) % samples.size();
+        }
+        return window.size() >= 2 ? window : samples;
+    }
+
+    private static int nearestSampleIndex(List<CartesianPoint> samples, CartesianPoint target) {
+        int bestIndex = 0;
+        double bestDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < samples.size(); i++) {
+            double distance = samples.get(i).distanceTo(target);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = i;
+            }
+        }
+        return bestIndex;
     }
 
     private static ProjectedLoop projectLoop(List<CartesianPoint> points, PlanarFrame frame, boolean outer) {
