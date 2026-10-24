@@ -307,48 +307,7 @@ public final class StepRepresentationPayloadBuilder {
             StepRepresentation seed,
             Map<Integer, StepEntity> resolved
     ) {
-        List<StepRepresentation> ordered = new ArrayList<>();
-        Set<Integer> visited = new LinkedHashSet<>();
-        collectLinkedShapeRepresentations(seed, resolved, visited, ordered);
-        return List.copyOf(ordered);
-    }
-
-
-    static void collectLinkedShapeRepresentations(
-            StepRepresentation current,
-            Map<Integer, StepEntity> resolved,
-            Set<Integer> visited,
-            List<StepRepresentation> ordered
-    ) {
-        if (!visited.add(current.id())) {
-            return;
-        }
-        ordered.add(current);
-        for (StepEntity entity : resolved.values()) {
-            if (entity instanceof StepShapeRepresentationRelationship) {
-            StepShapeRepresentationRelationship relationship = (StepShapeRepresentationRelationship) entity;
-                if (!relationship.rep1().shapeRepresentation() || !relationship.rep2().shapeRepresentation()) {
-                    continue;
-                }
-                if (relationship.rep1().id() == current.id()) {
-                    collectLinkedShapeRepresentations(relationship.rep2(), resolved, visited, ordered);
-                } else if (relationship.rep2().id() == current.id()) {
-                    collectLinkedShapeRepresentations(relationship.rep1(), resolved, visited, ordered);
-                }
-                continue;
-            }
-            if (entity instanceof StepRepresentationRelationship) {
-            StepRepresentationRelationship relationship = (StepRepresentationRelationship) entity;
-                if (!relationship.rep1().shapeRepresentation() || !relationship.rep2().shapeRepresentation()) {
-                    continue;
-                }
-                if (relationship.rep1().id() == current.id()) {
-                    collectLinkedShapeRepresentations(relationship.rep2(), resolved, visited, ordered);
-                } else if (relationship.rep2().id() == current.id()) {
-                    collectLinkedShapeRepresentations(relationship.rep1(), resolved, visited, ordered);
-                }
-            }
-        }
+        return ShapeRepresentationHelper.linkedRepresentations(seed, resolved);
     }
 
 

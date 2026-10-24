@@ -7,11 +7,28 @@ import com.minicad.geometry2d.Ellipse2;
 import com.minicad.geometry2d.Line2;
 import com.minicad.geometry2d.Point2;
 import com.minicad.geometry2d.TrimmedCurve2;
+import com.minicad.helper.ShapeRepresentationHelper;
 import com.minicad.helper.ShellHelper;
+import com.minicad.step.model.StepAdvancedBrep;
+import com.minicad.step.model.StepBrepWithVoids;
+import com.minicad.step.model.StepCompoundRepresentationItem;
+import com.minicad.step.model.StepConnectedFaceSet;
+import com.minicad.step.model.StepConnectedFaceSubSet;
 import com.minicad.step.model.StepEntity;
+import com.minicad.step.model.StepFacettedBrep;
+import com.minicad.step.model.StepFaceBasedSurfaceModel;
+import com.minicad.step.model.StepFaceEntity;
+import com.minicad.step.model.StepManifoldSolidBrep;
+import com.minicad.step.model.StepManifoldSurfaceModel;
+import com.minicad.step.model.StepNonManifoldSolidBrep;
+import com.minicad.step.model.StepOverRidingStyledItem;
+import com.minicad.step.model.StepRepresentation;
+import com.minicad.step.model.StepShellBasedSurfaceModel;
+import com.minicad.step.model.StepStyledItem;
 import com.minicad.step.semantic.StepCadBuilder;
 import com.minicad.step.semantic.TransformationOperatorBasis;
 import com.minicad.builder.CompiledStepDocument;
+import com.minicad.builder.StepAssemblyGraphBuilder;
 import com.minicad.topology.*;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -555,6 +572,11 @@ public final class StepMeshExporter {
         Map<Integer, StepEntity> resolved = compiled.resolved();
         StepCadBuilder builder = compiled.builder();
 
+        // Faces drawn by an assembly instance are emitted once per instance at
+        // that instance's world placement; everything else keeps the single
+        // local copy this exporter has always written.
+        Map<Integer, List<double[]>> placementsByFace = assemblyPlacementsByFace(resolved);
+
         // Collect face entities for deterministic triangulation.
         List<com.minicad.step.model.StepFaceEntity> faceEntities = resolved.values().stream()
                 .filter(e -> e instanceof com.minicad.step.model.StepFaceEntity)
@@ -564,15 +586,21 @@ public final class StepMeshExporter {
         int faceFailures = 0;
         String firstFaceFailure = null;
         for (com.minicad.step.model.StepFaceEntity faceEntity : faceEntities) {
-            try {
-                t.triangulateSemanticFace(faceEntity, builder);
-            } catch (Exception e) {
-                faceFailures++;
-                if (firstFaceFailure == null) {
-                    firstFaceFailure = "#" + faceEntity.id() + ": " + e.getMessage();
+            List<double[]> placements = placementsByFace.get(faceEntity.id());
+            int copies = placements == null ? 1 : placements.size();
+            for (int copy = 0; copy < copies; copy++) {
+                try {
+                    t.setTransform(placements == null ? null : placements.get(copy));
+                    t.triangulateSemanticFace(faceEntity, builder);
+                } catch (Exception e) {
+                    faceFailures++;
+                    if (firstFaceFailure == null) {
+                        firstFaceFailure = "#" + faceEntity.id() + ": " + e.getMessage();
+                    }
                 }
             }
         }
+        t.setTransform(null);
         if (faceFailures > 0) {
             LOG.warn("Skipped {} face(s) during mesh export; first failure: {}", faceFailures, firstFaceFailure);
         }
@@ -632,9 +660,172 @@ public final class StepMeshExporter {
                 || entity instanceof com.minicad.step.model.StepManifoldSolidBrep
                 || entity instanceof com.minicad.step.model.StepBrepWithVoids;
     }
+
+    /**
+     * Maps each face to the world placements of the product-structure instances
+     * that draw it. A lone root product is a plain part, not an assembly: its
+     * representation holds the same geometry the local face pass already writes,
+     * so no placements are returned and the output stays byte-identical.
+     *
+     * <p>Faces reachable from more than one node are emitted once per distinct
+     * placement. Faces no representation covers are absent and keep the single
+     * local copy.
+     */
+    private static Map<Integer, List<double[]>> assemblyPlacementsByFace(Map<Integer, StepEntity> resolved) {
+        StepAssemblyGraphBuilder.AssemblyGraph graph;
+        try {
+            graph = StepAssemblyGraphBuilder.build(resolved, 1.0);
+        } catch (RuntimeException e) {
+            // A degenerate placement should not cost the whole export: without a
+            // graph the local geometry is still written, exactly as before.
+            LOG.warn("Assembly placements unavailable, exporting local geometry only: {}", e.getMessage());
+            return Map.of();
+        }
+        if (graph.nodes().size() < 2) {
+            return Map.of();
+        }
+        Map<Integer, List<double[]>> placementsByFace = new LinkedHashMap<>();
+        for (StepAssemblyGraphBuilder.AssemblyNode node : graph.nodes()) {
+            for (Integer representationId : node.representationIds()) {
+                StepEntity representationEntity = resolved.get(representationId);
+                if (!(representationEntity instanceof StepRepresentation)) {
+                    continue;
+                }
+                for (Integer faceId : representationFaceIds((StepRepresentation) representationEntity, resolved)) {
+                    addPlacement(placementsByFace, faceId, node.worldMatrix());
+                }
+            }
+        }
+        return placementsByFace;
+    }
+
+    private static void addPlacement(
+            Map<Integer, List<double[]>> placementsByFace, int faceId, double[] placement) {
+        List<double[]> placements = placementsByFace.computeIfAbsent(faceId, ignored -> new ArrayList<>());
+        for (double[] existing : placements) {
+            if (Arrays.equals(existing, placement)) {
+                return;
+            }
+        }
+        placements.add(placement);
+    }
+
+    private static Set<Integer> representationFaceIds(
+            StepRepresentation representation, Map<Integer, StepEntity> resolved) {
+        Set<Integer> faceIds = new LinkedHashSet<>();
+        Set<Integer> visited = new LinkedHashSet<>();
+        for (StepRepresentation linked : ShapeRepresentationHelper.linkedRepresentations(representation, resolved)) {
+            for (StepEntity item : linked.items()) {
+                collectRepresentationFaceIds(item, faceIds, visited);
+            }
+        }
+        return faceIds;
+    }
+
+    /**
+     * Collects the faces an assembly representation item draws, descending
+     * through styled wrappers, solids, surface models and nested representations.
+     * Items with no face-based geometry (placements, mapped items, CSG) fall
+     * through, leaving their faces on the local pass.
+     */
+    private static void collectRepresentationFaceIds(
+            StepEntity entity, Set<Integer> faceIds, Set<Integer> visited) {
+        StepEntity item = entity;
+        while (item instanceof StepStyledItem || item instanceof StepOverRidingStyledItem) {
+            item = item instanceof StepStyledItem
+                    ? ((StepStyledItem) item).item()
+                    : ((StepOverRidingStyledItem) item).item();
+        }
+        if (item == null || !visited.add(item.id())) {
+            return;
+        }
+        if (item instanceof StepFaceEntity) {
+            faceIds.add(item.id());
+            return;
+        }
+        if (item instanceof StepManifoldSolidBrep) {
+            collectShellFaceIds(((StepManifoldSolidBrep) item).outer(), faceIds, visited);
+            return;
+        }
+        if (item instanceof StepBrepWithVoids) {
+            StepBrepWithVoids brep = (StepBrepWithVoids) item;
+            collectShellFaceIds(brep.outer(), faceIds, visited);
+            for (StepEntity voidShell : brep.voids()) {
+                collectShellFaceIds(voidShell, faceIds, visited);
+            }
+            return;
+        }
+        if (item instanceof StepAdvancedBrep) {
+            StepAdvancedBrep brep = (StepAdvancedBrep) item;
+            collectShellFaceIds(brep.outer(), faceIds, visited);
+            for (StepEntity voidShell : brep.voids()) {
+                collectShellFaceIds(voidShell, faceIds, visited);
+            }
+            return;
+        }
+        if (item instanceof StepFacettedBrep) {
+            collectShellFaceIds(((StepFacettedBrep) item).outer(), faceIds, visited);
+            return;
+        }
+        if (item instanceof StepNonManifoldSolidBrep) {
+            collectShellFaceIds(((StepNonManifoldSolidBrep) item).outer(), faceIds, visited);
+            return;
+        }
+        if (item instanceof StepShellBasedSurfaceModel) {
+            for (StepEntity shell : ((StepShellBasedSurfaceModel) item).shells()) {
+                collectShellFaceIds(shell, faceIds, visited);
+            }
+            return;
+        }
+        if (item instanceof StepManifoldSurfaceModel) {
+            for (StepEntity shell : ((StepManifoldSurfaceModel) item).shells()) {
+                collectShellFaceIds(shell, faceIds, visited);
+            }
+            return;
+        }
+        if (item instanceof StepFaceBasedSurfaceModel) {
+            for (StepEntity faceSet : ((StepFaceBasedSurfaceModel) item).faceSets()) {
+                collectShellFaceIds(faceSet, faceIds, visited);
+            }
+            return;
+        }
+        if (item instanceof StepRepresentation) {
+            for (StepEntity nestedItem : ((StepRepresentation) item).items()) {
+                collectRepresentationFaceIds(nestedItem, faceIds, visited);
+            }
+            return;
+        }
+        if (item instanceof StepCompoundRepresentationItem) {
+            for (StepEntity nestedItem : ((StepCompoundRepresentationItem) item).items()) {
+                collectRepresentationFaceIds(nestedItem, faceIds, visited);
+            }
+            return;
+        }
+        collectShellFaceIds(item, faceIds, visited);
+    }
+
+    private static void collectShellFaceIds(
+            StepEntity shellEntity, Set<Integer> faceIds, Set<Integer> visited) {
+        if (shellEntity == null) {
+            return;
+        }
+        boolean hasFaces = ShellHelper.isShellEntity(shellEntity)
+                || shellEntity instanceof StepConnectedFaceSet
+                || shellEntity instanceof StepConnectedFaceSubSet;
+        if (!hasFaces) {
+            return;
+        }
+        for (StepFaceEntity face : ShellHelper.shellFaces(shellEntity)) {
+            collectRepresentationFaceIds(face, faceIds, visited);
+        }
+    }
     private static class Triangulator {
         private final Map<MeshVertex, Integer> vertexIndex = new LinkedHashMap<>();
         private final List<int[]> faceIndices = new ArrayList<>();
+        // World placement of the assembly instance being triangulated, or null
+        // for the plain local pass. Vertices and normals are placed before dedup
+        // so two instances of one part get their own copies.
+        private double[] placement;
         private static class MeshVertex {
             private final double x;
             private final double y;
@@ -675,8 +866,39 @@ public final class StepMeshExporter {
             }
             @Override public int hashCode() { return java.util.Objects.hash(x, y, z, nx, ny, nz); }
         }
+        void setTransform(double[] placement) {
+            this.placement = isIdentityPlacement(placement) ? null : placement;
+        }
+        private static boolean isIdentityPlacement(double[] placement) {
+            if (placement == null) {
+                return true;
+            }
+            double[] identity = StepAssemblyGraphBuilder.identityMatrix();
+            for (int i = 0; i < identity.length; i++) {
+                if (placement[i] != identity[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        private static CartesianPoint placePoint(CartesianPoint p, double[] placement) {
+            return new CartesianPoint(
+                    placement[0] * p.x() + placement[1] * p.y() + placement[2] * p.z() + placement[3],
+                    placement[4] * p.x() + placement[5] * p.y() + placement[6] * p.z() + placement[7],
+                    placement[8] * p.x() + placement[9] * p.y() + placement[10] * p.z() + placement[11]);
+        }
+        private static Vector3 placeNormal(Vector3 n, double[] placement) {
+            Vector3 placed = new Vector3(
+                    placement[0] * n.x() + placement[1] * n.y() + placement[2] * n.z(),
+                    placement[4] * n.x() + placement[5] * n.y() + placement[6] * n.z(),
+                    placement[8] * n.x() + placement[9] * n.y() + placement[10] * n.z());
+            double length = placed.norm();
+            return length < MIN_TRIANGLE_AREA ? placed : placed.normalize().asVector();
+        }
         int addVertex(CartesianPoint p, Vector3 n) {
-            MeshVertex key = new MeshVertex(p, n);
+            MeshVertex key = placement == null
+                    ? new MeshVertex(p, n)
+                    : new MeshVertex(placePoint(p, placement), placeNormal(n, placement));
             Integer idx = vertexIndex.get(key);
             if (idx != null) {
                 return idx;

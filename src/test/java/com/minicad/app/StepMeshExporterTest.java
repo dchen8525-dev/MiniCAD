@@ -590,6 +590,57 @@ class StepMeshExporterTest {
         assertEquals(7.0 * Math.PI / 4.0, planarAreaFromObj(obj), 0.35);
     }
 
+    @Test
+    void shouldPlaceAssemblyInstancesAtTheirWorldTransforms() throws IOException {
+        // Each sample used to export the part once at its local origin: the mesh
+        // pass never read NEXT_ASSEMBLY_USAGE_OCCURRENCE or the placement
+        // relationships, so the assembly wrapper was invisible.
+        String nested = StepMeshExporter.exportObj(Files.readString(Path.of("samples/nested-assembly.step")));
+        assertBounds(nested, 10.0, 11.0, 4.0, 5.0);
+        assertEquals(2, triangleCount(nested));
+
+        // One part rep drawn twice: +x6 and +y5 from the shared local part.
+        String dual = StepMeshExporter.exportObj(Files.readString(Path.of("samples/two-instance-assembly.step")));
+        assertBounds(dual, 0.0, 8.0, 0.0, 5.8);
+        assertEquals(4, triangleCount(dual));
+
+        String translated = StepMeshExporter.exportObj(Files.readString(Path.of("samples/translated-part-assembly.step")));
+        assertBounds(translated, 12.0, 13.5, 0.0, 1.0);
+        assertEquals(2, triangleCount(translated));
+    }
+
+    private static void assertBounds(String obj, double minX, double maxX, double minY, double maxY) {
+        double[] bounds = objBounds(obj);
+        assertEquals(minX, bounds[0], 1e-9);
+        assertEquals(maxX, bounds[1], 1e-9);
+        assertEquals(minY, bounds[2], 1e-9);
+        assertEquals(maxY, bounds[3], 1e-9);
+    }
+
+    private static long triangleCount(String obj) {
+        return obj.lines().filter(line -> line.startsWith("f ")).count();
+    }
+
+    private static double[] objBounds(String obj) {
+        double[] bounds = {
+                Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
+                Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY
+        };
+        for (String line : obj.lines().collect(Collectors.toList())) {
+            if (!line.startsWith("v ")) {
+                continue;
+            }
+            String[] parts = line.trim().split("\\s+");
+            double x = Double.parseDouble(parts[1]);
+            double y = Double.parseDouble(parts[2]);
+            bounds[0] = Math.min(bounds[0], x);
+            bounds[1] = Math.max(bounds[1], x);
+            bounds[2] = Math.min(bounds[2], y);
+            bounds[3] = Math.max(bounds[3], y);
+        }
+        return bounds;
+    }
+
     private static String cylindricalFaceStep(String surfaceDeclarations, String faceGeometryRef) {
         return String.format(
         "ISO-10303-21;\n"
