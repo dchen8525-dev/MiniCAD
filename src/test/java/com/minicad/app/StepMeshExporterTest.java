@@ -272,6 +272,16 @@ class StepMeshExporterTest {
     }
 
     @Test
+    void shouldTriangulateEllipseFaceWhoseTrimWrapsTheSeam() throws IOException {
+        String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/ellipse-face.step")));
+
+        assertTrue(obj.contains("f "), obj);
+        // Two trims at (3,0) and (0,2) split the ellipse into a quarter arc and
+        // the complementary three-quarter arc, so the face is the whole ellipse.
+        assertEquals(Math.PI * 3.0 * 2.0, planarAreaFromObj(obj), 0.3);
+    }
+
+    @Test
     void shouldTrimCylindricalFaceToFaceBounds() throws IOException {
         String obj = StepMeshExporter.exportObj(Files.readString(Path.of("samples/cylindrical-band.step")));
         assertTrue(obj.contains("f "));

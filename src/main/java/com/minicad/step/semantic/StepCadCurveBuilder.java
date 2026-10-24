@@ -118,6 +118,33 @@ final class StepCadCurveBuilder {
 
     private static final Logger log = LoggerFactory.getLogger(StepCadCurveBuilder.class);
 
+    private static final double TWO_PI = 2.0 * Math.PI;
+
+    /**
+     * Orders the two trims of a periodic basis curve so that the trimmed segment
+     * runs in the direction the sense flag asks for.
+     *
+     * <p>Trim parameters resolved from points are atan2 angles, so a segment that
+     * crosses the {@code -pi/+pi} seam arrives with its end before its start, and
+     * interpolating between them traces the complementary arc backwards instead
+     * of the intended one. STEP's rule is to continue through one full period;
+     * the ellipse face split at {@code (3,0)} and {@code (0,2)} is exactly that
+     * case, and without the wrap its two edges cover the same quarter arc twice
+     * and enclose no area.</p>
+     *
+     * <p>A window already one period long is left alone: its two trims describe a
+     * full turn in either direction, which no shift improves.</p>
+     */
+    private static double[] wrapPeriodicTrim(double start, double end, boolean senseAgreement, boolean periodic) {
+        if (periodic && senseAgreement && end < start && start - end < TWO_PI) {
+            return new double[] {start, end + TWO_PI};
+        }
+        if (periodic && !senseAgreement && end > start && end - start < TWO_PI) {
+            return new double[] {start, end - TWO_PI};
+        }
+        return new double[] {start, end};
+    }
+
     // Entity lookup
     private final Map<Integer, StepEntity> entitiesById;
 
@@ -1426,7 +1453,11 @@ final class StepCadCurveBuilder {
         }
         double trimParamStart = trimResolver.resolveTrimParameter(trimmedCurve.trim1(), basis, "trim_1");
         double trimParamEnd = trimResolver.resolveTrimParameter(trimmedCurve.trim2(), basis, "trim_2");
-        TrimmedCurve3 built = new TrimmedCurve3(basis, trimParamStart, trimParamEnd, trimmedCurve.isSenseAgreement());
+        double[] window = wrapPeriodicTrim(
+                trimParamStart, trimParamEnd, trimmedCurve.isSenseAgreement(),
+                basis instanceof Ellipse3 || basis instanceof Circle);
+        TrimmedCurve3 built = new TrimmedCurve3(
+                basis, window[0], window[1], trimmedCurve.isSenseAgreement());
         trimmedCurves3d.put(id, built);
         return built;
     }
