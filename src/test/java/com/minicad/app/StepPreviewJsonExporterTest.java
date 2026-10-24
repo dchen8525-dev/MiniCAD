@@ -10669,6 +10669,18 @@ class StepPreviewJsonExporterTest {
         assertTrue(metadata.contains("\"solidCount\":31"), "engine.stp should have 31 solids");
         assertTrue(metadata.contains("\"unsupportedFaceCount\":0"), metadata);
         assertTrue(metadata.contains("\"faceCount\":2756"), metadata);
+
+        JSONObject preview = JSONObject.parseObject(metadata)
+                .getJSONArray("scenes").getJSONObject(0)
+                .getJSONObject("extras").getJSONObject("preview");
+        double area = preview.getJSONObject("validation").getDoubleValue("approxSurfaceArea");
+        // engine.stp carries a degenerate cone (radius 2.2e8, ~90 degree
+        // semi-angle) whose face strip sits around an axial height of -1000.
+        // Gridding it over the whole-surface [-10, 10] window threw its
+        // triangles 2.2e8 units from the origin and reported the assembly at
+        // 1.3e16. Sampling the face's own axial window keeps the total near
+        // the real 1e6-scale surface area.
+        assertTrue(area < 1.0e9, "engine.stp shouldn't report an exploded preview area: " + area);
     }
 
     @Test

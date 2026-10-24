@@ -410,7 +410,7 @@ public final class PreviewMeshExporter {
             double scalarC,
             List<FaceBound> bounds
     ) {
-        List<List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface);
+        List<List<CartesianPoint>> grid = sampleTopologySurfaceGrid(surface, bounds);
         if (grid.isEmpty()) return null;
         List<PointPayload> triangles = TriangulationHelper.triangulateSurfaceGrid(grid, sameSense);
         if (triangles.isEmpty()) return null;
@@ -623,6 +623,58 @@ public final class PreviewMeshExporter {
 
     public static List<List<CartesianPoint>> sampleTopologySurfaceGrid(SurfaceGeometry surface) {
         return surface.sampleGrid(TOPOLOGY_SURFACE_GRID_SEGMENTS, TOPOLOGY_SURFACE_GRID_SEGMENTS);
+    }
+
+    /**
+     * Samples the surface over the window the face itself occupies, which for a
+     * cone is the axial span of its bounds rather than the [-10, 10] the
+     * whole-surface grid draws over.
+     *
+     * <p>A STEP file can describe a plane-like cone: an almost 90 degree
+     * semi-angle with a matching huge radius, so that the conical strip the
+     * face needs sits at an axial height of about {@code -radius / tan(semiAngle)}
+     * - thousands of units away from the origin the default window samples.
+     * Sampling [-10, 10] then evaluates the cone far from that strip and emits
+     * triangles millions of units away, which is what inflated the engine
+     * sample's preview surface area to 1.3e16. For every other surface, or when
+     * the bounds carry no axial extent, the whole-domain grid is kept.</p>
+     */
+    private static List<List<CartesianPoint>> sampleTopologySurfaceGrid(
+            SurfaceGeometry surface, List<FaceBound> bounds) {
+        if (surface instanceof ConicalSurface && !bounds.isEmpty()) {
+            ConicalSurface cone = (ConicalSurface) surface;
+            Vector3 axis = cone.position().axis().asVector();
+            CartesianPoint origin = cone.position().location();
+            double minV = Double.POSITIVE_INFINITY;
+            double maxV = Double.NEGATIVE_INFINITY;
+            for (FaceBound bound : bounds) {
+                for (CartesianPoint point : StepPayloadBuilder.sampleLoop(bound)) {
+                    double v = point.subtract(origin).dot(axis);
+                    minV = Math.min(minV, v);
+                    maxV = Math.max(maxV, v);
+                }
+            }
+            if (Double.isFinite(minV) && Double.isFinite(maxV) && maxV - minV > Epsilon.EPS) {
+                return sampleSurfaceWindow(surface, 0.0, 2.0 * Math.PI, minV, maxV);
+            }
+        }
+        return sampleTopologySurfaceGrid(surface);
+    }
+
+    private static List<List<CartesianPoint>> sampleSurfaceWindow(
+            SurfaceGeometry surface, double uStart, double uEnd, double vStart, double vEnd) {
+        int segments = TOPOLOGY_SURFACE_GRID_SEGMENTS;
+        List<List<CartesianPoint>> rows = new ArrayList<>(segments + 1);
+        for (int ui = 0; ui <= segments; ui++) {
+            double u = uStart + (uEnd - uStart) * ui / segments;
+            List<CartesianPoint> row = new ArrayList<>(segments + 1);
+            for (int vi = 0; vi <= segments; vi++) {
+                double v = vStart + (vEnd - vStart) * vi / segments;
+                row.add(surface.pointAt(u, v));
+            }
+            rows.add(List.copyOf(row));
+        }
+        return List.copyOf(rows);
     }
 
     public static List<List<CartesianPoint>> sampleSurfaceGrid(BSplineSurface3 surface, int uSegments, int vSegments) {
