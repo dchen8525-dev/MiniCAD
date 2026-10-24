@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepSheetMetalFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("featureType", featureType);
-        state.put("sheetThickness", sheetThickness);
-        state.put("bendRadius", bendRadius);
-        state.put("bendAngle", bendAngle);
-        state.put("featureGeometry", featureGeometry);
-        state.put("flatPattern", flatPattern);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "featureType", featureType,
+                "sheetThickness", sheetThickness, "bendRadius", bendRadius, "bendAngle", bendAngle,
+                "featureGeometry", featureGeometry, "flatPattern", flatPattern);
     }
 }

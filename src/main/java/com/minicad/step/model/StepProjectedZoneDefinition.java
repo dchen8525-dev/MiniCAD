@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -39,12 +38,8 @@ public final class StepProjectedZoneDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("description", description);
-        state.put("projectedZone", projectedZone);
-        state.put("applied", applied);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "description", description, "projectedZone", projectedZone,
+                "applied", applied);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -53,13 +52,8 @@ public final class StepSurfacedEdgeCurve extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("edgeGeometry", edgeGeometry);
-        state.put("surface1", surface1);
-        state.put("surface2", surface2);
-        state.put("sameSurface", sameSurface);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "edgeGeometry", edgeGeometry, "surface1", surface1,
+                "surface2", surface2, "sameSurface", sameSurface);
     }
 }

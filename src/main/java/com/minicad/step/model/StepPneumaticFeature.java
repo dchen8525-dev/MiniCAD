@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepPneumaticFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("pneumaticType", pneumaticType);
-        state.put("pneumaticGeometry", pneumaticGeometry);
-        state.put("variancePressure", variancePressure);
-        state.put("varianceFlow", varianceFlow);
-        state.put("portSize", portSize);
-        state.put("varianceConnections", varianceConnections);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "pneumaticType", pneumaticType,
+                "pneumaticGeometry", pneumaticGeometry, "variancePressure", variancePressure,
+                "varianceFlow", varianceFlow, "portSize", portSize, "varianceConnections", varianceConnections);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,11 +55,7 @@ public final class StepAppliedIdentificationAssignment extends AbstractStepEntit
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("assignedId", assignedId);
-        state.put("role", role);
-        state.put("items", items);
-        return state;
+        return componentsOf(
+                "id", getId(), "assignedId", assignedId, "role", role, "items", items);
     }
 }

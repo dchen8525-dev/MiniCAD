@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepSignatureRecord extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("signatureType", signatureType);
-        state.put("signatureValue", signatureValue);
-        state.put("signatureSigner", signatureSigner);
-        state.put("signatureTimestamp", signatureTimestamp);
-        state.put("signatureValid", signatureValid);
-        state.put("signatureStatus", signatureStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "signatureType", signatureType,
+                "signatureValue", signatureValue, "signatureSigner", signatureSigner,
+                "signatureTimestamp", signatureTimestamp, "signatureValid", signatureValid,
+                "signatureStatus", signatureStatus);
     }
 }

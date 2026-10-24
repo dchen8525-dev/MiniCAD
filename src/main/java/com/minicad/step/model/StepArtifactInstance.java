@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepArtifactInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("artifactDefinition", artifactDefinition);
-        state.put("artifactState", artifactState);
-        state.put("artifactLocation", artifactLocation);
-        state.put("artifactSize", artifactSize);
-        state.put("artifactStatus", artifactStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "artifactDefinition", artifactDefinition,
+                "artifactState", artifactState, "artifactLocation", artifactLocation,
+                "artifactSize", artifactSize, "artifactStatus", artifactStatus);
     }
 }

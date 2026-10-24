@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,13 +46,9 @@ public final class StepHeatTreatmentSpecification extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("specificationType", specificationType);
-        state.put("specificationDescription", specificationDescription);
-        state.put("specificationParameters", specificationParameters);
-        state.put("specificationStatus", specificationStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "specificationType", specificationType,
+                "specificationDescription", specificationDescription,
+                "specificationParameters", specificationParameters, "specificationStatus", specificationStatus);
     }
 }

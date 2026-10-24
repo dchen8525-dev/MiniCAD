@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepSyncInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("syncDefinition", syncDefinition);
-        state.put("syncState", syncState);
-        state.put("syncLastSync", syncLastSync);
-        state.put("syncPending", syncPending);
-        state.put("syncConflicts", syncConflicts);
-        state.put("syncStatus", syncStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "syncDefinition", syncDefinition, "syncState", syncState,
+                "syncLastSync", syncLastSync, "syncPending", syncPending, "syncConflicts", syncConflicts,
+                "syncStatus", syncStatus);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepStorageDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("storageType", storageType);
-        state.put("storageCapacity", storageCapacity);
-        state.put("storageFormat", storageFormat);
-        state.put("storageLocation", storageLocation);
-        state.put("storageStatus", storageStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "storageType", storageType,
+                "storageCapacity", storageCapacity, "storageFormat", storageFormat,
+                "storageLocation", storageLocation, "storageStatus", storageStatus);
     }
 }

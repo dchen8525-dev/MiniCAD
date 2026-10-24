@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -61,14 +60,10 @@ public final class StepNextAssemblyUsageOccurrence extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("identifier", identifier);
-        state.put("name", getName());
-        state.put("description", description);
-        state.put("relatingProductDefinition", relatingProductDefinition);
-        state.put("relatedProductDefinition", relatedProductDefinition);
-        state.put("referenceDesignator", referenceDesignator);
-        return state;
+        return componentsOf(
+                "id", getId(), "identifier", identifier, "name", getName(), "description", description,
+                "relatingProductDefinition", relatingProductDefinition,
+                "relatedProductDefinition", relatedProductDefinition,
+                "referenceDesignator", referenceDesignator);
     }
 }

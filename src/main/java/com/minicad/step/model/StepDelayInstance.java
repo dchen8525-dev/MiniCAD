@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepDelayInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("delayDefinition", delayDefinition);
-        state.put("delayState", delayState);
-        state.put("delayStartTime", delayStartTime);
-        state.put("delayEndTime", delayEndTime);
-        state.put("delayRemaining", delayRemaining);
-        state.put("delayStatus", delayStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "delayDefinition", delayDefinition,
+                "delayState", delayState, "delayStartTime", delayStartTime, "delayEndTime", delayEndTime,
+                "delayRemaining", delayRemaining, "delayStatus", delayStatus);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,9 @@ public final class StepWarningEntry extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("entryType", entryType);
-        state.put("entryCode", entryCode);
-        state.put("entryMessage", entryMessage);
-        state.put("entrySeverity", entrySeverity);
-        state.put("entryTimestamp", entryTimestamp);
-        state.put("entryContext", entryContext);
-        state.put("entryStatus", entryStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "entryType", entryType, "entryCode", entryCode,
+                "entryMessage", entryMessage, "entrySeverity", entrySeverity,
+                "entryTimestamp", entryTimestamp, "entryContext", entryContext, "entryStatus", entryStatus);
     }
 }

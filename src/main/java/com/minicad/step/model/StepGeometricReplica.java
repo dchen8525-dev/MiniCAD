@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -45,12 +44,8 @@ public final class StepGeometricReplica extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("parent", parent);
-        state.put("transformation", transformation);
-        state.put("entityName", entityName);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "parent", parent, "transformation", transformation,
+                "entityName", entityName);
     }
 }

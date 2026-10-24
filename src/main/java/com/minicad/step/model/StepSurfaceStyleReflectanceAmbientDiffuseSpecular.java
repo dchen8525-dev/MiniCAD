@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -72,13 +71,9 @@ public final class StepSurfaceStyleReflectanceAmbientDiffuseSpecular extends Abs
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("ambientReflectance", ambientReflectance);
-        state.put("diffuseReflectance", diffuseReflectance);
-        state.put("specularReflectance", specularReflectance);
-        state.put("specularExponent", specularExponent);
-        state.put("specularColour", specularColour);
-        return state;
+        return componentsOf(
+                "id", getId(), "ambientReflectance", ambientReflectance,
+                "diffuseReflectance", diffuseReflectance, "specularReflectance", specularReflectance,
+                "specularExponent", specularExponent, "specularColour", specularColour);
     }
 }

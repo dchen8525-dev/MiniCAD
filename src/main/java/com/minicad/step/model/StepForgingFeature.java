@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepForgingFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("forgingType", forgingType);
-        state.put("forgingGeometry", forgingGeometry);
-        state.put("dieFlash", dieFlash);
-        state.put("forgingGrain", forgingGrain);
-        state.put("forgingMaterial", forgingMaterial);
-        state.put("forgingTemperature", forgingTemperature);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "forgingType", forgingType,
+                "forgingGeometry", forgingGeometry, "dieFlash", dieFlash, "forgingGrain", forgingGrain,
+                "forgingMaterial", forgingMaterial, "forgingTemperature", forgingTemperature);
     }
 }

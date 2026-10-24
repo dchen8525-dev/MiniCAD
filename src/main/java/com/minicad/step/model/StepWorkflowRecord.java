@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,10 @@ public final class StepWorkflowRecord extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("workflowType", workflowType);
-        state.put("workflowTarget", workflowTarget);
-        state.put("workflowStartTime", workflowStartTime);
-        state.put("workflowEndTime", workflowEndTime);
-        state.put("workflowResult", workflowResult);
-        state.put("workflowSteps", workflowSteps);
-        state.put("workflowStatus", workflowStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "workflowType", workflowType,
+                "workflowTarget", workflowTarget, "workflowStartTime", workflowStartTime,
+                "workflowEndTime", workflowEndTime, "workflowResult", workflowResult,
+                "workflowSteps", workflowSteps, "workflowStatus", workflowStatus);
     }
 }

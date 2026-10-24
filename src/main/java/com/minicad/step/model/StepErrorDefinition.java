@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepErrorDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("errorType", errorType);
-        state.put("errorCode", errorCode);
-        state.put("errorDescription", errorDescription);
-        state.put("errorSeverity", errorSeverity);
-        state.put("errorStatus", errorStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "errorType", errorType, "errorCode", errorCode,
+                "errorDescription", errorDescription, "errorSeverity", errorSeverity,
+                "errorStatus", errorStatus);
     }
 }

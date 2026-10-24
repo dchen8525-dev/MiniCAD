@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepRepositoryInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("repositoryDefinition", repositoryDefinition);
-        state.put("repositoryState", repositoryState);
-        state.put("repositoryItemCount", repositoryItemCount);
-        state.put("repositoryLastSync", repositoryLastSync);
-        state.put("repositoryStatus", repositoryStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "repositoryDefinition", repositoryDefinition,
+                "repositoryState", repositoryState, "repositoryItemCount", repositoryItemCount,
+                "repositoryLastSync", repositoryLastSync, "repositoryStatus", repositoryStatus);
     }
 }

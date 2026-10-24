@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepPlatingFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("platingType", platingType);
-        state.put("platingMaterial", platingMaterial);
-        state.put("platingThickness", platingThickness);
-        state.put("appliedSurfaces", appliedSurfaces);
-        state.put("platingParameters", platingParameters);
-        state.put("platingQuality", platingQuality);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "platingType", platingType,
+                "platingMaterial", platingMaterial, "platingThickness", platingThickness,
+                "appliedSurfaces", appliedSurfaces, "platingParameters", platingParameters,
+                "platingQuality", platingQuality);
     }
 }

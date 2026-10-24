@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepInterfaceFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("interfaceType", interfaceType);
-        state.put("interfaceGeometry", interfaceGeometry);
-        state.put("interfacePosition", interfacePosition);
-        state.put("varianceConnections", varianceConnections);
-        state.put("interfaceStandard", interfaceStandard);
-        state.put("matingInterface", matingInterface);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "interfaceType", interfaceType,
+                "interfaceGeometry", interfaceGeometry, "interfacePosition", interfacePosition,
+                "varianceConnections", varianceConnections, "interfaceStandard", interfaceStandard,
+                "matingInterface", matingInterface);
     }
 }

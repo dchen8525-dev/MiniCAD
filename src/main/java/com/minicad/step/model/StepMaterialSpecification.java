@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepMaterialSpecification extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("materialType", materialType);
-        state.put("materialGrade", materialGrade);
-        state.put("mechanicalProperties", mechanicalProperties);
-        state.put("chemicalComposition", chemicalComposition);
-        state.put("standards", standards);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "materialType", materialType,
+                "materialGrade", materialGrade, "mechanicalProperties", mechanicalProperties,
+                "chemicalComposition", chemicalComposition, "standards", standards);
     }
 }

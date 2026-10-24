@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,13 +46,9 @@ public final class StepWeldProcess extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("processType", processType);
-        state.put("processParameters", processParameters);
-        state.put("processEquipment", processEquipment);
-        state.put("processStatus", processStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "processType", processType,
+                "processParameters", processParameters, "processEquipment", processEquipment,
+                "processStatus", processStatus);
     }
 }

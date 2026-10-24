@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepFinishingFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("finishingType", finishingType);
-        state.put("surfaceGeometry", surfaceGeometry);
-        state.put("surfaceRoughness", surfaceRoughness);
-        state.put("finishingParameters", finishingParameters);
-        state.put("finishingMaterial", finishingMaterial);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "finishingType", finishingType,
+                "surfaceGeometry", surfaceGeometry, "surfaceRoughness", surfaceRoughness,
+                "finishingParameters", finishingParameters, "finishingMaterial", finishingMaterial);
     }
 }

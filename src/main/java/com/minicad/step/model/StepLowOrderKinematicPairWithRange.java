@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,16 +57,9 @@ public final class StepLowOrderKinematicPairWithRange extends AbstractStepEntity
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("description", description);
-        state.put("position", position);
-        state.put("direction", direction);
-        state.put("lowerRange", lowerRange);
-        state.put("upperRange", upperRange);
-        state.put("link1", link1);
-        state.put("link2", link2);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "description", description, "position", position,
+                "direction", direction, "lowerRange", lowerRange, "upperRange", upperRange, "link1", link1,
+                "link2", link2);
     }
 }

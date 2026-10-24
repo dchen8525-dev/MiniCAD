@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -40,11 +39,8 @@ public final class StepAnnotationSymbol extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("mappingSource", mappingSource);
-        state.put("mappingTarget", mappingTarget);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "mappingSource", mappingSource,
+                "mappingTarget", mappingTarget);
     }
 }

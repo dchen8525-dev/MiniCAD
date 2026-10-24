@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepResourceAllocation extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("allocationType", allocationType);
-        state.put("allocatedResource", allocatedResource);
-        state.put("allocationQuantity", allocationQuantity);
-        state.put("allocationPeriod", allocationPeriod);
-        state.put("variancePriority", variancePriority);
-        state.put("allocationStatus", allocationStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "allocationType", allocationType,
+                "allocatedResource", allocatedResource, "allocationQuantity", allocationQuantity,
+                "allocationPeriod", allocationPeriod, "variancePriority", variancePriority,
+                "allocationStatus", allocationStatus);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -36,10 +35,7 @@ public final class StepSurfaceStyleUsage extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("side", side);
-        state.put("style", style);
-        return state;
+        return componentsOf(
+                "id", getId(), "side", side, "style", style);
     }
 }

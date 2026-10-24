@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -66,13 +65,9 @@ public final class StepAnnotationOccurrenceRelationship extends AbstractStepEnti
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("entityName", entityName);
-        state.put("name", getName());
-        state.put("description", description);
-        state.put("relatingAnnotationOccurrence", relatingAnnotationOccurrence);
-        state.put("relatedAnnotationOccurrence", relatedAnnotationOccurrence);
-        return state;
+        return componentsOf(
+                "id", getId(), "entityName", entityName, "name", getName(), "description", description,
+                "relatingAnnotationOccurrence", relatingAnnotationOccurrence,
+                "relatedAnnotationOccurrence", relatedAnnotationOccurrence);
     }
 }

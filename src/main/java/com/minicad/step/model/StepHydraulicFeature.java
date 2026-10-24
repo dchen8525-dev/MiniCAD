@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepHydraulicFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("hydraulicType", hydraulicType);
-        state.put("hydraulicGeometry", hydraulicGeometry);
-        state.put("variancePressure", variancePressure);
-        state.put("flowRate", flowRate);
-        state.put("portSize", portSize);
-        state.put("varianceConnections", varianceConnections);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "hydraulicType", hydraulicType,
+                "hydraulicGeometry", hydraulicGeometry, "variancePressure", variancePressure,
+                "flowRate", flowRate, "portSize", portSize, "varianceConnections", varianceConnections);
     }
 }

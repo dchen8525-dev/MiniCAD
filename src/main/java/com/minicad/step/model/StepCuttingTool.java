@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,9 @@ public final class StepCuttingTool extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("toolType", toolType);
-        state.put("toolDiameter", toolDiameter);
-        state.put("toolLength", toolLength);
-        state.put("cuttingLength", cuttingLength);
-        state.put("numberOfFlutes", numberOfFlutes);
-        state.put("toolMaterial", toolMaterial);
-        state.put("toolGeometry", toolGeometry);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "toolType", toolType, "toolDiameter", toolDiameter,
+                "toolLength", toolLength, "cuttingLength", cuttingLength, "numberOfFlutes", numberOfFlutes,
+                "toolMaterial", toolMaterial, "toolGeometry", toolGeometry);
     }
 }

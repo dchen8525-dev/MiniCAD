@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -61,12 +60,8 @@ public final class StepApplicationProtocolDefinition extends AbstractStepEntity 
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("status", status);
-        state.put("schemaName", schemaName);
-        state.put("year", year);
-        state.put("application", application);
-        return state;
+        return componentsOf(
+                "id", getId(), "status", status, "schemaName", schemaName, "year", year,
+                "application", application);
     }
 }

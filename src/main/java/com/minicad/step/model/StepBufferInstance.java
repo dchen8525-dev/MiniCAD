@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -53,14 +52,9 @@ public final class StepBufferInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("bufferDefinition", bufferDefinition);
-        state.put("bufferState", bufferState);
-        state.put("bufferUsed", bufferUsed);
-        state.put("bufferAvailable", bufferAvailable);
-        state.put("bufferStatus", bufferStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "bufferDefinition", bufferDefinition,
+                "bufferState", bufferState, "bufferUsed", bufferUsed, "bufferAvailable", bufferAvailable,
+                "bufferStatus", bufferStatus);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -65,14 +64,8 @@ public final class StepProductDefinitionRelationshipRelationship extends Abstrac
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("identifier", identifier);
-        state.put("name", getName());
-        state.put("description", description);
-        state.put("relating", relating);
-        state.put("related", related);
-        state.put("entityName", entityName);
-        return state;
+        return componentsOf(
+                "id", getId(), "identifier", identifier, "name", getName(), "description", description,
+                "relating", relating, "related", related, "entityName", entityName);
     }
 }

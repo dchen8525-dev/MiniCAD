@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,17 +74,10 @@ public final class StepApprovalRecord extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("approvalId", approvalId);
-        state.put("varianceItem", varianceItem);
-        state.put("varianceApprover", varianceApprover);
-        state.put("varianceRole", varianceRole);
-        state.put("varianceDate", varianceDate);
-        state.put("varianceDecision", varianceDecision);
-        state.put("varianceComments", varianceComments);
-        state.put("varianceStatus", varianceStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "approvalId", approvalId, "varianceItem", varianceItem,
+                "varianceApprover", varianceApprover, "varianceRole", varianceRole,
+                "varianceDate", varianceDate, "varianceDecision", varianceDecision,
+                "varianceComments", varianceComments, "varianceStatus", varianceStatus);
     }
 }

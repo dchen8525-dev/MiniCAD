@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -54,11 +53,7 @@ public final class StepExternalIdentificationAssignment extends AbstractStepEnti
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("assignedId", assignedId);
-        state.put("role", role);
-        state.put("source", source);
-        return state;
+        return componentsOf(
+                "id", getId(), "assignedId", assignedId, "role", role, "source", source);
     }
 }

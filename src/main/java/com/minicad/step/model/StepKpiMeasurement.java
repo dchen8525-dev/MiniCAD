@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepKpiMeasurement extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("varianceKpi", varianceKpi);
-        state.put("varianceValue", varianceValue);
-        state.put("varianceDate", varianceDate);
-        state.put("variancePeriod", variancePeriod);
-        state.put("varianceStatus", varianceStatus);
-        state.put("varianceComment", varianceComment);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "varianceKpi", varianceKpi, "varianceValue", varianceValue,
+                "varianceDate", varianceDate, "variancePeriod", variancePeriod,
+                "varianceStatus", varianceStatus, "varianceComment", varianceComment);
     }
 }

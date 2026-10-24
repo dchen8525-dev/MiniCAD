@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepAuthenticationSpecification extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("varianceMethod", varianceMethod);
-        state.put("varianceProvider", varianceProvider);
-        state.put("varianceSession", varianceSession);
-        state.put("varianceMultiFactor", varianceMultiFactor);
-        state.put("varianceStatus", varianceStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "varianceMethod", varianceMethod,
+                "varianceProvider", varianceProvider, "varianceSession", varianceSession,
+                "varianceMultiFactor", varianceMultiFactor, "varianceStatus", varianceStatus);
     }
 }

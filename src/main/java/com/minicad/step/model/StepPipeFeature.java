@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,9 @@ public final class StepPipeFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("pipeType", pipeType);
-        state.put("outerDiameter", outerDiameter);
-        state.put("innerDiameter", innerDiameter);
-        state.put("pipeLength", pipeLength);
-        state.put("wallThickness", wallThickness);
-        state.put("pipeBends", pipeBends);
-        state.put("pipeMaterial", pipeMaterial);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "pipeType", pipeType, "outerDiameter", outerDiameter,
+                "innerDiameter", innerDiameter, "pipeLength", pipeLength, "wallThickness", wallThickness,
+                "pipeBends", pipeBends, "pipeMaterial", pipeMaterial);
     }
 }

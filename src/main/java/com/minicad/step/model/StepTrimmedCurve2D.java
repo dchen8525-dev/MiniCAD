@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -53,13 +52,8 @@ public final class StepTrimmedCurve2D extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("basisCurve", basisCurve);
-        state.put("trim1", trim1);
-        state.put("trim2", trim2);
-        state.put("senseAgreement", senseAgreement);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "basisCurve", basisCurve, "trim1", trim1, "trim2", trim2,
+                "senseAgreement", senseAgreement);
     }
 }

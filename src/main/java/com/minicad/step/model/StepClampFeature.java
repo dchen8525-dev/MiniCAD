@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepClampFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("clampType", clampType);
-        state.put("clampGeometry", clampGeometry);
-        state.put("clampForce", clampForce);
-        state.put("clampOpening", clampOpening);
-        state.put("clampMaterial", clampMaterial);
-        state.put("clampingSequence", clampingSequence);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "clampType", clampType, "clampGeometry", clampGeometry,
+                "clampForce", clampForce, "clampOpening", clampOpening, "clampMaterial", clampMaterial,
+                "clampingSequence", clampingSequence);
     }
 }

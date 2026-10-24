@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,11 +54,8 @@ public final class StepAppliedCertificationAssignment extends AbstractStepEntity
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("entityName", entityName);
-        state.put("assignedCertification", assignedCertification);
-        state.put("items", items);
-        return state;
+        return componentsOf(
+                "id", getId(), "entityName", entityName, "assignedCertification", assignedCertification,
+                "items", items);
     }
 }

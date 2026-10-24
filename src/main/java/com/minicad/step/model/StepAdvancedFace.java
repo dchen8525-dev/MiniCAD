@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,12 +45,8 @@ public final class StepAdvancedFace extends AbstractStepEntity implements StepFa
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("bounds", bounds);
-        state.put("faceGeometry", faceGeometry);
-        state.put("sameSense", sameSense);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "bounds", bounds, "faceGeometry", faceGeometry,
+                "sameSense", sameSense);
     }
 }

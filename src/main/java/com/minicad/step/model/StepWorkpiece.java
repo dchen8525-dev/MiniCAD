@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepWorkpiece extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("workpieceGeometry", workpieceGeometry);
-        state.put("rawMaterial", rawMaterial);
-        state.put("stockDimensions", stockDimensions);
-        state.put("features", features);
-        state.put("setupReference", setupReference);
-        state.put("workpieceType", workpieceType);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "workpieceGeometry", workpieceGeometry,
+                "rawMaterial", rawMaterial, "stockDimensions", stockDimensions, "features", features,
+                "setupReference", setupReference, "workpieceType", workpieceType);
     }
 }

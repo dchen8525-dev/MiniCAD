@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -32,12 +31,8 @@ public final class StepCharacterGlyphOutlineWithCharacteristics extends Abstract
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("glyph", glyph);
-        state.put("outline", outline);
-        state.put("characteristics", characteristics);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "glyph", glyph, "outline", outline,
+                "characteristics", characteristics);
     }
 }

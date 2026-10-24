@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,14 +97,8 @@ public final class StepChainBasedItemIdentifiedRepresentationUsage extends Abstr
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("description", description);
-        state.put("definition", definition);
-        state.put("nodes", nodes);
-        state.put("undirectedLinks", undirectedLinks);
-        state.put("identifiedItem", identifiedItem);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "description", description, "definition", definition,
+                "nodes", nodes, "undirectedLinks", undirectedLinks, "identifiedItem", identifiedItem);
     }
 }

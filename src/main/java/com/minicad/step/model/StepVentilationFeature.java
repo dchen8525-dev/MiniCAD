@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepVentilationFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("ventilationType", ventilationType);
-        state.put("ventilationGeometry", ventilationGeometry);
-        state.put("varianceAirflow", varianceAirflow);
-        state.put("inletFeatures", inletFeatures);
-        state.put("outletFeatures", outletFeatures);
-        state.put("ventilationControl", ventilationControl);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "ventilationType", ventilationType,
+                "ventilationGeometry", ventilationGeometry, "varianceAirflow", varianceAirflow,
+                "inletFeatures", inletFeatures, "outletFeatures", outletFeatures,
+                "ventilationControl", ventilationControl);
     }
 }

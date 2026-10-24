@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,10 @@ public final class StepPreventiveAction extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("variancePotential", variancePotential);
-        state.put("varianceCause", varianceCause);
-        state.put("varianceAction", varianceAction);
-        state.put("varianceResponsible", varianceResponsible);
-        state.put("varianceTarget", varianceTarget);
-        state.put("varianceStatus", varianceStatus);
-        state.put("varianceVerification", varianceVerification);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "variancePotential", variancePotential,
+                "varianceCause", varianceCause, "varianceAction", varianceAction,
+                "varianceResponsible", varianceResponsible, "varianceTarget", varianceTarget,
+                "varianceStatus", varianceStatus, "varianceVerification", varianceVerification);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepMetadataRecord extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("metadataType", metadataType);
-        state.put("metadataKey", metadataKey);
-        state.put("metadataValue", metadataValue);
-        state.put("metadataSource", metadataSource);
-        state.put("metadataTimestamp", metadataTimestamp);
-        state.put("metadataStatus", metadataStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "metadataType", metadataType, "metadataKey", metadataKey,
+                "metadataValue", metadataValue, "metadataSource", metadataSource,
+                "metadataTimestamp", metadataTimestamp, "metadataStatus", metadataStatus);
     }
 }

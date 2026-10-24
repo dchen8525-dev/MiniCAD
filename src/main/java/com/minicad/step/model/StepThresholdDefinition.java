@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepThresholdDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("thresholdType", thresholdType);
-        state.put("thresholdValue", thresholdValue);
-        state.put("thresholdTolerance", thresholdTolerance);
-        state.put("thresholdActions", thresholdActions);
-        state.put("thresholdStatus", thresholdStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "thresholdType", thresholdType,
+                "thresholdValue", thresholdValue, "thresholdTolerance", thresholdTolerance,
+                "thresholdActions", thresholdActions, "thresholdStatus", thresholdStatus);
     }
 }

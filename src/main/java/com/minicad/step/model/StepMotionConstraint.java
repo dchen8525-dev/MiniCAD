@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -33,12 +32,8 @@ public final class StepMotionConstraint extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("constraintType", constraintType);
-        state.put("lowerLimit", lowerLimit);
-        state.put("upperLimit", upperLimit);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "constraintType", constraintType, "lowerLimit", lowerLimit,
+                "upperLimit", upperLimit);
     }
 }

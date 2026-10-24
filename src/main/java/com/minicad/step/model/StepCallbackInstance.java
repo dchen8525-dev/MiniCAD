@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepCallbackInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("callbackDefinition", callbackDefinition);
-        state.put("callbackState", callbackState);
-        state.put("callbackResult", callbackResult);
-        state.put("callbackExecuted", callbackExecuted);
-        state.put("callbackStatus", callbackStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "callbackDefinition", callbackDefinition,
+                "callbackState", callbackState, "callbackResult", callbackResult,
+                "callbackExecuted", callbackExecuted, "callbackStatus", callbackStatus);
     }
 }

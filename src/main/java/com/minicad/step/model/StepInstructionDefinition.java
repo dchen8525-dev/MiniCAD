@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepInstructionDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("instructionType", instructionType);
-        state.put("instructionOpcode", instructionOpcode);
-        state.put("instructionOperands", instructionOperands);
-        state.put("instructionDescription", instructionDescription);
-        state.put("instructionStatus", instructionStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "instructionType", instructionType,
+                "instructionOpcode", instructionOpcode, "instructionOperands", instructionOperands,
+                "instructionDescription", instructionDescription, "instructionStatus", instructionStatus);
     }
 }

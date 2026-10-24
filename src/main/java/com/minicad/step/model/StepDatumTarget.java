@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -37,11 +36,7 @@ public final class StepDatumTarget extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("targetId", targetId);
-        state.put("targetShape", targetShape);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "targetId", targetId, "targetShape", targetShape);
     }
 }

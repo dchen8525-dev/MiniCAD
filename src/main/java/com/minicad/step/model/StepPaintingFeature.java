@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,9 @@ public final class StepPaintingFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("paintType", paintType);
-        state.put("paintColor", paintColor);
-        state.put("paintThickness", paintThickness);
-        state.put("appliedSurfaces", appliedSurfaces);
-        state.put("primerCoat", primerCoat);
-        state.put("varnishCoat", varnishCoat);
-        state.put("paintStandard", paintStandard);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "paintType", paintType, "paintColor", paintColor,
+                "paintThickness", paintThickness, "appliedSurfaces", appliedSurfaces,
+                "primerCoat", primerCoat, "varnishCoat", varnishCoat, "paintStandard", paintStandard);
     }
 }

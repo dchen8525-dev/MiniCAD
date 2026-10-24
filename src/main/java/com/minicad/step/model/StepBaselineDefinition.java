@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepBaselineDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("baselineType", baselineType);
-        state.put("baselineValues", baselineValues);
-        state.put("baselineUnit", baselineUnit);
-        state.put("baselineDescription", baselineDescription);
-        state.put("baselineStatus", baselineStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "baselineType", baselineType,
+                "baselineValues", baselineValues, "baselineUnit", baselineUnit,
+                "baselineDescription", baselineDescription, "baselineStatus", baselineStatus);
     }
 }

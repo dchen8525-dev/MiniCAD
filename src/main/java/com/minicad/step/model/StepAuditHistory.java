@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepAuditHistory extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("varianceItem", varianceItem);
-        state.put("varianceAudits", varianceAudits);
-        state.put("varianceLast", varianceLast);
-        state.put("varianceNext", varianceNext);
-        state.put("varianceStatus", varianceStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "varianceItem", varianceItem,
+                "varianceAudits", varianceAudits, "varianceLast", varianceLast, "varianceNext", varianceNext,
+                "varianceStatus", varianceStatus);
     }
 }

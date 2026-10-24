@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepAccessControl extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("varianceRoles", varianceRoles);
-        state.put("variancePermissions", variancePermissions);
-        state.put("varianceResources", varianceResources);
-        state.put("variancePolicy", variancePolicy);
-        state.put("varianceStatus", varianceStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "varianceRoles", varianceRoles,
+                "variancePermissions", variancePermissions, "varianceResources", varianceResources,
+                "variancePolicy", variancePolicy, "varianceStatus", varianceStatus);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepCncProgram extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("programType", programType);
-        state.put("toolpaths", toolpaths);
-        state.put("machiningOperations", machiningOperations);
-        state.put("programCode", programCode);
-        state.put("postProcessor", postProcessor);
-        state.put("machineTarget", machineTarget);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "programType", programType, "toolpaths", toolpaths,
+                "machiningOperations", machiningOperations, "programCode", programCode,
+                "postProcessor", postProcessor, "machineTarget", machineTarget);
     }
 }

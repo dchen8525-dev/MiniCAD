@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,16 +42,9 @@ public final class StepUniformSurface extends AbstractStepControlPointSurface {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("uDegree", getUDegree());
-        state.put("vDegree", getVDegree());
-        state.put("controlPoints", getControlPoints());
-        state.put("surfaceForm", getSurfaceForm());
-        state.put("uClosed", uClosed);
-        state.put("vClosed", vClosed);
-        state.put("selfIntersect", selfIntersect);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "uDegree", getUDegree(), "vDegree", getVDegree(),
+                "controlPoints", getControlPoints(), "surfaceForm", getSurfaceForm(), "uClosed", uClosed,
+                "vClosed", vClosed, "selfIntersect", selfIntersect);
     }
 }

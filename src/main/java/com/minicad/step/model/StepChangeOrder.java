@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,9 @@ public final class StepChangeOrder extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("orderNumber", orderNumber);
-        state.put("changeRequest", changeRequest);
-        state.put("affectedItems", affectedItems);
-        state.put("orderStatus", orderStatus);
-        state.put("varianceDate", varianceDate);
-        state.put("orderApprover", orderApprover);
-        state.put("implementationPlan", implementationPlan);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "orderNumber", orderNumber, "changeRequest", changeRequest,
+                "affectedItems", affectedItems, "orderStatus", orderStatus, "varianceDate", varianceDate,
+                "orderApprover", orderApprover, "implementationPlan", implementationPlan);
     }
 }

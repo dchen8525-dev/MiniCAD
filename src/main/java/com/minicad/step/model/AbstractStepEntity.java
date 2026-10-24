@@ -1,6 +1,7 @@
 package com.minicad.step.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -77,6 +78,26 @@ public abstract class AbstractStepEntity implements StepEntity {
      * @return an ordered map of component label to value
      */
     protected abstract Map<String, Object> components();
+
+    /**
+     * Builds the ordered component map from alternating label/value arguments.
+     *
+     * <p>The 1262 entities used to allocate the {@link LinkedHashMap} and fill it one
+     * {@code put} per field themselves, the same five lines of assembly in every file. This
+     * type owns that assembly now, so an entity's {@code components()} is left with the only
+     * thing it actually decides: which labels, in which order, read which field. The order is
+     * preserved because the map is insertion ordered and the arguments are taken in pairs.
+     *
+     * @param labelsAndValues label, value, label, value, ... in declaration order
+     * @return an ordered map of component label to value
+     */
+    protected static Map<String, Object> componentsOf(Object... labelsAndValues) {
+        Map<String, Object> state = new LinkedHashMap<>(labelsAndValues.length / 2);
+        for (int i = 0; i < labelsAndValues.length; i += 2) {
+            state.put((String) labelsAndValues[i], labelsAndValues[i + 1]);
+        }
+        return state;
+    }
 
     private Map<String, Object> componentCache;
 

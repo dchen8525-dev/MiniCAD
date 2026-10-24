@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,17 +63,9 @@ public final class StepBSplineCurveWithKnotsAndBreakpoints extends AbstractStepC
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("degree", getDegree());
-        state.put("controlPoints", getControlPoints());
-        state.put("knotMultiplicities", knotMultiplicities);
-        state.put("knots", knots);
-        state.put("breakpoints", breakpoints);
-        state.put("curveForm", getCurveForm());
-        state.put("closedCurve", closedCurve);
-        state.put("selfIntersect", selfIntersect);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "degree", getDegree(), "controlPoints", getControlPoints(),
+                "knotMultiplicities", knotMultiplicities, "knots", knots, "breakpoints", breakpoints,
+                "curveForm", getCurveForm(), "closedCurve", closedCurve, "selfIntersect", selfIntersect);
     }
 }

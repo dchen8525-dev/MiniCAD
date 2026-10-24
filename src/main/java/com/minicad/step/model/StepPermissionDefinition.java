@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepPermissionDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("permissionType", permissionType);
-        state.put("permissionScope", permissionScope);
-        state.put("permissionActions", permissionActions);
-        state.put("permissionConditions", permissionConditions);
-        state.put("permissionStatus", permissionStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "permissionType", permissionType,
+                "permissionScope", permissionScope, "permissionActions", permissionActions,
+                "permissionConditions", permissionConditions, "permissionStatus", permissionStatus);
     }
 }

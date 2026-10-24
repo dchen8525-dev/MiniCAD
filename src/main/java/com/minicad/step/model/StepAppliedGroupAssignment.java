@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,10 +47,7 @@ public final class StepAppliedGroupAssignment extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("assignedGroup", assignedGroup);
-        state.put("items", items);
-        return state;
+        return componentsOf(
+                "id", getId(), "assignedGroup", assignedGroup, "items", items);
     }
 }

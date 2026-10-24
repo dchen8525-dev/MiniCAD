@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -51,15 +50,8 @@ public final class StepScrewPair extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("description", description);
-        state.put("position", position);
-        state.put("axis", axis);
-        state.put("pitch", pitch);
-        state.put("link1", link1);
-        state.put("link2", link2);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "description", description, "position", position,
+                "axis", axis, "pitch", pitch, "link1", link1, "link2", link2);
     }
 }

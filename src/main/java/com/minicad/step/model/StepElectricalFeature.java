@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepElectricalFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("electricalType", electricalType);
-        state.put("electricalGeometry", electricalGeometry);
-        state.put("voltageRating", voltageRating);
-        state.put("currentRating", currentRating);
-        state.put("wireGauge", wireGauge);
-        state.put("variancePins", variancePins);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "electricalType", electricalType,
+                "electricalGeometry", electricalGeometry, "voltageRating", voltageRating,
+                "currentRating", currentRating, "wireGauge", wireGauge, "variancePins", variancePins);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepTriggerDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("triggerType", triggerType);
-        state.put("triggerCondition", triggerCondition);
-        state.put("triggerAction", triggerAction);
-        state.put("triggerSchedule", triggerSchedule);
-        state.put("triggerStatus", triggerStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "triggerType", triggerType,
+                "triggerCondition", triggerCondition, "triggerAction", triggerAction,
+                "triggerSchedule", triggerSchedule, "triggerStatus", triggerStatus);
     }
 }

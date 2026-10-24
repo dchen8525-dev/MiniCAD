@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepStructuralFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("structuralType", structuralType);
-        state.put("crossSection", crossSection);
-        state.put("structuralLength", structuralLength);
-        state.put("structuralMaterial", structuralMaterial);
-        state.put("endConditions", endConditions);
-        state.put("loadPoints", loadPoints);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "structuralType", structuralType,
+                "crossSection", crossSection, "structuralLength", structuralLength,
+                "structuralMaterial", structuralMaterial, "endConditions", endConditions,
+                "loadPoints", loadPoints);
     }
 }

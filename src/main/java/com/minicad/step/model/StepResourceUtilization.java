@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepResourceUtilization extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("varianceResource", varianceResource);
-        state.put("varianceUtilization", varianceUtilization);
-        state.put("variancePeriod", variancePeriod);
-        state.put("variancePeak", variancePeak);
-        state.put("varianceAverage", varianceAverage);
-        state.put("varianceStatus", varianceStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "varianceResource", varianceResource,
+                "varianceUtilization", varianceUtilization, "variancePeriod", variancePeriod,
+                "variancePeak", variancePeak, "varianceAverage", varianceAverage,
+                "varianceStatus", varianceStatus);
     }
 }

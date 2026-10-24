@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,8 @@ public final class StepTimerDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("timerType", timerType);
-        state.put("timerDuration", timerDuration);
-        state.put("timerAction", timerAction);
-        state.put("timerRecurring", timerRecurring);
-        state.put("timerStatus", timerStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "timerType", timerType, "timerDuration", timerDuration,
+                "timerAction", timerAction, "timerRecurring", timerRecurring, "timerStatus", timerStatus);
     }
 }

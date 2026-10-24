@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,17 +74,10 @@ public final class StepThreadFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("threadType", threadType);
-        state.put("threadStandard", threadStandard);
-        state.put("nominalDiameter", nominalDiameter);
-        state.put("pitch", pitch);
-        state.put("threadLength", threadLength);
-        state.put("numberOfStarts", numberOfStarts);
-        state.put("threadProfile", threadProfile);
-        state.put("threadDirection", threadDirection);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "threadType", threadType, "threadStandard", threadStandard,
+                "nominalDiameter", nominalDiameter, "pitch", pitch, "threadLength", threadLength,
+                "numberOfStarts", numberOfStarts, "threadProfile", threadProfile,
+                "threadDirection", threadDirection);
     }
 }

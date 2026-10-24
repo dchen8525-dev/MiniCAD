@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepRetryInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("retryDefinition", retryDefinition);
-        state.put("retryState", retryState);
-        state.put("retryAttempt", retryAttempt);
-        state.put("retryRemaining", retryRemaining);
-        state.put("retryLastError", retryLastError);
-        state.put("retryStatus", retryStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "retryDefinition", retryDefinition,
+                "retryState", retryState, "retryAttempt", retryAttempt, "retryRemaining", retryRemaining,
+                "retryLastError", retryLastError, "retryStatus", retryStatus);
     }
 }

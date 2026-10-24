@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -43,12 +42,7 @@ public final class StepTessellatedTriangle extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("vertex1", vertex1);
-        state.put("vertex2", vertex2);
-        state.put("vertex3", vertex3);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "vertex1", vertex1, "vertex2", vertex2, "vertex3", vertex3);
     }
 }

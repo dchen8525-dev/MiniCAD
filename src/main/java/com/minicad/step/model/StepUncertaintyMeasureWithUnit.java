@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -42,12 +41,8 @@ public final class StepUncertaintyMeasureWithUnit extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("valueComponent", valueComponent);
-        state.put("unitComponent", unitComponent);
-        state.put("name", getName());
-        state.put("description", description);
-        return state;
+        return componentsOf(
+                "id", getId(), "valueComponent", valueComponent, "unitComponent", unitComponent,
+                "name", getName(), "description", description);
     }
 }

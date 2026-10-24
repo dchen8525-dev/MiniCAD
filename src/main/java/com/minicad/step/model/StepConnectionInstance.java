@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepConnectionInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("connectionDefinition", connectionDefinition);
-        state.put("connectionState", connectionState);
-        state.put("connectionLatency", connectionLatency);
-        state.put("connectionThroughput", connectionThroughput);
-        state.put("connectionStatus", connectionStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "connectionDefinition", connectionDefinition,
+                "connectionState", connectionState, "connectionLatency", connectionLatency,
+                "connectionThroughput", connectionThroughput, "connectionStatus", connectionStatus);
     }
 }

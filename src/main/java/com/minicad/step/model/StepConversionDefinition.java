@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepConversionDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("conversionType", conversionType);
-        state.put("conversionSource", conversionSource);
-        state.put("conversionTarget", conversionTarget);
-        state.put("conversionFactor", conversionFactor);
-        state.put("conversionOffset", conversionOffset);
-        state.put("conversionStatus", conversionStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "conversionType", conversionType,
+                "conversionSource", conversionSource, "conversionTarget", conversionTarget,
+                "conversionFactor", conversionFactor, "conversionOffset", conversionOffset,
+                "conversionStatus", conversionStatus);
     }
 }

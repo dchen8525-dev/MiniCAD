@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,10 @@ public final class StepCorrectiveAction extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("varianceProblem", varianceProblem);
-        state.put("varianceRootCause", varianceRootCause);
-        state.put("varianceAction", varianceAction);
-        state.put("varianceResponsible", varianceResponsible);
-        state.put("varianceTarget", varianceTarget);
-        state.put("varianceStatus", varianceStatus);
-        state.put("varianceEffectiveness", varianceEffectiveness);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "varianceProblem", varianceProblem,
+                "varianceRootCause", varianceRootCause, "varianceAction", varianceAction,
+                "varianceResponsible", varianceResponsible, "varianceTarget", varianceTarget,
+                "varianceStatus", varianceStatus, "varianceEffectiveness", varianceEffectiveness);
     }
 }

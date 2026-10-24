@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,10 @@ public final class StepOperatorQualification extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("operatorId", operatorId);
-        state.put("qualificationType", qualificationType);
-        state.put("varianceLevel", varianceLevel);
-        state.put("qualificationDate", qualificationDate);
-        state.put("expirationDate", expirationDate);
-        state.put("varianceOperations", varianceOperations);
-        state.put("qualificationStatus", qualificationStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "operatorId", operatorId,
+                "qualificationType", qualificationType, "varianceLevel", varianceLevel,
+                "qualificationDate", qualificationDate, "expirationDate", expirationDate,
+                "varianceOperations", varianceOperations, "qualificationStatus", qualificationStatus);
     }
 }

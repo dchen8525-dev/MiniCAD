@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -30,10 +29,7 @@ public final class StepRepresentationContext extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("contextIdentifier", contextIdentifier);
-        state.put("contextType", contextType);
-        return state;
+        return componentsOf(
+                "id", getId(), "contextIdentifier", contextIdentifier, "contextType", contextType);
     }
 }

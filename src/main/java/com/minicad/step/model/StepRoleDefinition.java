@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepRoleDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("roleType", roleType);
-        state.put("roleDescription", roleDescription);
-        state.put("rolePermissions", rolePermissions);
-        state.put("roleResponsibilities", roleResponsibilities);
-        state.put("roleStatus", roleStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "roleType", roleType, "roleDescription", roleDescription,
+                "rolePermissions", rolePermissions, "roleResponsibilities", roleResponsibilities,
+                "roleStatus", roleStatus);
     }
 }

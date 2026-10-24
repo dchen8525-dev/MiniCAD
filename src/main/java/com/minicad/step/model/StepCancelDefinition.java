@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepCancelDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("cancelType", cancelType);
-        state.put("cancelCondition", cancelCondition);
-        state.put("cancelGracePeriod", cancelGracePeriod);
-        state.put("cancelCleanup", cancelCleanup);
-        state.put("cancelStatus", cancelStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "cancelType", cancelType,
+                "cancelCondition", cancelCondition, "cancelGracePeriod", cancelGracePeriod,
+                "cancelCleanup", cancelCleanup, "cancelStatus", cancelStatus);
     }
 }

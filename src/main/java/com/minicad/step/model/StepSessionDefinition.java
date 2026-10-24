@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepSessionDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("sessionType", sessionType);
-        state.put("sessionTimeout", sessionTimeout);
-        state.put("sessionMaxInactive", sessionMaxInactive);
-        state.put("sessionFeatures", sessionFeatures);
-        state.put("sessionStatus", sessionStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "sessionType", sessionType,
+                "sessionTimeout", sessionTimeout, "sessionMaxInactive", sessionMaxInactive,
+                "sessionFeatures", sessionFeatures, "sessionStatus", sessionStatus);
     }
 }

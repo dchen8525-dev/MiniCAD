@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,10 @@ public final class StepBearingFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("bearingType", bearingType);
-        state.put("boreDiameter", boreDiameter);
-        state.put("outerDiameter", outerDiameter);
-        state.put("bearingWidth", bearingWidth);
-        state.put("numberOfElements", numberOfElements);
-        state.put("bearingStandard", bearingStandard);
-        state.put("bearingPlacement", bearingPlacement);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "bearingType", bearingType, "boreDiameter", boreDiameter,
+                "outerDiameter", outerDiameter, "bearingWidth", bearingWidth,
+                "numberOfElements", numberOfElements, "bearingStandard", bearingStandard,
+                "bearingPlacement", bearingPlacement);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -35,10 +34,8 @@ public final class StepContextDependentShapeRepresentation extends AbstractStepE
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("representationRelationship", representationRelationship);
-        state.put("representedProductRelation", representedProductRelation);
-        return state;
+        return componentsOf(
+                "id", getId(), "representationRelationship", representationRelationship,
+                "representedProductRelation", representedProductRelation);
     }
 }

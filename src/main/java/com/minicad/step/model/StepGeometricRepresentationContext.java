@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -62,13 +61,10 @@ public final class StepGeometricRepresentationContext extends AbstractStepEntity
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("coordinateSpaceDimension", coordinateSpaceDimension);
-        state.put("contextIdentifier", contextIdentifier);
-        state.put("contextType", contextType);
-        state.put("globalUnitAssignedContext", globalUnitAssignedContext);
-        state.put("globalUncertaintyAssignedContext", globalUncertaintyAssignedContext);
-        return state;
+        return componentsOf(
+                "id", getId(), "coordinateSpaceDimension", coordinateSpaceDimension,
+                "contextIdentifier", contextIdentifier, "contextType", contextType,
+                "globalUnitAssignedContext", globalUnitAssignedContext,
+                "globalUncertaintyAssignedContext", globalUncertaintyAssignedContext);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -58,11 +57,8 @@ public final class StepDocumentUsageConstraint extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("source", source);
-        state.put("subjectElement", subjectElement);
-        state.put("subjectElementValue", subjectElementValue);
-        return state;
+        return componentsOf(
+                "id", getId(), "source", source, "subjectElement", subjectElement,
+                "subjectElementValue", subjectElementValue);
     }
 }

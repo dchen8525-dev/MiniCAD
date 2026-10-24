@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,14 +62,9 @@ public final class StepFlatPattern extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("flatGeometry", flatGeometry);
-        state.put("bendLines", bendLines);
-        state.put("formingFeatures", formingFeatures);
-        state.put("grainDirection", grainDirection);
-        state.put("unfoldingSequence", unfoldingSequence);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "flatGeometry", flatGeometry, "bendLines", bendLines,
+                "formingFeatures", formingFeatures, "grainDirection", grainDirection,
+                "unfoldingSequence", unfoldingSequence);
     }
 }

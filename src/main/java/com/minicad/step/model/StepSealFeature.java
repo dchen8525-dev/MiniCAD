@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepSealFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("sealType", sealType);
-        state.put("innerDiameter", innerDiameter);
-        state.put("outerDiameter", outerDiameter);
-        state.put("sealWidth", sealWidth);
-        state.put("sealMaterial", sealMaterial);
-        state.put("sealPlacement", sealPlacement);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "sealType", sealType, "innerDiameter", innerDiameter,
+                "outerDiameter", outerDiameter, "sealWidth", sealWidth, "sealMaterial", sealMaterial,
+                "sealPlacement", sealPlacement);
     }
 }

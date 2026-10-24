@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepLubricationFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("lubricationType", lubricationType);
-        state.put("lubricationPoints", lubricationPoints);
-        state.put("lubricationMethod", lubricationMethod);
-        state.put("lubricationInterval", lubricationInterval);
-        state.put("lubricantType", lubricantType);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "lubricationType", lubricationType,
+                "lubricationPoints", lubricationPoints, "lubricationMethod", lubricationMethod,
+                "lubricationInterval", lubricationInterval, "lubricantType", lubricantType);
     }
 }

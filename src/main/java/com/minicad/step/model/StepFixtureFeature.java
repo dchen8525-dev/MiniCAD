@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepFixtureFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("fixtureType", fixtureType);
-        state.put("fixtureGeometry", fixtureGeometry);
-        state.put("clampingPoints", clampingPoints);
-        state.put("supportingPoints", supportingPoints);
-        state.put("fixtureForce", fixtureForce);
-        state.put("fixtureMaterial", fixtureMaterial);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "fixtureType", fixtureType,
+                "fixtureGeometry", fixtureGeometry, "clampingPoints", clampingPoints,
+                "supportingPoints", supportingPoints, "fixtureForce", fixtureForce,
+                "fixtureMaterial", fixtureMaterial);
     }
 }

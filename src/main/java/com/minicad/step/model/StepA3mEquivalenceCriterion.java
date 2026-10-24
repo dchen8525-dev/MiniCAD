@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,15 +68,10 @@ public final class StepA3mEquivalenceCriterion extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("assessmentSpecification", assessmentSpecification);
-        state.put("comparingElementTypes", comparingElementTypes);
-        state.put("comparedElementTypes", comparedElementTypes);
-        state.put("measuredDataType", measuredDataType);
-        state.put("detectedDifferenceTypes", detectedDifferenceTypes);
-        state.put("accuracyTypes", accuracyTypes);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "assessmentSpecification", assessmentSpecification,
+                "comparingElementTypes", comparingElementTypes, "comparedElementTypes", comparedElementTypes,
+                "measuredDataType", measuredDataType, "detectedDifferenceTypes", detectedDifferenceTypes,
+                "accuracyTypes", accuracyTypes);
     }
 }

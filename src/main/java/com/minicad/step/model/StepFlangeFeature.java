@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,9 @@ public final class StepFlangeFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("flangeType", flangeType);
-        state.put("flangeDiameter", flangeDiameter);
-        state.put("flangeThickness", flangeThickness);
-        state.put("boltHoles", boltHoles);
-        state.put("boltCircle", boltCircle);
-        state.put("numberOfBoltHoles", numberOfBoltHoles);
-        state.put("flangeStandard", flangeStandard);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "flangeType", flangeType, "flangeDiameter", flangeDiameter,
+                "flangeThickness", flangeThickness, "boltHoles", boltHoles, "boltCircle", boltCircle,
+                "numberOfBoltHoles", numberOfBoltHoles, "flangeStandard", flangeStandard);
     }
 }

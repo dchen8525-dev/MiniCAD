@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,8 @@ public final class StepPortInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("portDefinition", portDefinition);
-        state.put("portState", portState);
-        state.put("portValue", portValue);
-        state.put("portConnections", portConnections);
-        state.put("portStatus", portStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "portDefinition", portDefinition, "portState", portState,
+                "portValue", portValue, "portConnections", portConnections, "portStatus", portStatus);
     }
 }

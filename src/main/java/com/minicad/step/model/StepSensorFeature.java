@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepSensorFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("sensorType", sensorType);
-        state.put("sensorGeometry", sensorGeometry);
-        state.put("sensorPosition", sensorPosition);
-        state.put("measurementRange", measurementRange);
-        state.put("varianceResolution", varianceResolution);
-        state.put("sensorInterface", sensorInterface);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "sensorType", sensorType, "sensorGeometry", sensorGeometry,
+                "sensorPosition", sensorPosition, "measurementRange", measurementRange,
+                "varianceResolution", varianceResolution, "sensorInterface", sensorInterface);
     }
 }

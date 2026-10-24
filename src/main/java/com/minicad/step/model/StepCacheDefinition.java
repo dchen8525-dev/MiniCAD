@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,8 @@ public final class StepCacheDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("cacheType", cacheType);
-        state.put("cacheCapacity", cacheCapacity);
-        state.put("cachePolicy", cachePolicy);
-        state.put("cacheTtl", cacheTtl);
-        state.put("cacheStatus", cacheStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "cacheType", cacheType, "cacheCapacity", cacheCapacity,
+                "cachePolicy", cachePolicy, "cacheTtl", cacheTtl, "cacheStatus", cacheStatus);
     }
 }

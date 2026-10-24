@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class StepViewVolume extends AbstractStepEntity {
@@ -41,14 +40,9 @@ public final class StepViewVolume extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("clippingBack", clippingBack);
-        state.put("clippingFront", clippingFront);
-        state.put("viewPlaneDistance", viewPlaneDistance);
-        state.put("viewPlaneWidth", viewPlaneWidth);
-        state.put("viewPlaneHeight", viewPlaneHeight);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "clippingBack", clippingBack,
+                "clippingFront", clippingFront, "viewPlaneDistance", viewPlaneDistance,
+                "viewPlaneWidth", viewPlaneWidth, "viewPlaneHeight", viewPlaneHeight);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -43,11 +42,7 @@ public final class StepCoordinatedUniversalTimeOffset extends AbstractStepEntity
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("hourOffset", hourOffset);
-        state.put("minuteOffset", minuteOffset);
-        state.put("sense", sense);
-        return state;
+        return componentsOf(
+                "id", getId(), "hourOffset", hourOffset, "minuteOffset", minuteOffset, "sense", sense);
     }
 }

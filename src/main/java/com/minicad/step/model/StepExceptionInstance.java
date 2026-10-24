@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepExceptionInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("exceptionDefinition", exceptionDefinition);
-        state.put("exceptionContext", exceptionContext);
-        state.put("exceptionTime", exceptionTime);
-        state.put("exceptionHandled", exceptionHandled);
-        state.put("exceptionStatus", exceptionStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "exceptionDefinition", exceptionDefinition,
+                "exceptionContext", exceptionContext, "exceptionTime", exceptionTime,
+                "exceptionHandled", exceptionHandled, "exceptionStatus", exceptionStatus);
     }
 }

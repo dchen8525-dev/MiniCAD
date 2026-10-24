@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,10 @@ public final class StepEnvironmentDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("environmentType", environmentType);
-        state.put("environmentDescription", environmentDescription);
-        state.put("environmentParameters", environmentParameters);
-        state.put("environmentConstraints", environmentConstraints);
-        state.put("environmentStatus", environmentStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "environmentType", environmentType,
+                "environmentDescription", environmentDescription,
+                "environmentParameters", environmentParameters,
+                "environmentConstraints", environmentConstraints, "environmentStatus", environmentStatus);
     }
 }

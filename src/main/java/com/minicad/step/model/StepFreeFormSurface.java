@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,15 +66,8 @@ public final class StepFreeFormSurface extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("surfaceType", surfaceType);
-        state.put("controlPoints", controlPoints);
-        state.put("degreeU", degreeU);
-        state.put("degreeV", degreeV);
-        state.put("knotVectors", knotVectors);
-        state.put("weights", weights);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "surfaceType", surfaceType, "controlPoints", controlPoints,
+                "degreeU", degreeU, "degreeV", degreeV, "knotVectors", knotVectors, "weights", weights);
     }
 }

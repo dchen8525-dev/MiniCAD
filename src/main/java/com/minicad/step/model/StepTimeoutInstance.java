@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepTimeoutInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("timeoutDefinition", timeoutDefinition);
-        state.put("timeoutState", timeoutState);
-        state.put("timeoutStartTime", timeoutStartTime);
-        state.put("timeoutTriggered", timeoutTriggered);
-        state.put("timeoutStatus", timeoutStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "timeoutDefinition", timeoutDefinition,
+                "timeoutState", timeoutState, "timeoutStartTime", timeoutStartTime,
+                "timeoutTriggered", timeoutTriggered, "timeoutStatus", timeoutStatus);
     }
 }

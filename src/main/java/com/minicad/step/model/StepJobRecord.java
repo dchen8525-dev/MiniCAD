@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,9 @@ public final class StepJobRecord extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("jobType", jobType);
-        state.put("jobTarget", jobTarget);
-        state.put("jobStartTime", jobStartTime);
-        state.put("jobEndTime", jobEndTime);
-        state.put("jobResult", jobResult);
-        state.put("jobDetails", jobDetails);
-        state.put("jobStatus", jobStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "jobType", jobType, "jobTarget", jobTarget,
+                "jobStartTime", jobStartTime, "jobEndTime", jobEndTime, "jobResult", jobResult,
+                "jobDetails", jobDetails, "jobStatus", jobStatus);
     }
 }

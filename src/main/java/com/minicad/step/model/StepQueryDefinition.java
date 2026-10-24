@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepQueryDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("queryType", queryType);
-        state.put("queryExpression", queryExpression);
-        state.put("queryParameters", queryParameters);
-        state.put("queryReturnType", queryReturnType);
-        state.put("queryStatus", queryStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "queryType", queryType, "queryExpression", queryExpression,
+                "queryParameters", queryParameters, "queryReturnType", queryReturnType,
+                "queryStatus", queryStatus);
     }
 }

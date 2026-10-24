@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -40,11 +39,8 @@ public final class StepDataEquivalenceInspectionInstanceReportItem extends Abstr
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("measuredValueForInspectedElement", measuredValueForInspectedElement);
-        state.put("entityName", entityName);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(),
+                "measuredValueForInspectedElement", measuredValueForInspectedElement, "entityName", entityName);
     }
 }

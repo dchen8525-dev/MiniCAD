@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,8 @@ public final class StepDataFlowInstance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("flowDefinition", flowDefinition);
-        state.put("flowState", flowState);
-        state.put("flowRate", flowRate);
-        state.put("flowData", flowData);
-        state.put("flowStatus", flowStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "flowDefinition", flowDefinition, "flowState", flowState,
+                "flowRate", flowRate, "flowData", flowData, "flowStatus", flowStatus);
     }
 }

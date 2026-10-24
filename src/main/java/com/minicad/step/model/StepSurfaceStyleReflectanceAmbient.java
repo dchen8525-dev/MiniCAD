@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -28,9 +27,7 @@ public final class StepSurfaceStyleReflectanceAmbient extends AbstractStepEntity
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("ambientReflectance", ambientReflectance);
-        return state;
+        return componentsOf(
+                "id", getId(), "ambientReflectance", ambientReflectance);
     }
 }

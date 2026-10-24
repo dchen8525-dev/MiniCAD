@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepRegulatoryCompliance extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("regulationType", regulationType);
-        state.put("regulationDescription", regulationDescription);
-        state.put("varianceStatus", varianceStatus);
-        state.put("certificationReference", certificationReference);
-        state.put("varianceDate", varianceDate);
-        state.put("varianceRequirements", varianceRequirements);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "regulationType", regulationType,
+                "regulationDescription", regulationDescription, "varianceStatus", varianceStatus,
+                "certificationReference", certificationReference, "varianceDate", varianceDate,
+                "varianceRequirements", varianceRequirements);
     }
 }

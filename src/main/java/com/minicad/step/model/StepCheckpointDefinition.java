@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepCheckpointDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("checkpointType", checkpointType);
-        state.put("checkpointLocation", checkpointLocation);
-        state.put("checkpointFrequency", checkpointFrequency);
-        state.put("checkpointRetention", checkpointRetention);
-        state.put("checkpointStatus", checkpointStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "checkpointType", checkpointType,
+                "checkpointLocation", checkpointLocation, "checkpointFrequency", checkpointFrequency,
+                "checkpointRetention", checkpointRetention, "checkpointStatus", checkpointStatus);
     }
 }

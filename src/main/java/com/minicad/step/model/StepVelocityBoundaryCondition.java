@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -39,13 +38,7 @@ public final class StepVelocityBoundaryCondition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("appliedTo", appliedTo);
-        state.put("vx", vx);
-        state.put("vy", vy);
-        state.put("vz", vz);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "appliedTo", appliedTo, "vx", vx, "vy", vy, "vz", vz);
     }
 }

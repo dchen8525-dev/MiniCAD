@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepSupplierInformation extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("supplierId", supplierId);
-        state.put("varianceContact", varianceContact);
-        state.put("suppliedItems", suppliedItems);
-        state.put("supplierRating", supplierRating);
-        state.put("varianceLeadTime", varianceLeadTime);
-        state.put("supplierStatus", supplierStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "supplierId", supplierId,
+                "varianceContact", varianceContact, "suppliedItems", suppliedItems,
+                "supplierRating", supplierRating, "varianceLeadTime", varianceLeadTime,
+                "supplierStatus", supplierStatus);
     }
 }

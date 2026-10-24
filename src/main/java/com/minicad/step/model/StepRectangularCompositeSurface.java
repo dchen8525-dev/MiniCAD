@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -56,14 +55,8 @@ public final class StepRectangularCompositeSurface extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("parentSurface", parentSurface);
-        state.put("u1", u1);
-        state.put("u2", u2);
-        state.put("v1", v1);
-        state.put("v2", v2);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "parentSurface", parentSurface, "u1", u1, "u2", u2,
+                "v1", v1, "v2", v2);
     }
 }

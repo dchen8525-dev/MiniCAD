@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,12 +65,8 @@ public final class StepAppliedDocumentReference extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("entityName", entityName);
-        state.put("assignedDocument", assignedDocument);
-        state.put("source", source);
-        state.put("items", items);
-        return state;
+        return componentsOf(
+                "id", getId(), "entityName", entityName, "assignedDocument", assignedDocument,
+                "source", source, "items", items);
     }
 }

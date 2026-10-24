@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -62,14 +61,9 @@ public final class StepGeometricToleranceWithMaximumTolerance extends AbstractSt
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("toleranceType", toleranceType);
-        state.put("magnitude", magnitude);
-        state.put("magnitudeUnit", magnitudeUnit);
-        state.put("tolerancedFeature", tolerancedFeature);
-        state.put("maximumTolerance", maximumTolerance);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "toleranceType", toleranceType, "magnitude", magnitude,
+                "magnitudeUnit", magnitudeUnit, "tolerancedFeature", tolerancedFeature,
+                "maximumTolerance", maximumTolerance);
     }
 }

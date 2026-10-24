@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,8 @@ public final class StepRuleDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("ruleType", ruleType);
-        state.put("ruleCondition", ruleCondition);
-        state.put("ruleActions", ruleActions);
-        state.put("rulePriority", rulePriority);
-        state.put("ruleStatus", ruleStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "ruleType", ruleType, "ruleCondition", ruleCondition,
+                "ruleActions", ruleActions, "rulePriority", rulePriority, "ruleStatus", ruleStatus);
     }
 }

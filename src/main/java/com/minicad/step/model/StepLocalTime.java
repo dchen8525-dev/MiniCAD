@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -51,12 +50,8 @@ public final class StepLocalTime extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("hourComponent", hourComponent);
-        state.put("minuteComponent", minuteComponent);
-        state.put("secondComponent", secondComponent);
-        state.put("zone", zone);
-        return state;
+        return componentsOf(
+                "id", getId(), "hourComponent", hourComponent, "minuteComponent", minuteComponent,
+                "secondComponent", secondComponent, "zone", zone);
     }
 }

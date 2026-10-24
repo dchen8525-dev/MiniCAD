@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepClusterDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("clusterType", clusterType);
-        state.put("clusterNodes", clusterNodes);
-        state.put("clusterPolicy", clusterPolicy);
-        state.put("clusterCapacity", clusterCapacity);
-        state.put("clusterStatus", clusterStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "clusterType", clusterType, "clusterNodes", clusterNodes,
+                "clusterPolicy", clusterPolicy, "clusterCapacity", clusterCapacity,
+                "clusterStatus", clusterStatus);
     }
 }

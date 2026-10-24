@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -45,12 +44,8 @@ public final class StepBooleanClippingResult extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("operator", operator);
-        state.put("firstOperand", firstOperand);
-        state.put("secondOperand", secondOperand);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "operator", operator, "firstOperand", firstOperand,
+                "secondOperand", secondOperand);
     }
 }

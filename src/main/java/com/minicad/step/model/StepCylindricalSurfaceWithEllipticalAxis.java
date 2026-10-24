@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -44,12 +43,8 @@ public final class StepCylindricalSurfaceWithEllipticalAxis extends AbstractStep
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("position", position);
-        state.put("semiAxisA", semiAxisA);
-        state.put("semiAxisB", semiAxisB);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "position", position, "semiAxisA", semiAxisA,
+                "semiAxisB", semiAxisB);
     }
 }

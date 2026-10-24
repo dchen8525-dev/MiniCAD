@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,13 +54,8 @@ public final class StepFilletEdge extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("originalEdge", originalEdge);
-        state.put("filletRadius", filletRadius);
-        state.put("adjacentFaces", adjacentFaces);
-        state.put("filletType", filletType);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "originalEdge", originalEdge, "filletRadius", filletRadius,
+                "adjacentFaces", adjacentFaces, "filletType", filletType);
     }
 }

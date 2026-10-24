@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,14 +53,9 @@ public final class StepFilterDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("filterType", filterType);
-        state.put("filterExpression", filterExpression);
-        state.put("filterConditions", filterConditions);
-        state.put("filterPriority", filterPriority);
-        state.put("filterStatus", filterStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "filterType", filterType,
+                "filterExpression", filterExpression, "filterConditions", filterConditions,
+                "filterPriority", filterPriority, "filterStatus", filterStatus);
     }
 }

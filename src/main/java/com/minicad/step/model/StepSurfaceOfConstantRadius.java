@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -38,11 +37,7 @@ public final class StepSurfaceOfConstantRadius extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("sweptSurface", sweptSurface);
-        state.put("radius", radius);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "sweptSurface", sweptSurface, "radius", radius);
     }
 }

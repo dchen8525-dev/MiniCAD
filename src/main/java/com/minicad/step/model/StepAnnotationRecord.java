@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,10 @@ public final class StepAnnotationRecord extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("annotationType", annotationType);
-        state.put("annotationText", annotationText);
-        state.put("annotationTarget", annotationTarget);
-        state.put("annotationAuthor", annotationAuthor);
-        state.put("annotationTimestamp", annotationTimestamp);
-        state.put("annotationStatus", annotationStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "annotationType", annotationType,
+                "annotationText", annotationText, "annotationTarget", annotationTarget,
+                "annotationAuthor", annotationAuthor, "annotationTimestamp", annotationTimestamp,
+                "annotationStatus", annotationStatus);
     }
 }

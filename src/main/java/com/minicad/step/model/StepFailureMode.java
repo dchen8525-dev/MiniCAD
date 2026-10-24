@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,16 +67,10 @@ public final class StepFailureMode extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("varianceItem", varianceItem);
-        state.put("varianceType", varianceType);
-        state.put("varianceCause", varianceCause);
-        state.put("varianceEffect", varianceEffect);
-        state.put("varianceSeverity", varianceSeverity);
-        state.put("varianceDetection", varianceDetection);
-        state.put("varianceRisk", varianceRisk);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "varianceItem", varianceItem, "varianceType", varianceType,
+                "varianceCause", varianceCause, "varianceEffect", varianceEffect,
+                "varianceSeverity", varianceSeverity, "varianceDetection", varianceDetection,
+                "varianceRisk", varianceRisk);
     }
 }

@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -50,11 +49,8 @@ public final class StepProductDefinitionEffectivity extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("effectivityId", effectivityId);
-        state.put("usage", usage);
-        state.put("productDefinition", productDefinition);
-        return state;
+        return componentsOf(
+                "id", getId(), "effectivityId", effectivityId, "usage", usage,
+                "productDefinition", productDefinition);
     }
 }

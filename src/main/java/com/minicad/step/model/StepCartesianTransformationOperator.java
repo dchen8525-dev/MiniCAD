@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -69,15 +68,8 @@ public final class StepCartesianTransformationOperator extends AbstractStepEntit
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("axis1", axis1);
-        state.put("axis2", axis2);
-        state.put("localOrigin", localOrigin);
-        state.put("scale", scale);
-        state.put("axis3", axis3);
-        state.put("entityName", entityName);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "axis1", axis1, "axis2", axis2, "localOrigin", localOrigin,
+                "scale", scale, "axis3", axis3, "entityName", entityName);
     }
 }

@@ -2,7 +2,6 @@ package com.minicad.step.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,11 +59,8 @@ public final class StepOrientedOpenShell extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("openShellElement", openShellElement);
-        state.put("orientation", orientation);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "openShellElement", openShellElement,
+                "orientation", orientation);
     }
 }

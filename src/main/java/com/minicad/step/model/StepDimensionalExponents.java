@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -65,15 +64,11 @@ public final class StepDimensionalExponents extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("lengthExponent", lengthExponent);
-        state.put("massExponent", massExponent);
-        state.put("timeExponent", timeExponent);
-        state.put("electricCurrentExponent", electricCurrentExponent);
-        state.put("thermodynamicTemperatureExponent", thermodynamicTemperatureExponent);
-        state.put("amountOfSubstanceExponent", amountOfSubstanceExponent);
-        state.put("luminousIntensityExponent", luminousIntensityExponent);
-        return state;
+        return componentsOf(
+                "id", getId(), "lengthExponent", lengthExponent, "massExponent", massExponent,
+                "timeExponent", timeExponent, "electricCurrentExponent", electricCurrentExponent,
+                "thermodynamicTemperatureExponent", thermodynamicTemperatureExponent,
+                "amountOfSubstanceExponent", amountOfSubstanceExponent,
+                "luminousIntensityExponent", luminousIntensityExponent);
     }
 }

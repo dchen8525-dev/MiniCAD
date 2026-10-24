@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -53,13 +52,8 @@ public final class StepOffsetCurve3D extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("basisCurve", basisCurve);
-        state.put("distance", distance);
-        state.put("selfIntersect", selfIntersect);
-        state.put("refDirection", refDirection);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "basisCurve", basisCurve, "distance", distance,
+                "selfIntersect", selfIntersect, "refDirection", refDirection);
     }
 }

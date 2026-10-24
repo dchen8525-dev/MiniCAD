@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,13 +46,9 @@ public final class StepInspectionCriteria extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("criteriaItems", criteriaItems);
-        state.put("criteriaContext", criteriaContext);
-        state.put("toleranceLimits", toleranceLimits);
-        state.put("measurementMethod", measurementMethod);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "criteriaItems", criteriaItems,
+                "criteriaContext", criteriaContext, "toleranceLimits", toleranceLimits,
+                "measurementMethod", measurementMethod);
     }
 }

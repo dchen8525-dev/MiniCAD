@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepMonitorDefinition extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("monitorType", monitorType);
-        state.put("monitorTarget", monitorTarget);
-        state.put("monitorMetrics", monitorMetrics);
-        state.put("monitorInterval", monitorInterval);
-        state.put("monitorThresholds", monitorThresholds);
-        state.put("monitorStatus", monitorStatus);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "monitorType", monitorType, "monitorTarget", monitorTarget,
+                "monitorMetrics", monitorMetrics, "monitorInterval", monitorInterval,
+                "monitorThresholds", monitorThresholds, "monitorStatus", monitorStatus);
     }
 }

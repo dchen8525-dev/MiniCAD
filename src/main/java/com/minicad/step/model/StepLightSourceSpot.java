@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class StepLightSourceSpot extends AbstractStepEntity {
@@ -47,15 +46,9 @@ public final class StepLightSourceSpot extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("color", color);
-        state.put("intensity", intensity);
-        state.put("position", position);
-        state.put("orientation", orientation);
-        state.put("concentration", concentration);
-        state.put("spreadAngle", spreadAngle);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "color", color, "intensity", intensity,
+                "position", position, "orientation", orientation, "concentration", concentration,
+                "spreadAngle", spreadAngle);
     }
 }

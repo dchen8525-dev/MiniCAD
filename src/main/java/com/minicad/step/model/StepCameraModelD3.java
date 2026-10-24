@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class StepCameraModelD3 extends AbstractStepEntity {
@@ -29,12 +28,8 @@ public final class StepCameraModelD3 extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("viewPlane", viewPlane);
-        state.put("viewReference", viewReference);
-        state.put("fieldOfView", fieldOfView);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "viewPlane", viewPlane, "viewReference", viewReference,
+                "fieldOfView", fieldOfView);
     }
 }

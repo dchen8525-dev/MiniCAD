@@ -86,7 +86,8 @@ class AbstractStepEntityConvergenceTest {
     private static final String RETIRED_ORDER_DIGEST =
             "7ddeaaa33e50ba1a1e60f0f0b933bcf7421a7d345f045f16ff16d7b215a2112e";
 
-    private static final Pattern COMPONENT = Pattern.compile("state\\.put\\(\"([A-Za-z0-9_]+)\",");
+    private static final Pattern COMPONENTS_CALL = Pattern.compile("(?s)return componentsOf\\((.*?)\\);");
+    private static final Pattern COMPONENT_LABEL = Pattern.compile("\"([A-Za-z0-9_]+)\",");
     private static final Pattern COMPONENTS_DECL =
             Pattern.compile("protected Map<String, Object> components\\(\\) \\{");
     private static final Pattern FIELD =
@@ -184,11 +185,16 @@ class AbstractStepEntityConvergenceTest {
      * writes a body the base owns - or keeps a second component cache - is a regression, whether or
      * not it happens to be one of the entities the tests above walk. Reading the whole package is
      * what lets this catch a copy in any file, including one that is not a {@code Step*} entity.
+     *
+     * <p>The map assembly is the same claim one level lower: every entity used to allocate and fill
+     * its own {@link java.util.LinkedHashMap}. A file that still names {@code LinkedHashMap} is back
+     * to assembling the map itself instead of handing its labels to {@code componentsOf}.
      */
     @Test
     void thePackageWritesTheAlgorithmInExactlyOnePlace() throws IOException {
         List<String> declarations = new ArrayList<>();
         List<String> caches = new ArrayList<>();
+        List<String> maps = new ArrayList<>();
         for (Path source : sources()) {
             String code = strip(Files.readString(source, StandardCharsets.UTF_8));
             if (EQUALS_DECL.matcher(code).find()) {
@@ -197,11 +203,16 @@ class AbstractStepEntityConvergenceTest {
             if (code.contains("componentCache")) {
                 caches.add(fileName(source));
             }
+            if (code.contains("LinkedHashMap")) {
+                maps.add(fileName(source));
+            }
         }
         assertEquals(List.of("AbstractStepEntity"), declarations,
                 "the value algorithms must be written in the base and nowhere else");
         assertEquals(List.of("AbstractStepEntity"), caches,
                 "the component cache must exist in the base and nowhere else");
+        assertEquals(List.of("AbstractStepEntity"), maps,
+                "the component map assembly must exist in the base and nowhere else");
     }
 
     // ------------------------------------------------------------------ the order is preserved
@@ -352,7 +363,9 @@ class AbstractStepEntityConvergenceTest {
     // ------------------------------------------------------------------ helpers
 
     private static List<String> components(String code, String name) {
-        Matcher m = COMPONENT.matcher(code);
+        Matcher call = COMPONENTS_CALL.matcher(code);
+        assertTrue(call.find(), name + " must hand its component list to the base's builder");
+        Matcher m = COMPONENT_LABEL.matcher(call.group(1));
         List<String> labels = new ArrayList<>();
         while (m.find()) {
             labels.add(m.group(1));

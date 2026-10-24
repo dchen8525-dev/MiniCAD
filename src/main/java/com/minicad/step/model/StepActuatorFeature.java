@@ -1,6 +1,5 @@
 package com.minicad.step.model;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,15 +60,9 @@ public final class StepActuatorFeature extends AbstractStepEntity {
 
     @Override
     protected Map<String, Object> components() {
-        Map<String, Object> state = new LinkedHashMap<>();
-        state.put("id", getId());
-        state.put("name", getName());
-        state.put("actuatorType", actuatorType);
-        state.put("actuatorGeometry", actuatorGeometry);
-        state.put("actuatorPosition", actuatorPosition);
-        state.put("actuatorForce", actuatorForce);
-        state.put("strokeLength", strokeLength);
-        state.put("varianceSpeed", varianceSpeed);
-        return state;
+        return componentsOf(
+                "id", getId(), "name", getName(), "actuatorType", actuatorType,
+                "actuatorGeometry", actuatorGeometry, "actuatorPosition", actuatorPosition,
+                "actuatorForce", actuatorForce, "strokeLength", strokeLength, "varianceSpeed", varianceSpeed);
     }
 }
